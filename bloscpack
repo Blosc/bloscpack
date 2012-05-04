@@ -48,7 +48,7 @@ if __name__ == '__main__':
             DEFAULT_CLEVEL)
     group.add_argument( '--no-shuffle',
             action='store_false',
-            default=False,
+            default=None,
             dest='no_shuffle',
             help='deactivate shuffle')
     # options to do heavy lifting

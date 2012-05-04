@@ -47,6 +47,12 @@ compression only:
 
 Repository is at: https://github.com/esc/embparpbar
 
+## TODO
+
+* files larger than memory
+* input-pipe and --raw for output
+* --verbose switch
+
 ## Author, Copyright and License
 
 (C) 2012 Valentin Haenel <valentin.haenel@gmx.de>

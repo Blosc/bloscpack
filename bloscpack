@@ -7,17 +7,7 @@ import os.path as path
 import blosc
 import argparse
 
-"""
-
-TODO
-----
-
-* author licencse readme
-* files larger than memory
-* input-pipe and --raw for output
-* --verbose switch
-
-"""
+""" Command line interface to Blosc via python-blosc """
 
 version = '0.1.0-dev'
 author = 'Valentin Haenel <valentin.haenel@gmx.>'

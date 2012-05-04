@@ -13,7 +13,6 @@ TODO
 ----
 
 * author licencse readme
-* shuffel
 * files larger than memory
 * input-pipe and --raw for output
 * --verbose switch
@@ -23,6 +22,7 @@ TODO
 EXTENSION = '.blp'
 DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
+DEFAULT_SHUFFLE = True
 version = '0.1.0-dev'
 
 if __name__ == '__main__':
@@ -37,11 +37,16 @@ if __name__ == '__main__':
                     "python-blosc: '%s'\n" % blosc.version.__version__ +\
                     "blosc: '%s'\n" % blosc.BLOSC_VERSION_STRING
             )
-    parser.add_argument( '--typesize', metavar='<size>', default=None,
-            type=int, help='typesize argument for compressor (compression only)')
-    parser.add_argument( '--clevel', metavar='<level>', default=None,
-            choices=range(10), type=int,
-            help='compression level (compression only)')
+    group = parser.add_argument_group(title='compression only')
+    group.add_argument( '--typesize', metavar='<size>', default=None,
+            type=int,
+            help='typesize for blosc, default = %d' %
+            DEFAULT_TYPESIZE)
+    group.add_argument( '--clevel', default=None, choices=range(10), type=int,
+            help='compression level, default = %d' %
+            DEFAULT_CLEVEL)
+    group.add_argument( '--no-shuffle', action='store_false', default=False,
+            dest='no_shuffle', help='deactivate shuffle')
     # options to do heavy lifting
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-c', '--compress',
@@ -62,10 +67,13 @@ if __name__ == '__main__':
             is not None else DEFAULT_TYPESIZE
         clevel = args.clevel if args.clevel \
             is not None else DEFAULT_CLEVEL
-        blosc_args = [typesize, clevel, True]
+        shuffle = False if args.no_shuffle is False \
+                else DEFAULT_SHUFFLE
+        blosc_args = [typesize, clevel, shuffle]
     elif args.decompress:
         for arg,switch in [(args.typesize, '--typesize'),
-                           (args.clevel, '--clevel')]:
+                           (args.clevel, '--clevel'),
+                           (args.no_shuffle, '--no-shuffle')]:
             if arg is not None:
                 parser.error("'%s' makes no sense when decompressing" % switch)
         input_file = file_

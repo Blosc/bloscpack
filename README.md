@@ -45,7 +45,7 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
 
 ## Website
 
-Repository is at: 
+Repository is at: https://github.com/esc/bloscpack
 
 ## TODO
 

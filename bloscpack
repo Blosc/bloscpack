@@ -13,7 +13,7 @@ TODO
 ----
 
 * author licencse readme
-* clevel and shuffel
+* shuffel
 * files larger than memory
 * input-pipe and --raw for output
 * --verbose switch
@@ -22,6 +22,7 @@ TODO
 
 EXTENSION = '.blp'
 DEFAULT_TYPESIZE = 4
+DEFAULT_CLEVEL = 7
 version = '0.1.0-dev'
 
 if __name__ == '__main__':
@@ -38,6 +39,9 @@ if __name__ == '__main__':
             )
     parser.add_argument( '--typesize', metavar='<size>', default=None,
             type=int, help='typesize argument for compressor (compression only)')
+    parser.add_argument( '--clevel', metavar='<level>', default=None,
+            choices=range(10), type=int,
+            help='compression level (compression only)')
     # options to do heavy lifting
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-c', '--compress',
@@ -56,10 +60,14 @@ if __name__ == '__main__':
         blosc_function = blosc.compress
         typesize = args.typesize if args.typesize \
             is not None else DEFAULT_TYPESIZE
-        blosc_args = [typesize, 7, True]
+        clevel = args.clevel if args.clevel \
+            is not None else DEFAULT_CLEVEL
+        blosc_args = [typesize, clevel, True]
     elif args.decompress:
-        if args.typesize is not None:
-            parser.error('--typesize makes no sense when decompressing')
+        for arg,switch in [(args.typesize, '--typesize'),
+                           (args.clevel, '--clevel')]:
+            if arg is not None:
+                parser.error("'%s' makes no sense when decompressing" % switch)
         input_file = file_
         output_file = file_
         # remove the extension for output file

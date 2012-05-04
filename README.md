@@ -52,6 +52,7 @@ Repository is at: https://github.com/esc/bloscpack
 * files larger than memory
 * input-pipe and --raw for output
 * --verbose switch
+* --force switch to disable overwrite checking
 
 ## Author, Copyright and License
 

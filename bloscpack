@@ -11,7 +11,6 @@ import argparse
 TODO
 ----
 
-* version string
 * author licencse readme
 * check for overwrite
 * typesize and clevel
@@ -22,12 +21,18 @@ TODO
 """
 
 EXTENSION = '.blp'
+version = '0.1.0-dev'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             description='command line de/compression with blosc')
     parser.add_argument('file_', metavar='<file>', type=str, nargs=1,
                             help='file to be de/compressed')
+    parser.add_argument('--version', action='version',
+            version='%(prog)s: ' + ("'%s'\n" % version) + \
+                    "python-blosc: '%s'\n" % blosc.version.__version__ +\
+                    "blosc: '%s'\n" % blosc.BLOSC_VERSION_STRING
+            )
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-c', '--compress',
             action='store_true', dest='compress', default=True)

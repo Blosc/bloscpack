@@ -38,15 +38,16 @@ if __name__ == '__main__':
     # options to do heavy lifting
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-c', '--compress',
-            action='store_true', dest='compress', default=False)
+            action='store_true', dest='compress', default=False,
+            help='perform compression on <file>')
     group.add_argument('-d', '--decompress',
-            action='store_true', dest='decompress', default=False)
+            action='store_true', dest='decompress', default=False,
+            help='perform decompression on <file>')
     args = parser.parse_args()
     file_ = args.file_[0]
 
-    # If decompress is set, we want to decompress, otherwise compress
     # argparse takes care of the mutual exclusivity of -c and -d
-    if args.compress
+    if args.compress:
         input_file = file_
         output_file = file_ + EXTENSION
         blosc_function = blosc.compress

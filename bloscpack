@@ -3,6 +3,7 @@
 # vim :set ft=py:
 
 import sys
+import os.path as path
 import blosc
 import argparse
 
@@ -12,7 +13,6 @@ TODO
 ----
 
 * author licencse readme
-* check for overwrite
 * typesize and clevel
 * error string
 * files larger than memory
@@ -42,17 +42,26 @@ if __name__ == '__main__':
     file_ = args.file_[0]
 
     if not args.decompress:
-        with open(file_, 'rb') as input_file, \
-                open(file_ + EXTENSION, 'wb') as output_file:
-            plaintext = input_file.read()
-            compressed = blosc.compress(plaintext, 4 ,clevel=9)
-            output_file.write(compressed)
+        input_file = file_
+        output_file = file_ + EXTENSION
+        blosc_function = blosc.compress
+        blosc_args = [4, 7]
     else:
-        if not file_.endswith(EXTENSION):
-            print "files does not end with EXTENSION"
-            sys.exit('3')
-        with open(file_, 'rb') as input_file, \
-                open(file_[:-4], 'wb') as output_file:
-            plaintext = input_file.read()
-            compressed = blosc.decompress(plaintext)
-            output_file.write(compressed)
+        input_file = file_
+        output_file = file_
+        if file_.endswith(EXTENSION):
+            output_file = input_file[:-len(EXTENSION)]
+        else:
+            parser.error("input file '%s' does not end with '%s'" %
+                    (input_file, EXTENSION))
+        blosc_function = blosc.decompress
+        blosc_args = []
+    if not path.exists(input_file):
+        parser.error("input file '%s' does not exist!" % input_file)
+    if path.exists(output_file):
+        parser.error("output file '%s' exists!" % output_file)
+    with open(input_file, 'rb') as input_fp, \
+                open(output_file, 'wb') as output_fp:
+            in_data = input_fp.read()
+            out_data = blosc_function(in_data, *blosc_args)
+            output_fp.write(out_data)

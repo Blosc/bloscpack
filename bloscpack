@@ -37,7 +37,7 @@ if __name__ == '__main__':
                     "blosc: '%s'\n" % blosc.BLOSC_VERSION_STRING
             )
     parser.add_argument( '--typesize', metavar='<size>', default=None,
-            type=int, help='typesize argument for compressor')
+            type=int, help='typesize argument for compressor (compression only)')
     # options to do heavy lifting
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-c', '--compress',

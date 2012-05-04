@@ -1,6 +1,6 @@
 # bloscpack
 
-Command line interface to Blosc
+Command line interface to Blosc via python-blosc
 
 ## Description
 

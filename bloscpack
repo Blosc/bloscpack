@@ -29,9 +29,10 @@ if __name__ == '__main__':
     parser.add_argument('file_', metavar='<file>', type=str, nargs=1,
                             help='file to be de/compressed')
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-c', '--compress', action='store_true', dest='compress', default=True)
-    group.add_argument('-d', '--decompress', action='store_true',
-            dest='decompress', default=False)
+    group.add_argument('-c', '--compress',
+            action='store_true', dest='compress', default=True)
+    group.add_argument('-d', '--decompress',
+            action='store_true', dest='decompress', default=False)
     args = parser.parse_args()
     file_ = args.file_[0]
 

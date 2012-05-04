@@ -36,9 +36,9 @@ if __name__ == '__main__':
                     "blosc: '%s'\n" % blosc.BLOSC_VERSION_STRING
             )
     # options to do heavy lifting
-    group = parser.add_mutually_exclusive_group()
+    group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-c', '--compress',
-            action='store_true', dest='compress', default=True)
+            action='store_true', dest='compress', default=False)
     group.add_argument('-d', '--decompress',
             action='store_true', dest='decompress', default=False)
     args = parser.parse_args()
@@ -46,12 +46,12 @@ if __name__ == '__main__':
 
     # If decompress is set, we want to decompress, otherwise compress
     # argparse takes care of the mutual exclusivity of -c and -d
-    if not args.decompress:
+    if args.compress
         input_file = file_
         output_file = file_ + EXTENSION
         blosc_function = blosc.compress
         blosc_args = [4, 7]
-    else:
+    elif args.decompress:
         input_file = file_
         output_file = file_
         # remove the extension for output file
@@ -62,6 +62,9 @@ if __name__ == '__main__':
                     (input_file, EXTENSION))
         blosc_function = blosc.decompress
         blosc_args = []
+    else:
+        # we should never reach this
+        parser.error('You found the easter-egg, please contact the autor')
     # check files exist/don't exist
     if not path.exists(input_file):
         parser.error("input file '%s' does not exist!" % input_file)

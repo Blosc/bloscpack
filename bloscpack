@@ -26,13 +26,16 @@ version = '0.1.0-dev'
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             description='command line de/compression with blosc')
+    # accepts a single input file for now
     parser.add_argument('file_', metavar='<file>', type=str, nargs=1,
                             help='file to be de/compressed')
+    # print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version', action='version',
             version='%(prog)s: ' + ("'%s'\n" % version) + \
                     "python-blosc: '%s'\n" % blosc.version.__version__ +\
                     "blosc: '%s'\n" % blosc.BLOSC_VERSION_STRING
             )
+    # options to do heavy lifting
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-c', '--compress',
             action='store_true', dest='compress', default=True)
@@ -41,6 +44,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     file_ = args.file_[0]
 
+    # If decompress is set, we want to decompress, otherwise compress
+    # argparse takes care of the mutual exclusivity of -c and -d
     if not args.decompress:
         input_file = file_
         output_file = file_ + EXTENSION
@@ -49,6 +54,7 @@ if __name__ == '__main__':
     else:
         input_file = file_
         output_file = file_
+        # remove the extension for output file
         if file_.endswith(EXTENSION):
             output_file = input_file[:-len(EXTENSION)]
         else:
@@ -56,10 +62,12 @@ if __name__ == '__main__':
                     (input_file, EXTENSION))
         blosc_function = blosc.decompress
         blosc_args = []
+    # check files exist/don't exist
     if not path.exists(input_file):
         parser.error("input file '%s' does not exist!" % input_file)
     if path.exists(output_file):
         parser.error("output file '%s' exists!" % output_file)
+    # use context managers and functions points to do the heavy lifting
     with open(input_file, 'rb') as input_fp, \
                 open(output_file, 'wb') as output_fp:
             in_data = input_fp.read()

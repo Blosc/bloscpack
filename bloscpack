@@ -63,12 +63,15 @@ if __name__ == '__main__':
         input_file = file_
         output_file = file_ + EXTENSION
         blosc_function = blosc.compress
-        typesize = args.typesize if args.typesize \
-            is not None else DEFAULT_TYPESIZE
-        clevel = args.clevel if args.clevel \
-            is not None else DEFAULT_CLEVEL
-        shuffle = False if args.no_shuffle is False \
-                else DEFAULT_SHUFFLE
+        typesize = args.typesize \
+            if args.typesize \ is not None \
+            else DEFAULT_TYPESIZE
+        clevel = args.clevel \
+            if args.clevel is not None \
+            else DEFAULT_CLEVEL
+        shuffle = False
+            if args.no_shuffle is False \
+            else DEFAULT_SHUFFLE
         blosc_args = [typesize, clevel, shuffle]
     elif args.decompress:
         for arg,switch in [(args.typesize, '--typesize'),

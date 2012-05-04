@@ -14,9 +14,7 @@ TODO
 
 * author licencse readme
 * typesize and clevel
-* error string
 * files larger than memory
-* print function
 * input-pipe and --raw for output
 * --verbose switch
 

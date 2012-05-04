@@ -4,14 +4,25 @@
 
 import sys
 import blosc
+import argparse
 
 if __name__ == '__main__':
-    file_name = sys.argv[1]
-    input_file = open(file_name, 'r')
-    plaintext = input_file.read()
-    input_file.close()
-    compressed = blosc.compress(plaintext, 4 ,clevel=9)
-    output_file = open(file_name + '.blp', 'w')
-    output_file.write(compressed)
-    output_file.close()
+    parser = argparse.ArgumentParser(
+            description='command line de/compression with blosc')
+    parser.add_argument('file_', metavar='<file>', type=str, nargs=1,
+                            help='file to be de/compressed')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-c', '--compress', action='store_true', default=True)
+    group.add_argument('-d', '--decompress', action='store_true', default=False)
+    args = parser.parse_args()
+    print args.file_
+
+    # file_name = sys.argv[1]
+    # input_file = open(file_name, 'r')
+    # plaintext = input_file.read()
+    # input_file.close()
+    # compressed = blosc.compress(plaintext, 4 ,clevel=9)
+    # output_file = open(file_name + '.blp', 'w')
+    # output_file.write(compressed)
+    # output_file.close()
 

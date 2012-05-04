@@ -34,8 +34,8 @@ if __name__ == '__main__':
     # print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version', action='version',
             version='%(prog)s: ' + ("'%s'\n" % version) + \
-                    "python-blosc: '%s'\n" % blosc.version.__version__ +\
-                    "blosc: '%s'\n" % blosc.BLOSC_VERSION_STRING
+                    "python-blosc: '%s'\n"   % blosc.version.__version__ +\
+                    "blosc: '%s'\n"          % blosc.BLOSC_VERSION_STRING
             )
     group = parser.add_argument_group(title='compression only')
     group.add_argument( '--typesize', metavar='<size>', default=None,

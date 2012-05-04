@@ -6,6 +6,21 @@ import sys
 import blosc
 import argparse
 
+"""
+
+TODO
+----
+
+* version string
+* author licencse readme
+* check for overwrite
+* typesize and clevel
+* error string
+* files larger than memory
+* print function
+
+"""
+
 EXTENSION = '.blp'
 
 if __name__ == '__main__':

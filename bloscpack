@@ -29,31 +29,49 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             description='command line de/compression with blosc')
     # accepts a single input file for now
-    parser.add_argument('file_', metavar='<file>', type=str, nargs=1,
-                            help='file to be de/compressed')
+    parser.add_argument('file_',
+            metavar='<file>',
+            type=str,
+            nargs=1,
+            help='file to be de/compressed')
     # print version of bloscpack, python-blosc and blosc itself
-    parser.add_argument('--version', action='version',
+    parser.add_argument('--version',
+            action='version',
             version='%(prog)s: ' + ("'%s'\n" % version) + \
                     "python-blosc: '%s'\n"   % blosc.version.__version__ +\
                     "blosc: '%s'\n"          % blosc.BLOSC_VERSION_STRING
             )
     group = parser.add_argument_group(title='compression only')
-    group.add_argument( '--typesize', metavar='<size>', default=None,
+    group.add_argument( '--typesize',
+            metavar='<size>',
+            default=None,
             type=int,
             help='typesize for blosc, default = %d' %
             DEFAULT_TYPESIZE)
-    group.add_argument( '--clevel', default=None, choices=range(10), type=int,
+    group.add_argument( '--clevel',
+            default=None,
+            choices=range(10),
+            type=int,
             help='compression level, default = %d' %
             DEFAULT_CLEVEL)
-    group.add_argument( '--no-shuffle', action='store_false', default=False,
-            dest='no_shuffle', help='deactivate shuffle')
+    group.add_argument( '--no-shuffle',
+            action='store_false',
+            default=False,
+            dest='no_shuffle',
+            help='deactivate shuffle')
     # options to do heavy lifting
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-c', '--compress',
-            action='store_true', dest='compress', default=False,
+    group.add_argument('-c',
+            '--compress',
+            action='store_true',
+            dest='compress',
+            default=False,
             help='perform compression on <file>')
-    group.add_argument('-d', '--decompress',
-            action='store_true', dest='decompress', default=False,
+    group.add_argument('-d',
+            '--decompress',
+            action='store_true',
+            dest='decompress',
+            default=False,
             help='perform decompression on <file>')
     args = parser.parse_args()
     file_ = args.file_[0]
@@ -64,12 +82,12 @@ if __name__ == '__main__':
         output_file = file_ + EXTENSION
         blosc_function = blosc.compress
         typesize = args.typesize \
-            if args.typesize \ is not None \
+            if args.typesize is not None \
             else DEFAULT_TYPESIZE
         clevel = args.clevel \
             if args.clevel is not None \
             else DEFAULT_CLEVEL
-        shuffle = False
+        shuffle = False \
             if args.no_shuffle is False \
             else DEFAULT_SHUFFLE
         blosc_args = [typesize, clevel, shuffle]
@@ -100,6 +118,6 @@ if __name__ == '__main__':
     # use context managers and functions pointers to do the heavy lifting
     with open(input_file, 'rb') as input_fp, \
                 open(output_file, 'wb') as output_fp:
-            in_data = input_fp.read()
-            out_data = blosc_function(in_data, *blosc_args)
-            output_fp.write(out_data)
+        in_data = input_fp.read()
+        out_data = blosc_function(in_data, *blosc_args)
+        output_fp.write(out_data)

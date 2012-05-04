@@ -12,17 +12,15 @@ if __name__ == '__main__':
     parser.add_argument('file_', metavar='<file>', type=str, nargs=1,
                             help='file to be de/compressed')
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-c', '--compress', action='store_true', default=True)
-    group.add_argument('-d', '--decompress', action='store_true', default=False)
+    group.add_argument('-c', '--compress', action='store_true', dest='compress', default=True)
+    group.add_argument('-d', '--decompress', action='store_true',
+            dest='decompress', default=False)
     args = parser.parse_args()
-    print args.file_
+    file_ = args.file_[0]
 
-    # file_name = sys.argv[1]
-    # input_file = open(file_name, 'r')
-    # plaintext = input_file.read()
-    # input_file.close()
-    # compressed = blosc.compress(plaintext, 4 ,clevel=9)
-    # output_file = open(file_name + '.blp', 'w')
-    # output_file.write(compressed)
-    # output_file.close()
-
+    if not args.decompress:
+        with open(file_, 'r') as input_file, \
+                open(file_ + '.blp', 'w') as output_file:
+            plaintext = input_file.read()
+            compressed = blosc.compress(plaintext, 4 ,clevel=9)
+            output_file.write(compressed)

@@ -13,7 +13,7 @@ TODO
 ----
 
 * author licencse readme
-* typesize and clevel
+* clevel and shuffel
 * files larger than memory
 * input-pipe and --raw for output
 * --verbose switch
@@ -21,6 +21,7 @@ TODO
 """
 
 EXTENSION = '.blp'
+DEFAULT_TYPESIZE = 4
 version = '0.1.0-dev'
 
 if __name__ == '__main__':
@@ -35,6 +36,8 @@ if __name__ == '__main__':
                     "python-blosc: '%s'\n" % blosc.version.__version__ +\
                     "blosc: '%s'\n" % blosc.BLOSC_VERSION_STRING
             )
+    parser.add_argument( '--typesize', metavar='<size>', default=None,
+            type=int, help='typesize argument for compressor')
     # options to do heavy lifting
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-c', '--compress',
@@ -51,8 +54,12 @@ if __name__ == '__main__':
         input_file = file_
         output_file = file_ + EXTENSION
         blosc_function = blosc.compress
-        blosc_args = [4, 7]
+        typesize = args.typesize if args.typesize \
+            is not None else DEFAULT_TYPESIZE
+        blosc_args = [typesize, 7, True]
     elif args.decompress:
+        if args.typesize is not None:
+            parser.error('--typesize makes no sense when decompressing')
         input_file = file_
         output_file = file_
         # remove the extension for output file

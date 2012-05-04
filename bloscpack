@@ -71,7 +71,7 @@ if __name__ == '__main__':
         parser.error("input file '%s' does not exist!" % input_file)
     if path.exists(output_file):
         parser.error("output file '%s' exists!" % output_file)
-    # use context managers and functions points to do the heavy lifting
+    # use context managers and functions pointers to do the heavy lifting
     with open(input_file, 'rb') as input_fp, \
                 open(output_file, 'wb') as output_fp:
             in_data = input_fp.read()

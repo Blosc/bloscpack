@@ -19,11 +19,13 @@ TODO
 
 """
 
+version = '0.1.0-dev'
+author = 'Valentin Haenel <valentin.haenel@gmx.>'
+
 EXTENSION = '.blp'
 DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
 DEFAULT_SHUFFLE = True
-version = '0.1.0-dev'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

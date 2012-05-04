@@ -6,6 +6,8 @@ import sys
 import blosc
 import argparse
 
+EXTENSION = '.blp'
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             description='command line de/compression with blosc')
@@ -19,8 +21,17 @@ if __name__ == '__main__':
     file_ = args.file_[0]
 
     if not args.decompress:
-        with open(file_, 'r') as input_file, \
-                open(file_ + '.blp', 'w') as output_file:
+        with open(file_, 'rb') as input_file, \
+                open(file_ + EXTENSION, 'wb') as output_file:
             plaintext = input_file.read()
             compressed = blosc.compress(plaintext, 4 ,clevel=9)
+            output_file.write(compressed)
+    else:
+        if not file_.endswith(EXTENSION):
+            print "files does not end with EXTENSION"
+            sys.exit('3')
+        with open(file_, 'rb') as input_file, \
+                open(file_[:-4], 'wb') as output_file:
+            plaintext = input_file.read()
+            compressed = blosc.decompress(plaintext)
             output_file.write(compressed)

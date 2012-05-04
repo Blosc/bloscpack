@@ -21,27 +21,27 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
 
 ## Usage
 
-zsh» ./bloscpack --help
-usage: bloscpack [-h] [--version] [--typesize <size>]
-                 [--clevel {0,1,2,3,4,5,6,7,8,9}] [--no-shuffle] (-c | -d)
-                 <file>
+    zsh» ./bloscpack --help
+    usage: bloscpack [-h] [--version] [--typesize <size>]
+                    [--clevel {0,1,2,3,4,5,6,7,8,9}] [--no-shuffle] (-c | -d)
+                    <file>
 
-command line de/compression with blosc
+    command line de/compression with blosc
 
-positional arguments:
-  <file>                file to be de/compressed
+    positional arguments:
+    <file>                file to be de/compressed
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --version             show program's version number and exit
-  -c, --compress        perform compression on <file>
-  -d, --decompress      perform decompression on <file>
+    optional arguments:
+    -h, --help            show this help message and exit
+    --version             show program's version number and exit
+    -c, --compress        perform compression on <file>
+    -d, --decompress      perform decompression on <file>
 
-compression only:
-  --typesize <size>     typesize for blosc, default = 4
-  --clevel {0,1,2,3,4,5,6,7,8,9}
-                        compression level, default = 7
-  --no-shuffle          deactivate shuffle
+    compression only:
+    --typesize <size>     typesize for blosc, default = 4
+    --clevel {0,1,2,3,4,5,6,7,8,9}
+                            compression level, default = 7
+    --no-shuffle          deactivate shuffle
 
 ## Website
 

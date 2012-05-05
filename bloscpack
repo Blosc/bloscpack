@@ -16,6 +16,7 @@ DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
 DEFAULT_SHUFFLE = True
 
+
 def create_parser():
     """ Create and return the parser.
 
@@ -43,9 +44,8 @@ def create_parser():
     parser.add_argument('--version',
             action='version',
             version='%(prog)s:\t' + ("'%s'\n" % version) + \
-                    "python-blosc:\t'%s'\n"   % blosc.version.__version__ +\
-                    "blosc:\t\t'%s'\n"          % blosc.BLOSC_VERSION_STRING
-            )
+                    "python-blosc:\t'%s'\n"   % blosc.version.__version__ + \
+                    "blosc:\t\t'%s'\n"        % blosc.BLOSC_VERSION_STRING)
     parser.add_argument('--verbose',
             action='store_true',
             default=False,
@@ -53,7 +53,7 @@ def create_parser():
     parser.add_argument('--force',
             action='store_true',
             default=False,
-            help='disable overwrite checks for existing files\n'+\
+            help='disable overwrite checks for existing files\n' + \
             '(use with caution)')
     class ThreadAction(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
@@ -68,29 +68,29 @@ def create_parser():
             dest='nthreads',
             help='set number of thereads, default = ncores (%(default)s)')
     group = parser.add_argument_group(title='compression only')
-    group.add_argument( '--typesize',
+    group.add_argument('--typesize',
             metavar='<size>',
             default=None,
             type=int,
             help='typesize for blosc, default = %d' %
             DEFAULT_TYPESIZE)
-    group.add_argument( '--clevel',
+    group.add_argument('--clevel',
             default=None,
             choices=range(10),
             type=int,
             help='compression level, default = %d' %
             DEFAULT_CLEVEL)
-    group.add_argument( '--no-shuffle',
+    group.add_argument('--no-shuffle',
             action='store_false',
             default=None,
             dest='no_shuffle',
             help='deactivate shuffle')
     group = parser.add_argument_group(title='decompression only')
-    group.add_argument( '--no-check-extension',
+    group.add_argument('--no-check-extension',
             action='store_true',
             default=None,
             dest='no_check_extension',
-            help='disable checking input file for extension (*.blp)\n'+
+            help='disable checking input file for extension (*.blp)\n' +
             '(requires use of <out_file>)')
     # options to do heavy lifting
     group = parser.add_mutually_exclusive_group(required=True)
@@ -112,6 +112,7 @@ if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()
     def print_verbose(message):
+        """ verbose printing as closure """
         if args.verbose:
             print('%s: %s' % (parser.prog, message))
     print_verbose('command line argument parsing complete')
@@ -183,13 +184,13 @@ if __name__ == '__main__':
             (args.nthreads, 's' if args.nthreads > 1 else ''))
     # use context managers and functions pointers to do the heavy lifting
     with open(in_file, 'rb') as input_fp, \
-                open(out_file, 'wb') as output_fp:
+         open(out_file, 'wb') as output_fp:
         in_data = input_fp.read()
         len_in = len(in_data)
         print_verbose('input buffer length: %d' % len_in)
         out_data = blosc_function(in_data, *blosc_args)
         len_out = len(out_data)
         print_verbose('output buffer length: %d' % len_out)
-        print_verbose('ratio: %f' % (float(len_out)/float(len_in)))
+        print_verbose('ratio: %f' % (float(len_out) / float(len_in)))
         output_fp.write(out_data)
     print_verbose('done')

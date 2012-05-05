@@ -74,6 +74,13 @@ def create_parser():
             default=None,
             dest='no_shuffle',
             help='deactivate shuffle')
+    group = parser.add_argument_group(title='decompression only')
+    group.add_argument( '--no-check-extension',
+            action='store_true',
+            default=None,
+            dest='no_check_extension',
+            help='disable checking input file for extension (*.blp)\n'+
+            '(requires use of <out_file>)')
     # options to do heavy lifting
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-c',
@@ -106,6 +113,9 @@ if __name__ == '__main__':
     # argparse takes care of the mutual exclusivity of -c and -d
     if args.compress:
         print_verbose('getting ready for compression')
+        for arg,switch in [(args.no_check_extension, '--no-check-extension')]:
+            if arg is not None:
+                parser.error("'%s' makes no sense when compressing" % switch)
         out_file = in_file + EXTENSION if out_file is None else out_file
         blosc_function = blosc.compress
         typesize = args.typesize \
@@ -130,12 +140,16 @@ if __name__ == '__main__':
             if arg is not None:
                 parser.error("'%s' makes no sense when decompressing" % switch)
         # remove the extension for output file
-        if in_file.endswith(EXTENSION):
-            out_file = in_file[:-len(EXTENSION)] \
-                    if out_file is None else out_file
+        if args.no_check_extension:
+            if out_file is None:
+                parser.error('--no-check-extension requires use of <out_file>')
         else:
-            parser.error("input file '%s' does not end with '%s'" %
-                    (in_file, EXTENSION))
+            if in_file.endswith(EXTENSION):
+                out_file = in_file[:-len(EXTENSION)] \
+                        if out_file is None else out_file
+            else:
+                parser.error("input file '%s' does not end with '%s'" %
+                        (in_file, EXTENSION))
         blosc_function = blosc.decompress
         blosc_args = []
     else:

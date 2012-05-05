@@ -17,7 +17,15 @@ DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
 DEFAULT_SHUFFLE = True
 
-if __name__ == '__main__':
+def create_parser():
+    """ Create and return the parser.
+
+    Useful to have this in a function for interactive debugging. If you need to
+    import this file do:
+
+        $ ln -s bloscpack bloscpack.py
+
+    """
     parser = argparse.ArgumentParser(
             description='command line de/compression with blosc')
     # accepts a single input file for now
@@ -69,6 +77,10 @@ if __name__ == '__main__':
             dest='decompress',
             default=False,
             help='perform decompression on <file>')
+    return parser
+
+if __name__ == '__main__':
+    parser = create_parser()
     args = parser.parse_args()
     def print_verbose(message):
         if args.verbose:

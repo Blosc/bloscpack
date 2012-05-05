@@ -39,7 +39,7 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
       --verbose             be verbose about actions
       --force               disable overwrite checks for existing files
                             (use with caution)
-      --nthreads <num>      set number of thereads, default = 4
+      --nthreads <num>      set number of thereads, default = ncores (4)
       -c, --compress        perform compression on <in_file>
       -d, --decompress      perform decompression on <in_file>
 

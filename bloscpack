@@ -67,7 +67,7 @@ def create_parser():
             default=blosc.ncores,
             type=int,
             dest='nthreads',
-            help='set number of thereads, default = %(default)s')
+            help='set number of thereads, default = ncores (%(default)s)')
     group = parser.add_argument_group(title='compression only')
     group.add_argument( '--typesize',
             metavar='<size>',

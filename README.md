@@ -35,6 +35,8 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
     -h, --help            show this help message and exit
     --version             show program's version number and exit
     --verbose             be verbose about actions
+    --force               disable overwrite checks for existing files
+                          (use with caution)
     -c, --compress        perform compression on <file>
     -d, --decompress      perform decompression on <file>
 
@@ -52,7 +54,6 @@ Repository is at: https://github.com/esc/bloscpack
 
 * files larger than memory, maybe chunking
 * input-pipe and --raw for output
-* --force switch to disable overwrite checking
 * output file argument
 * magic file header
 

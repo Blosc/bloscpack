@@ -27,7 +27,8 @@ def create_parser():
 
     """
     parser = argparse.ArgumentParser(
-            description='command line de/compression with blosc')
+            description='command line de/compression with blosc',
+            formatter_class=argparse.RawTextHelpFormatter)
     # accepts a single input file for now
     parser.add_argument('file_',
             metavar='<file>',
@@ -45,6 +46,11 @@ def create_parser():
             action='store_true',
             default=False,
             help='be verbose about actions')
+    parser.add_argument('--force',
+            action='store_true',
+            default=False,
+            help='disable overwrite checks for existing files\n'+\
+            '(use with caution)')
     group = parser.add_argument_group(title='compression only')
     group.add_argument( '--typesize',
             metavar='<size>',
@@ -131,13 +137,16 @@ if __name__ == '__main__':
     else:
         # we should never reach this
         parser.error('You found the easter-egg, please contact the autor')
+    print_verbose('input file is: %s' % input_file)
+    print_verbose('output file is: %s' % output_file)
     # check files exist/don't exist
     if not path.exists(input_file):
         parser.error("input file '%s' does not exist!" % input_file)
-    print_verbose('input file is: %s' % input_file)
     if path.exists(output_file):
-        parser.error("output file '%s' exists!" % output_file)
-    print_verbose('output file is: %s' % output_file)
+        if not args.force:
+            parser.error("output file '%s' exists!" % output_file)
+        else:
+            print_verbose("overwriting exisiting file: %s" % output_file)
     # use context managers and functions pointers to do the heavy lifting
     with open(input_file, 'rb') as input_fp, \
                 open(output_file, 'wb') as output_fp:

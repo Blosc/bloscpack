@@ -30,6 +30,7 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
 
     positional arguments:
     <file>                file to be de/compressed
+    [<out_file>]          file to de/compress to
 
     optional arguments:
     -h, --help            show this help message and exit
@@ -54,7 +55,6 @@ Repository is at: https://github.com/esc/bloscpack
 
 * files larger than memory, maybe chunking
 * input-pipe and --raw for output
-* output file argument
 * magic file header
 
 ## Author, Copyright and License

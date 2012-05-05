@@ -30,11 +30,16 @@ def create_parser():
             description='command line de/compression with blosc',
             formatter_class=argparse.RawTextHelpFormatter)
     # accepts a single input file for now
-    parser.add_argument('file_',
-            metavar='<file>',
+    parser.add_argument('in_file',
+            metavar='<in_file>',
             type=str,
-            nargs=1,
             help='file to be de/compressed')
+    parser.add_argument('out_file',
+            metavar='[<out_file>]',
+            type=str,
+            nargs='?',
+            default=None,
+            help='file to de/compress to')
     # print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version',
             action='version',
@@ -95,13 +100,13 @@ if __name__ == '__main__':
     print_verbose('command line arguments are: ')
     for arg,val in vars(args).iteritems():
         print_verbose('\t%s: %s' % (arg,str(val)))
-    file_ = args.file_[0]
+    in_file = args.in_file
+    out_file = args.out_file if args.out_file is not None else None
 
     # argparse takes care of the mutual exclusivity of -c and -d
     if args.compress:
         print_verbose('getting ready for compression')
-        input_file = file_
-        output_file = file_ + EXTENSION
+        out_file = in_file + EXTENSION if out_file is None else out_file
         blosc_function = blosc.compress
         typesize = args.typesize \
             if args.typesize is not None \
@@ -124,32 +129,31 @@ if __name__ == '__main__':
                            (args.no_shuffle, '--no-shuffle')]:
             if arg is not None:
                 parser.error("'%s' makes no sense when decompressing" % switch)
-        input_file = file_
-        output_file = file_
         # remove the extension for output file
-        if file_.endswith(EXTENSION):
-            output_file = input_file[:-len(EXTENSION)]
+        if in_file.endswith(EXTENSION):
+            out_file = in_file[:-len(EXTENSION)] \
+                    if out_file is None else out_file
         else:
             parser.error("input file '%s' does not end with '%s'" %
-                    (input_file, EXTENSION))
+                    (in_file, EXTENSION))
         blosc_function = blosc.decompress
         blosc_args = []
     else:
         # we should never reach this
         parser.error('You found the easter-egg, please contact the autor')
-    print_verbose('input file is: %s' % input_file)
-    print_verbose('output file is: %s' % output_file)
+    print_verbose('input file is: %s' % in_file)
+    print_verbose('output file is: %s' % out_file)
     # check files exist/don't exist
-    if not path.exists(input_file):
-        parser.error("input file '%s' does not exist!" % input_file)
-    if path.exists(output_file):
+    if not path.exists(in_file):
+        parser.error("input file '%s' does not exist!" % in_file)
+    if path.exists(out_file):
         if not args.force:
-            parser.error("output file '%s' exists!" % output_file)
+            parser.error("output file '%s' exists!" % out_file)
         else:
-            print_verbose("overwriting exisiting file: %s" % output_file)
+            print_verbose("overwriting exisiting file: %s" % out_file)
     # use context managers and functions pointers to do the heavy lifting
-    with open(input_file, 'rb') as input_fp, \
-                open(output_file, 'wb') as output_fp:
+    with open(in_file, 'rb') as input_fp, \
+                open(out_file, 'wb') as output_fp:
         in_data = input_fp.read()
         len_in = len(in_data)
         print_verbose('input buffer length: %d' % len_in)

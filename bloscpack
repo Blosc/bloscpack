@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
-import sys
 import os.path as path
 import blosc
 import argparse

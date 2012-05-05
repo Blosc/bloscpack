@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
+""" Command line interface to Blosc via python-blosc """
+
 import os.path as path
 import blosc
 import argparse
-
-""" Command line interface to Blosc via python-blosc """
 
 version = '0.1.0-dev'
 author = 'Valentin Haenel <valentin.haenel@gmx.>'

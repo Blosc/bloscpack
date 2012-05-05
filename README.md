@@ -57,6 +57,25 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
 
 Repository is at: https://github.com/esc/bloscpack
 
+## Shell completion
+
+For ``zsh`` you can activate rudimentary completion using::
+
+    zsh» compdef _gnu_generic bloscpack
+    zsh» bloscpack --<TAB>
+    completing option
+    --clevel              -- {0,1,2,3,4,5,6,7,8,9}
+    --compress            -- perform compression on <in_file>
+    --decompress          -- perform decompression on <in_file>
+    --force               -- disable overwrite checks for existing files
+    --help                -- show this help message and exit
+    --no-check-extension  -- disable checking input file for extension (*.blp)
+    --no-shuffle          -- deactivate shuffle
+    --nthreads            -- set number of thereads, default = ncores (4)
+    --typesize            -- typesize for blosc, default = 4
+    --verbose             -- be verbose about actions
+    --version             -- show program's version number and exit
+
 ## TODO
 
 * files larger than memory, maybe chunking, also Blosc has a 2GB limit on buffers

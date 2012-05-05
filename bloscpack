@@ -56,6 +56,18 @@ def create_parser():
             default=False,
             help='disable overwrite checks for existing files\n'+\
             '(use with caution)')
+    class ThreadAction(argparse.Action):
+        def __call__(self, parser, namespace, value, option_string=None):
+            if value < 1:
+                parser.error('%s must be greater than zero' % option_string)
+            setattr(namespace, self.dest, value)
+    parser.add_argument('--nthreads',
+            metavar='<num>',
+            action=ThreadAction,
+            default=blosc.ncores,
+            type=int,
+            dest='nthreads',
+            help='set number of thereads, default: %(default)s')
     group = parser.add_argument_group(title='compression only')
     group.add_argument( '--typesize',
             metavar='<size>',
@@ -165,6 +177,11 @@ if __name__ == '__main__':
             parser.error("output file '%s' exists!" % out_file)
         else:
             print_verbose("overwriting exisiting file: %s" % out_file)
+    # set number of threads
+    if args.nthreads != blosc.ncores:
+        blosc.set_nthreads(args.nthreads)
+    print_verbose('using %d thread%s' %
+            (args.nthreads, 's' if args.nthreads > 1 else ''))
     # use context managers and functions pointers to do the heavy lifting
     with open(in_file, 'rb') as input_fp, \
                 open(out_file, 'wb') as output_fp:

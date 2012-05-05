@@ -116,15 +116,15 @@ if __name__ == '__main__':
             print('%s: %s' % (parser.prog, message))
     print_verbose('command line argument parsing complete')
     print_verbose('command line arguments are: ')
-    for arg,val in vars(args).iteritems():
-        print_verbose('\t%s: %s' % (arg,str(val)))
+    for arg, val in vars(args).iteritems():
+        print_verbose('\t%s: %s' % (arg, str(val)))
     in_file = args.in_file
     out_file = args.out_file if args.out_file is not None else None
 
     # argparse takes care of the mutual exclusivity of -c and -d
     if args.compress:
         print_verbose('getting ready for compression')
-        for arg,switch in [(args.no_check_extension, '--no-check-extension')]:
+        for arg, switch in [(args.no_check_extension, '--no-check-extension')]:
             if arg is not None:
                 parser.error("'%s' makes no sense when compressing" % switch)
         out_file = in_file + EXTENSION if out_file is None else out_file
@@ -145,7 +145,7 @@ if __name__ == '__main__':
             print_verbose('\t%s: %s' % arg_val)
     elif args.decompress:
         print_verbose('getting ready for decompression')
-        for arg,switch in [(args.typesize, '--typesize'),
+        for arg, switch in [(args.typesize, '--typesize'),
                            (args.clevel, '--clevel'),
                            (args.no_shuffle, '--no-shuffle')]:
             if arg is not None:

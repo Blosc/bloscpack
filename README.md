@@ -58,7 +58,7 @@ Repository is at: https://github.com/esc/bloscpack
 
 ## TODO
 
-* files larger than memory, maybe chunking
+* files larger than memory, maybe chunking, also Blosc has a 2GB limit on buffers
 * input-pipe and --raw for output
 * magic file header
 * thread control

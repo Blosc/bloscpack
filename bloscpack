@@ -43,9 +43,9 @@ def create_parser():
     # print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version',
             action='version',
-            version='%(prog)s: ' + ("'%s'\n" % version) + \
-                    "python-blosc: '%s'\n"   % blosc.version.__version__ +\
-                    "blosc: '%s'\n"          % blosc.BLOSC_VERSION_STRING
+            version='%(prog)s:\t' + ("'%s'\n" % version) + \
+                    "python-blosc:\t'%s'\n"   % blosc.version.__version__ +\
+                    "blosc:\t\t'%s'\n"          % blosc.BLOSC_VERSION_STRING
             )
     parser.add_argument('--verbose',
             action='store_true',

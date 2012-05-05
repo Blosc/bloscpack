@@ -33,6 +33,10 @@ if __name__ == '__main__':
                     "python-blosc: '%s'\n"   % blosc.version.__version__ +\
                     "blosc: '%s'\n"          % blosc.BLOSC_VERSION_STRING
             )
+    parser.add_argument('--verbose',
+            action='store_true',
+            default=False,
+            help='be verbose about actions')
     group = parser.add_argument_group(title='compression only')
     group.add_argument( '--typesize',
             metavar='<size>',
@@ -66,10 +70,18 @@ if __name__ == '__main__':
             default=False,
             help='perform decompression on <file>')
     args = parser.parse_args()
+    def print_verbose(message):
+        if args.verbose:
+            print('%s: %s' % (parser.prog, message))
+    print_verbose('command line argument parsing complete')
+    print_verbose('command line arguments are: ')
+    for arg,val in vars(args).iteritems():
+        print_verbose('\t%s: %s' % (arg,str(val)))
     file_ = args.file_[0]
 
     # argparse takes care of the mutual exclusivity of -c and -d
     if args.compress:
+        print_verbose('getting ready for compression')
         input_file = file_
         output_file = file_ + EXTENSION
         blosc_function = blosc.compress
@@ -83,7 +95,12 @@ if __name__ == '__main__':
             if args.no_shuffle is False \
             else DEFAULT_SHUFFLE
         blosc_args = [typesize, clevel, shuffle]
+        print_verbose('blosc args are:')
+        for arg_val in zip(['typesize', 'clevel', 'shuffle'],
+                           map(str, blosc_args)):
+            print_verbose('\t%s: %s' % arg_val)
     elif args.decompress:
+        print_verbose('getting ready for decompression')
         for arg,switch in [(args.typesize, '--typesize'),
                            (args.clevel, '--clevel'),
                            (args.no_shuffle, '--no-shuffle')]:
@@ -105,11 +122,19 @@ if __name__ == '__main__':
     # check files exist/don't exist
     if not path.exists(input_file):
         parser.error("input file '%s' does not exist!" % input_file)
+    print_verbose('input file is: %s' % input_file)
     if path.exists(output_file):
         parser.error("output file '%s' exists!" % output_file)
+    print_verbose('output file is: %s' % output_file)
     # use context managers and functions pointers to do the heavy lifting
     with open(input_file, 'rb') as input_fp, \
                 open(output_file, 'wb') as output_fp:
         in_data = input_fp.read()
+        len_in = len(in_data)
+        print_verbose('input buffer length: %d' % len_in)
         out_data = blosc_function(in_data, *blosc_args)
+        len_out = len(out_data)
+        print_verbose('output buffer length: %d' % len_out)
+        print_verbose('ratio: %f' % (float(len_out)/float(len_in)))
         output_fp.write(out_data)
+    print_verbose('done')

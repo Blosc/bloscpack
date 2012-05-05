@@ -22,7 +22,7 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
 ## Usage
 
     zsh» ./bloscpack --help
-    usage: bloscpack [-h] [--version] [--typesize <size>]
+    usage: bloscpack [-h] [--version] [--verbose] [--typesize <size>]
                     [--clevel {0,1,2,3,4,5,6,7,8,9}] [--no-shuffle] (-c | -d)
                     <file>
 
@@ -34,6 +34,7 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
     optional arguments:
     -h, --help            show this help message and exit
     --version             show program's version number and exit
+    --verbose             be verbose about actions
     -c, --compress        perform compression on <file>
     -d, --decompress      perform decompression on <file>
 
@@ -49,10 +50,11 @@ Repository is at: https://github.com/esc/bloscpack
 
 ## TODO
 
-* files larger than memory
+* files larger than memory, maybe chunking
 * input-pipe and --raw for output
-* --verbose switch
 * --force switch to disable overwrite checking
+* output file argument
+* magic file header
 
 ## Author, Copyright and License
 

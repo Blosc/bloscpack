@@ -61,6 +61,7 @@ Repository is at: https://github.com/esc/bloscpack
 * files larger than memory, maybe chunking
 * input-pipe and --raw for output
 * magic file header
+* thread control
 
 ## Author, Copyright and License
 

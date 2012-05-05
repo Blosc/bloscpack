@@ -88,13 +88,13 @@ def create_parser():
             action='store_true',
             dest='compress',
             default=False,
-            help='perform compression on <file>')
+            help='perform compression on <in_file>')
     group.add_argument('-d',
             '--decompress',
             action='store_true',
             dest='decompress',
             default=False,
-            help='perform decompression on <file>')
+            help='perform decompression on <in_file>')
     return parser
 
 if __name__ == '__main__':

@@ -53,6 +53,30 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
       --no-check-extension  disable checking input file for extension (*.blp)
                             (requires use of <out_file>)
 
+## Benchmark
+
+Using the provided ``benchmark`` script on a ``Intel(R) Core(TM) i7 CPU
+960  @ 3.20GHz`` cpu with 4 cores and active hyperthreading yields the
+following results:
+
+    zsh» ./benchmark
+    create the test data
+    testfile is: 1.5G
+    do compression with bloscpack
+    real 6.69
+    user 7.24
+    sys 1.68
+    testfile.blp is: 589M
+    do compression with gzip
+    real 146.69
+    user 144.24
+    sys 0.91
+    testfile.gz is: 919M
+
+As was expected from previous benchmarks of Blosc using the python-blosc
+bindings, Blosc is both much faster and has a better compression ratio for this
+kind of data (``a = numpy.linspace(0, 100, 2e8)``).
+
 ## Website
 
 Repository is at: https://github.com/esc/bloscpack

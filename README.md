@@ -10,6 +10,10 @@ blocking and shuffeling compressor. The interface is realized by using the
 [argparse](http://docs.python.org/dev/library/argparse.html) library
 and [python-blosc](https://github.com/FrancescAlted/python-blosc) bindings.
 
+## Website
+
+Repository is at: https://github.com/esc/bloscpack
+
 ## Dependencies
 
 * Python 2.7
@@ -76,10 +80,6 @@ following results:
 As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
 kind of data (``a = numpy.linspace(0, 100, 2e8)``).
-
-## Website
-
-Repository is at: https://github.com/esc/bloscpack
 
 ## Shell completion
 

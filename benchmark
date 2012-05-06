@@ -1,0 +1,26 @@
+#!/bin/sh
+# vim :set ft=sh:
+
+
+get_fs (){
+    echo $(ls -lah $1 | cut -f5 -d' ')
+}
+
+testfile=testfile
+
+echo 'create the test data'
+python -c "
+import numpy
+a = numpy.linspace(0, 100, 2e8)
+with open('$testfile', 'w') as test_file:
+    test_file.write(a.tostring())
+"
+echo "$testfile is: $(get_fs $testfile)"
+
+echo "do compression with blosc"
+/usr/bin/time -p ./bloscpack --force -c $testfile
+echo "$testfile.blp is: $(get_fs $testfile.blp)"
+
+echo "do compression with gzip"
+/usr/bin/time -p gzip -c $testfile > $testfile.gz
+echo "$testfile.gz is: $(get_fs $testfile.gz)"

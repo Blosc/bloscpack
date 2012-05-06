@@ -59,7 +59,7 @@ Repository is at: https://github.com/esc/bloscpack
 
 ## Shell completion
 
-For ``zsh`` you can activate rudimentary completion using::
+For ``zsh`` you can activate rudimentary completion using:
 
     zsh» compdef _gnu_generic bloscpack
     zsh» bloscpack --<TAB>

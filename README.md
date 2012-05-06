@@ -5,7 +5,7 @@ Command line interface to Blosc via python-blosc
 ## Description
 
 This script provides a command line interface to
-[Blosc](http://blosc.pytables.org/trac) a high performance, multi-threaded,
+[Blosc](http://blosc.pytables.org/trac), a high performance, multi-threaded,
 blocking and shuffeling compressor. The interface is realized by using the
 [argparse](http://docs.python.org/dev/library/argparse.html) library
 and [python-blosc](https://github.com/FrancescAlted/python-blosc) bindings.

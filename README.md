@@ -102,9 +102,15 @@ For ``zsh`` you can activate rudimentary completion using:
 
 ## TODO
 
+* subcommand parser for 'c' and 'd' with aliases
+* magic file header containing magic and number of chunks for large file.
 * files larger than memory, maybe chunking, also Blosc has a 2GB limit on buffers
+* allow to adjust the chunk size
+* unit tests
+* --test switch to run tests automatically
+* progress bar (maybe) and timing (maybe)
+* multiple verbosity levels
 * input-pipe and --raw for output
-* magic file header
 
 ## Author, Copyright and License
 

@@ -108,6 +108,19 @@ def create_parser():
             help='perform decompression on <in_file>')
     return parser
 
+def read_blosc_header(buffer_):
+    def decode_byte(byte):
+        return int(byte.encode('hex'), 16)
+    def decode_uint32(fourbyte):
+        return struct.unpack('I', fourbyte)
+    blosc_version_format = decode_byte(buffer_[0])
+    blosclz_version_format = decode_byte(buffer_[1])
+    blosc_flags = decode_byte(buffer_[2])
+    blosc_typesize = decode_byte(buffer_[3])
+    nbytes = decode_uint32(buffer_[4:8])
+    blocksize = decode_uint32(buffer_[8:12])
+    ctbytes = decode_uint32(buffer_[12:16])
+
 if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()

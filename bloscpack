@@ -4,9 +4,12 @@
 
 """ Command line interface to Blosc via python-blosc """
 
+from __future__ import division
+
 import os.path as path
 import argparse
 import struct
+import math
 import blosc
 
 version = '0.1.0-dev'
@@ -16,7 +19,6 @@ EXTENSION = '.blp'
 DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
 DEFAULT_SHUFFLE = True
-
 
 def create_parser():
     """ Create and return the parser.
@@ -150,6 +152,21 @@ def read_blosc_header(buffer_):
             'nbytes': decode_uint32(buffer_[4:8]),
             'blocksize': decode_uint32(buffer_[8:12]),
             'ctbytes': decode_uint32(buffer_[12:16])}
+
+def pack_file(in_file, out_file, blosc_args, nchunks=None):
+    # determine number of chunks
+    in_file_size = path.getsize(in_file)
+    nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE))
+    print('nchunks: %d' % nchunks)
+    chunk_size = in_file_size//nchunks
+    print('chunk_size: %d bytes' % chunk_size)
+    last_chunk_size = chunk_size + in_file_size%nchunks
+    print('last_chunk_size: %d bytes' % last_chunk_size)
+    # write the bloscpack_header
+
+    # write the chunks to the file
+    for bytes_to_read in ([chunk_size] * (nchunks - 1)) + [last_chunk_size]:
+        print bytes_to_read
 
 if __name__ == '__main__':
     parser = create_parser()

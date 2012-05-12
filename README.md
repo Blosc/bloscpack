@@ -111,6 +111,7 @@ For ``zsh`` you can activate rudimentary completion using:
 * progress bar (maybe) and timing (maybe)
 * multiple verbosity levels
 * input-pipe and --raw for output
+* implement checking --nthreads agaings blosc thread limit
 
 ## Author, Copyright and License
 

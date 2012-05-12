@@ -112,8 +112,6 @@ def create_parser():
 def read_blosc_header(buffer_):
     """ Read and decode header from compressed Blosc buffer.
 
-    May not be endian safe...
-
     Parameters
     ----------
     buffer_ : string of bytes
@@ -138,13 +136,13 @@ def read_blosc_header(buffer_):
       +--------------version
 
     The first four are simply bytes, the last three are are each unsigned ints
-    (uint32) each occupying 4 bytes.
+    (uint32) each occupying 4 bytes. The header is always littel-endian.
 
     """
     def decode_byte(byte):
         return int(byte.encode('hex'), 16)
     def decode_uint32(fourbyte):
-        return struct.unpack('I', fourbyte)[0]
+        return struct.unpack('<I', fourbyte)[0]
     return {'version': decode_byte(buffer_[0]),
             'versionlz': decode_byte(buffer_[1]),
             'flags': decode_byte(buffer_[2]),

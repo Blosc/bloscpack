@@ -153,17 +153,64 @@ def read_blosc_header(buffer_):
             'blocksize': decode_uint32(buffer_[8:12]),
             'ctbytes': decode_uint32(buffer_[12:16])}
 
-def pack_file(in_file, out_file, blosc_args, nchunks=None):
-    # determine number of chunks
-    in_file_size = path.getsize(in_file)
-    nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE))
-    print('nchunks: %d' % nchunks)
+class ChunkingException(BaseException):
+    pass
+
+def _nchunks(in_file_size, nchunks=None):
+    """ Determine chunking for an input file.
+
+    Parameters
+    ----------
+
+    in_file : str
+        the input file
+    nchunks : int
+        the number of chunks desired by the user
+
+    Returns
+    -------
+    nchunks, chunk_size, last_chunk_size
+
+    nchunks : int
+        the number of chunks
+    chunk_size : int
+        the size of each chunk in bytes
+    last_chunk_size : int
+        the size of the last chunk
+
+    Raises
+    ------
+    ChunkingException
+        if the chunk_size resulting from nchunks makes the chunks larger than
+        permitted by BLOSC_MAX_BUFFERSIZE
+
+    """
+    nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE)) \
+            if nchunks is None else nchunks
     chunk_size = in_file_size//nchunks
-    print('chunk_size: %d bytes' % chunk_size)
     last_chunk_size = chunk_size + in_file_size%nchunks
+    if chunk_size > blosc.BLOSC_MAX_BUFFERSIZE \
+            or last_chunk_size > blosc.BLOSC_MAX_BUFFERSIZE:
+        raise ChunkingException(
+            "Your value of 'nchunks' would lead to chunk sizes bigger than " +\
+            "'BLOSC_MAX_BUFFERSIZE', please use something smaller.\n" +\
+            "proposed nchunks : %d\n" % nchunks +\
+            "chunk_size : %d\n" % chunk_size +\
+            "last_chunk_size : %d\n" % last_chunk_size +\
+            "BLOSC_MAX_BUFFERSIZE : %d\n" % blosc.BLOSC_MAX_BUFFERSIZE)
+    return nchunks, chunk_size, last_chunk_size
+
+def pack_file(in_file, out_file, blosc_args, nchunks=None):
+    # calculate chunk sizes
+    in_file_size = path.getsize(in_file)
+    try:
+        nchunks, chunk_size, last_chunk_size = _nchunks(in_file_size, nchunks)
+    except ChunkingException as e:
+        pass
+    print('nchunks: %d' % nchunks)
+    print('chunk_size: %d bytes' % chunk_size)
     print('last_chunk_size: %d bytes' % last_chunk_size)
     # write the bloscpack_header
-
     # write the chunks to the file
     for bytes_to_read in ([chunk_size] * (nchunks - 1)) + [last_chunk_size]:
         print bytes_to_read

@@ -162,8 +162,8 @@ def _nchunks(in_file_size, nchunks=None):
     Parameters
     ----------
 
-    in_file : str
-        the input file
+    in_file_size : int
+        the size of the input file
     nchunks : int
         the number of chunks desired by the user
 

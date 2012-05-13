@@ -10,6 +10,8 @@ import os.path as path
 import argparse
 import struct
 import math
+import nose
+import nose.tools as nt
 import blosc
 
 version = '0.1.0-dev'
@@ -199,6 +201,11 @@ def _nchunks(in_file_size, nchunks=None):
             "last_chunk_size : %d\n" % last_chunk_size +\
             "BLOSC_MAX_BUFFERSIZE : %d\n" % blosc.BLOSC_MAX_BUFFERSIZE)
     return nchunks, chunk_size, last_chunk_size
+
+def test_nchunks():
+    nt.assert_equal((2, 3, 4), _nchunks(7, nchunks=2))
+    nt.assert_raises(ChunkingException,
+            _nchunks, blosc.BLOSC_MAX_BUFFERSIZE*4, nchunks=2)
 
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes

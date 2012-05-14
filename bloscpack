@@ -18,6 +18,7 @@ version = '0.1.0-dev'
 author = 'Valentin Haenel <valentin.haenel@gmx.>'
 
 EXTENSION = '.blp'
+MAGIC = 'blpk'
 DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
 DEFAULT_SHUFFLE = True
@@ -209,10 +210,12 @@ def test_nchunks():
     nt.assert_raises(ChunkingException,
             _nchunks, blosc.BLOSC_MAX_BUFFERSIZE*4, nchunks=2)
 
-
 def create_bloscpack_header(nchunks):
     # this will fail if nchunks is larger than the max of an unsigned int
-    return ('blpk' + struct.pack('<I', nchunks))
+    return (MAGIC + struct.pack('<I', nchunks))
+
+def test_create_bloscpack_header():
+    nt.assert_equal('%s\x00\x00\x00\x00' % MAGIC, create_bloscpack_header(0))
 
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes
@@ -227,7 +230,7 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
     print('last_chunk_size: %d bytes' % last_chunk_size)
     # calculate header
     bloscpack_header = create_bloscpack_header(nchunks)
-    print('bloscpack_header: %s' % bloscpack_header)
+    print('bloscpack_header: %s' % repr(bloscpack_header))
     # write the chunks to the file
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:

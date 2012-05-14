@@ -29,7 +29,7 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
     usage: bloscpack [-h] [--version] [--verbose] [--force] [--nthreads [1, 256]]
                      [--typesize <size>] [--clevel [0, 9]] [--no-shuffle]
                      [--no-check-extension] (-c | -d)
-                     <in_file> [[<out_file>]]
+                     <in_file> [<out_file>]
 
     command line de/compression with blosc
 

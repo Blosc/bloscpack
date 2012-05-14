@@ -83,6 +83,7 @@ def create_parser():
     group.add_argument('--clevel',
             default=None,
             choices=range(10),
+            metavar='[0, 9]',
             type=int,
             help='compression level, default = %d' %
             DEFAULT_CLEVEL)

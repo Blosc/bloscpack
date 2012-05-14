@@ -40,7 +40,7 @@ def create_parser():
             type=str,
             help='file to be de/compressed')
     parser.add_argument('out_file',
-            metavar='[<out_file>]',
+            metavar='<out_file>',
             type=str,
             nargs='?',
             default=None,

@@ -209,6 +209,11 @@ def test_nchunks():
     nt.assert_raises(ChunkingException,
             _nchunks, blosc.BLOSC_MAX_BUFFERSIZE*4, nchunks=2)
 
+
+def create_bloscpack_header(nchunks):
+    # this will fail if nchunks is larger than the max of an unsigned int
+    return ('blpk' + struct.pack('<I', nchunks))
+
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)

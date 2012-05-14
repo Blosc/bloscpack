@@ -26,9 +26,9 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
 ## Usage
 
     zsh» ./bloscpack --help
-    usage: bloscpack [-h] [--version] [--verbose] [--force] [--nthreads <num>]
-                     [--typesize <size>] [--clevel {0,1,2,3,4,5,6,7,8,9}]
-                     [--no-shuffle] [--no-check-extension] (-c | -d)
+    usage: bloscpack [-h] [--version] [--verbose] [--force] [--nthreads [1, 256]]
+                     [--typesize <size>] [--clevel [0, 9]] [--no-shuffle]
+                     [--no-check-extension] (-c | -d)
                      <in_file> [[<out_file>]]
 
     command line de/compression with blosc
@@ -43,14 +43,13 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
       --verbose             be verbose about actions
       --force               disable overwrite checks for existing files
                             (use with caution)
-      --nthreads <num>      set number of thereads, default = ncores (4)
+      --nthreads [1, 256]   set number of thereads, default = ncores (8)
       -c, --compress        perform compression on <in_file>
       -d, --decompress      perform decompression on <in_file>
 
     compression only:
       --typesize <size>     typesize for blosc, default = 4
-      --clevel {0,1,2,3,4,5,6,7,8,9}
-                            compression level, default = 7
+      --clevel [0, 9]       compression level, default = 7
       --no-shuffle          deactivate shuffle
 
     decompression only:

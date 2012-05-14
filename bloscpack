@@ -62,8 +62,8 @@ def create_parser():
             '(use with caution)')
     class ThreadAction(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
-            if not 0 < value <= blosc.BLOSC_MAX_THREADS:
-                parser.error('%s must be 0 < n <= %d'
+            if not 1 <= value <= blosc.BLOSC_MAX_THREADS:
+                parser.error('%s must be 1 <= n <= %d'
                         % (option_string, blosc.BLOSC_MAX_THREADS))
             setattr(namespace, self.dest, value)
     parser.add_argument('--nthreads',

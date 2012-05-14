@@ -67,7 +67,7 @@ def create_parser():
                         % (option_string, blosc.BLOSC_MAX_THREADS))
             setattr(namespace, self.dest, value)
     parser.add_argument('--nthreads',
-            metavar='(0, %d]' % blosc.BLOSC_MAX_THREADS,
+            metavar='[1, %d]' % blosc.BLOSC_MAX_THREADS,
             action=ThreadAction,
             default=blosc.ncores,
             type=int,

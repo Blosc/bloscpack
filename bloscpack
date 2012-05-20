@@ -19,9 +19,28 @@ author = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'
 MAGIC = 'blpk'
-DEFAULT_TYPESIZE = 4
-DEFAULT_CLEVEL = 7
-DEFAULT_SHUFFLE = True
+
+class BloscPackCustomFormatter(argparse.HelpFormatter):
+    """ Custom HelpFormatter.
+
+    Basically a combination and extension of ArgumentDefaultsHelpFormatter adn
+    RawTextHelpFormatter. Adds default values to argument help, but only if the
+    default is not in [None, True, False]. Also retains all whitespace as it
+    is.
+
+    """
+
+    def _get_help_string(self, action):
+        help = action.help
+        if '%(default)' not in action.help \
+                and action.default not in [argparse.SUPPRESS, None, True, False]:
+            defaulting_nargs = [argparse.OPTIONAL, argparse.ZERO_OR_MORE]
+            if action.option_strings or action.nargs in defaulting_nargs:
+                help += ' (default: %(default)s)'
+        return help
+
+    def _split_lines(self, text, width):
+        return text.splitlines()
 
 def create_parser():
     """ Create and return the parser.
@@ -33,30 +52,22 @@ def create_parser():
 
     """
     parser = argparse.ArgumentParser(
+            #usage='%(prog)s [GLOBAL_OPTIONS] (compress | decompress) [COMMAND_OPTIONS] <in_file> [<out_file>]',
             description='command line de/compression with blosc',
-            formatter_class=argparse.RawTextHelpFormatter)
+            formatter_class=BloscPackCustomFormatter)
     # accepts a single input file for now
-    parser.add_argument('in_file',
-            metavar='<in_file>',
-            type=str,
-            help='file to be de/compressed')
-    parser.add_argument('out_file',
-            metavar='<out_file>',
-            type=str,
-            nargs='?',
-            default=None,
-            help='file to de/compress to')
-    # print version of bloscpack, python-blosc and blosc itself
+    ## print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version',
             action='version',
             version='%(prog)s:\t' + ("'%s'\n" % version) + \
                     "python-blosc:\t'%s'\n"   % blosc.version.__version__ + \
                     "blosc:\t\t'%s'\n"        % blosc.BLOSC_VERSION_STRING)
-    parser.add_argument('--verbose',
+    global_group = parser.add_argument_group(title='global options')
+    global_group.add_argument('--verbose',
             action='store_true',
             default=False,
             help='be verbose about actions')
-    parser.add_argument('--force',
+    global_group.add_argument('--force',
             action='store_true',
             default=False,
             help='disable overwrite checks for existing files\n' + \
@@ -67,53 +78,64 @@ def create_parser():
                 parser.error('%s must be 1 <= n <= %d'
                         % (option_string, blosc.BLOSC_MAX_THREADS))
             setattr(namespace, self.dest, value)
-    parser.add_argument('--nthreads',
+    global_group.add_argument('--nthreads',
             metavar='[1, %d]' % blosc.BLOSC_MAX_THREADS,
             action=CheckThreadOption,
             default=blosc.ncores,
             type=int,
             dest='nthreads',
-            help='set number of thereads, default = ncores (%(default)s)')
-    group = parser.add_argument_group(title='compression only')
+            help='set number of threads, (default: %(default)s (ncores))')
+
+    subparsers = parser.add_subparsers(title='subcommands',metavar='', dest='subcommand')
+
+    compress_parser = subparsers.add_parser('compress',
+            formatter_class=BloscPackCustomFormatter,
+            help='perform compression on file')
+    group = compress_parser.add_argument_group(title='blosc settings')
     group.add_argument('--typesize',
             metavar='<size>',
-            default=None,
+            default=4,
             type=int,
-            help='typesize for blosc, default = %d' %
-            DEFAULT_TYPESIZE)
+            help='typesize for blosc')
     group.add_argument('--clevel',
-            default=None,
+            default=7,
             choices=range(10),
             metavar='[0, 9]',
             type=int,
-            help='compression level, default = %d' %
-            DEFAULT_CLEVEL)
+            help='compression level')
     group.add_argument('--no-shuffle',
             action='store_false',
-            default=None,
-            dest='no_shuffle',
+            default=True,
+            dest='shuffle',
             help='deactivate shuffle')
-    group = parser.add_argument_group(title='decompression only')
-    group.add_argument('--no-check-extension',
+
+    decompress_parser = subparsers.add_parser('decompress',
+            formatter_class=BloscPackCustomFormatter,
+            help='perform decompression on file')
+
+    decompress_parser.add_argument('--no-check-extension',
             action='store_true',
-            default=None,
+            default=False,
             dest='no_check_extension',
             help='disable checking input file for extension (*.blp)\n' +
             '(requires use of <out_file>)')
-    # options to do heavy lifting
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-c',
-            '--compress',
-            action='store_true',
-            dest='compress',
-            default=False,
-            help='perform compression on <in_file>')
-    group.add_argument('-d',
-            '--decompress',
-            action='store_true',
-            dest='decompress',
-            default=False,
-            help='perform decompression on <in_file>')
+
+    for p, help_in, help_out in [(compress_parser,
+            'file to be compressed', 'file to compress to'),
+                                 (decompress_parser,
+            'file to be decompressed', 'file to decompress to'),
+                                  ]:
+        p.add_argument('in_file',
+                metavar='<in_file>',
+                type=str,
+                help=help_in)
+        p.add_argument('out_file',
+                metavar='<out_file>',
+                type=str,
+                nargs='?',
+                default=None,
+                help=help_out)
+
     return parser
 
 def read_blosc_header(buffer_):
@@ -254,37 +276,20 @@ if __name__ == '__main__':
     for arg, val in vars(args).iteritems():
         print_verbose('\t%s: %s' % (arg, str(val)))
     in_file = args.in_file
-    out_file = args.out_file if args.out_file is not None else None
+    out_file = args.out_file
 
-    # argparse takes care of the mutual exclusivity of -c and -d
-    if args.compress:
+    # compression and decompression handled via subparsers
+    if args.subcommand == 'compress':
         print_verbose('getting ready for compression')
-        for arg, switch in [(args.no_check_extension, '--no-check-extension')]:
-            if arg is not None:
-                parser.error("'%s' makes no sense when compressing" % switch)
         out_file = in_file + EXTENSION if out_file is None else out_file
         blosc_function = blosc.compress
-        typesize = args.typesize \
-            if args.typesize is not None \
-            else DEFAULT_TYPESIZE
-        clevel = args.clevel \
-            if args.clevel is not None \
-            else DEFAULT_CLEVEL
-        shuffle = False \
-            if args.no_shuffle is False \
-            else DEFAULT_SHUFFLE
-        blosc_args = [typesize, clevel, shuffle]
+        blosc_args = [args.typesize, args.clevel, args.shuffle]
         print_verbose('blosc args are:')
         for arg_val in zip(['typesize', 'clevel', 'shuffle'],
                            map(str, blosc_args)):
             print_verbose('\t%s: %s' % arg_val)
-    elif args.decompress:
+    elif args.subcommand == 'decompress':
         print_verbose('getting ready for decompression')
-        for arg, switch in [(args.typesize, '--typesize'),
-                           (args.clevel, '--clevel'),
-                           (args.no_shuffle, '--no-shuffle')]:
-            if arg is not None:
-                parser.error("'%s' makes no sense when decompressing" % switch)
         # remove the extension for output file
         if args.no_check_extension:
             if out_file is None:

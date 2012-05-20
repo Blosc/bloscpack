@@ -27,33 +27,53 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
 
     zsh» ./bloscpack --help
     usage: bloscpack [-h] [--version] [--verbose] [--force] [--nthreads [1, 256]]
-                     [--typesize <size>] [--clevel [0, 9]] [--no-shuffle]
-                     [--no-check-extension] (-c | -d)
-                     <in_file> [<out_file>]
+                    ...
 
     command line de/compression with blosc
 
+    optional arguments:
+    -h, --help           show this help message and exit
+    --version            show program's version number and exit
+
+    global options:
+    --verbose            be verbose about actions
+    --force              disable overwrite checks for existing files
+                        (use with caution)
+    --nthreads [1, 256]  set number of threads, (default: 8 (ncores))
+
+    subcommands:
+
+        compress           perform compression on file
+        decompress         perform decompression on file
+
+
+    zsh» ./bloscpack compress --help
+    usage: bloscpack compress [-h] [--typesize <size>] [--clevel [0, 9]]
+                            [--no-shuffle]
+                            <in_file> [<out_file>]
+
     positional arguments:
-      <in_file>             file to be de/compressed
-      [<out_file>]          file to de/compress to
+    <in_file>          file to be compressed
+    <out_file>         file to compress to
 
     optional arguments:
-      -h, --help            show this help message and exit
-      --version             show program's version number and exit
-      --verbose             be verbose about actions
-      --force               disable overwrite checks for existing files
-                            (use with caution)
-      --nthreads [1, 256]   set number of thereads, default = ncores (8)
-      -c, --compress        perform compression on <in_file>
-      -d, --decompress      perform decompression on <in_file>
+    -h, --help         show this help message and exit
 
-    compression only:
-      --typesize <size>     typesize for blosc, default = 4
-      --clevel [0, 9]       compression level, default = 7
-      --no-shuffle          deactivate shuffle
+    blosc settings:
+    --typesize <size>  typesize for blosc (default: 4)
+    --clevel [0, 9]    compression level (default: 7)
+    --no-shuffle       deactivate shuffle
 
-    decompression only:
-      --no-check-extension  disable checking input file for extension (*.blp)
+    zsh» ./bloscpack decompress --help
+    usage: bloscpack decompress [-h] [--no-check-extension] <in_file> [<out_file>]
+
+    positional arguments:
+    <in_file>             file to be decompressed
+    <out_file>            file to decompress to
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    --no-check-extension  disable checking input file for extension (*.blp)
                             (requires use of <out_file>)
 
 ## Benchmark

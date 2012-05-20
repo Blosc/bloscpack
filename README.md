@@ -25,6 +25,8 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
 
 ## Usage
 
+Basic help:
+
     zsh» ./bloscpack --help
     usage: bloscpack [-h] [--version] [--verbose] [--force] [--nthreads [1, 256]]
                     ...
@@ -46,6 +48,8 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
         compress           perform compression on file
         decompress         perform decompression on file
 
+Help for the ``compress`` subcommand:
+
 
     zsh» ./bloscpack compress --help
     usage: bloscpack compress [-h] [--typesize <size>] [--clevel [0, 9]]
@@ -63,6 +67,8 @@ Place the file ``bloscpack`` somewhere in your ``$PATH``.
     --typesize <size>  typesize for blosc (default: 4)
     --clevel [0, 9]    compression level (default: 7)
     --no-shuffle       deactivate shuffle
+
+Help for the ``decompress`` subcommand:
 
     zsh» ./bloscpack decompress --help
     usage: bloscpack decompress [-h] [--no-check-extension] <in_file> [<out_file>]

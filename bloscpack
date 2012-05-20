@@ -84,7 +84,7 @@ def create_parser():
             dest='nthreads',
             help='set number of threads, (default: %(default)s (ncores))')
 
-    subparsers = parser.add_subparsers(title='subcommands', dest='subcommand')
+    subparsers = parser.add_subparsers(title='subcommands',metavar='', dest='subcommand')
 
     compress_parser = subparsers.add_parser('compress',
             formatter_class=BloscPackCustomFormatter,
@@ -276,7 +276,7 @@ if __name__ == '__main__':
     in_file = args.in_file
     out_file = args.out_file
 
-    # argparse takes care of the mutual exclusivity of -c and -d
+    # compression and decompression handled via subparsers
     if args.subcommand == 'compress':
         print_verbose('getting ready for compression')
         out_file = in_file + EXTENSION if out_file is None else out_file

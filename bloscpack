@@ -61,11 +61,12 @@ def create_parser():
             version='%(prog)s:\t' + ("'%s'\n" % version) + \
                     "python-blosc:\t'%s'\n"   % blosc.version.__version__ + \
                     "blosc:\t\t'%s'\n"        % blosc.BLOSC_VERSION_STRING)
-    parser.add_argument('--verbose',
+    global_group = parser.add_argument_group(title='global options')
+    global_group.add_argument('--verbose',
             action='store_true',
             default=False,
             help='be verbose about actions')
-    parser.add_argument('--force',
+    global_group.add_argument('--force',
             action='store_true',
             default=False,
             help='disable overwrite checks for existing files\n' + \
@@ -76,7 +77,7 @@ def create_parser():
                 parser.error('%s must be 1 <= n <= %d'
                         % (option_string, blosc.BLOSC_MAX_THREADS))
             setattr(namespace, self.dest, value)
-    parser.add_argument('--nthreads',
+    global_group.add_argument('--nthreads',
             metavar='[1, %d]' % blosc.BLOSC_MAX_THREADS,
             action=CheckThreadOption,
             default=blosc.ncores,

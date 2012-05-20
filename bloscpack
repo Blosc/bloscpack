@@ -19,9 +19,6 @@ author = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'
 MAGIC = 'blpk'
-DEFAULT_TYPESIZE = 4
-DEFAULT_CLEVEL = 7
-DEFAULT_SHUFFLE = True
 
 def create_parser():
     """ Create and return the parser.
@@ -36,17 +33,7 @@ def create_parser():
             description='command line de/compression with blosc',
             formatter_class=argparse.RawTextHelpFormatter)
     # accepts a single input file for now
-    parser.add_argument('in_file',
-            metavar='<in_file>',
-            type=str,
-            help='file to be de/compressed')
-    parser.add_argument('out_file',
-            metavar='<out_file>',
-            type=str,
-            nargs='?',
-            default=None,
-            help='file to de/compress to')
-    # print version of bloscpack, python-blosc and blosc itself
+    ## print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version',
             action='version',
             version='%(prog)s:\t' + ("'%s'\n" % version) + \
@@ -74,46 +61,57 @@ def create_parser():
             type=int,
             dest='nthreads',
             help='set number of thereads, default = ncores (%(default)s)')
-    group = parser.add_argument_group(title='compression only')
+
+    subparsers = parser.add_subparsers(title='subcommands')
+
+    compress_parser = subparsers.add_parser('compress',
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            help='perform compression on file')
+    group = compress_parser.add_argument_group(title='blosc settings')
     group.add_argument('--typesize',
             metavar='<size>',
-            default=None,
+            default=4,
             type=int,
-            help='typesize for blosc, default = %d' %
-            DEFAULT_TYPESIZE)
+            help='typesize for blosc')
     group.add_argument('--clevel',
-            default=None,
+            default=7,
             choices=range(10),
             metavar='[0, 9]',
             type=int,
-            help='compression level, default = %d' %
-            DEFAULT_CLEVEL)
+            help='compression level')
     group.add_argument('--no-shuffle',
             action='store_false',
-            default=None,
+            default=argparse.SUPPRESS,
             dest='no_shuffle',
             help='deactivate shuffle')
-    group = parser.add_argument_group(title='decompression only')
-    group.add_argument('--no-check-extension',
+
+    decompress_parser = subparsers.add_parser('decompress',
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            help='perform decompression on file')
+
+    decompress_parser.add_argument('--no-check-extension',
             action='store_true',
-            default=None,
+            default=argparse.SUPPRESS,
             dest='no_check_extension',
             help='disable checking input file for extension (*.blp)\n' +
             '(requires use of <out_file>)')
-    # options to do heavy lifting
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-c',
-            '--compress',
-            action='store_true',
-            dest='compress',
-            default=False,
-            help='perform compression on <in_file>')
-    group.add_argument('-d',
-            '--decompress',
-            action='store_true',
-            dest='decompress',
-            default=False,
-            help='perform decompression on <in_file>')
+
+    for p, help_in, help_out in [(compress_parser,
+            'file to be compressed', 'file to compress to'),
+                                 (decompress_parser,
+            'file to be decompressed', 'file to decompress to'),
+                                  ]:
+        p.add_argument('in_file',
+                metavar='<in_file>',
+                type=str,
+                help=help_in)
+        p.add_argument('out_file',
+                metavar='<out_file>',
+                type=str,
+                nargs='?',
+                default=argparse.SUPPRESS,
+                help=help_out)
+
     return parser
 
 def read_blosc_header(buffer_):

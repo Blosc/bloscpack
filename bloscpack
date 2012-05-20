@@ -62,7 +62,7 @@ def create_parser():
             dest='nthreads',
             help='set number of thereads, default = ncores (%(default)s)')
 
-    subparsers = parser.add_subparsers(title='subcommands')
+    subparsers = parser.add_subparsers(title='subcommands', dest='subcommand')
 
     compress_parser = subparsers.add_parser('compress',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -258,7 +258,7 @@ if __name__ == '__main__':
         pass
 
     # argparse takes care of the mutual exclusivity of -c and -d
-    if args.compress:
+    if args.subcommand == 'compress':
         print_verbose('getting ready for compression')
         for arg, switch in [(args.no_check_extension, '--no-check-extension')]:
             if arg is not None:
@@ -279,7 +279,7 @@ if __name__ == '__main__':
         for arg_val in zip(['typesize', 'clevel', 'shuffle'],
                            map(str, blosc_args)):
             print_verbose('\t%s: %s' % arg_val)
-    elif args.decompress:
+    elif args.subcommand == 'decompress':
         print_verbose('getting ready for decompression')
         for arg, switch in [(args.typesize, '--typesize'),
                            (args.clevel, '--clevel'),

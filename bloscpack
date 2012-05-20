@@ -32,11 +32,11 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
 
     def _get_help_string(self, action):
         help = action.help
-        if '%(default)' not in action.help:
-            if action.default not in [argparse.SUPPRESS, None, True, False]:
-                defaulting_nargs = [argparse.OPTIONAL, argparse.ZERO_OR_MORE]
-                if action.option_strings or action.nargs in defaulting_nargs:
-                    help += ' (default: %(default)s)'
+        if '%(default)' not in action.help \
+                and action.default not in [argparse.SUPPRESS, None, True, False]:
+            defaulting_nargs = [argparse.OPTIONAL, argparse.ZERO_OR_MORE]
+            if action.option_strings or action.nargs in defaulting_nargs:
+                help += ' (default: %(default)s)'
         return help
 
     def _split_lines(self, text, width):

@@ -127,7 +127,7 @@ For ``zsh`` you can activate rudimentary completion using:
 
 ## TODO
 
-* subcommand parser for 'c' and 'd' with aliases
+* 'c' and 'd' as aliases for compress and decompress
 * magic file header containing magic and number of chunks for large file.
 * files larger than memory, maybe chunking, also Blosc has a 2GB limit on buffers
 * allow to adjust the chunk size

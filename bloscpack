@@ -113,7 +113,7 @@ def create_parser():
 
     decompress_parser.add_argument('--no-check-extension',
             action='store_true',
-            default=argparse.SUPPRESS,
+            default=False,
             dest='no_check_extension',
             help='disable checking input file for extension (*.blp)\n' +
             '(requires use of <out_file>)')
@@ -131,7 +131,7 @@ def create_parser():
                 metavar='<out_file>',
                 type=str,
                 nargs='?',
-                default=argparse.SUPPRESS,
+                default=None,
                 help=help_out)
 
     return parser
@@ -288,11 +288,6 @@ if __name__ == '__main__':
             print_verbose('\t%s: %s' % arg_val)
     elif args.subcommand == 'decompress':
         print_verbose('getting ready for decompression')
-        for arg, switch in [(args.typesize, '--typesize'),
-                           (args.clevel, '--clevel'),
-                           (args.no_shuffle, '--no-shuffle')]:
-            if arg is not None:
-                parser.error("'%s' makes no sense when decompressing" % switch)
         # remove the extension for output file
         if args.no_check_extension:
             if out_file is None:

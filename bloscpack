@@ -20,6 +20,28 @@ author = 'Valentin Haenel <valentin.haenel@gmx.de>'
 EXTENSION = '.blp'
 MAGIC = 'blpk'
 
+class BloscPackCustomFormatter(argparse.HelpFormatter):
+    """ Custom HelpFormatter.j
+
+    Basically a combination and extension of ArgumentDefaultsHelpFormatter adn
+    RawTextHelpFormatter. Adds default values to argument help, but only if the
+    default is not in [None, True, False]. Also retains all whitespace as it
+    is.
+
+    """
+
+    def _get_help_string(self, action):
+        help = action.help
+        if '%(default)' not in action.help:
+            if action.default not in [argparse.SUPPRESS, None, True, False]:
+                defaulting_nargs = [argparse.OPTIONAL, argparse.ZERO_OR_MORE]
+                if action.option_strings or action.nargs in defaulting_nargs:
+                    help += ' (default: %(default)s)'
+        return help
+
+    def _split_lines(self, text, width):
+        return text.splitlines()
+
 def create_parser():
     """ Create and return the parser.
 
@@ -31,7 +53,7 @@ def create_parser():
     """
     parser = argparse.ArgumentParser(
             description='command line de/compression with blosc',
-            formatter_class=argparse.RawTextHelpFormatter)
+            formatter_class=BloscPackCustomFormatter)
     # accepts a single input file for now
     ## print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version',
@@ -60,12 +82,12 @@ def create_parser():
             default=blosc.ncores,
             type=int,
             dest='nthreads',
-            help='set number of thereads, default = ncores (%(default)s)')
+            help='set number of threads, (default: %(default)s (ncores))')
 
     subparsers = parser.add_subparsers(title='subcommands', dest='subcommand')
 
     compress_parser = subparsers.add_parser('compress',
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            formatter_class=BloscPackCustomFormatter,
             help='perform compression on file')
     group = compress_parser.add_argument_group(title='blosc settings')
     group.add_argument('--typesize',
@@ -80,13 +102,13 @@ def create_parser():
             type=int,
             help='compression level')
     group.add_argument('--no-shuffle',
-            action='store_false',
-            default=argparse.SUPPRESS,
+            action='store_true',
+            default=False,
             dest='no_shuffle',
             help='deactivate shuffle')
 
     decompress_parser = subparsers.add_parser('decompress',
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            formatter_class=BloscPackCustomFormatter,
             help='perform decompression on file')
 
     decompress_parser.add_argument('--no-check-extension',
@@ -262,11 +284,7 @@ if __name__ == '__main__':
         print_verbose('getting ready for compression')
         out_file = in_file + EXTENSION if out_file is None else out_file
         blosc_function = blosc.compress
-        try:
-            shuffle = args.shuffle
-        except AttributeError as ae:
-            shuffle=True
-        blosc_args = [args.typesize, args.clevel, shuffle]
+        blosc_args = [args.typesize, args.clevel, not args.no_shuffle]
         print_verbose('blosc args are:')
         for arg_val in zip(['typesize', 'clevel', 'shuffle'],
                            map(str, blosc_args)):

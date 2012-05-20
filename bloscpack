@@ -21,7 +21,7 @@ EXTENSION = '.blp'
 MAGIC = 'blpk'
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
-    """ Custom HelpFormatter.j
+    """ Custom HelpFormatter.
 
     Basically a combination and extension of ArgumentDefaultsHelpFormatter adn
     RawTextHelpFormatter. Adds default values to argument help, but only if the

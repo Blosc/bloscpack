@@ -274,10 +274,7 @@ if __name__ == '__main__':
     for arg, val in vars(args).iteritems():
         print_verbose('\t%s: %s' % (arg, str(val)))
     in_file = args.in_file
-    try:
-        out_file = args.out_file
-    except AttributeError as ae:
-        out_file = None
+    out_file = args.out_file
 
     # argparse takes care of the mutual exclusivity of -c and -d
     if args.subcommand == 'compress':

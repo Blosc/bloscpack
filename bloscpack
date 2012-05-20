@@ -15,7 +15,7 @@ import nose.tools as nt
 import blosc
 
 version = '0.1.0-dev'
-author = 'Valentin Haenel <valentin.haenel@gmx.>'
+author = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'
 MAGIC = 'blpk'

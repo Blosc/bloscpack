@@ -52,6 +52,7 @@ def create_parser():
 
     """
     parser = argparse.ArgumentParser(
+            #usage='%(prog)s [GLOBAL_OPTIONS] (compress | decompress) [COMMAND_OPTIONS] <in_file> [<out_file>]',
             description='command line de/compression with blosc',
             formatter_class=BloscPackCustomFormatter)
     # accepts a single input file for now

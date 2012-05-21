@@ -120,6 +120,8 @@ def create_parser():
             help='disable checking input file for extension (*.blp)\n' +
             '(requires use of <out_file>)')
 
+    test_parser = subparsers.add_parser('test')
+
     for p, help_in, help_out in [(compress_parser,
             'file to be compressed', 'file to compress to'),
                                  (decompress_parser,
@@ -128,6 +130,7 @@ def create_parser():
         p.add_argument('in_file',
                 metavar='<in_file>',
                 type=str,
+                default=None,
                 help=help_in)
         p.add_argument('out_file',
                 metavar='<out_file>',
@@ -273,6 +276,8 @@ if __name__ == '__main__':
             print('%s: %s' % (parser.prog, message))
     print_verbose('command line argument parsing complete')
     print_verbose('command line arguments are: ')
+    if args.subcommand == 'test':
+        nose.main(argv=[parser.prog], module='bloscpack', suite=[test_create_bloscpack_header])
     for arg, val in vars(args).iteritems():
         print_verbose('\t%s: %s' % (arg, str(val)))
     in_file = args.in_file

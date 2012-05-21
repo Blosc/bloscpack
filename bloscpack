@@ -19,6 +19,12 @@ author = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'
 MAGIC = 'blpk'
+VERBOSE = False
+PREFIX = ""
+
+def print_verbose(message):
+    if VERBOSE:
+        print('%s: %s' % (PREFIX, message))
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
@@ -270,10 +276,8 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
 if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()
-    def print_verbose(message):
-        """ verbose printing as closure """
-        if args.verbose:
-            print('%s: %s' % (parser.prog, message))
+    VERBOSE = args.verbose
+    PREFIX = parser.prog
     print_verbose('command line argument parsing complete')
     print_verbose('command line arguments are: ')
     for arg, val in vars(args).iteritems():

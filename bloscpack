@@ -247,6 +247,10 @@ def create_bloscpack_header(nchunks):
 
 def test_create_bloscpack_header():
     nt.assert_equal('%s\x00\x00\x00\x00' % MAGIC, create_bloscpack_header(0))
+    nt.assert_equal('%s\x01\x00\x00\x00' % MAGIC, create_bloscpack_header(1))
+    nt.assert_equal('%s\xff\xff\xff\xff' % MAGIC,
+            create_bloscpack_header(4294967295))
+    nt.assert_raises(Exception, create_bloscpack_header, 4294967296)
 
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes

@@ -252,6 +252,32 @@ def test_create_bloscpack_header():
             create_bloscpack_header(4294967295))
     nt.assert_raises(Exception, create_bloscpack_header, 4294967296)
 
+def process_compression_args(args, error_func):
+    """
+
+    Parameters
+    ----------
+
+    args : argparse.Namespace
+        the parsed command line arguments
+    error_func : function
+        an error function that takes a single message string as argument
+
+    Returns
+    -------
+    in_file : str
+        the input file name
+    out_file : str
+        the out_file name
+    blosc_args : tuple of (int, int, bool)
+        typesize, clevel and shuffle
+    """
+    in_file = args.in_file
+    out_file = in_file + EXTENSION \
+        if args.out_file is None else args.out_file
+    blosc_args = [args.typesize, args.clevel, args.shuffle]
+    return in_file, out_file, blosc_args
+
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)
@@ -290,12 +316,10 @@ if __name__ == '__main__':
     # compression and decompression handled via subparsers
     if args.subcommand == 'compress':
         print_verbose('getting ready for compression')
-        in_file = args.in_file
-        out_file = in_file + EXTENSION \
-            if args.out_file is None else args.out_file
-        blosc_function = blosc.compress
-        blosc_args = [args.typesize, args.clevel, args.shuffle]
         print_verbose('blosc args are:')
+        in_file, out_file, blosc_args = process_compression_args(args,
+                parser.error)
+        blosc_function = blosc.compress
         for arg_val in zip(['typesize', 'clevel', 'shuffle'],
                            map(str, blosc_args)):
             print_verbose('\t%s: %s' % arg_val)

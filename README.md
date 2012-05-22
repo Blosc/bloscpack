@@ -59,8 +59,6 @@ kind of data (``a = numpy.linspace(0, 100, 2e8)``).
 ## TODO
 
 * 'c' and 'd' as aliases for compress and decompress
-* magic file header containing magic and number of chunks for large file.
-* files larger than memory, maybe chunking, also Blosc has a 2GB limit on buffers
 * allow to adjust the chunk size
 * unit tests
 * --test switch to run tests automatically

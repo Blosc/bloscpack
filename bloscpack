@@ -314,12 +314,14 @@ def process_decompression_args(args, error_func):
 def check_files(in_file, out_file, args, error_func):
     """ Check files exist/don't exist. """
     if not path.exists(in_file):
-        parser.error("input file '%s' does not exist!" % in_file)
+        error_func("input file '%s' does not exist!" % in_file)
     if path.exists(out_file):
         if not args.force:
             error_func("output file '%s' exists!" % out_file)
         else:
             print_verbose("overwriting exisiting file: %s" % out_file)
+    print_verbose('input file is: %s' % in_file)
+    print_verbose('output file is: %s' % out_file)
 
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes
@@ -376,8 +378,6 @@ if __name__ == '__main__':
         # we should never reach this
         parser.error('You found the easter-egg, please contact the autor')
     check_files(in_file, out_file, args, parser.error)
-    print_verbose('input file is: %s' % in_file)
-    print_verbose('output file is: %s' % out_file)
     # set number of threads
     if args.nthreads != blosc.ncores:
         blosc.set_nthreads(args.nthreads)

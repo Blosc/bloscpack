@@ -216,7 +216,7 @@ def calculate_nchunks(in_file_size, nchunks=None):
     chunk_size : int
         the size of each chunk in bytes
     last_chunk_size : int
-        the size of the last chunk
+        the size of the last chunk in bytes
 
     Raises
     ------

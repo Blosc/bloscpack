@@ -73,7 +73,7 @@ def create_parser():
     ## print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version',
             action='version',
-            version='%(prog)s:\t' + ("'%s'\n" % version) + \
+            version='%(prog)s:\t' + ("'%s'\n" % __version__) + \
                     "python-blosc:\t'%s'\n"   % blosc.version.__version__ + \
                     "blosc:\t\t'%s'\n"        % blosc.BLOSC_VERSION_STRING)
     global_group = parser.add_argument_group(title='global options')

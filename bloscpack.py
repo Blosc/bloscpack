@@ -248,6 +248,30 @@ def calculate_nchunks(in_file_size, nchunks=None):
     return nchunks, chunk_size, last_chunk_size
 
 def create_bloscpack_header(nchunks):
+    """ Create the bloscpack header string
+
+    Parameters
+    ----------
+    nchunks : int
+        the number of chunks
+
+    Returns
+    -------
+    bloscpack_header : string
+        the header as string
+
+    Notes
+    -----
+
+    The bloscpack 1.1.3 header is 8 bytes as follows:
+
+    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|
+    | b   l   p   k |    nchunks    |
+
+    The first four are the magic string 'blpk' and the second four are an
+    unsigned 32 bit little-endian integer.
+
+    """
     # this will fail if nchunks is larger than the max of an unsigned int
     return (MAGIC + struct.pack('<I', nchunks))
 

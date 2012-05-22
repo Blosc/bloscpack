@@ -10,8 +10,6 @@ import os.path as path
 import argparse
 import struct
 import math
-import nose
-import nose.tools as nt
 import blosc
 
 version = '0.1.0-dev'
@@ -140,8 +138,6 @@ def create_parser():
             help='disable checking input file for extension (*.blp)\n' +
             '(requires use of <out_file>)')
 
-    test_parser = subparsers.add_parser('test')
-
     for p, help_in, help_out in [(compress_parser,
             'file to be compressed', 'file to compress to'),
                                  (decompress_parser,
@@ -252,21 +248,9 @@ def calculate_nchunks(in_file_size, nchunks=None):
             "BLOSC_MAX_BUFFERSIZE : %d\n" % blosc.BLOSC_MAX_BUFFERSIZE)
     return nchunks, chunk_size, last_chunk_size
 
-def test_nchunks():
-    nt.assert_equal((2, 3, 4), _nchunks(7, nchunks=2))
-    nt.assert_raises(ChunkingException,
-            _nchunks, blosc.BLOSC_MAX_BUFFERSIZE*4, nchunks=2)
-
 def create_bloscpack_header(nchunks):
     # this will fail if nchunks is larger than the max of an unsigned int
     return (MAGIC + struct.pack('<I', nchunks))
-
-def test_create_bloscpack_header():
-    nt.assert_equal('%s\x00\x00\x00\x00' % MAGIC, create_bloscpack_header(0))
-    nt.assert_equal('%s\x01\x00\x00\x00' % MAGIC, create_bloscpack_header(1))
-    nt.assert_equal('%s\xff\xff\xff\xff' % MAGIC,
-            create_bloscpack_header(4294967295))
-    nt.assert_raises(Exception, create_bloscpack_header, 4294967296)
 
 def decode_bloscpack_header(buffer_, error_func):
     # buffer should be of length 16
@@ -275,14 +259,6 @@ def decode_bloscpack_header(buffer_, error_func):
     elif buffer_[0:4] != MAGIC:
         error_func('the magic marker is missing from the bloscpack header')
     return struct.unpack('<I', buffer_[4:])[0]
-
-def test_decode_bloscpack_header():
-    nt.assert_equal(0, decode_bloscpack_header('%s\x00\x00\x00\x00' % MAGIC,
-        None))
-    nt.assert_equal(1, decode_bloscpack_header('%s\x01\x00\x00\x00' % MAGIC,
-        None))
-    nt.assert_equal(4294967295,
-            decode_bloscpack_header('%s\xff\xff\xff\xff' % MAGIC, None))
 
 def process_compression_args(args, error_func):
     """
@@ -448,8 +424,6 @@ if __name__ == '__main__':
         check_files(in_file, out_file, args, parser.error)
         process_nthread_arg(args)
         unpack_file(in_file, out_file)
-    elif args.subcommand == 'test':
-        nose.main(argv=[parser.prog], module='bloscpack', suite=[test_create_bloscpack_header])
     else:
         # we should never reach this
         parser.error('You found the easter-egg, please contact the autor')

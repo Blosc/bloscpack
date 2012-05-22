@@ -12,8 +12,8 @@ import struct
 import math
 import blosc
 
-version = '0.1.0-dev'
-author = 'Valentin Haenel <valentin.haenel@gmx.de>'
+__version__ = '0.1.0-dev'
+__author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'
 MAGIC = 'blpk'

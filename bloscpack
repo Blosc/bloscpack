@@ -382,7 +382,7 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
             print_verbose("compressing chunk '%d'%s" %
                     (i, ' (last)' if i == nchunks-1 else ''))
             current_chunk = input_fp.read(bytes_to_read)
-            compressed = blosc.compress(current_chunk, *blosc_args)
+            compressed = blosc.compress(current_chunk, **blosc_args)
             output_fp.write(compressed)
             print_verbose("chunk written, in: %s out: %s" %
                     (pretty_size(len(current_chunk)),
@@ -433,31 +433,21 @@ if __name__ == '__main__':
         print_verbose('getting ready for compression')
         in_file, out_file, blosc_args = process_compression_args(args,
                 parser.error)
-        blosc_function = blosc.compress
         print_verbose('blosc args are:')
         for arg,value in blosc_args.iteritems():
             print_verbose('\t%s: %s' % (arg, value))
+        check_files(in_file, out_file, args, parser.error)
+        process_nthread_arg(args)
+        pack_file(in_file, out_file, blosc_args)
     elif args.subcommand == 'decompress':
         print_verbose('getting ready for decompression')
         in_file, out_file = process_decompression_args(args, parser.error)
-        blosc_function = blosc.decompress
-        blosc_args = []
+        check_files(in_file, out_file, args, parser.error)
+        process_nthread_arg(args)
+        unpack_file(in_file, out_file)
     elif args.subcommand == 'test':
         nose.main(argv=[parser.prog], module='bloscpack', suite=[test_create_bloscpack_header])
     else:
         # we should never reach this
         parser.error('You found the easter-egg, please contact the autor')
-    check_files(in_file, out_file, args, parser.error)
-    process_nthread_arg(args)
-    # use context managers and functions pointers to do the heavy lifting
-    with open(in_file, 'rb') as input_fp, \
-         open(out_file, 'wb') as output_fp:
-        in_data = input_fp.read()
-        len_in = len(in_data)
-        print_verbose('input buffer length: %d' % len_in)
-        out_data = blosc_function(in_data, **blosc_args)
-        len_out = len(out_data)
-        print_verbose('output buffer length: %d' % len_out)
-        print_verbose('ratio: %f' % (float(len_out) / float(len_in)))
-        output_fp.write(out_data)
     print_verbose('done')

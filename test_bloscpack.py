@@ -9,7 +9,7 @@ from bloscpack import *
 def test_nchunks():
     nt.assert_equal((2, 3, 4), calculate_nchunks(7, nchunks=2))
     nt.assert_raises(ChunkingException,
-            calculate_nchunks, blosc.BLOSC_MAX_BUFFERSIZE*4, nchunks=2)
+            calculate_nchunks, blosc.BLOSC_MAX_BUFFERSIZE*2+1, nchunks=2)
 
 def test_create_bloscpack_header():
     nt.assert_equal('%s\x00\x00\x00\x00' % MAGIC, create_bloscpack_header(0))

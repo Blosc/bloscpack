@@ -31,7 +31,11 @@ def pretty_size(size_in_bytes):
     From: http://www.dzone.com/snippets/filesize-nice-units
 
     """
-    suffixes = [("B",2**10), ("K",2**20), ("M",2**30), ("G",2**40), ("T",2**50)]
+    suffixes = [("B", 2**10),
+                ("K", 2**20),
+                ("M", 2**30),
+                ("G", 2**40),
+                ("T", 2**50)]
     for suf, lim in suffixes:
         if size_in_bytes > lim:
             continue

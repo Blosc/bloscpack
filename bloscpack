@@ -323,6 +323,13 @@ def check_files(in_file, out_file, args, error_func):
     print_verbose('input file is: %s' % in_file)
     print_verbose('output file is: %s' % out_file)
 
+def process_nthread_arg(args):
+    """ Extract and set nthreads. """
+    if args.nthreads != blosc.ncores:
+        blosc.set_nthreads(args.nthreads)
+    print_verbose('using %d thread%s' %
+            (args.nthreads, 's' if args.nthreads > 1 else ''))
+
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)
@@ -378,11 +385,7 @@ if __name__ == '__main__':
         # we should never reach this
         parser.error('You found the easter-egg, please contact the autor')
     check_files(in_file, out_file, args, parser.error)
-    # set number of threads
-    if args.nthreads != blosc.ncores:
-        blosc.set_nthreads(args.nthreads)
-    print_verbose('using %d thread%s' %
-            (args.nthreads, 's' if args.nthreads > 1 else ''))
+    process_nthread_arg(args)
     # use context managers and functions pointers to do the heavy lifting
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:

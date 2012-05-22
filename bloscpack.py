@@ -208,7 +208,7 @@ def read_blosc_header(buffer_):
 class ChunkingException(BaseException):
     pass
 
-def _nchunks(in_file_size, nchunks=None):
+def calculate_nchunks(in_file_size, nchunks=None):
     """ Determine chunking for an input file.
 
     Parameters
@@ -366,7 +366,7 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
     in_file_size = path.getsize(in_file)
     print_verbose('Input file size: %s' % pretty_size(in_file_size))
     try:
-        nchunks, chunk_size, last_chunk_size = _nchunks(in_file_size, nchunks)
+        nchunks, chunk_size, last_chunk_size = calculate_nchunks(in_file_size, nchunks)
     except ChunkingException as e:
         pass
     print_verbose('nchunks: %d' % nchunks)

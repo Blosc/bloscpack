@@ -362,14 +362,14 @@ def process_nthread_arg(args):
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)
-    print_verbose('Input file size: %d' % in_file_size)
+    print_verbose('Input file size: %s' % pretty_size(in_file_size))
     try:
         nchunks, chunk_size, last_chunk_size = _nchunks(in_file_size, nchunks)
     except ChunkingException as e:
         pass
     print_verbose('nchunks: %d' % nchunks)
-    print_verbose('chunk_size: %d bytes' % chunk_size)
-    print_verbose('last_chunk_size: %d bytes' % last_chunk_size)
+    print_verbose('chunk_size: %s' % pretty_size(chunk_size))
+    print_verbose('last_chunk_size: %s' % pretty_size(last_chunk_size))
     # calculate header
     bloscpack_header = create_bloscpack_header(nchunks)
     print_verbose('bloscpack_header: %s' % repr(bloscpack_header))
@@ -377,12 +377,18 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:
         output_fp.write(bloscpack_header)
-        for bytes_to_read in ([chunk_size] * (nchunks - 1)) + [last_chunk_size]:
+        for i, bytes_to_read in enumerate((
+                [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
+            print_verbose("compressing chunk '%d'%s" %
+                    (i, ' (last)' if i == nchunks-1 else ''))
             current_chunk = input_fp.read(bytes_to_read)
             compressed = blosc.compress(current_chunk, *blosc_args)
             output_fp.write(compressed)
+            print_verbose("chunk written, in: %s out: %s" %
+                    (pretty_size(len(current_chunk)),
+                        pretty_size(len(compressed))))
     out_file_size = path.getsize(out_file)
-    print_verbose('Output file size: %d' % out_file_size)
+    print_verbose('Output file size: %s' % pretty_size(out_file_size))
 
 def unpack_file(in_file, out_file):
     with open(in_file, 'rb') as input_fp, \

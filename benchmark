@@ -18,7 +18,7 @@ with open('$testfile', 'w') as test_file:
 echo "$testfile is: $(get_fs $testfile)"
 
 echo "do compression with bloscpack"
-/usr/bin/time -p ./bloscpack --force compress $testfile
+/usr/bin/time -p ./blpk --force compress $testfile
 echo "$testfile.blp is: $(get_fs $testfile.blp)"
 
 echo "do compression with gzip"

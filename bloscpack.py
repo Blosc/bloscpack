@@ -53,13 +53,14 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
     """
 
     def _get_help_string(self, action):
-        help = action.help
+        help_ = action.help
         if '%(default)' not in action.help \
-                and action.default not in [argparse.SUPPRESS, None, True, False]:
+                and action.default not in \
+                [argparse.SUPPRESS, None, True, False]:
             defaulting_nargs = [argparse.OPTIONAL, argparse.ZERO_OR_MORE]
             if action.option_strings or action.nargs in defaulting_nargs:
-                help += ' (default: %(default)s)'
-        return help
+                help_ += ' (default: %(default)s)'
+        return help_
 
     def _split_lines(self, text, width):
         return text.splitlines()
@@ -67,7 +68,8 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
 def create_parser():
     """ Create and return the parser. """
     parser = argparse.ArgumentParser(
-            #usage='%(prog)s [GLOBAL_OPTIONS] (compress | decompress) [COMMAND_OPTIONS] <in_file> [<out_file>]',
+            #usage='%(prog)s [GLOBAL_OPTIONS] (compress | decompress)
+            # [COMMAND_OPTIONS] <in_file> [<out_file>]',
             description='command line de/compression with blosc',
             formatter_class=BloscPackCustomFormatter)
     ## print version of bloscpack, python-blosc and blosc itself
@@ -100,7 +102,8 @@ def create_parser():
             dest='nthreads',
             help='set number of threads, (default: %(default)s (ncores))')
 
-    subparsers = parser.add_subparsers(title='subcommands', metavar='', dest='subcommand')
+    subparsers = parser.add_subparsers(title='subcommands',
+            metavar='', dest='subcommand')
 
     compress_parser = subparsers.add_parser('compress',
             formatter_class=BloscPackCustomFormatter,
@@ -275,7 +278,8 @@ def create_bloscpack_header(nchunks):
 def decode_bloscpack_header(buffer_, error_func):
     # buffer should be of length 16
     if len(buffer_) != 8:
-        error_func('attempting to decode a bloscpack header of length other than 16')
+        error_func(
+            'attempting to decode a bloscpack header of length other than 16')
     elif buffer_[0:4] != MAGIC:
         error_func('the magic marker is missing from the bloscpack header')
     return struct.unpack('<I', buffer_[4:])[0]
@@ -362,7 +366,8 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
     in_file_size = path.getsize(in_file)
     print_verbose('Input file size: %s' % pretty_size(in_file_size))
     try:
-        nchunks, chunk_size, last_chunk_size = calculate_nchunks(in_file_size, nchunks)
+        nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(in_file_size, nchunks)
     except ChunkingException as e:
         pass
     print_verbose('nchunks: %d' % nchunks)

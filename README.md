@@ -106,25 +106,6 @@ As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
 kind of data (``a = numpy.linspace(0, 100, 2e8)``).
 
-## Shell completion
-
-For ``zsh`` you can activate rudimentary completion using:
-
-    zsh» compdef _gnu_generic bloscpack
-    zsh» bloscpack --<TAB>
-    completing option
-    --clevel              -- {0,1,2,3,4,5,6,7,8,9}
-    --compress            -- perform compression on <in_file>
-    --decompress          -- perform decompression on <in_file>
-    --force               -- disable overwrite checks for existing files
-    --help                -- show this help message and exit
-    --no-check-extension  -- disable checking input file for extension (*.blp)
-    --no-shuffle          -- deactivate shuffle
-    --nthreads            -- set number of thereads, default = ncores (4)
-    --typesize            -- typesize for blosc, default = 4
-    --verbose             -- be verbose about actions
-    --version             -- show program's version number and exit
-
 ## TODO
 
 * 'c' and 'd' as aliases for compress and decompress

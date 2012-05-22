@@ -324,7 +324,7 @@ def process_decompression_args(args, error_func):
     out_file = args.out_file
     # remove the extension for output file
     if args.no_check_extension and out_file is None:
-            error_func('--no-check-extension requires use of <out_file>')
+        error_func('--no-check-extension requires use of <out_file>')
     else:
         if in_file.endswith(EXTENSION):
             out_file = in_file[:-len(EXTENSION)] \

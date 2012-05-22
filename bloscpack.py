@@ -256,7 +256,7 @@ def create_bloscpack_header(nchunks):
     Notes
     -----
 
-    The bloscpack 1.1.3 header is 8 bytes as follows:
+    The bloscpack header is 8 bytes as follows:
 
     |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|
     | b   l   p   k |    nchunks    |

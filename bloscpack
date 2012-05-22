@@ -395,7 +395,7 @@ def unpack_file(in_file, out_file):
     print_verbose('Input file size: %s' % pretty_size(in_file_size))
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:
-        # read the blocpack header
+        # read the bloscpack header
         print_verbose('reading bloscpack header')
         bloscpack_header = input_fp.read(8)
         nchunks = decode_bloscpack_header(bloscpack_header, None)

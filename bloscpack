@@ -189,6 +189,8 @@ def read_blosc_header(buffer_):
 
     The first four are simply bytes, the last three are are each unsigned ints
     (uint32) each occupying 4 bytes. The header is always little-endian.
+    'ctbytes' is the length of the buffer including header and nbytes is the
+    length of the data when uncompressed.
 
     """
     def decode_byte(byte):

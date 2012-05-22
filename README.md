@@ -25,11 +25,11 @@ Place the file ``blpk`` somewhere in your ``$PATH``.
 
 ## Usage
 
-    zsh» ./bloscpack --help
+    zsh» ./blpk --help
     [...]
-    zsh» ./bloscpack compress --help
+    zsh» ./blpk compress --help
     [...]
-    zsh» ./bloscpack decompress --help
+    zsh» ./blpk decompress --help
     [...]
 
 ## Testing

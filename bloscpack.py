@@ -40,7 +40,7 @@ def pretty_size(size_in_bytes):
         if size_in_bytes > lim:
             continue
         else:
-            return round(size_in_bytes/float(lim/2**10),2).__str__()+suf
+            return round(size_in_bytes/float(lim/2**10), 2).__str__()+suf
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
@@ -100,7 +100,7 @@ def create_parser():
             dest='nthreads',
             help='set number of threads, (default: %(default)s (ncores))')
 
-    subparsers = parser.add_subparsers(title='subcommands',metavar='', dest='subcommand')
+    subparsers = parser.add_subparsers(title='subcommands', metavar='', dest='subcommand')
 
     compress_parser = subparsers.add_parser('compress',
             formatter_class=BloscPackCustomFormatter,
@@ -433,7 +433,7 @@ if __name__ == '__main__':
         in_file, out_file, blosc_args = process_compression_args(args,
                 parser.error)
         print_verbose('blosc args are:')
-        for arg,value in blosc_args.iteritems():
+        for arg, value in blosc_args.iteritems():
             print_verbose('\t%s: %s' % (arg, value))
         check_files(in_file, out_file, args, parser.error)
         process_nthread_arg(args)

@@ -65,6 +65,7 @@ kind of data (``a = numpy.linspace(0, 100, 2e8)``).
 * progress bar (maybe) and timing (maybe)
 * multiple verbosity levels
 * input-pipe and --raw for output
+* python-blosc as submodule?
 
 ## Author, Copyright and License
 

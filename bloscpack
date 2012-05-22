@@ -401,7 +401,8 @@ def unpack_file(in_file, out_file):
         nchunks = decode_bloscpack_header(bloscpack_header, None)
         print_verbose('nchunks: %d' % nchunks)
         for i in range(nchunks):
-            print_verbose("decompressing chunk '%d'" % i)
+            print_verbose("decompressing chunk '%d'%s" %
+                    (i, ' (last)' if i == nchunks-1 else ''))
             print_verbose('reading blosc header')
             blosc_header_raw = input_fp.read(16)
             blosc_header = read_blosc_header(blosc_header_raw)

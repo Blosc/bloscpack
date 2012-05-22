@@ -426,5 +426,5 @@ if __name__ == '__main__':
         unpack_file(in_file, out_file)
     else:
         # we should never reach this
-        parser.error('You found the easter-egg, please contact the autor')
+        parser.error('You found the easter-egg, please contact the author')
     print_verbose('done')

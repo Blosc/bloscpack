@@ -21,66 +21,16 @@ Repository is at: https://github.com/esc/bloscpack
 
 ## Installation
 
-Place the file ``bloscpack`` somewhere in your ``$PATH``.
+Place the file ``blpk`` somewhere in your ``$PATH``.
 
 ## Usage
 
-Basic help:
-
     zsh» ./bloscpack --help
-    usage: bloscpack [-h] [--version] [--verbose] [--force] [--nthreads [1, 256]]
-                    ...
-
-    command line de/compression with blosc
-
-    optional arguments:
-    -h, --help           show this help message and exit
-    --version            show program's version number and exit
-
-    global options:
-    --verbose            be verbose about actions
-    --force              disable overwrite checks for existing files
-                        (use with caution)
-    --nthreads [1, 256]  set number of threads, (default: 8 (ncores))
-
-    subcommands:
-
-        compress           perform compression on file
-        decompress         perform decompression on file
-
-Help for the ``compress`` subcommand:
-
-
+    [...]
     zsh» ./bloscpack compress --help
-    usage: bloscpack compress [-h] [--typesize <size>] [--clevel [0, 9]]
-                            [--no-shuffle]
-                            <in_file> [<out_file>]
-
-    positional arguments:
-    <in_file>          file to be compressed
-    <out_file>         file to compress to
-
-    optional arguments:
-    -h, --help         show this help message and exit
-
-    blosc settings:
-    --typesize <size>  typesize for blosc (default: 4)
-    --clevel [0, 9]    compression level (default: 7)
-    --no-shuffle       deactivate shuffle
-
-Help for the ``decompress`` subcommand:
-
+    [...]
     zsh» ./bloscpack decompress --help
-    usage: bloscpack decompress [-h] [--no-check-extension] <in_file> [<out_file>]
-
-    positional arguments:
-    <in_file>             file to be decompressed
-    <out_file>            file to decompress to
-
-    optional arguments:
-    -h, --help            show this help message and exit
-    --no-check-extension  disable checking input file for extension (*.blp)
-                            (requires use of <out_file>)
+    [...]
 
 ## Benchmark
 

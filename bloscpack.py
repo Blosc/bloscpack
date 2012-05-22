@@ -63,11 +63,6 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
 def create_parser():
     """ Create and return the parser.
 
-    Useful to have this in a function for interactive debugging. If you need to
-    import this file do:
-
-        $ ln -s bloscpack bloscpack.py
-
     """
     parser = argparse.ArgumentParser(
             #usage='%(prog)s [GLOBAL_OPTIONS] (compress | decompress) [COMMAND_OPTIONS] <in_file> [<out_file>]',

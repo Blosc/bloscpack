@@ -27,6 +27,19 @@ def print_verbose(message):
     if VERBOSE:
         print('%s: %s' % (PREFIX, message))
 
+def pretty_size(size_in_bytes):
+    """ Pretty print filesize
+
+    From: http://www.dzone.com/snippets/filesize-nice-units
+
+    """
+    suffixes = [("B",2**10), ("K",2**20), ("M",2**30), ("G",2**40), ("T",2**50)]
+    for suf, lim in suffixes:
+        if size_in_bytes > lim:
+            continue
+        else:
+            return round(size_in_bytes/float(lim/2**10),2).__str__()+suf
+
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
 

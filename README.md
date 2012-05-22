@@ -32,6 +32,11 @@ Place the file ``blpk`` somewhere in your ``$PATH``.
     zsh» ./bloscpack decompress --help
     [...]
 
+## Testing
+
+    zsh» nosetests
+    [...]
+
 ## Benchmark
 
 Using the provided ``benchmark`` script on a ``Intel(R) Core(TM) i7 CPU

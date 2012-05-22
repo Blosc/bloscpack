@@ -60,8 +60,6 @@ kind of data (``a = numpy.linspace(0, 100, 2e8)``).
 
 * 'c' and 'd' as aliases for compress and decompress
 * allow to adjust the chunk size
-* unit tests
-* --test switch to run tests automatically
 * progress bar (maybe) and timing (maybe)
 * multiple verbosity levels
 * input-pipe and --raw for output

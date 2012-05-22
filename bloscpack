@@ -253,6 +253,22 @@ def test_create_bloscpack_header():
             create_bloscpack_header(4294967295))
     nt.assert_raises(Exception, create_bloscpack_header, 4294967296)
 
+def decode_bloscpack_header(buffer_, error_func):
+    # buffer should be of length 16
+    if len(buffer_) != 8:
+        error_func('attempting to decode a bloscpack header of length other than 16')
+    elif buffer_[0:4] != MAGIC:
+        error_func('the magic marker is missing from the bloscpack header')
+    return struct.unpack('<I', buffer_[4:])[0]
+
+def test_decode_bloscpack_header():
+    nt.assert_equal(0, decode_bloscpack_header('%s\x00\x00\x00\x00' % MAGIC,
+        None))
+    nt.assert_equal(1, decode_bloscpack_header('%s\x01\x00\x00\x00' % MAGIC,
+        None))
+    nt.assert_equal(4294967295,
+            decode_bloscpack_header('%s\xff\xff\xff\xff' % MAGIC, None))
+
 def process_compression_args(args, error_func):
     """
 
@@ -354,6 +370,12 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
             output_fp.write(compressed)
     out_file_size = path.getsize(out_file)
     print_verbose('Output file size: %d' % out_file_size)
+
+def unpack_file(in_file, out_file):
+    with open(in_file, 'rb') as input_fp, \
+         open(out_file, 'wb') as output_fp:
+        # read the blocpack header
+        blosc_header = in_file.read(16)
 
 if __name__ == '__main__':
     parser = create_parser()

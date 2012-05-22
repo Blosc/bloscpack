@@ -61,9 +61,7 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
         return text.splitlines()
 
 def create_parser():
-    """ Create and return the parser.
-
-    """
+    """ Create and return the parser. """
     parser = argparse.ArgumentParser(
             #usage='%(prog)s [GLOBAL_OPTIONS] (compress | decompress) [COMMAND_OPTIONS] <in_file> [<out_file>]',
             description='command line de/compression with blosc',

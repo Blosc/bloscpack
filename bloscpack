@@ -188,7 +188,7 @@ def read_blosc_header(buffer_):
       +--------------version
 
     The first four are simply bytes, the last three are are each unsigned ints
-    (uint32) each occupying 4 bytes. The header is always littel-endian.
+    (uint32) each occupying 4 bytes. The header is always little-endian.
 
     """
     def decode_byte(byte):

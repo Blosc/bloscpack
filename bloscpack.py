@@ -232,7 +232,7 @@ def calculate_nchunks(in_file_size, nchunks=None):
     nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE)) \
             if nchunks is None else nchunks
     chunk_size = in_file_size//nchunks
-    last_chunk_size = chunk_size + in_file_size%nchunks
+    last_chunk_size = chunk_size + in_file_size % nchunks
     if chunk_size > blosc.BLOSC_MAX_BUFFERSIZE \
             or last_chunk_size > blosc.BLOSC_MAX_BUFFERSIZE:
         raise ChunkingException(

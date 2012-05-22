@@ -278,6 +278,38 @@ def process_compression_args(args, error_func):
     blosc_args = [args.typesize, args.clevel, args.shuffle]
     return in_file, out_file, blosc_args
 
+def process_decompression_args(args, error_func):
+    """
+
+    Parameters
+    ----------
+
+    args : argparse.Namespace
+        the parsed command line arguments
+    error_func : function
+        an error function that takes a single message string as argument
+
+    Returns
+    -------
+    in_file : str
+        the input file name
+    out_file : str
+        the out_file name
+    """
+    in_file = args.in_file
+    out_file = args.out_file
+    # remove the extension for output file
+    if args.no_check_extension and out_file is None:
+            error_func('--no-check-extension requires use of <out_file>')
+    else:
+        if in_file.endswith(EXTENSION):
+            out_file = in_file[:-len(EXTENSION)] \
+                    if args.out_file is None else args.out_file
+        else:
+            error_func("input file '%s' does not end with '%s'" %
+                    (in_file, EXTENSION))
+    return in_file, out_file
+
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)
@@ -325,18 +357,7 @@ if __name__ == '__main__':
             print_verbose('\t%s: %s' % arg_val)
     elif args.subcommand == 'decompress':
         print_verbose('getting ready for decompression')
-        in_file = args.in_file
-        out_file = args.out_file
-        # remove the extension for output file
-        if args.no_check_extension and out_file is None:
-                parser.error('--no-check-extension requires use of <out_file>')
-        else:
-            if in_file.endswith(EXTENSION):
-                out_file = in_file[:-len(EXTENSION)] \
-                        if args.out_file is None else arg.sout_file
-            else:
-                parser.error("input file '%s' does not end with '%s'" %
-                        (in_file, EXTENSION))
+        in_file, out_file = process_decompression_args(args, parser.error)
         blosc_function = blosc.decompress
         blosc_args = []
     elif args.subcommand == 'test':

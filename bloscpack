@@ -333,17 +333,17 @@ def process_nthread_arg(args):
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)
-    print('Input file size: %d' % in_file_size)
+    print_verbose('Input file size: %d' % in_file_size)
     try:
         nchunks, chunk_size, last_chunk_size = _nchunks(in_file_size, nchunks)
     except ChunkingException as e:
         pass
-    print('nchunks: %d' % nchunks)
-    print('chunk_size: %d bytes' % chunk_size)
-    print('last_chunk_size: %d bytes' % last_chunk_size)
+    print_verbose('nchunks: %d' % nchunks)
+    print_verbose('chunk_size: %d bytes' % chunk_size)
+    print_verbose('last_chunk_size: %d bytes' % last_chunk_size)
     # calculate header
     bloscpack_header = create_bloscpack_header(nchunks)
-    print('bloscpack_header: %s' % repr(bloscpack_header))
+    print_verbose('bloscpack_header: %s' % repr(bloscpack_header))
     # write the chunks to the file
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:
@@ -353,7 +353,7 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
             compressed = blosc.compress(current_chunk, *blosc_args)
             output_fp.write(compressed)
     out_file_size = path.getsize(out_file)
-    print('Output file size: %d' % out_file_size)
+    print_verbose('Output file size: %d' % out_file_size)
 
 if __name__ == '__main__':
     parser = create_parser()

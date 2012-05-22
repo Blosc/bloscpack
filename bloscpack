@@ -21,6 +21,7 @@ EXTENSION = '.blp'
 MAGIC = 'blpk'
 VERBOSE = False
 PREFIX = ""
+BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 
 def print_verbose(message):
     if VERBOSE:
@@ -275,7 +276,7 @@ def process_compression_args(args, error_func):
     in_file = args.in_file
     out_file = in_file + EXTENSION \
         if args.out_file is None else args.out_file
-    blosc_args = [args.typesize, args.clevel, args.shuffle]
+    blosc_args = dict((arg, args.__getattribute__(arg)) for arg in BLOSC_ARGS)
     return in_file, out_file, blosc_args
 
 def process_decompression_args(args, error_func):
@@ -352,9 +353,8 @@ if __name__ == '__main__':
         in_file, out_file, blosc_args = process_compression_args(args,
                 parser.error)
         blosc_function = blosc.compress
-        for arg_val in zip(['typesize', 'clevel', 'shuffle'],
-                           map(str, blosc_args)):
-            print_verbose('\t%s: %s' % arg_val)
+        for arg,value in blosc_args.iteritems():
+            print_verbose('\t%s: %s' % (arg, value))
     elif args.subcommand == 'decompress':
         print_verbose('getting ready for decompression')
         in_file, out_file = process_decompression_args(args, parser.error)
@@ -386,7 +386,7 @@ if __name__ == '__main__':
         in_data = input_fp.read()
         len_in = len(in_data)
         print_verbose('input buffer length: %d' % len_in)
-        out_data = blosc_function(in_data, *blosc_args)
+        out_data = blosc_function(in_data, **blosc_args)
         len_out = len(out_data)
         print_verbose('output buffer length: %d' % len_out)
         print_verbose('ratio: %f' % (float(len_out) / float(len_in)))

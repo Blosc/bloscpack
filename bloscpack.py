@@ -26,11 +26,11 @@ VERBOSITY_LEVELS = [NORMAL, VERBOSE, DEBUG]
 PREFIX = "bloscpack.py"
 BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 
-def print_verbose(message, level='VERBOSE'):
+def print_verbose(message, level=VERBOSE):
     if level not in VERBOSITY_LEVELS:
         raise TypeError("Desired level '%s' is not one of %s" % (level,
             str(VERBOSITY_LEVELS)))
-    elif VERBOSITY_LEVELS.index(level) <= VERBOSITY_LEVELS.index(LEVEL):
+    if VERBOSITY_LEVELS.index(level) <= VERBOSITY_LEVELS.index(LEVEL):
         print('%s: %s' % (PREFIX, message))
 
 def error(message, exit_code=1):
@@ -384,12 +384,12 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
     except ChunkingException as e:
         # TODO print e.message
         pass
-    print_verbose('nchunks: %d' % nchunks)
-    print_verbose('chunk_size: %s' % pretty_size(chunk_size))
-    print_verbose('last_chunk_size: %s' % pretty_size(last_chunk_size))
+    print_verbose('nchunks: %d' % nchunks, level=DEBUG)
+    print_verbose('chunk_size: %s' % pretty_size(chunk_size), level=DEBUG)
+    print_verbose('last_chunk_size: %s' % pretty_size(last_chunk_size), level=DEBUG)
     # calculate header
     bloscpack_header = create_bloscpack_header(nchunks)
-    print_verbose('bloscpack_header: %s' % repr(bloscpack_header))
+    print_verbose('bloscpack_header: %s' % repr(bloscpack_header), level=DEBUG)
     # write the chunks to the file
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:
@@ -397,13 +397,13 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
         for i, bytes_to_read in enumerate((
                 [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
             print_verbose("compressing chunk '%d'%s" %
-                    (i, ' (last)' if i == nchunks-1 else ''))
+                    (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
             current_chunk = input_fp.read(bytes_to_read)
             compressed = blosc.compress(current_chunk, **blosc_args)
             output_fp.write(compressed)
             print_verbose("chunk written, in: %s out: %s" %
                     (pretty_size(len(current_chunk)),
-                        pretty_size(len(compressed))))
+                        pretty_size(len(compressed))), level=DEBUG)
     out_file_size = path.getsize(out_file)
     print_verbose('Output file size: %s' % pretty_size(out_file_size))
 
@@ -413,18 +413,18 @@ def unpack_file(in_file, out_file):
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:
         # read the bloscpack header
-        print_verbose('reading bloscpack header')
+        print_verbose('reading bloscpack header', level=DEBUG)
         bloscpack_header = input_fp.read(8)
         nchunks = decode_bloscpack_header(bloscpack_header, None)
-        print_verbose('nchunks: %d' % nchunks)
+        print_verbose('nchunks: %d' % nchunks, level=DEBUG)
         for i in range(nchunks):
             print_verbose("decompressing chunk '%d'%s" %
-                    (i, ' (last)' if i == nchunks-1 else ''))
-            print_verbose('reading blosc header')
+                    (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
+            print_verbose('reading blosc header', level=DEBUG)
             blosc_header_raw = input_fp.read(16)
             blosc_header = read_blosc_header(blosc_header_raw)
             ctbytes = blosc_header['ctbytes']
-            print_verbose('ctbytes: %s' % pretty_size(ctbytes))
+            print_verbose('ctbytes: %s' % pretty_size(ctbytes), level=DEBUG)
             # seek back 16 bytes in file relative to current position
             input_fp.seek(-16, 1)
             compressed = input_fp.read(ctbytes)
@@ -432,7 +432,7 @@ def unpack_file(in_file, out_file):
             output_fp.write(decompressed)
             print_verbose("chunk written, in: %s out: %s" %
                     (pretty_size(len(compressed)),
-                        pretty_size(len(decompressed))))
+                        pretty_size(len(decompressed))), level=DEBUG)
     out_file_size = path.getsize(out_file)
     print_verbose('Output file size: %s' % pretty_size(out_file_size))
 
@@ -442,20 +442,20 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.verbose:
         LEVEL = VERBOSE
-    elif args.debug
+    elif args.debug:
         LEVEL = DEBUG
-    print_verbose('command line argument parsing complete')
-    print_verbose('command line arguments are: ')
+    print_verbose('command line argument parsing complete', level=DEBUG)
+    print_verbose('command line arguments are: ', level=DEBUG)
     for arg, val in vars(args).iteritems():
-        print_verbose('\t%s: %s' % (arg, str(val)))
+        print_verbose('\t%s: %s' % (arg, str(val)), level=DEBUG)
 
     # compression and decompression handled via subparsers
     if args.subcommand == 'compress':
         print_verbose('getting ready for compression')
         in_file, out_file, blosc_args = process_compression_args(args)
-        print_verbose('blosc args are:')
+        print_verbose('blosc args are:', level=DEBUG)
         for arg, value in blosc_args.iteritems():
-            print_verbose('\t%s: %s' % (arg, value))
+            print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
         check_files(in_file, out_file, args)
         process_nthread_arg(args)
         pack_file(in_file, out_file, blosc_args)

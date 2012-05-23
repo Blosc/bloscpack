@@ -84,7 +84,6 @@ is required.
 * 'c' and 'd' as aliases for compress and decompress
 * allow to adjust the chunk size
 * progress bar (maybe) and timing (maybe)
-* multiple verbosity levels
 * input-pipe and --raw for output
 * python-blosc as submodule?
 

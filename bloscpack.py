@@ -414,12 +414,8 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)
     print_verbose('input file size: %s' % pretty_size(in_file_size))
-    try:
-        nchunks, chunk_size, last_chunk_size = \
+    nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, nchunks)
-    except ChunkingException as e:
-        # TODO print e.message
-        pass
     print_verbose('nchunks: %d' % nchunks, level=DEBUG)
     print_verbose('chunk_size: %s' % pretty_size(chunk_size), level=DEBUG)
     print_verbose('last_chunk_size: %s' % pretty_size(last_chunk_size), level=DEBUG)

@@ -65,7 +65,6 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
     is.
 
     """
-
     def _get_help_string(self, action):
         help_ = action.help
         if '%(default)' not in action.help \

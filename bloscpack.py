@@ -134,7 +134,7 @@ def create_parser():
 
     class CheckNchunksOption(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
-            if not 1 <= value <= blosc.BLOSC_MAX_THREADS:
+            if not 1 <= value <= MAX_CHUNKS:
                 error('%s must be 1 <= n <= %d'
                         % (option_string, MAX_CHUNKS))
             setattr(namespace, self.dest, value)

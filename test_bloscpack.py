@@ -26,6 +26,6 @@ def test_decode_bloscpack_header():
     nt.assert_equal(1, decode_bloscpack_header('%s\x01\x00\x00\x00' % MAGIC))
     nt.assert_equal(4294967295,
             decode_bloscpack_header('%s\xff\xff\xff\xff' % MAGIC))
-    nt.assert_raises(TypeError, decode_bloscpack_header, 'blpk')
-    nt.assert_raises(TypeError, decode_bloscpack_header, 'xxxxxxxx')
+    nt.assert_raises(ValueError, decode_bloscpack_header, 'blpk')
+    nt.assert_raises(ValueError, decode_bloscpack_header, 'xxxxxxxx')
 

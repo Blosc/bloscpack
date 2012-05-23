@@ -310,9 +310,9 @@ def create_bloscpack_header(nchunks):
 def decode_bloscpack_header(buffer_):
     """ Check that the magic marker exists and return number of chunks. """
     if len(buffer_) != 8:
-        error('attempting to decode a bloscpack header of length other than 8')
+        raise ValueError('attempting to decode a bloscpack header of length other than 8')
     elif buffer_[0:4] != MAGIC:
-        error("the magic marker '%s' is missing from the bloscpack " % MAGIC +
+        raise ValueError("the magic marker '%s' is missing from the bloscpack " % MAGIC +
               "header, instead we found: '%s'" % buffer_[0:4])
     return struct.unpack('<I', buffer_[4:])[0]
 
@@ -499,13 +499,19 @@ if __name__ == '__main__':
             print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
         check_files(in_file, out_file, args)
         process_nthread_arg(args)
-        pack_file(in_file, out_file, blosc_args)
+        try:
+            pack_file(in_file, out_file, blosc_args)
+        except ValueError as ve:
+            error(ve.message)
     elif args.subcommand in ['decompress', 'd']:
         print_verbose('getting ready for decompression')
         in_file, out_file = process_decompression_args(args)
         check_files(in_file, out_file, args)
         process_nthread_arg(args)
-        unpack_file(in_file, out_file)
+        try:
+            unpack_file(in_file, out_file)
+        except ValueError as ve:
+            error(ve.message)
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

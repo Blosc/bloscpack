@@ -188,7 +188,7 @@ def create_parser():
 
     return parser
 
-def read_blosc_header(buffer_):
+def decode_blosc_header(buffer_):
     """ Read and decode header from compressed Blosc buffer.
 
     Parameters
@@ -468,7 +468,7 @@ def unpack_file(in_file, out_file):
                     (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
             print_verbose('reading blosc header', level=DEBUG)
             blosc_header_raw = input_fp.read(16)
-            blosc_header = read_blosc_header(blosc_header_raw)
+            blosc_header = decode_blosc_header(blosc_header_raw)
             ctbytes = blosc_header['ctbytes']
             print_verbose('ctbytes: %s' % pretty_size(ctbytes), level=DEBUG)
             # seek back 16 bytes in file relative to current position

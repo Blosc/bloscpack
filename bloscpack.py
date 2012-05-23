@@ -277,8 +277,9 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     Raises
     ------
     ChunkingException
-        if the chunk_size resulting from nchunks makes the chunks larger than
-        permitted by BLOSC_MAX_BUFFERSIZE
+        If the chunk_size resulting from nchunks makes the chunks larger than
+        permitted by BLOSC_MAX_BUFFERSIZE. Or if the nchunks resulting from
+        chunk_size are larger than MAX_CHUNKS.
 
     """
     if nchunks != None and chunk_size != None:

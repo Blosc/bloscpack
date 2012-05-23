@@ -266,7 +266,7 @@ def calculate_nchunks(in_file_size, nchunks=None):
     return nchunks, chunk_size, last_chunk_size
 
 def create_bloscpack_header(nchunks):
-    """ Create the bloscpack header string
+    """ Create the bloscpack header string.
 
     Parameters
     ----------

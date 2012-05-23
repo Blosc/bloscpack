@@ -343,6 +343,8 @@ def process_compression_args(args):
 def process_decompression_args(args):
     """ Extract and check the decompression args after parsing by argparse.
 
+    Warning: may call sys.exit()
+
     Parameters
     ----------
 
@@ -372,7 +374,11 @@ def process_decompression_args(args):
     return in_file, out_file
 
 def check_files(in_file, out_file, args):
-    """ Check files exist/don't exist. """
+    """ Check files exist/don't exist.
+
+    Warning: may call sys.exit()
+
+    """
     if not path.exists(in_file):
         error("input file '%s' does not exist!" % in_file)
     if path.exists(out_file):

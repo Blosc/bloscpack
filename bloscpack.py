@@ -61,7 +61,7 @@ def pretty_size(size_in_bytes):
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
 
-    Basically a combination and extension of ArgumentDefaultsHelpFormatter adn
+    Basically a combination and extension of ArgumentDefaultsHelpFormatter and
     RawTextHelpFormatter. Adds default values to argument help, but only if the
     default is not in [None, True, False]. Also retains all whitespace as it
     is.

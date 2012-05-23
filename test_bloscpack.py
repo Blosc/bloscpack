@@ -19,10 +19,8 @@ def test_create_bloscpack_header():
     nt.assert_raises(Exception, create_bloscpack_header, 4294967296)
 
 def test_decode_bloscpack_header():
-    nt.assert_equal(0, decode_bloscpack_header('%s\x00\x00\x00\x00' % MAGIC,
-        None))
-    nt.assert_equal(1, decode_bloscpack_header('%s\x01\x00\x00\x00' % MAGIC,
-        None))
+    nt.assert_equal(0, decode_bloscpack_header('%s\x00\x00\x00\x00' % MAGIC))
+    nt.assert_equal(1, decode_bloscpack_header('%s\x01\x00\x00\x00' % MAGIC))
     nt.assert_equal(4294967295,
-            decode_bloscpack_header('%s\xff\xff\xff\xff' % MAGIC, None))
+            decode_bloscpack_header('%s\xff\xff\xff\xff' % MAGIC))
 

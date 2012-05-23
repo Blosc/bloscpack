@@ -6,6 +6,7 @@
 
 from __future__ import division
 
+import sys
 import os.path as path
 import argparse
 import struct
@@ -18,12 +19,17 @@ __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 EXTENSION = '.blp'
 MAGIC = 'blpk'
 VERBOSE = False
-PREFIX = ""
+PREFIX = "bloscpack.py"
 BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 
 def print_verbose(message):
     if VERBOSE:
         print('%s: %s' % (PREFIX, message))
+
+def error(message, exit_code=1):
+    """ Print message and exit with desired code. """
+    print('%s: error: %s' % (PREFIX, message))
+    sys.exit(exit_code)
 
 def pretty_size(size_in_bytes):
     """ Pretty print filesize
@@ -91,7 +97,7 @@ def create_parser():
     class CheckThreadOption(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
             if not 1 <= value <= blosc.BLOSC_MAX_THREADS:
-                parser.error('%s must be 1 <= n <= %d'
+                error('%s must be 1 <= n <= %d'
                         % (option_string, blosc.BLOSC_MAX_THREADS))
             setattr(namespace, self.dest, value)
     global_group.add_argument('--nthreads',
@@ -275,16 +281,15 @@ def create_bloscpack_header(nchunks):
     # this will fail if nchunks is larger than the max of an unsigned int
     return (MAGIC + struct.pack('<I', nchunks))
 
-def decode_bloscpack_header(buffer_, error_func):
+def decode_bloscpack_header(buffer_):
     # buffer should be of length 16
     if len(buffer_) != 8:
-        error_func(
-            'attempting to decode a bloscpack header of length other than 16')
+        error('attempting to decode a bloscpack header of length other than 16')
     elif buffer_[0:4] != MAGIC:
-        error_func('the magic marker is missing from the bloscpack header')
+        error('the magic marker is missing from the bloscpack header')
     return struct.unpack('<I', buffer_[4:])[0]
 
-def process_compression_args(args, error_func):
+def process_compression_args(args):
     """
 
     Parameters
@@ -292,8 +297,6 @@ def process_compression_args(args, error_func):
 
     args : argparse.Namespace
         the parsed command line arguments
-    error_func : function
-        an error function that takes a single message string as argument
 
     Returns
     -------
@@ -310,7 +313,7 @@ def process_compression_args(args, error_func):
     blosc_args = dict((arg, args.__getattribute__(arg)) for arg in BLOSC_ARGS)
     return in_file, out_file, blosc_args
 
-def process_decompression_args(args, error_func):
+def process_decompression_args(args):
     """
 
     Parameters
@@ -318,8 +321,6 @@ def process_decompression_args(args, error_func):
 
     args : argparse.Namespace
         the parsed command line arguments
-    error_func : function
-        an error function that takes a single message string as argument
 
     Returns
     -------
@@ -332,23 +333,23 @@ def process_decompression_args(args, error_func):
     out_file = args.out_file
     # remove the extension for output file
     if args.no_check_extension and out_file is None:
-        error_func('--no-check-extension requires use of <out_file>')
+        error('--no-check-extension requires use of <out_file>')
     else:
         if in_file.endswith(EXTENSION):
             out_file = in_file[:-len(EXTENSION)] \
                     if args.out_file is None else args.out_file
         else:
-            error_func("input file '%s' does not end with '%s'" %
+            error("input file '%s' does not end with '%s'" %
                     (in_file, EXTENSION))
     return in_file, out_file
 
-def check_files(in_file, out_file, args, error_func):
+def check_files(in_file, out_file, args):
     """ Check files exist/don't exist. """
     if not path.exists(in_file):
-        error_func("input file '%s' does not exist!" % in_file)
+        error("input file '%s' does not exist!" % in_file)
     if path.exists(out_file):
         if not args.force:
-            error_func("output file '%s' exists!" % out_file)
+            error("output file '%s' exists!" % out_file)
         else:
             print_verbose("overwriting existing file: %s" % out_file)
     print_verbose('input file is: %s' % in_file)
@@ -425,9 +426,9 @@ def unpack_file(in_file, out_file):
 
 if __name__ == '__main__':
     parser = create_parser()
+    PREFIX = parser.prog
     args = parser.parse_args()
     VERBOSE = args.verbose
-    PREFIX = parser.prog
     print_verbose('command line argument parsing complete')
     print_verbose('command line arguments are: ')
     for arg, val in vars(args).iteritems():
@@ -436,21 +437,20 @@ if __name__ == '__main__':
     # compression and decompression handled via subparsers
     if args.subcommand == 'compress':
         print_verbose('getting ready for compression')
-        in_file, out_file, blosc_args = process_compression_args(args,
-                parser.error)
+        in_file, out_file, blosc_args = process_compression_args(args)
         print_verbose('blosc args are:')
         for arg, value in blosc_args.iteritems():
             print_verbose('\t%s: %s' % (arg, value))
-        check_files(in_file, out_file, args, parser.error)
+        check_files(in_file, out_file, args)
         process_nthread_arg(args)
         pack_file(in_file, out_file, blosc_args)
     elif args.subcommand == 'decompress':
         print_verbose('getting ready for decompression')
-        in_file, out_file = process_decompression_args(args, parser.error)
-        check_files(in_file, out_file, args, parser.error)
+        in_file, out_file = process_decompression_args(args)
+        check_files(in_file, out_file, args)
         process_nthread_arg(args)
         unpack_file(in_file, out_file)
     else:
         # we should never reach this
-        parser.error('You found the easter-egg, please contact the author')
+        error('You found the easter-egg, please contact the author')
     print_verbose('done')

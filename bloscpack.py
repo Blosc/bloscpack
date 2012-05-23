@@ -138,30 +138,41 @@ def create_parser():
                 error('%s must be 1 <= n <= %d'
                         % (option_string, MAX_CHUNKS))
             setattr(namespace, self.dest, value)
+    class CheckChunkSizeOption(argparse.Action):
+        def __call__(self, parser, namespace, value, option_string=None):
+            if value < 0:
+                error('%s must be > 0 ' % option_string)
+            setattr(namespace, self.dest, value)
     for p in [compress_parser, c_parser]:
-        group = p.add_argument_group(title='blosc settings')
-        group.add_argument('-t', '--typesize',
+        blosc_group = p.add_argument_group(title='blosc settings')
+        blosc_group.add_argument('-t', '--typesize',
                 metavar='<size>',
                 default=4,
                 type=int,
                 help='typesize for blosc')
-        group.add_argument('-l', '--clevel',
+        blosc_group.add_argument('-l', '--clevel',
                 default=7,
                 choices=range(10),
                 metavar='[0, 9]',
                 type=int,
                 help='compression level')
-        group.add_argument('-s', '--no-shuffle',
+        blosc_group.add_argument('-s', '--no-shuffle',
                 action='store_false',
                 default=True,
                 dest='shuffle',
                 help='deactivate shuffle')
-        p.add_argument('-c', '--nchunks',
+        bloscpack_group = p.add_argument_group(title='bloscpack settings')
+        bloscpack_group.add_argument('-c', '--nchunks',
                 metavar='[1, 2**32-1]',
                 action=CheckNchunksOption,
                 type=int,
                 default=None,
-                dest='nchunks',
+                help='set desired number of chunks')
+        bloscpack_group.add_argument('-z', '--chunk-size',
+                metavar='<size>',
+                action=CheckChunkSizeOption,
+                type=int,
+                default=None,
                 help='set desired number of chunks')
 
     decompress_parser = subparsers.add_parser('decompress',

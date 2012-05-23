@@ -18,6 +18,7 @@ __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'
 MAGIC = 'blpk'
+MAX_CHUNKS = (2**32)-1
 NORMAL  = 'NORMAL'
 VERBOSE = 'VERBOSE'
 DEBUG   = 'DEBUG'
@@ -130,6 +131,12 @@ def create_parser():
             formatter_class=BloscPackCustomFormatter,
             help="alias for 'compress'")
 
+    class CheckNchunksOption(argparse.Action):
+        def __call__(self, parser, namespace, value, option_string=None):
+            if not 1 <= value <= blosc.BLOSC_MAX_THREADS:
+                error('%s must be 1 <= n <= %d'
+                        % (option_string, MAX_CHUNKS))
+            setattr(namespace, self.dest, value)
     for p in [compress_parser, c_parser]:
         group = p.add_argument_group(title='blosc settings')
         group.add_argument('-t', '--typesize',
@@ -148,6 +155,13 @@ def create_parser():
                 default=True,
                 dest='shuffle',
                 help='deactivate shuffle')
+        p.add_argument('-c', '--nchunks',
+                metavar='[1, 2**32-1]',
+                action=CheckNchunksOption,
+                type=int,
+                default=None,
+                dest='nchunks',
+                help='set desired number of chunks')
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,

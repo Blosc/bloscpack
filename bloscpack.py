@@ -92,16 +92,16 @@ def create_parser():
                     "python-blosc:\t'%s'\n"   % blosc.version.__version__ + \
                     "blosc:\t\t'%s'\n"        % blosc.BLOSC_VERSION_STRING)
     output_group = parser.add_mutually_exclusive_group()
-    output_group.add_argument('--verbose',
+    output_group.add_argument('-v', '--verbose',
             action='store_true',
             default=False,
             help='be verbose about actions')
-    output_group.add_argument('--debug',
+    output_group.add_argument('-d', '--debug',
             action='store_true',
             default=False,
             help='print debugging output too')
     global_group = parser.add_argument_group(title='global options')
-    global_group.add_argument('--force',
+    global_group.add_argument('-f', '--force',
             action='store_true',
             default=False,
             help='disable overwrite checks for existing files\n' + \
@@ -112,7 +112,7 @@ def create_parser():
                 error('%s must be 1 <= n <= %d'
                         % (option_string, blosc.BLOSC_MAX_THREADS))
             setattr(namespace, self.dest, value)
-    global_group.add_argument('--nthreads',
+    global_group.add_argument('-n', '--nthreads',
             metavar='[1, %d]' % blosc.BLOSC_MAX_THREADS,
             action=CheckThreadOption,
             default=blosc.ncores,
@@ -127,18 +127,18 @@ def create_parser():
             formatter_class=BloscPackCustomFormatter,
             help='perform compression on file')
     group = compress_parser.add_argument_group(title='blosc settings')
-    group.add_argument('--typesize',
+    group.add_argument('-t', '--typesize',
             metavar='<size>',
             default=4,
             type=int,
             help='typesize for blosc')
-    group.add_argument('--clevel',
+    group.add_argument('-l', '--clevel',
             default=7,
             choices=range(10),
             metavar='[0, 9]',
             type=int,
             help='compression level')
-    group.add_argument('--no-shuffle',
+    group.add_argument('-s', '--no-shuffle',
             action='store_false',
             default=True,
             dest='shuffle',
@@ -148,7 +148,7 @@ def create_parser():
             formatter_class=BloscPackCustomFormatter,
             help='perform decompression on file')
 
-    decompress_parser.add_argument('--no-check-extension',
+    decompress_parser.add_argument('-e', '--no-check-extension',
             action='store_true',
             default=False,
             dest='no_check_extension',

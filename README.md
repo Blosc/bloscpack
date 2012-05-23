@@ -81,7 +81,6 @@ is required.
 
 ## TODO
 
-* allow to adjust the chunk size
 * progress bar (maybe) and timing (maybe)
 * input-pipe and --raw for output
 * python-blosc as submodule?

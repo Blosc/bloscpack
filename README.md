@@ -82,7 +82,6 @@ is required.
 ## TODO
 
 * progress bar (maybe) and timing (maybe)
-* input-pipe and --raw for output
 * python-blosc as submodule?
 
 ## Author, Copyright and License

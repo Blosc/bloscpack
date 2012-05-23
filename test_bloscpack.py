@@ -6,6 +6,9 @@ import nose
 import nose.tools as nt
 from bloscpack import *
 
+def test_print_verbose():
+    nt.assert_raises(TypeError, print_verbose, 'message', 'MAXIMUM')
+
 def test_nchunks():
     nt.assert_equal((2, 3, 4), calculate_nchunks(7, nchunks=2))
     nt.assert_raises(ChunkingException,

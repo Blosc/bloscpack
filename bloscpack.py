@@ -18,12 +18,19 @@ __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'
 MAGIC = 'blpk'
-VERBOSE = False
+NORMAL  = 'NORMAL'
+VERBOSE = 'VERBOSE'
+DEBUG   = 'DEBUG'
+LEVEL = NORMAL
+VERBOSITY_LEVELS = [NORMAL, VERBOSE, DEBUG]
 PREFIX = "bloscpack.py"
 BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 
-def print_verbose(message):
-    if VERBOSE:
+def print_verbose(message, level='VERBOSE'):
+    if level not in VERBOSITY_LEVELS:
+        raise TypeError("Desired level '%s' is not one of %s" % (level,
+            str(VERBOSITY_LEVELS)))
+    elif VERBOSITY_LEVELS.index(level) <= VERBOSITY_LEVELS.index(LEVEL):
         print('%s: %s' % (PREFIX, message))
 
 def error(message, exit_code=1):
@@ -428,7 +435,8 @@ if __name__ == '__main__':
     parser = create_parser()
     PREFIX = parser.prog
     args = parser.parse_args()
-    VERBOSE = args.verbose
+    if args.verbose:
+        LEVEL = VERBOSE
     print_verbose('command line argument parsing complete')
     print_verbose('command line arguments are: ')
     for arg, val in vars(args).iteritems():

@@ -377,7 +377,7 @@ def process_nthread_arg(args):
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)
-    print_verbose('Input file size: %s' % pretty_size(in_file_size))
+    print_verbose('input file size: %s' % pretty_size(in_file_size))
     try:
         nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, nchunks)
@@ -405,11 +405,12 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
                     (pretty_size(len(current_chunk)),
                         pretty_size(len(compressed))), level=DEBUG)
     out_file_size = path.getsize(out_file)
-    print_verbose('Output file size: %s' % pretty_size(out_file_size))
+    print_verbose('output file size: %s' % pretty_size(out_file_size))
+    print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
 def unpack_file(in_file, out_file):
     in_file_size = path.getsize(in_file)
-    print_verbose('Input file size: %s' % pretty_size(in_file_size))
+    print_verbose('input file size: %s' % pretty_size(in_file_size))
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:
         # read the bloscpack header
@@ -434,7 +435,8 @@ def unpack_file(in_file, out_file):
                     (pretty_size(len(compressed)),
                         pretty_size(len(decompressed))), level=DEBUG)
     out_file_size = path.getsize(out_file)
-    print_verbose('Output file size: %s' % pretty_size(out_file_size))
+    print_verbose('output file size: %s' % pretty_size(out_file_size))
+    print_verbose('decompression ratio: %f' % (out_file_size/in_file_size))
 
 if __name__ == '__main__':
     parser = create_parser()

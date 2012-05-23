@@ -37,7 +37,8 @@ def print_verbose(message, level=VERBOSE):
 
 def error(message, exit_code=1):
     """ Print message and exit with desired code. """
-    print('%s: error: %s' % (PREFIX, message))
+    for l in [l for l in message.split('\n') if l != '']:
+        print('%s: error: %s' % (PREFIX, l))
     sys.exit(exit_code)
 
 def pretty_size(size_in_bytes):
@@ -516,9 +517,9 @@ if __name__ == '__main__':
         check_files(in_file, out_file, args)
         process_nthread_arg(args)
         try:
-            pack_file(in_file, out_file, blosc_args)
-        except ValueError as ve:
-            error(ve.message)
+            pack_file(in_file, out_file, blosc_args, nchunks=args.nchunks)
+        except ChunkingException as e:
+            error(e.message)
     elif args.subcommand in ['decompress', 'd']:
         print_verbose('getting ready for decompression')
         in_file, out_file = process_decompression_args(args)

@@ -91,11 +91,16 @@ def create_parser():
             version='%(prog)s:\t' + ("'%s'\n" % __version__) + \
                     "python-blosc:\t'%s'\n"   % blosc.version.__version__ + \
                     "blosc:\t\t'%s'\n"        % blosc.BLOSC_VERSION_STRING)
-    global_group = parser.add_argument_group(title='global options')
-    global_group.add_argument('--verbose',
+    output_group = parser.add_mutually_exclusive_group()
+    output_group.add_argument('--verbose',
             action='store_true',
             default=False,
             help='be verbose about actions')
+    output_group.add_argument('--debug',
+            action='store_true',
+            default=False,
+            help='print debugging output too')
+    global_group = parser.add_argument_group(title='global options')
     global_group.add_argument('--force',
             action='store_true',
             default=False,
@@ -437,6 +442,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.verbose:
         LEVEL = VERBOSE
+    elif args.debug
+        LEVEL = DEBUG
     print_verbose('command line argument parsing complete')
     print_verbose('command line arguments are: ')
     for arg, val in vars(args).iteritems():

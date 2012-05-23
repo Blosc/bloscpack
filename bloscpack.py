@@ -303,7 +303,7 @@ def decode_bloscpack_header(buffer_):
     return struct.unpack('<I', buffer_[4:])[0]
 
 def process_compression_args(args):
-    """
+    """ Extract and check the compression args after parsing by argparse.
 
     Parameters
     ----------
@@ -327,7 +327,7 @@ def process_compression_args(args):
     return in_file, out_file, blosc_args
 
 def process_decompression_args(args):
-    """
+    """ Extract and check the decompression args after parsing by argparse.
 
     Parameters
     ----------

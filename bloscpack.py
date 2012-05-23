@@ -377,6 +377,20 @@ def process_nthread_arg(args):
             (args.nthreads, 's' if args.nthreads > 1 else ''))
 
 def pack_file(in_file, out_file, blosc_args, nchunks=None):
+    """ Main function for compressing a file.
+
+    Parameters
+    ----------
+    in_file : str
+        the name of the input file
+    out_file : str
+        the name of the output file
+    blosc_args : dict
+        dictionary of blosc keyword args
+    nchunks : int, default: None
+        The desired number of chunks. Will be determined automatically if not
+        present.
+    """
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)
     print_verbose('input file size: %s' % pretty_size(in_file_size))
@@ -411,6 +425,15 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None):
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
 def unpack_file(in_file, out_file):
+    """ Main function for decompressing a file.
+
+    Parameters
+    ----------
+    in_file : str
+        the name of the input file
+    out_file : str
+        the name of the output file
+    """
     in_file_size = path.getsize(in_file)
     print_verbose('input file size: %s' % pretty_size(in_file_size))
     with open(in_file, 'rb') as input_fp, \

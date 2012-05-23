@@ -161,7 +161,7 @@ def create_parser():
                 default=True,
                 dest='shuffle',
                 help='deactivate shuffle')
-        bloscpack_group = p.add_argument_group(title='bloscpack settings')
+        bloscpack_group = p.add_mutually_exclusive_group()
         bloscpack_group.add_argument('-c', '--nchunks',
                 metavar='[1, 2**32-1]',
                 action=CheckNchunksOption,

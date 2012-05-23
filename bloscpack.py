@@ -294,7 +294,7 @@ def create_bloscpack_header(nchunks):
     return (MAGIC + struct.pack('<I', nchunks))
 
 def decode_bloscpack_header(buffer_):
-    # buffer should be of length 16
+    """ Check that the magic marker exists and return number of chunks. """
     if len(buffer_) != 8:
         error('attempting to decode a bloscpack header of length other than 16')
     elif buffer_[0:4] != MAGIC:

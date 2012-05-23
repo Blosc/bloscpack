@@ -28,7 +28,7 @@ PREFIX = "bloscpack.py"
 BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 
 def print_verbose(message, level=VERBOSE):
-    """ Print messge with desired verbosity level. """
+    """ Print message with desired verbosity level. """
     if level not in VERBOSITY_LEVELS:
         raise TypeError("Desired level '%s' is not one of %s" % (level,
             str(VERBOSITY_LEVELS)))

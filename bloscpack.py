@@ -310,7 +310,7 @@ def create_bloscpack_header(nchunks):
 def decode_bloscpack_header(buffer_):
     """ Check that the magic marker exists and return number of chunks. """
     if len(buffer_) != 8:
-        error('attempting to decode a bloscpack header of length other than 16')
+        error('attempting to decode a bloscpack header of length other than 8')
     elif buffer_[0:4] != MAGIC:
         error("the magic marker '%s' is missing from the bloscpack " % MAGIC +
               "header, instead we found: '%s'" % buffer_[0:4])

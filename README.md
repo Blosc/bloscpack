@@ -79,6 +79,14 @@ compressors. It will need enough memory to keep both the uncompressed and
 compressed data in memory---with a chunk size of 2GB, more than 4GB of memory
 is required.
 
+## TODO
+
+* ``setup.py``
+* examples of use
+* library usage
+* make pylint happier
+* more unit testing
+
 ## Author, Copyright and License
 
 (C) 2012 Valentin Haenel <valentin.haenel@gmx.de>

@@ -126,38 +126,52 @@ def create_parser():
     compress_parser = subparsers.add_parser('compress',
             formatter_class=BloscPackCustomFormatter,
             help='perform compression on file')
-    group = compress_parser.add_argument_group(title='blosc settings')
-    group.add_argument('-t', '--typesize',
-            metavar='<size>',
-            default=4,
-            type=int,
-            help='typesize for blosc')
-    group.add_argument('-l', '--clevel',
-            default=7,
-            choices=range(10),
-            metavar='[0, 9]',
-            type=int,
-            help='compression level')
-    group.add_argument('-s', '--no-shuffle',
-            action='store_false',
-            default=True,
-            dest='shuffle',
-            help='deactivate shuffle')
+    c_parser = subparsers.add_parser('c',
+            formatter_class=BloscPackCustomFormatter,
+            help="alias for 'compress'")
+
+    for p in [compress_parser, c_parser]:
+        group = p.add_argument_group(title='blosc settings')
+        group.add_argument('-t', '--typesize',
+                metavar='<size>',
+                default=4,
+                type=int,
+                help='typesize for blosc')
+        group.add_argument('-l', '--clevel',
+                default=7,
+                choices=range(10),
+                metavar='[0, 9]',
+                type=int,
+                help='compression level')
+        group.add_argument('-s', '--no-shuffle',
+                action='store_false',
+                default=True,
+                dest='shuffle',
+                help='deactivate shuffle')
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,
             help='perform decompression on file')
 
-    decompress_parser.add_argument('-e', '--no-check-extension',
-            action='store_true',
-            default=False,
-            dest='no_check_extension',
-            help='disable checking input file for extension (*.blp)\n' +
-            '(requires use of <out_file>)')
+    d_parser = subparsers.add_parser('d',
+            formatter_class=BloscPackCustomFormatter,
+            help="alias for 'decompress'")
+
+    for p in [decompress_parser, d_parser]:
+        p.add_argument('-e', '--no-check-extension',
+                action='store_true',
+                default=False,
+                dest='no_check_extension',
+                help='disable checking input file for extension (*.blp)\n' +
+                '(requires use of <out_file>)')
 
     for p, help_in, help_out in [(compress_parser,
             'file to be compressed', 'file to compress to'),
+                                 (c_parser,
+            'file to be compressed', 'file to compress to'),
                                  (decompress_parser,
+            'file to be decompressed', 'file to decompress to'),
+                                 (d_parser,
             'file to be decompressed', 'file to decompress to'),
                                   ]:
         p.add_argument('in_file',
@@ -477,7 +491,7 @@ if __name__ == '__main__':
         print_verbose('\t%s: %s' % (arg, str(val)), level=DEBUG)
 
     # compression and decompression handled via subparsers
-    if args.subcommand == 'compress':
+    if args.subcommand in ['compress', 'c']:
         print_verbose('getting ready for compression')
         in_file, out_file, blosc_args = process_compression_args(args)
         print_verbose('blosc args are:', level=DEBUG)
@@ -486,7 +500,7 @@ if __name__ == '__main__':
         check_files(in_file, out_file, args)
         process_nthread_arg(args)
         pack_file(in_file, out_file, blosc_args)
-    elif args.subcommand == 'decompress':
+    elif args.subcommand in ['decompress', 'd']:
         print_verbose('getting ready for decompression')
         in_file, out_file = process_decompression_args(args)
         check_files(in_file, out_file, args)

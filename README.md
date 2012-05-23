@@ -81,7 +81,6 @@ is required.
 
 ## TODO
 
-* 'c' and 'd' as aliases for compress and decompress
 * allow to adjust the chunk size
 * progress bar (maybe) and timing (maybe)
 * input-pipe and --raw for output

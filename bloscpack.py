@@ -285,10 +285,10 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
         raise ValueError(
                 "either specify 'nchunks' or 'chunk_size', but not both")
     elif nchunks != None and chunk_size == None:
-        print_verbose("'nchunks' proposed ")
+        print_verbose("'nchunks' proposed", level=DEBUG)
         chunk_size = in_file_size//nchunks
     elif nchunks == None and chunk_size != None:
-        print_verbose("'chunk_size' proposed ")
+        print_verbose("'chunk_size' proposed", level=DEBUG)
         nchunks = in_file_size//chunk_size
     elif nchunks == None and chunk_size == None:
         nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE)) 

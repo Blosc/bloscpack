@@ -304,11 +304,13 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             "last_chunk_size : %d\n" % last_chunk_size +\
             "BLOSC_MAX_BUFFERSIZE : %d\n" % blosc.BLOSC_MAX_BUFFERSIZE)
     if nchunks > MAX_CHUNKS:
-        raise ChunkingException("nchunks: '%d' is greate than the MAX_CHUNKS: '%d'" % 
+        raise ChunkingException(
+                "nchunks: '%d' is greate than the MAX_CHUNKS: '%d'" %
                 (nchunks, MAX_CHUNKS))
     print_verbose('nchunks: %d' % nchunks, level=DEBUG)
     print_verbose('chunk_size: %s' % pretty_size(chunk_size), level=DEBUG)
-    print_verbose('last_chunk_size: %s' % pretty_size(last_chunk_size), level=DEBUG)
+    print_verbose('last_chunk_size: %s' % pretty_size(last_chunk_size),
+            level=DEBUG)
     return nchunks, chunk_size, last_chunk_size
 
 def create_bloscpack_header(nchunks):
@@ -342,10 +344,12 @@ def create_bloscpack_header(nchunks):
 def decode_bloscpack_header(buffer_):
     """ Check that the magic marker exists and return number of chunks. """
     if len(buffer_) != 8:
-        raise ValueError('attempting to decode a bloscpack header of length other than 8')
+        raise ValueError(
+            'attempting to decode a bloscpack header of length other than 8')
     elif buffer_[0:4] != MAGIC:
-        raise ValueError("the magic marker '%s' is missing from the bloscpack " % MAGIC +
-              "header, instead we found: '%s'" % buffer_[0:4])
+        raise ValueError(
+            "the magic marker '%s' is missing from the bloscpack " % MAGIC +
+            "header, instead we found: '%s'" % buffer_[0:4])
     return struct.unpack('<I', buffer_[4:])[0]
 
 def process_compression_args(args):

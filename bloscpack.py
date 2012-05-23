@@ -298,7 +298,8 @@ def decode_bloscpack_header(buffer_):
     if len(buffer_) != 8:
         error('attempting to decode a bloscpack header of length other than 16')
     elif buffer_[0:4] != MAGIC:
-        error('the magic marker is missing from the bloscpack header')
+        error("the magic marker '%s' is missing from the bloscpack " % MAGIC +
+              "header, instead we found: '%s'" % buffer_[0:4])
     return struct.unpack('<I', buffer_[4:])[0]
 
 def process_compression_args(args):

@@ -40,7 +40,7 @@ def error(message, exit_code=1):
     sys.exit(exit_code)
 
 def pretty_size(size_in_bytes):
-    """ Pretty print filesize
+    """ Pretty print filesize.
 
     From: http://www.dzone.com/snippets/filesize-nice-units
 

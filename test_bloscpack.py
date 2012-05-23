@@ -10,7 +10,17 @@ def test_print_verbose():
     nt.assert_raises(TypeError, print_verbose, 'message', 'MAXIMUM')
 
 def test_nchunks():
+    nt.assert_equal((3, 3, 3), calculate_nchunks(9, nchunks=3))
+    nt.assert_equal((9, 1, 1), calculate_nchunks(9, chunk_size=1))
+    nt.assert_equal((2, 4, 5), calculate_nchunks(9, chunk_size=4))
     nt.assert_equal((2, 3, 4), calculate_nchunks(7, nchunks=2))
+    # check that giving both arguments raises an error
+    nt.assert_raises(ValueError, calculate_nchunks,
+            128, nchunks=23, chunk_size=23)
+    # check overflow of nchunks due to chunk_size being too small
+    nt.assert_raises(ChunkingException, calculate_nchunks,
+            blosc.BLOSC_MAX_BUFFERSIZE*23, chunk_size=1)
+    # check overflow of BLOSC_MAX_BUFFERSIZE due to nchunks being too small
     nt.assert_raises(ChunkingException,
             calculate_nchunks, blosc.BLOSC_MAX_BUFFERSIZE*2+1, nchunks=2)
 

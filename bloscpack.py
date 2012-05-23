@@ -548,7 +548,8 @@ if __name__ == '__main__':
         check_files(in_file, out_file, args)
         process_nthread_arg(args)
         try:
-            pack_file(in_file, out_file, blosc_args, nchunks=args.nchunks)
+            pack_file(in_file, out_file, blosc_args,
+                    nchunks=args.nchunks, chunk_size=args.chunk_size)
         except ChunkingException as e:
             error(e.message)
     elif args.subcommand in ['decompress', 'd']:

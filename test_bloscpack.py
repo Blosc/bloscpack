@@ -20,7 +20,7 @@ def test_print_verbose():
 def test_error():
     # switch out the exit, to make sure test-suite doesn't fall over
     backup = bloscpack.sys.exit
-    bloscpack.sys.exit = lambda x: x+2
+    bloscpack.sys.exit = lambda x: x
     # should probably hijack the print statement
     error('error')
     bloscpack.sys.exit = backup

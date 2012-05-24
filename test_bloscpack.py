@@ -7,10 +7,23 @@ import tempfile
 import numpy
 import nose
 import nose.tools as nt
+import bloscpack
 from bloscpack import *
 
 def test_print_verbose():
     nt.assert_raises(TypeError, print_verbose, 'message', 'MAXIMUM')
+    bloscpack.LEVEL = DEBUG
+    # should probably hijack the print statement
+    print_verbose('notification')
+    bloscpack.LEVEL = NORMAL
+
+def test_error():
+    # switch out the exit, to make sure test-suite doesn't fall over
+    backup = bloscpack.sys.exit
+    bloscpack.sys.exit = lambda x: x+2
+    # should probably hijack the print statement
+    error('error')
+    bloscpack.sys.exit = backup
 
 def test_nchunks():
     nt.assert_equal((3, 3, 3), calculate_nchunks(9, nchunks=3))

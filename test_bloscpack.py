@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
+import os.path as path
+import tempfile
+import numpy
 import nose
 import nose.tools as nt
 from bloscpack import *
@@ -39,3 +42,28 @@ def test_decode_bloscpack_header():
     nt.assert_raises(ValueError, decode_bloscpack_header, 'blpk')
     nt.assert_raises(ValueError, decode_bloscpack_header, 'xxxxxxxx')
 
+def pack_unpack():
+    tdir = tempfile.mkdtemp()
+    blosc_args = {'typesize': 4,
+                  'clevel' : 7,
+                  'shuffle' : True}
+    in_file = path.join(tdir, 'file')
+    out_file = path.join(tdir, 'file.blp')
+    dcmp_file = path.join(tdir, 'file.dcmp')
+    array_ = numpy.linspace(0, 100, 2e8)
+    with open(in_file, 'wb') as in_fp:
+        in_fp.write(array_.tostring())
+    pack_file(in_file, out_file, blosc_args, nchunks=20)
+    unpack_file(out_file, dcmp_file)
+    cmp(in_file, dcmp_file)
+
+def cmp(file1, file2):
+    """ File comparison utility with a 500 MB chunksize """
+    with open(file1, 'rb') as afp, open(file2, 'rb') as bfp:
+        while True:
+            a = afp.read(524288000)
+            b = bfp.read(524288000)
+            if a == '' and b == '':
+                return True
+            else:
+                nt.assert_equal(a, b)

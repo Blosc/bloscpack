@@ -34,10 +34,17 @@ Place the file ``blpk`` somewhere in your ``$PATH``.
 
 ## Testing
 
+Basic tests, runs quickly:
+
     zsh» nosetests
     [...]
 
-## Benchmark
+Extended tests:
+
+    zsh» nosetests test_bloscpack.py:pack_unpack
+    [...]
+
+# Benchmark
 
 Using the provided ``benchmark`` script on a ``Intel(R) Core(TM) i7 CPU
 960  @ 3.20GHz`` cpu with 4 cores and active hyperthreading yields the

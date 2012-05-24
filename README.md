@@ -91,8 +91,6 @@ is required.
 * ``setup.py``
 * examples of use
 * library usage
-* make pylint happier
-* more unit testing
 
 ## Author, Copyright and License
 

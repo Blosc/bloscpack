@@ -27,6 +27,48 @@ def test_nchunks():
     nt.assert_raises(ChunkingException,
             calculate_nchunks, blosc.BLOSC_MAX_BUFFERSIZE*2+1, nchunks=2)
 
+def test_decode_blosc_header():
+    array_ = numpy.linspace(0, 100, 2e4).tostring()
+    # basic test case
+    blosc_args = {'typesize': 4,
+                  'clevel' : 7,
+                  'shuffle' : True}
+    compressed = blosc.compress(array_, **blosc_args)
+    header = decode_blosc_header(compressed)
+    expected = {'versionlz': 1,
+                'blocksize': 131072,
+                'ctbytes': len(compressed),
+                'version': 2,
+                'flags': 1,
+                'nbytes': len(array_),
+                'typesize': blosc_args['typesize']}
+    nt.assert_equal(expected, header)
+    # deactivate shuffle
+    blosc_args['shuffle'] = False
+    compressed = blosc.compress(array_, **blosc_args)
+    header = decode_blosc_header(compressed)
+    expected = {'versionlz': 1,
+                'blocksize': 131072,
+                'ctbytes': len(compressed),
+                'version': 2,
+                'flags': 0, # no shuffle flag
+                'nbytes': len(array_),
+                'typesize': blosc_args['typesize']}
+    nt.assert_equal(expected, header)
+    # uncompressible data
+    array_ = numpy.random.randn(2e4).tostring()
+    blosc_args['shuffle'] = True
+    compressed = blosc.compress(array_, **blosc_args)
+    header = decode_blosc_header(compressed)
+    expected = {'versionlz': 1,
+                'blocksize': 131072,
+                'ctbytes': len(array_) + 16, # original + 16 header bytes
+                'version': 2,
+                'flags': 3, # 1 for shuffle 2 for non-compressed
+                'nbytes': len(array_),
+                'typesize': blosc_args['typesize']}
+    nt.assert_equal(expected, header)
+
 def test_create_bloscpack_header():
     nt.assert_equal('%s\x00\x00\x00\x00' % MAGIC, create_bloscpack_header(0))
     nt.assert_equal('%s\x01\x00\x00\x00' % MAGIC, create_bloscpack_header(1))

@@ -41,7 +41,7 @@ Basic tests, runs quickly:
 
 Extended tests:
 
-    zsh» nosetests test_bloscpack.py:pack_unpack
+    zsh» nosetests test_bloscpack.py:pack_unpack_extended
     [...]
 
 # Benchmark

@@ -84,7 +84,13 @@ def test_decode_bloscpack_header():
     nt.assert_raises(ValueError, decode_bloscpack_header, 'blpk')
     nt.assert_raises(ValueError, decode_bloscpack_header, 'xxxxxxxx')
 
-def pack_unpack():
+def test_pack_unpack():
+    pack_unpack(2e6)
+
+def pack_unpack_extended():
+    pack_unpack(2e8)
+
+def pack_unpack(nnumbers):
     tdir = tempfile.mkdtemp()
     blosc_args = {'typesize': 4,
                   'clevel' : 7,
@@ -92,7 +98,7 @@ def pack_unpack():
     in_file = path.join(tdir, 'file')
     out_file = path.join(tdir, 'file.blp')
     dcmp_file = path.join(tdir, 'file.dcmp')
-    array_ = numpy.linspace(0, 100, 2e8)
+    array_ = numpy.linspace(0, 100, nnumbers)
     with open(in_file, 'wb') as in_fp:
         in_fp.write(array_.tostring())
     pack_file(in_file, out_file, blosc_args, nchunks=20)

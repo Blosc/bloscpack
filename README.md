@@ -77,14 +77,13 @@ no larger than 2GB where the last chunk may be a little larger than the other
 ones since it contains the remainder. To facilitate this, Bloscpack adds an 8
 byte header containing a 4 byte magic string, 'blpk', and a 4 byte
 little-endian unsigned integer which designates how many chunks there are.
-Effectively this limits the number of chunks to 2\*\*32-1 = 4294967295, but
+Effectively, this limits the number of chunks to 2\*\*32-1 = 4294967295, but
 this should not be relevant in practice. In terms of overhead, this means that
 for a file which can not be compressed, bloscpack will add a total of 8 bytes
-for itself and  16 bytes for each chunk compressed by Blosc overhead. Regarding
-memory considerations, bloscpack is quite memory hungry compared to other
-compressors. It will need enough memory to keep both the uncompressed and
-compressed data in memory---with a chunk size of 2GB, more than 4GB of memory
-is required.
+for itself and  16 bytes for each chunk compressed by Blosc. Regarding memory,
+bloscpack is quite memory hungry compared to other compressors. It will need
+enough memory to keep both the uncompressed and compressed data in
+memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
 
 ## TODO
 

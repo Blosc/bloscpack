@@ -25,6 +25,10 @@ def test_error():
     error('error')
     bloscpack.sys.exit = backup
 
+def test_parser():
+    # hmmm I guess we could override the error
+    parser = create_parser()
+
 def test_nchunks():
     nt.assert_equal((3, 3, 3), calculate_nchunks(9, nchunks=3))
     nt.assert_equal((9, 1, 1), calculate_nchunks(9, chunk_size=1))

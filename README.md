@@ -81,7 +81,12 @@ There are some useful additional options for compression, that are passed
 directly to Blosc:
 
 :``[-t | --typesize]``:
-    Typesize used by Blosc (default: 4): ``zsh» ./blpk c -t 8 data.dat``
+    typesize
+:``[-t | --typesize]``:
+    typesize
+
+:``[-t | --typesize]``:
+    Typesize used by Blosc (default 4) ``zsh» ./blpk c -t 8 data.dat``
 :``[-l | --level]``:
     Compression level (default: 7): ``zsh» ./blpk c -l 3 data.dat``
 :``[-s | --no-shuffle]``:

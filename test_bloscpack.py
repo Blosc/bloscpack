@@ -34,6 +34,9 @@ def test_nchunks():
     nt.assert_equal((9, 1, 1), calculate_nchunks(9, chunk_size=1))
     nt.assert_equal((2, 4, 5), calculate_nchunks(9, chunk_size=4))
     nt.assert_equal((2, 3, 4), calculate_nchunks(7, nchunks=2))
+    # check that a chunk_size larger than the file_size succeeds
+    nt.assert_equal((1, 6, 5), calculate_nchunks(5, chunk_size=6))
+    nt.assert_equal((1, 500000, 5), calculate_nchunks(5, chunk_size=500000))
     # check that giving both arguments raises an error
     nt.assert_raises(ValueError, calculate_nchunks,
             128, nchunks=23, chunk_size=23)

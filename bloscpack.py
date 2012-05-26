@@ -286,6 +286,13 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     last_chunk_size : int
         the size of the last chunk in bytes
 
+    Notes
+    -----
+
+    if a chunk_size larger than in_file_size is proposed, the return value for
+    chunk_size will contain the proposed chunk size and the last_chunk_size
+    will be actual chunk size.
+
     Raises
     ------
     ChunkingException
@@ -302,11 +309,12 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
         chunk_size = in_file_size//nchunks
     elif nchunks == None and chunk_size != None:
         print_verbose("'chunk_size' proposed", level=DEBUG)
-        nchunks = in_file_size//chunk_size
+        nchunks = in_file_size//chunk_size if in_file_size >= chunk_size else 1
     elif nchunks == None and chunk_size == None:
         nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE)) 
         chunk_size = in_file_size//nchunks
-    last_chunk_size = chunk_size + in_file_size % nchunks
+    last_chunk_size = chunk_size + in_file_size % nchunks \
+        if nchunks > 1 else in_file_size
     if chunk_size > blosc.BLOSC_MAX_BUFFERSIZE \
             or last_chunk_size > blosc.BLOSC_MAX_BUFFERSIZE:
         raise ChunkingException(
@@ -472,6 +480,7 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None):
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:
         output_fp.write(bloscpack_header)
+        # if nchunks == 1 the last_chunk_size is the size of the single chunk
         for i, bytes_to_read in enumerate((
                 [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
             print_verbose("compressing chunk '%d'%s" %

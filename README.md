@@ -28,6 +28,7 @@ Place the file ``blpk`` somewhere in your ``$PATH``.
 Bloscpack has t number of global options and two subcommands: ``[c |
 compress]`` and ``[d | decompress]`` which each have their own options.
 
+
 Help for global options and subcommands:
 
     zsh» ./blpk --help
@@ -80,30 +81,24 @@ There are some useful additional options for compression, that are passed
 directly to Blosc:
 
 :``[-t | --typesize]``:
-    Typesize used by Blosc (default: 4)::
-        zsh» ./blpk c -t 8 data.dat
+    Typesize used by Blosc (default: 4):
+    ``zsh» ./blpk c -t 8 data.dat``
 :``[-l | --level]``:
-    Compression level (default: 7)::
-
-        zsh» ./blpk c -l 3 data.dat
-
+    Compression level (default: 7):
+    ``zsh» ./blpk c -l 3 data.dat``
 :``[-s | --no-shuffle]``:
-    Deactivate shuffle::
-
-        zsh» ./blpk c -s data.dat
+    Deactivate shuffle:
+    ``zsh» ./blpk c -s data.dat``
 
 In addition, there are two mutually exclusive options for bloscpack itself,
 that govern how the file is split into chunks:
 
 :``[-z | --chunk-size]``:
     Desired approximate size of the chunks, in byte::
-
-        zsh» ./blpk -d c -z 500000 data.dat
-
+    ``zsh» ./blpk -d c -z 500000 data.dat``
 :``[-c | --nchunks]``:
     Desired number of chunks:
-
-        zsh» ./blpk -d c -c 2 data.dat
+    ``zsh» ./blpk -d c -c 2 data.dat``
 
 Lastly there are two options to control how much output is produced,
 

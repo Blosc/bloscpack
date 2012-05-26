@@ -93,12 +93,12 @@ directly to Blosc:
 In addition, there are two mutually exclusive options for bloscpack itself,
 that govern how the file is split into chunks:
 
-:``[-z | --chunk-size]``:
-    Desired approximate size of the chunks, in byte::
-    ``zsh» ./blpk -d c -z 500000 data.dat``
-:``[-c | --nchunks]``:
-    Desired number of chunks:
-    ``zsh» ./blpk -d c -c 2 data.dat``
+* ``[-z | --chunk-size]``
+  Desired approximate size of the chunks, in byte::
+  ``zsh» ./blpk -d c -z 500000 data.dat``
+* ``[-c | --nchunks]``
+  Desired number of chunks:
+  ``zsh» ./blpk -d c -c 2 data.dat``
 
 Lastly there are two options to control how much output is produced,
 

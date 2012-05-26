@@ -83,7 +83,7 @@ directly to Blosc:
 * ``[-t | --typesize]``
   Typesize used by Blosc (default: 4):
   ``zsh» ./blpk c -t 8 data.dat``
-* ``[-l | --level]``:
+* ``[-l | --level]``
   Compression level (default: 7):
   ``zsh» ./blpk c -l 3 data.dat``
 * ``[-s | --no-shuffle]``

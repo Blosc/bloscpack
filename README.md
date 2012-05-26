@@ -71,8 +71,8 @@ Incidentally this works for compression too:
     blpk: error: output file 'data.dat.blp' exists!
     zsh» ./blpk -f c data.dat
 
-By default, the number of threads that Blosc uses is detrmined by the number of
-cores detected on your system. You can change this using the ``[-n |
+By default, the number of threads that Blosc uses is determined by the number
+of cores detected on your system. You can change this using the ``[-n |
 --nthreads]`` option:
 
     zsh» ./blpk -n 1 c data.dat
@@ -102,7 +102,7 @@ that govern how the file is split into chunks:
 
 Lastly there are two options to control how much output is produced,
 
-The first causes basic info to be printen``[-v | --verbose]``
+The first causes basic info to be printed, ``[-v | --verbose]``:
 
     zsh» ./blpk -v c data.dat
     blpk: getting ready for compression
@@ -114,7 +114,7 @@ The first causes basic info to be printen``[-v | --verbose]``
     blpk: compression ratio: 0.639903
     blpk: done
 
-... and ``[-d | --debug]`` prints a detailed account of what is going on::
+... and ``[-d | --debug]`` prints a detailed account of what is going on:
 
     zsh» ./blpk -d c data.dat
     blpk: command line argument parsing complete

@@ -80,17 +80,15 @@ cores detected on your system. You can change this using the ``[-n |
 There are some useful additional options for compression, that are passed
 directly to Blosc:
 
-:``[-t | --typesize]``:
-    typesize
-:``[-t | --typesize]``:
-    typesize
-
-:``[-t | --typesize]``:
-    Typesize used by Blosc (default 4) ``zsh» ./blpk c -t 8 data.dat``
-:``[-l | --level]``:
-    Compression level (default: 7): ``zsh» ./blpk c -l 3 data.dat``
-:``[-s | --no-shuffle]``:
-    Deactivate shuffle: ``zsh» ./blpk c -s data.dat``
+* ``[-t | --typesize]``
+  Typesize used by Blosc (default: 4):
+  ``zsh» ./blpk c -t 8 data.dat``
+* ``[-l | --level]``:
+  Compression level (default: 7):
+  ``zsh» ./blpk c -l 3 data.dat``
+* ``[-s | --no-shuffle]``
+  Deactivate shuffle:
+  ``zsh» ./blpk c -s data.dat``
 
 In addition, there are two mutually exclusive options for bloscpack itself,
 that govern how the file is split into chunks:

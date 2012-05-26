@@ -25,12 +25,137 @@ Place the file ``blpk`` somewhere in your ``$PATH``.
 
 ## Usage
 
+Bloscpack has t number of global options and two subcommands: ``[c |
+compress]`` and ``[d | decompress]`` which each have their own options.
+
+Help for global options and subcommands::
+
     zsh» ./blpk --help
     [...]
+
+Help for each one of the subcommands::
+
     zsh» ./blpk compress --help
     [...]
     zsh» ./blpk decompress --help
     [...]
+
+## Examples
+
+Basic compression::
+
+    zsh» ./blpk c data.dat
+
+... will compress the file ``data.dat`` to ``data.dat.blp``
+
+Basic decompression::
+
+    zsh» ./blpk d data.dat.blp data.dcmp
+
+... will decompress the file ``data.dat.blp`` to the file ``data.dcmp``. If you
+leave out the ``[<out_file>]`` argument, bloscpack will complain that the file
+``data.dat`` exists already and refuse to overwrite it::
+
+    zsh» ./blpk d data.dat.blp
+    blpk: error: output file 'data.dat' exists!
+
+If you know what you are doing, you can use the global option ``[-f |
+--force]`` to override the overwrite checks::
+
+    zsh» ./blpk -f d data.dat.blp
+
+Incidentally this works for compression too::
+
+    zsh» ./blpk c data.dat
+    blpk: error: output file 'data.dat.blp' exists!
+    zsh» ./blpk -f c data.dat
+
+By default, the number of threads that Blosc uses is detrmined by the number of
+cores detected on your system. You can change this using the ``[-n |
+--nthreads]`` option::
+
+    zsh» ./blpk -n 1 c data.dat
+
+There are some useful additional options for compression, that are passed
+directly to Blosc:
+
+:``[-t | --typesize]``:
+    Typesize used by Blosc (default: 4)::
+
+        zsh» ./blpk c -t 8 data.dat
+
+:``[-l | --level]``:
+    Compression level (default: 7)::
+
+    zsh» ./blpk c -l 3 data.dat
+
+:``[-s | --no-shuffle]``:
+    Deactivate shuffle::
+
+    zsh» ./blpk c -s data.dat
+
+In addition, there are two mutually exclusive options for bloscpack itself,
+that govern how the file is split into chunks:
+
+:``[-z | --chunk-size]``:
+    Desired approximate size of the chunks, in byte::
+
+    zsh» ./blpk -d c -z 500000 data.dat
+
+:``[-c | --nchunks]``:
+    Desired number of chunks::
+
+    zsh» ./blpk -d c -c 2 data.dat
+
+Lastly there are two options to control how much output is produced,
+
+The first causes basic info to be printen``[-v | --verbose]``
+
+    zsh» ./blpk -v c data.dat
+    blpk: getting ready for compression
+    blpk: input file is: data.dat
+    blpk: output file is: data.dat.blp
+    blpk: using 8 threads
+    blpk: input file size: 1.53M
+    blpk: output file size: 999.85K
+    blpk: compression ratio: 0.639903
+    blpk: done
+
+... and ``[-d | --debug]`` prints a detailed account of what is going on::
+
+    zsh» ./blpk -d c data.dat
+    blpk: command line argument parsing complete
+    blpk: command line arguments are:
+    blpk:   nchunks: None
+    blpk:   force: False
+    blpk:   verbose: False
+    blpk:   out_file: None
+    blpk:   subcommand: c
+    blpk:   in_file: data.dat
+    blpk:   chunk_size: None
+    blpk:   debug: True
+    blpk:   shuffle: True
+    blpk:   typesize: 4
+    blpk:   clevel: 7
+    blpk:   nthreads: 8
+    blpk: getting ready for compression
+    blpk: blosc args are:
+    blpk:   typesize: 4
+    blpk:   shuffle: True
+    blpk:   clevel: 7
+    blpk: input file is: data.dat
+    blpk: output file is: data.dat.blp
+    blpk: using 8 threads
+    blpk: input file size: 1.53M
+    blpk: nchunks: 1
+    blpk: chunk_size: 1.53M
+    blpk: last_chunk_size: 1.53M
+    blpk: bloscpack_header: 'blpk\x01\x00\x00\x00'
+    blpk: compressing chunk '0' (last)
+    blpk: chunk written, in: 1.53M out: 999.84K
+    blpk: output file size: 999.85K
+    blpk: compression ratio: 0.639903
+    blpk: done
 
 ## Testing
 
@@ -88,7 +213,6 @@ memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
 ## TODO
 
 * ``setup.py``
-* examples of use
 * library usage
 
 ## Author, Copyright and License

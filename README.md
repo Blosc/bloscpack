@@ -214,7 +214,6 @@ memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
 
 ## TODO
 
-* ``setup.py``
 * library usage
 
 ## Author, Copyright and License

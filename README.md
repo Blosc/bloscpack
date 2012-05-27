@@ -21,11 +21,20 @@ Repository is at: https://github.com/esc/bloscpack
 
 ## Installation
 
-Place the file ``blpk`` somewhere in your ``$PATH``.
+Add the ``blpk`` file to your ``$PATH`` somehow. For example by copying using
+dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``::
+
+    zsh» cp -L blpk ~/bin
+
+Or, of course, use the standard ``setup.py``::
+
+    zsh» python setup.py install
+
+... which may require superuser privileges.
 
 ## Usage
 
-Bloscpack has t number of global options and two subcommands: ``[c |
+Bloscpack has a number of global options and two subcommands: ``[c |
 compress]`` and ``[d | decompress]`` which each have their own options.
 
 

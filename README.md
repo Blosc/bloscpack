@@ -179,21 +179,24 @@ following results:
 
     zsh» ./benchmark
     create the test data
+    testfile is: 153M
+    enlarge the testfile......... done.
     testfile is: 1.5G
-    do compression with bloscpack
-    real 6.69
-    user 7.24
-    sys 1.68
-    testfile.blp is: 589M
+    do compression with bloscpack, chunk-size: 128MB
+    real 8.79
+    user 6.64
+    sys 1.29
+    testfile.blp is: 639M
     do compression with gzip
-    real 146.69
-    user 144.24
-    sys 0.91
-    testfile.gz is: 919M
+    real 117.18
+    user 113.26
+    sys 1.01
+    testfile.gz is: 960M
+
 
 As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
-kind of data (``a = numpy.linspace(0, 100, 2e8)``).
+kind of structured data.
 
 ## Implementation Details
 

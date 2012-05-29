@@ -25,8 +25,8 @@ do
     cat $chunk >> $testfile
     echo -n '.'
 done
-rm -v $chunk
 echo ' done.'
+rm $chunk
 
 echo "$testfile is: $(get_fs $testfile)"
 

@@ -7,18 +7,31 @@ get_fs (){
 }
 
 testfile=testfile
+chunk=chunk
 
 echo 'create the test data'
 python -c "
 import numpy
-a = numpy.linspace(0, 100, 2e8)
+a = numpy.linspace(0, 100, 2e7)
 with open('$testfile', 'w') as test_file:
     test_file.write(a.tostring())
 "
 echo "$testfile is: $(get_fs $testfile)"
 
-echo "do compression with bloscpack"
-/usr/bin/time -p ./blpk --force compress $testfile
+echo -n 'enlarge the testfile'
+cat $testfile > $chunk
+for i in $( seq 9);
+do
+    cat $chunk >> $testfile
+    echo -n '.'
+done
+rm -v $chunk
+echo ' done.'
+
+echo "$testfile is: $(get_fs $testfile)"
+
+echo "do compression with bloscpack, chunk-size: 128MB"
+/usr/bin/time -p ./blpk --force compress --chunk-size 134217728  $testfile
 echo "$testfile.blp is: $(get_fs $testfile.blp)"
 
 echo "do compression with gzip"

@@ -328,8 +328,8 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
         raise ChunkingException(
                 "nchunks: '%d' is greate than the MAX_CHUNKS: '%d'" %
                 (nchunks, MAX_CHUNKS))
-    print_verbose('nchunks: %d' % nchunks, level=DEBUG)
-    print_verbose('chunk_size: %s' % pretty_size(chunk_size), level=DEBUG)
+    print_verbose('nchunks: %d' % nchunks, level=VERBOSE)
+    print_verbose('chunk_size: %s' % pretty_size(chunk_size), level=VERBOSE)
     print_verbose('last_chunk_size: %s' % pretty_size(last_chunk_size),
             level=DEBUG)
     return nchunks, chunk_size, last_chunk_size

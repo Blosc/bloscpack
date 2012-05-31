@@ -59,7 +59,8 @@ def reverse_pretty(readable):
     # otherwise we assume it has a suffix
     suffix = readable[-1]
     if suffix not in SUFFIXES.keys():
-        raise ValueError("'%s' is not a valid prefix multiplier: '%s'" %
+        raise ValueError(
+                "'%s' is not a valid prefix multiplier, use one of: '%s'" %
                 (suffix, SUFFIXES.keys()))
     else:
         return int(float(readable[:-1]) * SUFFIXES[suffix])

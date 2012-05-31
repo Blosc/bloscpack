@@ -187,7 +187,7 @@ def create_parser():
                 type=str,
                 default=None,
                 dest='chunk_size',
-                help='set desired number of chunks in bytes')
+                help='set desired number of chunks')
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,

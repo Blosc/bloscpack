@@ -104,7 +104,7 @@ that govern how the file is split into chunks:
 
 * ``[-z | --chunk-size]``
   Desired approximate size of the chunks, where you can use human readable
-  strings like ``8M`` or ``128K``: ``zsh» ./blpk -d c -z 500000 data.dat``
+  strings like ``8M`` or ``128K``: ``zsh» ./blpk -d c -z 128K data.dat``
 * ``[-c | --nchunks]``
   Desired number of chunks:
   ``zsh» ./blpk -d c -c 2 data.dat``

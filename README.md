@@ -218,6 +218,7 @@ memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
 ## TODO
 
 * library usage
+* Human readable chunk-size spec, e.g. 128M
 
 ## Author, Copyright and License
 

@@ -148,6 +148,11 @@ def create_parser():
             setattr(namespace, self.dest, value)
     class CheckChunkSizeOption(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
+            try:
+                # try to get the value as bytes
+                value = reverse_pretty(value)
+            except ValueError as ve:
+                error('%s error: %s' % (option_string, ve.message))
             if value < 0:
                 error('%s must be > 0 ' % option_string)
             setattr(namespace, self.dest, value)
@@ -179,7 +184,7 @@ def create_parser():
         bloscpack_group.add_argument('-z', '--chunk-size',
                 metavar='<size>',
                 action=CheckChunkSizeOption,
-                type=int,
+                type=str,
                 default=None,
                 dest='chunk_size',
                 help='set desired number of chunks in bytes')

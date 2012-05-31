@@ -26,6 +26,11 @@ LEVEL = NORMAL
 VERBOSITY_LEVELS = [NORMAL, VERBOSE, DEBUG]
 PREFIX = "bloscpack.py"
 BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
+SUFFIXES = { "B": 1,
+             "K": 2**10,
+             "M": 2**20,
+             "G": 2**30,
+             "T": 2**40}
 
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
@@ -42,21 +47,23 @@ def error(message, exit_code=1):
     sys.exit(exit_code)
 
 def pretty_size(size_in_bytes):
-    """ Pretty print filesize.
-
-    From: http://www.dzone.com/snippets/filesize-nice-units
-
-    """
-    suffixes = [("B", 2**10),
-                ("K", 2**20),
-                ("M", 2**30),
-                ("G", 2**40),
-                ("T", 2**50)]
-    for suf, lim in suffixes:
-        if size_in_bytes > lim:
+    """ Pretty print filesize.  """
+    for suf, lim in reversed(sorted(SUFFIXES.items(),key=lambda x: x[1])):
+        if size_in_bytes < lim:
             continue
         else:
-            return round(size_in_bytes/float(lim/2**10), 2).__str__()+suf
+            return str(round(size_in_bytes/lim, 2))+suf
+
+def reverse_pretty(readable):
+    """ Reverse pretty printed file size. """
+    # otherwise we assume it has a suffix
+    suffix = readable[-1]
+    if suffix not in SUFFIXES.keys():
+        raise ValueError("'%s' is not a valid prefix multiplier: '%s'" %
+                (suffix, SUFFIXES.keys()))
+    else:
+        return int(float(readable[:-1]) * SUFFIXES[suffix])
+
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.

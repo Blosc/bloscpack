@@ -218,6 +218,8 @@ memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
 ## TODO
 
 * library usage
+* rewrite benchmark in pure python
+* benchmark the effect of chunk-size on compression-time
 
 ## Author, Copyright and License
 

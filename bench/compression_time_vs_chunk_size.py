@@ -20,8 +20,10 @@ del array_
 
 repeats = 3
 print "%s\t\t\t%s" % ("chunk_size", "comp-time")
-for chunk_size in (int(2**i) for i in numpy.arange(12, 32, 0.5)):
+for chunk_size in (int(2**i) for i in numpy.arange(19, 31.5, 0.5)):
     times = []
+    if chunk_size == 2147483648:
+        chunk_size -= 1
     for _ in range(repeats):
         tic = time.time()
         bloscpack.pack_file(in_file, out_file, blosc_args, chunk_size=chunk_size)

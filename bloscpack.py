@@ -304,7 +304,9 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
 
     If a chunk_size larger than in_file_size is proposed, the return value for
     chunk_size will contain the proposed chunk size and the last_chunk_size
-    will be actual chunk size.
+    will be actual chunk size. The value of 'nchunks' will always include the
+    last chunk. So for example for a filesize of 10 and a chunk-size of 3 you
+    would get 3 chunks, two of size 3 and one of size 4.
 
     Raises
     ------

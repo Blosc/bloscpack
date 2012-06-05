@@ -302,7 +302,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     Notes
     -----
 
-    if a chunk_size larger than in_file_size is proposed, the return value for
+    If a chunk_size larger than in_file_size is proposed, the return value for
     chunk_size will contain the proposed chunk size and the last_chunk_size
     will be actual chunk size.
 

@@ -514,8 +514,15 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None):
     blosc_args : dict
         dictionary of blosc keyword args
     nchunks : int, default: None
-        The desired number of chunks. Will be determined automatically if not
-        present.
+        The desired number of chunks.
+    chunk_size : int, default: None
+        The desired chunk size in bytes.
+
+    Notes
+    -----
+    The parameters 'nchunks' and 'chunk_size' are mutually exclusive. Will be
+    determined automatically if not present.
+
     """
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)

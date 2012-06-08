@@ -343,10 +343,25 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             last_chunk_size = in_file_size - chunk_size * (nchunks-1)
     elif nchunks == None and chunk_size != None:
         print_verbose("'chunk_size' proposed", level=DEBUG)
-        nchunks = int(math.ceil(in_file_size/chunk_size)) \
-                if in_file_size >= chunk_size else 1
-        last_chunk_size = chunk_size + in_file_size % chunk_size \
-            if nchunks > 1 else in_file_size
+        if chunk_size > in_file_size:
+            raise ChunkingException(
+                    "Your value of 'chunk_size': %d is" % chunk_size +
+                    "greater than the 'in_file size': %d" % in_file_size)
+        elif chunk_size <= 0:
+            raise ChunkingException(
+                    "'chunk_size' must be greate than zero, not '%d' " %
+                    chunk_size)
+        quotient, remainder = divmod(in_file_size, chunk_size)
+        if chunk_size == in_file_size:
+            nchunks = 1
+            chunk_size = 0
+            last_chunk_size = in_file_size
+        elif remainder == 0:
+            nchunks = int(math.ceil(in_file_size/chunk_size))
+            last_chunk_size = chunk_size
+        else:
+            nchunks = int(math.ceil(in_file_size/chunk_size))
+            last_chunk_size = remainder
     elif nchunks == None and chunk_size == None:
         nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE)) 
         chunk_size = in_file_size//nchunks

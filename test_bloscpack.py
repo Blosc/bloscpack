@@ -92,20 +92,33 @@ def test_nchunks():
     # check for nchunks bigger than in_file_size
     nt.assert_raises(ChunkingException, calculate_nchunks,
             23, nchunks=24)
-    # check for zero or negative chunk_size
+    # check for zero or negative nchunks
     nt.assert_raises(ChunkingException, calculate_nchunks,
             23, nchunks=0)
     nt.assert_raises(ChunkingException, calculate_nchunks,
             23, nchunks=-1)
 
-    nt.assert_equal((9, 1, 1), calculate_nchunks(9, chunk_size=1))
-    nt.assert_equal((3, 4, 5), calculate_nchunks(9, chunk_size=4))
-    nt.assert_equal((3, 8, 15), calculate_nchunks(23, chunk_size=8))
-    nt.assert_equal((1, 16, 8), calculate_nchunks(8, chunk_size=16))
+    # check for chunk_size bigger than in_file_size
+    nt.assert_raises(ChunkingException, calculate_nchunks,
+            23, chunk_size=24)
+    # check for zero or negative chunk_size
+    nt.assert_raises(ChunkingException, calculate_nchunks,
+            23, chunk_size=0)
+    nt.assert_raises(ChunkingException, calculate_nchunks,
+            23, chunk_size=-1)
 
-    # check that a chunk_size larger than the file_size succeeds
-    nt.assert_equal((1, 6, 5), calculate_nchunks(5, chunk_size=6))
-    nt.assert_equal((1, 500000, 5), calculate_nchunks(5, chunk_size=500000))
+    nt.assert_equal((9, 1, 1), calculate_nchunks(9, chunk_size=1))
+    nt.assert_equal((5, 2, 1), calculate_nchunks(9, chunk_size=2))
+    nt.assert_equal((3, 3, 3), calculate_nchunks(9, chunk_size=3))
+    nt.assert_equal((3, 4, 1), calculate_nchunks(9, chunk_size=4))
+    nt.assert_equal((2, 5, 4), calculate_nchunks(9, chunk_size=5))
+    nt.assert_equal((2, 6, 3), calculate_nchunks(9, chunk_size=6))
+    nt.assert_equal((2, 7, 2), calculate_nchunks(9, chunk_size=7))
+    nt.assert_equal((2, 8, 1), calculate_nchunks(9, chunk_size=8))
+    nt.assert_equal((1, 0, 9), calculate_nchunks(9, chunk_size=9))
+
+    nt.assert_equal((3, 8, 7), calculate_nchunks(23, chunk_size=8))
+
     # check that giving both arguments raises an error
     nt.assert_raises(ValueError, calculate_nchunks,
             128, nchunks=23, chunk_size=23)

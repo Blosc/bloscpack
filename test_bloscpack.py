@@ -45,10 +45,58 @@ def test_parser():
     parser = create_parser()
 
 def test_nchunks():
+    # tests for nchunks given
+    # odd with no remainder
     nt.assert_equal((3, 3, 3), calculate_nchunks(9, nchunks=3))
-    nt.assert_equal((2, 4, 4), calculate_nchunks(8, nchunks=2))
-    nt.assert_equal((2, 3, 4), calculate_nchunks(7, nchunks=2))
+    # even with no remaider
     nt.assert_equal((4, 2, 2), calculate_nchunks(8, nchunks=4))
+    # odd with nchunks 2
+    nt.assert_equal((2, 3, 4), calculate_nchunks(7, nchunks=2))
+    # even with nchunks 2
+    nt.assert_equal((2, 4, 4), calculate_nchunks(8, nchunks=2))
+    # odd with nchunks 1
+    nt.assert_equal((1, 0, 9), calculate_nchunks(9, nchunks=1))
+    # even with nchunks 1
+    nt.assert_equal((1, 0, 8), calculate_nchunks(8, nchunks=1))
+
+    # once, from beginning to end
+    nt.assert_equal((1,  0,  23), calculate_nchunks(23, nchunks=1))
+    nt.assert_equal((2,  11, 12), calculate_nchunks(23, nchunks=2))
+    nt.assert_equal((3,  11, 1),  calculate_nchunks(23, nchunks=3))
+    nt.assert_equal((4,  7,  2),  calculate_nchunks(23, nchunks=4))
+    nt.assert_equal((5,  5,  3),  calculate_nchunks(23, nchunks=5))
+    nt.assert_equal((6,  4,  3),  calculate_nchunks(23, nchunks=6))
+    nt.assert_equal((7,  3,  5),  calculate_nchunks(23, nchunks=7))
+    nt.assert_equal((8,  3,  2),  calculate_nchunks(23, nchunks=8))
+    nt.assert_equal((9,  2,  7),  calculate_nchunks(23, nchunks=9))
+    nt.assert_equal((10, 2,  5),  calculate_nchunks(23, nchunks=10))
+    nt.assert_equal((11, 2,  3),  calculate_nchunks(23, nchunks=11))
+    nt.assert_equal((12, 2,  1),  calculate_nchunks(23, nchunks=12))
+    nt.assert_equal((13, 1,  11), calculate_nchunks(23, nchunks=13))
+    nt.assert_equal((14, 1,  10), calculate_nchunks(23, nchunks=14))
+    nt.assert_equal((15, 1,  9),  calculate_nchunks(23, nchunks=15))
+    nt.assert_equal((16, 1,  8),  calculate_nchunks(23, nchunks=16))
+    nt.assert_equal((17, 1,  7),  calculate_nchunks(23, nchunks=17))
+    nt.assert_equal((18, 1,  6),  calculate_nchunks(23, nchunks=18))
+    nt.assert_equal((19, 1,  5),  calculate_nchunks(23, nchunks=19))
+    nt.assert_equal((20, 1,  4),  calculate_nchunks(23, nchunks=20))
+    nt.assert_equal((21, 1,  3),  calculate_nchunks(23, nchunks=21))
+    nt.assert_equal((22, 1,  2),  calculate_nchunks(23, nchunks=22))
+    nt.assert_equal((23, 1,  1),  calculate_nchunks(23, nchunks=23))
+
+    # some more random spot tests
+    nt.assert_equal((2, 8, 9), calculate_nchunks(17, nchunks=2))
+    nt.assert_equal((4, 2, 2), calculate_nchunks(8, nchunks=4))
+    nt.assert_equal((7, 3, 2), calculate_nchunks(20, nchunks=7))
+
+    # check for chunk_size bigger than in_file_size
+    nt.assert_raises(ChunkingException, calculate_nchunks,
+            23, nchunks=24)
+    # check for zero or negative chunk_size
+    nt.assert_raises(ChunkingException, calculate_nchunks,
+            23, nchunks=0)
+    nt.assert_raises(ChunkingException, calculate_nchunks,
+            23, nchunks=-1)
 
     nt.assert_equal((9, 1, 1), calculate_nchunks(9, chunk_size=1))
     nt.assert_equal((3, 4, 5), calculate_nchunks(9, chunk_size=4))

@@ -321,16 +321,37 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
                 "either specify 'nchunks' or 'chunk_size', but not both")
     elif nchunks != None and chunk_size == None:
         print_verbose("'nchunks' proposed", level=DEBUG)
-        chunk_size = in_file_size//nchunks
+        if nchunks > in_file_size:
+            raise ChunkingException(
+                    "Your value of 'nchunks': %d is" % nchunks +
+                    "greater than the 'in_file size': %d" % in_file_size)
+        if nchunks <= 0:
+            raise ChunkingException(
+                    "'nchunks' must be greate than zero, not '%d' " % nchunks)
+        quotient, remainder = divmod(in_file_size, nchunks)
+        if nchunks == 1:
+            chunk_size = 0
+            last_chunk_size = in_file_size
+        elif remainder == 0:
+            chunk_size = quotient
+            last_chunk_size = chunk_size
+        elif nchunks == 2:
+            chunk_size = quotient
+            last_chunk_size = in_file_size - chunk_size
+        else:
+            chunk_size = in_file_size//(nchunks-1)
+            last_chunk_size = in_file_size - chunk_size * (nchunks-1)
     elif nchunks == None and chunk_size != None:
         print_verbose("'chunk_size' proposed", level=DEBUG)
         nchunks = int(math.ceil(in_file_size/chunk_size)) \
                 if in_file_size >= chunk_size else 1
+        last_chunk_size = chunk_size + in_file_size % chunk_size \
+            if nchunks > 1 else in_file_size
     elif nchunks == None and chunk_size == None:
         nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE)) 
         chunk_size = in_file_size//nchunks
-    last_chunk_size = chunk_size + in_file_size % chunk_size \
-        if nchunks > 1 else in_file_size
+        last_chunk_size = chunk_size + in_file_size % chunk_size \
+            if nchunks > 1 else in_file_size
     if chunk_size > blosc.BLOSC_MAX_BUFFERSIZE \
             or last_chunk_size > blosc.BLOSC_MAX_BUFFERSIZE:
         raise ChunkingException(

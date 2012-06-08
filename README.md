@@ -221,6 +221,8 @@ memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
 * rewrite benchmark in pure python
 * benchmark the effect of chunk-size on compression-time
 * Use a default chunk-size of 8MB
+* The last chunk should store the remainder
+* fix the typesize default argument
 
 ## Author, Copyright and License
 

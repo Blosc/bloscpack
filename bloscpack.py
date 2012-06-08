@@ -364,9 +364,17 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             last_chunk_size = remainder
     elif nchunks == None and chunk_size == None:
         nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE)) 
-        chunk_size = in_file_size//nchunks
-        last_chunk_size = chunk_size + in_file_size % chunk_size \
-            if nchunks > 1 else in_file_size
+        quotient, remainder = divmod(in_file_size, blosc.BLOSC_MAX_BUFFERSIZE)
+        if in_file_size == blosc.BLOSC_MAX_BUFFERSIZE:
+            nchunks = 1
+            chunk_size = 0
+            last_chunk_size = blosc.BLOSC_MAX_BUFFERSIZE
+        elif quotient == 0:
+            chunk_size = 0
+            last_chunk_size = in_file_size
+        else:
+            chunk_size = blosc.BLOSC_MAX_BUFFERSIZE
+            last_chunk_size = in_file_size % blosc.BLOSC_MAX_BUFFERSIZE
     if chunk_size > blosc.BLOSC_MAX_BUFFERSIZE \
             or last_chunk_size > blosc.BLOSC_MAX_BUFFERSIZE:
         raise ChunkingException(

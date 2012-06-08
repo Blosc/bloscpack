@@ -19,6 +19,7 @@ __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 EXTENSION = '.blp'
 MAGIC = 'blpk'
 MAX_CHUNKS = (2**32)-1
+DEFAULT_CHUNK_SIZE = '4M'
 NORMAL  = 'NORMAL'
 VERBOSE = 'VERBOSE'
 DEBUG   = 'DEBUG'
@@ -187,7 +188,8 @@ def create_parser():
                 type=str,
                 default=None,
                 dest='chunk_size',
-                help='set desired number of chunks')
+                help='set desired number of chunks (default: %s)' %
+                DEFAULT_CHUNK_SIZE)
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,
@@ -352,7 +354,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             nchunks = quotient + 1
             last_chunk_size = remainder
     elif nchunks == None and chunk_size == None:
-        nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE)) 
+        nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE))
         quotient, remainder = divmod(in_file_size, blosc.BLOSC_MAX_BUFFERSIZE)
         if in_file_size == blosc.BLOSC_MAX_BUFFERSIZE:
             nchunks = 1
@@ -514,8 +516,15 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None):
     blosc_args : dict
         dictionary of blosc keyword args
     nchunks : int, default: None
-        The desired number of chunks. Will be determined automatically if not
-        present.
+        The desired number of chunks.
+    chunk_size : int, default: None
+        The desired chunk size in bytes.
+
+    Notes
+    -----
+    The parameters 'nchunks' and 'chunk_size' are mutually exclusive. Will be
+    determined automatically if not present.
+
     """
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)
@@ -605,6 +614,9 @@ if __name__ == '__main__':
             print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
         check_files(in_file, out_file, args)
         process_nthread_arg(args)
+        # mutually exclusivity in parser protects us from both having a value
+        if args.nchunk is None and args.chunk_size is None:
+            args.chunk_size = DEFAULT_CHUNK_SIZE
         try:
             pack_file(in_file, out_file, blosc_args,
                     nchunks=args.nchunks, chunk_size=args.chunk_size)

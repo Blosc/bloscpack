@@ -357,10 +357,10 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             chunk_size = 0
             last_chunk_size = in_file_size
         elif remainder == 0:
-            nchunks = int(math.ceil(in_file_size/chunk_size))
+            nchunks = quotient
             last_chunk_size = chunk_size
         else:
-            nchunks = int(math.ceil(in_file_size/chunk_size))
+            nchunks = quotient + 1
             last_chunk_size = remainder
     elif nchunks == None and chunk_size == None:
         nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE)) 

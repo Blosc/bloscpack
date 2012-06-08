@@ -307,7 +307,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
         under various error conditions
 
     """
-    if nchunk is not None and chunk_size is not None:
+    if nchunks is not None and chunk_size is not None:
         raise ValueError(
                 "either specify 'nchunks' or 'chunk_size', but not both")
     elif nchunks is not None and chunk_size is None:
@@ -615,8 +615,8 @@ if __name__ == '__main__':
         check_files(in_file, out_file, args)
         process_nthread_arg(args)
         # mutually exclusivity in parser protects us from both having a value
-        if args.nchunk is None and args.chunk_size is None:
-            args.chunk_size = DEFAULT_CHUNK_SIZE
+        if args.nchunks is None and args.chunk_size is None:
+            args.chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
         try:
             pack_file(in_file, out_file, blosc_args,
                     nchunks=args.nchunks, chunk_size=args.chunk_size)

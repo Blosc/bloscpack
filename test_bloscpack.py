@@ -89,7 +89,7 @@ def test_nchunks():
     nt.assert_equal((4, 2, 2), calculate_nchunks(8, nchunks=4))
     nt.assert_equal((7, 3, 2), calculate_nchunks(20, nchunks=7))
 
-    # check for chunk_size bigger than in_file_size
+    # check for nchunks bigger than in_file_size
     nt.assert_raises(ChunkingException, calculate_nchunks,
             23, nchunks=24)
     # check for zero or negative chunk_size

@@ -30,8 +30,8 @@ rm $chunk
 
 echo "$testfile is: $(get_fs $testfile)"
 
-echo "do compression with bloscpack, chunk-size: 128MB"
-/usr/bin/time -p ./blpk --force compress --chunk-size 128M $testfile
+echo "do compression with bloscpack, chunk-size: 4MB (default)"
+/usr/bin/time -p ./blpk --force compress $testfile
 echo "$testfile.blp is: $(get_fs $testfile.blp)"
 
 echo "do compression with gzip"

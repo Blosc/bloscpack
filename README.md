@@ -220,6 +220,7 @@ memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
 * library usage
 * rewrite benchmark in pure python
 * fix the typesize default argument
+* double check the introduction and technical overview
 
 ## Author, Copyright and License
 

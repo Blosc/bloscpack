@@ -19,6 +19,7 @@ __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 EXTENSION = '.blp'
 MAGIC = 'blpk'
 MAX_CHUNKS = (2**32)-1
+DEFAULT_CHUNK_SIZE = '4M'
 NORMAL  = 'NORMAL'
 VERBOSE = 'VERBOSE'
 DEBUG   = 'DEBUG'
@@ -187,7 +188,8 @@ def create_parser():
                 type=str,
                 default=None,
                 dest='chunk_size',
-                help='set desired number of chunks')
+                help='set desired number of chunks (default: %s)' %
+                DEFAULT_CHUNK_SIZE)
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,
@@ -612,6 +614,9 @@ if __name__ == '__main__':
             print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
         check_files(in_file, out_file, args)
         process_nthread_arg(args)
+        # mutually exclusivity in parser protects us from both having a value
+        if args.nchunk is None and args.chunk_size is None:
+            args.chunk_size = DEFAULT_CHUNK_SIZE
         try:
             pack_file(in_file, out_file, blosc_args,
                     nchunks=args.nchunks, chunk_size=args.chunk_size)

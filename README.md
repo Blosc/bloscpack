@@ -223,6 +223,7 @@ memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
 * Use a default chunk-size of 8MB
 * The last chunk should store the remainder
 * fix the typesize default argument
+* don't use x == None, use x is None instead (PEP8)
 
 ## Author, Copyright and License
 

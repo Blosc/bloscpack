@@ -228,7 +228,6 @@ by Blosc.
 * fix the typesize default argument, possibly make it platform dependent
 * since we now have potentially small chunks, the progressbar becomes relevant
   again
-* double check the introduction and technical overview
 
 ## Changelog
 

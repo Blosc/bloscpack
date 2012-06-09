@@ -541,14 +541,14 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None):
         # if nchunks == 1 the last_chunk_size is the size of the single chunk
         for i, bytes_to_read in enumerate((
                 [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
-            print_verbose("compressing chunk '%d'%s" %
-                    (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
             current_chunk = input_fp.read(bytes_to_read)
             compressed = blosc.compress(current_chunk, **blosc_args)
             output_fp.write(compressed)
-            print_verbose("chunk written, in: %s out: %s" %
-                    (pretty_size(len(current_chunk)),
-                        pretty_size(len(compressed))), level=DEBUG)
+            print_verbose("chunk '%d'%s written, in: %s out: %s" %
+                    (i, ' (last)' if i == nchunks-1 else '',
+                    pretty_size(len(current_chunk)),
+                    pretty_size(len(compressed))),
+                    level=DEBUG)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))

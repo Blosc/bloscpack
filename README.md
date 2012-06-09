@@ -239,6 +239,11 @@ by Blosc.
 * command line argument parser
 * README, setup.py, tests and benchmark
 
+## Thanks
+
+* Fracesc Alted for writing Blosc in the first place and for providing
+  code-review and feedback on bloscpack
+
 ## Author, Copyright and License
 
 (C) 2012 Valentin Haenel <valentin.haenel@gmx.de>

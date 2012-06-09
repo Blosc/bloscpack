@@ -219,7 +219,7 @@ by Blosc.
 
 * document library usage
 * --equal-size argument to create large chunks of equal size
-* --max-size to create the largest possible chunks, regadless of input size
+* --max-size to create the largest possible chunks, regardless of input size
 * remove the number of chunks in the bloscpack header
 * ... this allows it to be used as a filter, since the data size needs not be
   known in advance
@@ -243,8 +243,8 @@ by Blosc.
 ### ∴ v0.1.0-rc1 ∴ Sun May 27 2012 ∴
 
 * Initial version
-* compression/decompression
-* command line argument parser
+* Compression/decompression
+* Command line argument parser
 * README, setup.py, tests and benchmark
 
 ## Thanks

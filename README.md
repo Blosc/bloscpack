@@ -177,7 +177,7 @@ Extended tests:
     zsh» nosetests test_bloscpack.py:pack_unpack_extended
     [...]
 
-# ∴ Benchmark
+## ∴ Benchmark
 
 Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
 CPU 960  @ 3.20GHz`` cpu with 4 cores and active hyperthreading yields the

@@ -188,7 +188,7 @@ def create_parser():
                 type=str,
                 default=None,
                 dest='chunk_size',
-                help='set desired number of chunks (default: %s)' %
+                help='set desired chunk size (default: %s)' %
                 DEFAULT_CHUNK_SIZE)
 
     decompress_parser = subparsers.add_parser('decompress',

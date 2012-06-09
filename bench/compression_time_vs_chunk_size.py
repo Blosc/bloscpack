@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import division
+
 import os.path as path
 import tempfile
 import time
@@ -20,7 +22,7 @@ with open(in_file, 'wb') as in_fp:
 del array_
 
 repeats = 3
-print "%s\t\t%s\t\t%s" % ("chunk_size", "comp-time", "decomp-time")
+print "%s\t\t%s\t\t%s\t\t%s" % ("chunk_size", "comp-time", "decomp-time", "ratio")
 for chunk_size in (int(2**i) for i in numpy.arange(19, 31.5, 0.5)):
     cmp_times = []
     dcmp_times = []
@@ -35,6 +37,8 @@ for chunk_size in (int(2**i) for i in numpy.arange(19, 31.5, 0.5)):
         bloscpack.unpack_file(out_file, dcmp_file)
         toc = time.time()
         dcmp_times.append(toc-tic)
-    print "%d\t\t%f\t\t%f" % (chunk_size,
+    ratio = path.getsize(out_file)/path.getsize(in_file)
+    print "%d\t\t%f\t\t%f\t\t%f" % (chunk_size,
             sum(cmp_times)/repeats,
-            sum(dcmp_times)/repeats)
+            sum(dcmp_times)/repeats,
+            ratio)

@@ -217,8 +217,17 @@ memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
 
 ## TODO
 
-* library usage
-* fix the typesize default argument
+* document library usage
+* --equal-size argument to create large chunks of equal size
+* --max-size to create the largest possible chunks, regadless of input size
+* remove the number of chunks in the bloscpack header
+* ... this allows it to be used as a filter, since the data size needs not be
+  known in advance
+* then add --raw-input and --raw-output switches to allow stuff like:
+  cat file | blpk --raw-input --raw-output compress > file.blp
+* fix the typesize default argument, possibly make it platform dependent
+* since we now have potentially small chunks, the progressbar becomes relevant
+  again
 * double check the introduction and technical overview
 
 ## Author, Copyright and License

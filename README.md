@@ -201,20 +201,19 @@ kind of structured data.
 
 ## Implementation Details
 
-This section describes various details regarding the implementation.
+The input is split into chunks since a) we wish to put less stress on main
+memory and b) because Blosc has a buffer limit of 2GB (May 2012). By default
+the chunk-size is a moderate ``4MB`` which should be fine, even for less
+powerful machines. The last chunk always contains the remainder and has thus
+size either equal too or less than the rest of the chunks.
 
-Since Blosc has a buffer limit of 2GB (May 2012) we split the file into chunks
-no larger than 2GB where the last chunk may be a little larger than the other
-ones since it contains the remainder. To facilitate this, Bloscpack adds an 8
-byte header containing a 4 byte magic string, 'blpk', and a 4 byte
-little-endian unsigned integer which designates how many chunks there are.
-Effectively, this limits the number of chunks to ``2**32-1 = 4294967295``, but
-this should not be relevant in practice. In terms of overhead, this means that
-for a file which can not be compressed, bloscpack will add a total of 8 bytes
-for itself and  16 bytes for each chunk compressed by Blosc. Regarding memory,
-bloscpack is quite memory hungry compared to other compressors. It will need
-enough memory to keep both the uncompressed and compressed data in
-memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
+Bloscpack adds an 8 byte header to a compressed file, which consists of a 4
+byte magic string, ``blpk``, and a 4 byte little-endian unsigned integer which
+designates how many chunks there are.  Effectively, this limits the number of
+chunks to ``2**32-1 = 4294967295``, but this should not be relevant in
+practice. In terms of overhead, this means that for a given file bloscpack
+will add a total of 8 bytes for itself and 16 bytes for each chunk compressed
+by Blosc.
 
 ## TODO
 

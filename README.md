@@ -22,11 +22,11 @@ Repository is at: https://github.com/esc/bloscpack
 ## Installation
 
 Add the ``blpk`` file to your ``$PATH`` somehow. For example by copying using
-dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``::
+dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``:
 
     zsh» cp -L blpk ~/bin
 
-Or, of course, use the standard ``setup.py``::
+Or, of course, use the standard ``setup.py``:
 
     zsh» python setup.py install
 
@@ -104,7 +104,8 @@ that govern how the file is split into chunks:
 
 * ``[-z | --chunk-size]``
   Desired approximate size of the chunks, where you can use human readable
-  strings like ``8M`` or ``128K``: ``zsh» ./blpk -d c -z 128K data.dat``
+  strings like ``8M`` or ``128K`` (default: ``4MB``):
+  ``zsh» ./blpk -d c -z 128K data.dat``
 * ``[-c | --nchunks]``
   Desired number of chunks:
   ``zsh» ./blpk -d c -c 2 data.dat``
@@ -118,23 +119,25 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: input file is: data.dat
     blpk: output file is: data.dat.blp
     blpk: using 8 threads
-    blpk: input file size: 1.53M
-    blpk: output file size: 999.85K
-    blpk: compression ratio: 0.639903
+    blpk: input file size: 1.49G
+    blpk: nchunks: 382
+    blpk: chunk_size: 4.0M
+    blpk: output file size: 688.07M
+    blpk: compression ratio: 0.450935
     blpk: done
 
 ... and ``[-d | --debug]`` prints a detailed account of what is going on:
 
-    zsh» ./blpk -d c data.dat
+    zsh» ./blpk -d c -z 0.5G data.dat
     blpk: command line argument parsing complete
-    blpk: command line arguments are:
+    blpk: command line arguments are: 
     blpk:   nchunks: None
     blpk:   force: False
     blpk:   verbose: False
     blpk:   out_file: None
     blpk:   subcommand: c
     blpk:   in_file: data.dat
-    blpk:   chunk_size: None
+    blpk:   chunk_size: 536870912
     blpk:   debug: True
     blpk:   shuffle: True
     blpk:   typesize: 4
@@ -148,16 +151,19 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: input file is: data.dat
     blpk: output file is: data.dat.blp
     blpk: using 8 threads
-    blpk: input file size: 1.53M
-    blpk: nchunks: 1
-    blpk: chunk_size: 1.53M
-    blpk: last_chunk_size: 1.53M
-    blpk: bloscpack_header: 'blpk\x01\x00\x00\x00'
-    blpk: compressing chunk '0' (last)
-    blpk: chunk written, in: 1.53M out: 999.84K
-    blpk: output file size: 999.85K
-    blpk: compression ratio: 0.639903
+    blpk: input file size: 1.49G
+    blpk: 'chunk_size' proposed
+    blpk: nchunks: 3
+    blpk: chunk_size: 512.0M
+    blpk: last_chunk_size: 501.88M
+    blpk: bloscpack_header: 'blpk\x03\x00\x00\x00'
+    blpk: chunk '0' written, in: 512.0M out: 235.14M
+    blpk: chunk '1' written, in: 512.0M out: 229.74M
+    blpk: chunk '2' (last) written, in: 501.88M out: 223.19M
+    blpk: output file size: 688.07M
+    blpk: compression ratio: 0.450932
     blpk: done
+
 
 ## Testing
 
@@ -173,26 +179,21 @@ Extended tests:
 
 # Benchmark
 
-Using the provided ``benchmark`` script on a ``Intel(R) Core(TM) i7 CPU
-960  @ 3.20GHz`` cpu with 4 cores and active hyperthreading yields the
+Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
+CPU 960  @ 3.20GHz`` cpu with 4 cores and active hyperthreading yields the
 following results:
 
-    zsh» ./benchmark
-    create the test data
-    testfile is: 153M
-    enlarge the testfile......... done.
-    testfile is: 1.5G
-    do compression with bloscpack, chunk-size: 128MB
-    real 8.79
-    user 6.64
-    sys 1.29
-    testfile.blp is: 639M
-    do compression with gzip
-    real 117.18
-    user 113.26
-    sys 1.01
-    testfile.gz is: 960M
-
+    zsh» PYTHONPATH=. bench/blpk_vs_gzip.py
+    create the test data..........
+    Input file size: 1.49G
+    Will now run bloscpack...
+    Time: 8.91 seconds
+    Output file size: 688.07M
+    Ratio: 0.45
+    Will now run gzip...
+    Time: 121.33 seconds
+    Output file size: 959.13M
+    Ratio: 0.63
 
 As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
@@ -200,20 +201,19 @@ kind of structured data.
 
 ## Implementation Details
 
-This section describes various details regarding the implementation.
+The input is split into chunks since a) we wish to put less stress on main
+memory and b) because Blosc has a buffer limit of 2GB (May 2012). By default
+the chunk-size is a moderate ``4MB`` which should be fine, even for less
+powerful machines. The last chunk always contains the remainder and has thus
+size either equal too or less than the rest of the chunks.
 
-Since Blosc has a buffer limit of 2GB (May 2012) we split the file into chunks
-no larger than 2GB where the last chunk may be a little larger than the other
-ones since it contains the remainder. To facilitate this, Bloscpack adds an 8
-byte header containing a 4 byte magic string, 'blpk', and a 4 byte
-little-endian unsigned integer which designates how many chunks there are.
-Effectively, this limits the number of chunks to ``2**32-1 = 4294967295``, but
-this should not be relevant in practice. In terms of overhead, this means that
-for a file which can not be compressed, bloscpack will add a total of 8 bytes
-for itself and  16 bytes for each chunk compressed by Blosc. Regarding memory,
-bloscpack is quite memory hungry compared to other compressors. It will need
-enough memory to keep both the uncompressed and compressed data in
-memory---with a chunk size of 2GB, more than 4GB of memory is recommended.
+Bloscpack adds an 8 byte header to a compressed file, which consists of a 4
+byte magic string, ``blpk``, and a 4 byte little-endian unsigned integer which
+designates how many chunks there are.  Effectively, this limits the number of
+chunks to ``2**32-1 = 4294967295``, but this should not be relevant in
+practice. In terms of overhead, this means that for a given file bloscpack
+will add a total of 8 bytes for itself and 16 bytes for each chunk compressed
+by Blosc.
 
 ## TODO
 

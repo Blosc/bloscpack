@@ -119,23 +119,25 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: input file is: data.dat
     blpk: output file is: data.dat.blp
     blpk: using 8 threads
-    blpk: input file size: 1.53M
-    blpk: output file size: 999.85K
-    blpk: compression ratio: 0.639903
+    blpk: input file size: 1.49G
+    blpk: nchunks: 382
+    blpk: chunk_size: 4.0M
+    blpk: output file size: 688.07M
+    blpk: compression ratio: 0.450935
     blpk: done
 
 ... and ``[-d | --debug]`` prints a detailed account of what is going on:
 
-    zsh» ./blpk -d c data.dat
+    zsh» ./blpk -d c -z 0.5G data.dat
     blpk: command line argument parsing complete
-    blpk: command line arguments are:
+    blpk: command line arguments are: 
     blpk:   nchunks: None
     blpk:   force: False
     blpk:   verbose: False
     blpk:   out_file: None
     blpk:   subcommand: c
     blpk:   in_file: data.dat
-    blpk:   chunk_size: None
+    blpk:   chunk_size: 536870912
     blpk:   debug: True
     blpk:   shuffle: True
     blpk:   typesize: 4
@@ -149,16 +151,19 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: input file is: data.dat
     blpk: output file is: data.dat.blp
     blpk: using 8 threads
-    blpk: input file size: 1.53M
-    blpk: nchunks: 1
-    blpk: chunk_size: 1.53M
-    blpk: last_chunk_size: 1.53M
-    blpk: bloscpack_header: 'blpk\x01\x00\x00\x00'
-    blpk: compressing chunk '0' (last)
-    blpk: chunk written, in: 1.53M out: 999.84K
-    blpk: output file size: 999.85K
-    blpk: compression ratio: 0.639903
+    blpk: input file size: 1.49G
+    blpk: 'chunk_size' proposed
+    blpk: nchunks: 3
+    blpk: chunk_size: 512.0M
+    blpk: last_chunk_size: 501.88M
+    blpk: bloscpack_header: 'blpk\x03\x00\x00\x00'
+    blpk: chunk '0' written, in: 512.0M out: 235.14M
+    blpk: chunk '1' written, in: 512.0M out: 229.74M
+    blpk: chunk '2' (last) written, in: 501.88M out: 223.19M
+    blpk: output file size: 688.07M
+    blpk: compression ratio: 0.450932
     blpk: done
+
 
 ## Testing
 

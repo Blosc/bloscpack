@@ -314,7 +314,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
         print_verbose("'nchunks' proposed", level=DEBUG)
         if nchunks > in_file_size:
             raise ChunkingException(
-                    "Your value of 'nchunks': %d is" % nchunks +
+                    "Your value of 'nchunks': %d is " % nchunks +
                     "greater than the 'in_file size': %d" % in_file_size)
         elif nchunks <= 0:
             raise ChunkingException(
@@ -336,7 +336,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
         print_verbose("'chunk_size' proposed", level=DEBUG)
         if chunk_size > in_file_size:
             raise ChunkingException(
-                    "Your value of 'chunk_size': %d is" % chunk_size +
+                    "Your value of 'chunk_size': %d is " % chunk_size +
                     "greater than the 'in_file size': %d" % in_file_size)
         elif chunk_size <= 0:
             raise ChunkingException(

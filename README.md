@@ -232,6 +232,15 @@ by Blosc.
 
 ## Changelog
 
+### ∴ v0.1.0-rc2 ∴ Sat Jun 09 2012 ∴
+
+* Default chunk-size now ``4MB``
+* Human readable chunk-size argument
+* Last chunk now contains remainder
+* Pure python benchmark to compare against gzip
+* Benchmark to measure the effect of chunk-size
+* Various minor fixes and enhancements
+
 ### ∴ v0.1.0-rc1 ∴ Sun May 27 2012 ∴
 
 * Initial version

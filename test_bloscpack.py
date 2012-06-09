@@ -212,11 +212,17 @@ def test_decode_bloscpack_header():
 def test_pack_unpack():
     pack_unpack(2e6)
     pack_unpack(2e6, nchunks=20)
+    pack_unpack(2e6, nchunks=1)
+    pack_unpack(2e6, nchunks=100)
+    pack_unpack(2e6, chunk_size=reverse_pretty('1M'))
+    pack_unpack(2e6, chunk_size=reverse_pretty('2M'))
+    pack_unpack(2e6, chunk_size=reverse_pretty('4M'))
+    pack_unpack(2e6, chunk_size=reverse_pretty('8M'))
 
 def pack_unpack_extended():
     pack_unpack(2e8)
 
-def pack_unpack(nnumbers, nchunks=None):
+def pack_unpack(nnumbers, nchunks=None, chunk_size=None):
     tdir = tempfile.mkdtemp()
     blosc_args = {'typesize': 4,
                   'clevel' : 7,
@@ -227,7 +233,8 @@ def pack_unpack(nnumbers, nchunks=None):
     array_ = numpy.linspace(0, 100, nnumbers)
     with open(in_file, 'wb') as in_fp:
         in_fp.write(array_.tostring())
-    pack_file(in_file, out_file, blosc_args, nchunks=nchunks)
+    pack_file(in_file, out_file, blosc_args,
+            nchunks=nchunks, chunk_size=chunk_size)
     unpack_file(out_file, dcmp_file)
     cmp(in_file, dcmp_file)
 

@@ -230,6 +230,15 @@ by Blosc.
   again
 * double check the introduction and technical overview
 
+## Changelog
+
+### ∴ v0.1.0-rc1 ∴ Sun May 27 2012 ∴
+
+* Initial version
+* compression/decompression
+* command line argument parser
+* README, setup.py, tests and benchmark
+
 ## Author, Copyright and License
 
 (C) 2012 Valentin Haenel <valentin.haenel@gmx.de>

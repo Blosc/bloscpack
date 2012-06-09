@@ -179,26 +179,21 @@ Extended tests:
 
 # Benchmark
 
-Using the provided ``benchmark`` script on a ``Intel(R) Core(TM) i7 CPU
-960  @ 3.20GHz`` cpu with 4 cores and active hyperthreading yields the
+Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
+CPU 960  @ 3.20GHz`` cpu with 4 cores and active hyperthreading yields the
 following results:
 
-    zsh» ./benchmark
-    create the test data
-    testfile is: 153M
-    enlarge the testfile......... done.
-    testfile is: 1.5G
-    do compression with bloscpack, chunk-size: 128MB
-    real 8.79
-    user 6.64
-    sys 1.29
-    testfile.blp is: 639M
-    do compression with gzip
-    real 117.18
-    user 113.26
-    sys 1.01
-    testfile.gz is: 960M
-
+    zsh» PYTHONPATH=. bench/blpk_vs_gzip.py
+    create the test data..........
+    Input file size: 1.49G
+    Will now run bloscpack...
+    Time: 8.91 seconds
+    Output file size: 688.07M
+    Ratio: 0.45
+    Will now run gzip...
+    Time: 121.33 seconds
+    Output file size: 959.13M
+    Ratio: 0.63
 
 As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this

@@ -22,11 +22,11 @@ Repository is at: https://github.com/esc/bloscpack
 ## Installation
 
 Add the ``blpk`` file to your ``$PATH`` somehow. For example by copying using
-dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``::
+dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``:
 
     zsh» cp -L blpk ~/bin
 
-Or, of course, use the standard ``setup.py``::
+Or, of course, use the standard ``setup.py``:
 
     zsh» python setup.py install
 

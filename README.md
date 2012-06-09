@@ -1,8 +1,8 @@
-# bloscpack
+# ∴ bloscpack
 
 Command line interface to Blosc via python-blosc
 
-## Description
+## ∴ Description
 
 This script provides a command line interface to
 [Blosc](http://blosc.pytables.org/trac), a high performance, multi-threaded,
@@ -10,16 +10,16 @@ blocking and shuffeling compressor. The interface is realized by using the
 [argparse](http://docs.python.org/dev/library/argparse.html) library
 and [python-blosc](https://github.com/FrancescAlted/python-blosc) bindings.
 
-## Website
+## ∴ Website
 
 Repository is at: https://github.com/esc/bloscpack
 
-## Dependencies
+## ∴ Dependencies
 
 * Python 2.7
 * [python-blosc](https://github.com/FrancescAlted/python-blosc) (provides Blosc)
 
-## Installation
+## ∴ Installation
 
 Add the ``blpk`` file to your ``$PATH`` somehow. For example by copying using
 dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``:
@@ -32,7 +32,7 @@ Or, of course, use the standard ``setup.py``:
 
 ... which may require superuser privileges.
 
-## Usage
+## ∴ Usage
 
 Bloscpack has a number of global options and two subcommands: ``[c |
 compress]`` and ``[d | decompress]`` which each have their own options.
@@ -50,7 +50,7 @@ Help for each one of the subcommands:
     zsh» ./blpk decompress --help
     [...]
 
-## Examples
+## ∴ Examples
 
 Basic compression:
 
@@ -165,7 +165,7 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: done
 
 
-## Testing
+## ∴ Testing
 
 Basic tests, runs quickly:
 
@@ -177,7 +177,7 @@ Extended tests:
     zsh» nosetests test_bloscpack.py:pack_unpack_extended
     [...]
 
-# Benchmark
+# ∴ Benchmark
 
 Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
 CPU 960  @ 3.20GHz`` cpu with 4 cores and active hyperthreading yields the
@@ -199,7 +199,7 @@ As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
 kind of structured data.
 
-## Implementation Details
+## ∴ Implementation Details
 
 The input is split into chunks since a) we wish to put less stress on main
 memory and b) because Blosc has a buffer limit of 2GB (May 2012). By default
@@ -215,7 +215,7 @@ practice. In terms of overhead, this means that for a given file bloscpack
 will add a total of 8 bytes for itself and 16 bytes for each chunk compressed
 by Blosc.
 
-## TODO
+## ∴ TODO
 
 * document library usage
 * --equal-size argument to create large chunks of equal size
@@ -229,7 +229,7 @@ by Blosc.
 * since we now have potentially small chunks, the progressbar becomes relevant
   again
 
-## Changelog
+## ∴ Changelog
 
 ### ∴ v0.1.0-rc2 ∴ Sat Jun 09 2012 ∴
 
@@ -247,12 +247,12 @@ by Blosc.
 * Command line argument parser
 * README, setup.py, tests and benchmark
 
-## Thanks
+## ∴ Thanks
 
 * Fracesc Alted for writing Blosc in the first place and for providing
   code-review and feedback on bloscpack
 
-## Author, Copyright and License
+## ∴ Author, Copyright and License
 
 (C) 2012 Valentin Haenel <valentin.haenel@gmx.de>
 

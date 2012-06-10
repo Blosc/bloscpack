@@ -10,10 +10,7 @@ import numpy
 import bloscpack
 import test_bloscpack as tb
 
-tdir = tempfile.mkdtemp()
-in_file = path.join(tdir, 'file')
-out_file = path.join(tdir, 'file.blp')
-dcmp_file = path.join(tdir, 'file.dcmp')
+tdir, in_file, out_file, dcmp_file = tb.create_tmp_files()
 blosc_args = bloscpack.DEFAULT_BLOSC_ARGS
 tb.create_array(100, in_file)
 

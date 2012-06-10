@@ -215,6 +215,13 @@ def create_array(repeats, in_file, progress=None):
             if progress is not None:
                 progress(i)
 
+def create_tmp_files():
+    tdir = tempfile.mkdtemp()
+    in_file = path.join(tdir, 'file')
+    out_file = path.join(tdir, 'file.blp')
+    dcmp_file = path.join(tdir, 'file.dcmp')
+    return tdir, in_file, out_file, dcmp_file
+
 def test_pack_unpack():
     pack_unpack(1)
     pack_unpack(1, nchunks=20)
@@ -231,11 +238,8 @@ def pack_unpack_extended():
     pack_unpack(100, chunk_size=reverse_pretty('1M'))
 
 def pack_unpack(repeats, nchunks=None, chunk_size=None):
-    tdir = tempfile.mkdtemp()
     blosc_args = DEFAULT_BLOSC_ARGS
-    in_file = path.join(tdir, 'file')
-    out_file = path.join(tdir, 'file.blp')
-    dcmp_file = path.join(tdir, 'file.dcmp')
+    tdir, in_file, out_file, dcmp_file = tb.create_tmp_files()
     create_array(repeats, in_file)
     pack_file(in_file, out_file, blosc_args,
             nchunks=nchunks, chunk_size=chunk_size)

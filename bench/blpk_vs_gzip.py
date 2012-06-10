@@ -13,11 +13,8 @@ import numpy
 import bloscpack
 import test_bloscpack as tb
 
-tdir = tempfile.mkdtemp()
-in_file = path.join(tdir, 'file')
-out_file = path.join(tdir, 'file.blp')
+tdir, in_file, out_file, dcmp_file = tb.create_tmp_files()
 gz_out_file = path.join(tdir, 'file.gz')
-dcmp_file = path.join(tdir, 'file.dcmp')
 blosc_args = bloscpack.DEFAULT_BLOSC_ARGS
 
 def get_fs(file_name):

@@ -6,21 +6,14 @@ from __future__ import print_function
 
 import os.path as path
 import sys
-import tempfile
 import time
 import subprocess
-import numpy
 import bloscpack
 import test_bloscpack as tb
 
-tdir = tempfile.mkdtemp()
-in_file = path.join(tdir, 'file')
-out_file = path.join(tdir, 'file.blp')
+tdir, in_file, out_file, dcmp_file = tb.create_tmp_files()
 gz_out_file = path.join(tdir, 'file.gz')
-dcmp_file = path.join(tdir, 'file.dcmp')
-blosc_args = {'typesize': 4,
-                'clevel' : 7,
-                'shuffle' : True}
+blosc_args = bloscpack.DEFAULT_BLOSC_ARGS
 
 def get_fs(file_name):
     return bloscpack.pretty_size(path.getsize(file_name))

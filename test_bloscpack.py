@@ -5,7 +5,6 @@
 import os.path as path
 import tempfile
 import numpy
-import nose
 import nose.tools as nt
 import bloscpack
 from bloscpack import *
@@ -155,9 +154,7 @@ def test_nchunks():
 def test_decode_blosc_header():
     array_ = numpy.linspace(0, 100, 2e4).tostring()
     # basic test case
-    blosc_args = {'typesize': 4,
-                  'clevel' : 7,
-                  'shuffle' : True}
+    blosc_args = DEFAULT_BLOSC_ARGS
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
@@ -217,6 +214,13 @@ def create_array(repeats, in_file, progress=None):
             if progress is not None:
                 progress(i)
 
+def create_tmp_files():
+    tdir = tempfile.mkdtemp()
+    in_file = path.join(tdir, 'file')
+    out_file = path.join(tdir, 'file.blp')
+    dcmp_file = path.join(tdir, 'file.dcmp')
+    return tdir, in_file, out_file, dcmp_file
+
 def test_pack_unpack():
     pack_unpack(1)
     pack_unpack(1, nchunks=20)
@@ -233,13 +237,8 @@ def pack_unpack_extended():
     pack_unpack(100, chunk_size=reverse_pretty('1M'))
 
 def pack_unpack(repeats, nchunks=None, chunk_size=None):
-    tdir = tempfile.mkdtemp()
-    blosc_args = {'typesize': 4,
-                  'clevel' : 7,
-                  'shuffle' : True}
-    in_file = path.join(tdir, 'file')
-    out_file = path.join(tdir, 'file.blp')
-    dcmp_file = path.join(tdir, 'file.dcmp')
+    blosc_args = DEFAULT_BLOSC_ARGS
+    tdir, in_file, out_file, dcmp_file = tb.create_tmp_files()
     create_array(repeats, in_file)
     pack_file(in_file, out_file, blosc_args,
             nchunks=nchunks, chunk_size=chunk_size)
@@ -248,7 +247,7 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None):
 
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """
-    chunk_size = bloscpack.reverse_pretty(bloscpack.DEFAULT_CHUNK_SIZE)
+    chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
     with open(file1, 'rb') as afp, open(file2, 'rb') as bfp:
         while True:
             a = afp.read(chunk_size)

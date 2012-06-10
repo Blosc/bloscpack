@@ -4,27 +4,19 @@
 from __future__ import division
 
 import os.path as path
-import tempfile
 import time
 import numpy
 import bloscpack
 import test_bloscpack as tb
 
-tdir = tempfile.mkdtemp()
-blosc_args = {'typesize': 4,
-                'clevel' : 7,
-                'shuffle' : True}
-in_file = path.join(tdir, 'file')
-out_file = path.join(tdir, 'file.blp')
-dcmp_file = path.join(tdir, 'file.dcmp')
-
+tdir, in_file, out_file, dcmp_file = tb.create_tmp_files()
+blosc_args = bloscpack.DEFAULT_BLOSC_ARGS
 tb.create_array(100, in_file)
 
 repeats = 3
 print "%s\t\t%s\t\t%s\t\t%s" % ("chunk_size", "comp-time", "decomp-time", "ratio")
 for chunk_size in [int(2**i) for i in numpy.arange(30, 31, 0.5)] + [1600000000]:
-    cmp_times = []
-    dcmp_times = []
+    cmp_times, dcmp_times = [], []
     for _ in range(repeats):
         tic = time.time()
         bloscpack.pack_file(in_file, out_file, blosc_args, chunk_size=chunk_size)

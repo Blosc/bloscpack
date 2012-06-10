@@ -16,10 +16,11 @@ blosc_args = {'typesize': 4,
 in_file = path.join(tdir, 'file')
 out_file = path.join(tdir, 'file.blp')
 dcmp_file = path.join(tdir, 'file.dcmp')
-array_ = numpy.linspace(0, 100, 2e8)
-with open(in_file, 'wb') as in_fp:
-    in_fp.write(array_.tostring())
-del array_
+
+with open(in_file, 'w') as in_fp:
+    for i in range(100):
+        array_ = numpy.linspace(i, i+1, 2e6)
+        in_fp.write(array_.tostring())
 
 repeats = 3
 print "%s\t\t%s\t\t%s\t\t%s" % ("chunk_size", "comp-time", "decomp-time", "ratio")

@@ -217,10 +217,12 @@ by Blosc.
 
 ## ∴ TODO
 
+* possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage
 * --equal-size argument to create large chunks of equal size
 * --max-size to create the largest possible chunks, regardless of input size
-* remove the number of chunks in the bloscpack header
+* remove the number of chunks in the bloscpack header, or use  a special token
+* subcommand e or estimate to estimate the size of the uncompressed dtaa.
 * ... this allows it to be used as a filter, since the data size needs not be
   known in advance
 * then add --raw-input and --raw-output switches to allow stuff like:
@@ -228,6 +230,8 @@ by Blosc.
 * fix the typesize default argument, possibly make it platform dependent
 * since we now have potentially small chunks, the progressbar becomes relevant
   again
+* set the default chunk-size to 1MB
+* make the chunk-size benchmark go from 0.1MB to 64M or something like that
 
 ## ∴ Changelog
 

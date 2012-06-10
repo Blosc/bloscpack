@@ -20,6 +20,9 @@ EXTENSION = '.blp'
 MAGIC = 'blpk'
 MAX_CHUNKS = (2**32)-1
 DEFAULT_CHUNK_SIZE = '4M'
+DEFAULT_TYPESIZE = 4
+DEFAULT_CLEVEL = 7
+DEFAULT_SUFFLE = True
 NORMAL  = 'NORMAL'
 VERBOSE = 'VERBOSE'
 DEBUG   = 'DEBUG'
@@ -161,18 +164,18 @@ def create_parser():
         blosc_group = p.add_argument_group(title='blosc settings')
         blosc_group.add_argument('-t', '--typesize',
                 metavar='<size>',
-                default=4,
+                default=DEFAULT_TYPESIZE,
                 type=int,
                 help='typesize for blosc')
         blosc_group.add_argument('-l', '--clevel',
-                default=7,
+                default=DEFAULT_CLEVEL,
                 choices=range(10),
                 metavar='[0, 9]',
                 type=int,
                 help='compression level')
         blosc_group.add_argument('-s', '--no-shuffle',
                 action='store_false',
-                default=True,
+                default=DEFAULT_SUFFLE,
                 dest='shuffle',
                 help='deactivate shuffle')
         bloscpack_group = p.add_mutually_exclusive_group()

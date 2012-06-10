@@ -16,8 +16,7 @@ tb.create_array(100, in_file)
 repeats = 3
 print "%s\t\t%s\t\t%s\t\t%s" % ("chunk_size", "comp-time", "decomp-time", "ratio")
 for chunk_size in [int(2**i) for i in numpy.arange(30, 31, 0.5)] + [1600000000]:
-    cmp_times = []
-    dcmp_times = []
+    cmp_times, dcmp_times = [], []
     for _ in range(repeats):
         tic = time.time()
         bloscpack.pack_file(in_file, out_file, blosc_args, chunk_size=chunk_size)

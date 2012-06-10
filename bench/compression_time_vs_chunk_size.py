@@ -11,13 +11,10 @@ import bloscpack
 import test_bloscpack as tb
 
 tdir = tempfile.mkdtemp()
-blosc_args = {'typesize': 4,
-                'clevel' : 7,
-                'shuffle' : True}
 in_file = path.join(tdir, 'file')
 out_file = path.join(tdir, 'file.blp')
 dcmp_file = path.join(tdir, 'file.dcmp')
-
+blosc_args = bloscpack.DEFAULT_BLOSC_ARGS
 tb.create_array(100, in_file)
 
 repeats = 3

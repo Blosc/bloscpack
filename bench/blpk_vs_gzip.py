@@ -18,9 +18,7 @@ in_file = path.join(tdir, 'file')
 out_file = path.join(tdir, 'file.blp')
 gz_out_file = path.join(tdir, 'file.gz')
 dcmp_file = path.join(tdir, 'file.dcmp')
-blosc_args = {'typesize': 4,
-                'clevel' : 7,
-                'shuffle' : True}
+blosc_args = bloscpack.DEFAULT_BLOSC_ARGS
 
 def get_fs(file_name):
     return bloscpack.pretty_size(path.getsize(file_name))

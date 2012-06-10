@@ -155,9 +155,7 @@ def test_nchunks():
 def test_decode_blosc_header():
     array_ = numpy.linspace(0, 100, 2e4).tostring()
     # basic test case
-    blosc_args = {'typesize': 4,
-                  'clevel' : 7,
-                  'shuffle' : True}
+    blosc_args = DEFAULT_BLOSC_ARGS
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
@@ -234,9 +232,7 @@ def pack_unpack_extended():
 
 def pack_unpack(repeats, nchunks=None, chunk_size=None):
     tdir = tempfile.mkdtemp()
-    blosc_args = {'typesize': 4,
-                  'clevel' : 7,
-                  'shuffle' : True}
+    blosc_args = DEFAULT_BLOSC_ARGS
     in_file = path.join(tdir, 'file')
     out_file = path.join(tdir, 'file.blp')
     dcmp_file = path.join(tdir, 'file.dcmp')

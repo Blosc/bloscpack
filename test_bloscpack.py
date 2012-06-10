@@ -247,11 +247,12 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None):
     cmp(in_file, dcmp_file)
 
 def cmp(file1, file2):
-    """ File comparison utility with a 500 MB chunksize """
+    """ File comparison utility with a small chunksize """
+    chunk_size = bloscpack.reverse_pretty(bloscpack.DEFAULT_CHUNK_SIZE)
     with open(file1, 'rb') as afp, open(file2, 'rb') as bfp:
         while True:
-            a = afp.read(524288000)
-            b = bfp.read(524288000)
+            a = afp.read(chunk_size)
+            b = bfp.read(chunk_size)
             if a == '' and b == '':
                 return True
             else:

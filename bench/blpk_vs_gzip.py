@@ -28,14 +28,15 @@ def get_ratio(file1, file2):
     return path.getsize(file1)/path.getsize(file2)
 
 print('create the test data', end='')
-array_ = numpy.linspace(0, 100, 2e7)
 with open(in_file, 'w') as in_fp:
-    for _ in range(10):
+    for i in range(100):
+        array_ = numpy.linspace(i, i+1, 2e6)
         in_fp.write(array_.tostring())
-        print('.', end='')
+        if i % 10 == 0:
+            print('.', end='')
         sys.stdout.flush()
 print('')
-del array_
+
 print("Input file size: %s" % get_fs(in_file))
 
 print("Will now run bloscpack... ")

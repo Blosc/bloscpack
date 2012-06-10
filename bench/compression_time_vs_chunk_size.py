@@ -8,6 +8,7 @@ import tempfile
 import time
 import numpy
 import bloscpack
+import test_bloscpack as tb
 
 tdir = tempfile.mkdtemp()
 blosc_args = {'typesize': 4,
@@ -17,10 +18,7 @@ in_file = path.join(tdir, 'file')
 out_file = path.join(tdir, 'file.blp')
 dcmp_file = path.join(tdir, 'file.dcmp')
 
-with open(in_file, 'w') as in_fp:
-    for i in range(100):
-        array_ = numpy.linspace(i, i+1, 2e6)
-        in_fp.write(array_.tostring())
+tb.create_array(100, in_file)
 
 repeats = 3
 print "%s\t\t%s\t\t%s\t\t%s" % ("chunk_size", "comp-time", "decomp-time", "ratio")

@@ -11,6 +11,7 @@ import time
 import subprocess
 import numpy
 import bloscpack
+import test_bloscpack as tb
 
 tdir = tempfile.mkdtemp()
 in_file = path.join(tdir, 'file')
@@ -28,13 +29,11 @@ def get_ratio(file1, file2):
     return path.getsize(file1)/path.getsize(file2)
 
 print('create the test data', end='')
-with open(in_file, 'w') as in_fp:
-    for i in range(100):
-        array_ = numpy.linspace(i, i+1, 2e6)
-        in_fp.write(array_.tostring())
-        if i % 10 == 0:
-            print('.', end='')
-        sys.stdout.flush()
+def progress(i):
+    if i % 10 == 0:
+        print('.', end='')
+    sys.stdout.flush()
+tb.create_array(100, in_file, progress=progress)
 print('')
 
 print("Input file size: %s" % get_fs(in_file))

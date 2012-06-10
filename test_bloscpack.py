@@ -209,11 +209,13 @@ def test_decode_bloscpack_header():
     nt.assert_raises(ValueError, decode_bloscpack_header, 'blpk')
     nt.assert_raises(ValueError, decode_bloscpack_header, 'xxxxxxxx')
 
-def create_array(repeats, in_file):
+def create_array(repeats, in_file, progress=None):
     with open(in_file, 'w') as in_fp:
         for i in range(repeats):
             array_ = numpy.linspace(i, i+1, 2e6)
             in_fp.write(array_.tostring())
+            if progress is not None:
+                progress(i)
 
 def test_pack_unpack():
     pack_unpack(1)

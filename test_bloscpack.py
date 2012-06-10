@@ -247,7 +247,7 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None):
 
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """
-    chunk_size = bloscpack.reverse_pretty(bloscpack.DEFAULT_CHUNK_SIZE)
+    chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
     with open(file1, 'rb') as afp, open(file2, 'rb') as bfp:
         while True:
             a = afp.read(chunk_size)

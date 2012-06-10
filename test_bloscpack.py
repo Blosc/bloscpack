@@ -209,20 +209,28 @@ def test_decode_bloscpack_header():
     nt.assert_raises(ValueError, decode_bloscpack_header, 'blpk')
     nt.assert_raises(ValueError, decode_bloscpack_header, 'xxxxxxxx')
 
+def create_array(repeats, in_file):
+    with open(in_file, 'w') as in_fp:
+        for i in range(repeats):
+            array_ = numpy.linspace(i, i+1, 2e6)
+            in_fp.write(array_.tostring())
+
 def test_pack_unpack():
-    pack_unpack(2e6)
-    pack_unpack(2e6, nchunks=20)
-    pack_unpack(2e6, nchunks=1)
-    pack_unpack(2e6, nchunks=100)
-    pack_unpack(2e6, chunk_size=reverse_pretty('1M'))
-    pack_unpack(2e6, chunk_size=reverse_pretty('2M'))
-    pack_unpack(2e6, chunk_size=reverse_pretty('4M'))
-    pack_unpack(2e6, chunk_size=reverse_pretty('8M'))
+    pack_unpack(1)
+    pack_unpack(1, nchunks=20)
+    pack_unpack(1, nchunks=1)
+    pack_unpack(1, nchunks=100)
+    pack_unpack(1, chunk_size=reverse_pretty('1M'))
+    pack_unpack(1, chunk_size=reverse_pretty('2M'))
+    pack_unpack(1, chunk_size=reverse_pretty('4M'))
+    pack_unpack(1, chunk_size=reverse_pretty('8M'))
 
 def pack_unpack_extended():
-    pack_unpack(2e8)
+    pack_unpack(100)
+    pack_unpack(100, nchunks=23)
+    pack_unpack(100, chunk_size=reverse_pretty('1M'))
 
-def pack_unpack(nnumbers, nchunks=None, chunk_size=None):
+def pack_unpack(repeats, nchunks=None, chunk_size=None):
     tdir = tempfile.mkdtemp()
     blosc_args = {'typesize': 4,
                   'clevel' : 7,
@@ -230,9 +238,7 @@ def pack_unpack(nnumbers, nchunks=None, chunk_size=None):
     in_file = path.join(tdir, 'file')
     out_file = path.join(tdir, 'file.blp')
     dcmp_file = path.join(tdir, 'file.dcmp')
-    array_ = numpy.linspace(0, 100, nnumbers)
-    with open(in_file, 'wb') as in_fp:
-        in_fp.write(array_.tostring())
+    create_array(repeats, in_file)
     pack_file(in_file, out_file, blosc_args,
             nchunks=nchunks, chunk_size=chunk_size)
     unpack_file(out_file, dcmp_file)

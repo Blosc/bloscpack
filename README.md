@@ -130,7 +130,7 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
 
     zsh» ./blpk -d c -z 0.5G data.dat
     blpk: command line argument parsing complete
-    blpk: command line arguments are: 
+    blpk: command line arguments are:
     blpk:   nchunks: None
     blpk:   force: False
     blpk:   verbose: False
@@ -187,13 +187,13 @@ following results:
     create the test data..........
     Input file size: 1.49G
     Will now run bloscpack...
-    Time: 8.91 seconds
-    Output file size: 688.07M
-    Ratio: 0.45
+    Time: 6.69 seconds
+    Output file size: 557.93M
+    Ratio: 0.37
     Will now run gzip...
-    Time: 121.33 seconds
-    Output file size: 959.13M
-    Ratio: 0.63
+    Time: 141.38 seconds
+    Output file size: 924.05M
+    Ratio: 0.61
 
 As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this

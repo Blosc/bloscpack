@@ -4,7 +4,6 @@
 from __future__ import division
 
 import os.path as path
-import tempfile
 import time
 import numpy
 import bloscpack

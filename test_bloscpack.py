@@ -5,7 +5,6 @@
 import os.path as path
 import tempfile
 import numpy
-import nose
 import nose.tools as nt
 import bloscpack
 from bloscpack import *

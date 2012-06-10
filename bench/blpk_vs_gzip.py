@@ -6,10 +6,8 @@ from __future__ import print_function
 
 import os.path as path
 import sys
-import tempfile
 import time
 import subprocess
-import numpy
 import bloscpack
 import test_bloscpack as tb
 

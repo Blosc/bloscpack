@@ -242,7 +242,7 @@ def pack_unpack_extended():
 
 def pack_unpack(repeats, nchunks=None, chunk_size=None):
     blosc_args = DEFAULT_BLOSC_ARGS
-    with tb.create_tmp_files() as tdir, in_file, out_file, dcmp_file:
+    with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(repeats, in_file)
         pack_file(in_file, out_file, blosc_args,
                 nchunks=nchunks, chunk_size=chunk_size)

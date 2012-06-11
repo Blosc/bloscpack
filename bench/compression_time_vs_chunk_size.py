@@ -15,7 +15,7 @@ with tb.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
     tb.create_array(100, in_file)
     repeats = 3
     print "%s\t\t%s\t\t%s\t\t%s" % ("chunk_size", "comp-time", "decomp-time", "ratio")
-    for chunk_size in [int(2**i) for i in numpy.arange(30, 31, 0.5)] + [1600000000]:
+    for chunk_size in (int(2**i) for i in numpy.arange(19, 23.5, 0.5)):
         cmp_times, dcmp_times = [], []
         for _ in range(repeats):
             tic = time.time()

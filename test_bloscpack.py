@@ -4,6 +4,8 @@
 
 import os.path as path
 import tempfile
+import contextlib
+import shutil
 import numpy
 import nose.tools as nt
 import bloscpack
@@ -214,12 +216,14 @@ def create_array(repeats, in_file, progress=None):
             if progress is not None:
                 progress(i)
 
+@contextlib.contextmanager
 def create_tmp_files():
     tdir = tempfile.mkdtemp()
     in_file = path.join(tdir, 'file')
     out_file = path.join(tdir, 'file.blp')
     dcmp_file = path.join(tdir, 'file.dcmp')
-    return tdir, in_file, out_file, dcmp_file
+    yield tdir, in_file, out_file, dcmp_file
+    shutil.rmtree(tdir)
 
 def test_pack_unpack():
     pack_unpack(1)
@@ -238,12 +242,12 @@ def pack_unpack_extended():
 
 def pack_unpack(repeats, nchunks=None, chunk_size=None):
     blosc_args = DEFAULT_BLOSC_ARGS
-    tdir, in_file, out_file, dcmp_file = tb.create_tmp_files()
-    create_array(repeats, in_file)
-    pack_file(in_file, out_file, blosc_args,
-            nchunks=nchunks, chunk_size=chunk_size)
-    unpack_file(out_file, dcmp_file)
-    cmp(in_file, dcmp_file)
+    with tb.create_tmp_files() as tdir, in_file, out_file, dcmp_file:
+        create_array(repeats, in_file)
+        pack_file(in_file, out_file, blosc_args,
+                nchunks=nchunks, chunk_size=chunk_size)
+        unpack_file(out_file, dcmp_file)
+        cmp(in_file, dcmp_file)
 
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """

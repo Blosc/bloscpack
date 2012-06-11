@@ -221,7 +221,7 @@ by Blosc.
 * document library usage
 * --equal-size argument to create large chunks of equal size
 * --max-size to create the largest possible chunks, regardless of input size
-* remove the number of chunks in the bloscpack header, or use  a special token
+* Use the special token -1 and a singned 64 int to denote the number of chunks
 * subcommand e or estimate to estimate the size of the uncompressed dtaa.
 * ... this allows it to be used as a filter, since the data size needs not be
   known in advance

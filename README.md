@@ -231,7 +231,6 @@ by Blosc.
 * since we now have potentially small chunks, the progressbar becomes relevant
   again
 * set the default chunk-size to 1MB
-* make the chunk-size benchmark go from 0.1MB to 64M or something like that
 
 ## ∴ Changelog
 

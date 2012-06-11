@@ -230,7 +230,6 @@ by Blosc.
 * fix the typesize default argument, possibly make it platform dependent
 * since we now have potentially small chunks, the progressbar becomes relevant
   again
-* set the default chunk-size to 1MB
 
 ## ∴ Changelog
 

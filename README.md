@@ -23,7 +23,7 @@ Repository is at: https://github.com/esc/bloscpack
 
 The tool is considered alpha-stage, experimental, research software. It is not
 unlikely that **the internal storage format for the compressed files will
-change in future**. Please **do not depend critically on the files generated **
+change in future**. Please **do not depend critically on the files generated**
 by bloscpack. See the warranty disclaimer in the licence at the end of this
 file.
 

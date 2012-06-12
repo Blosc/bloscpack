@@ -147,9 +147,10 @@ def test_nchunks():
     nt.assert_raises(ValueError, calculate_nchunks,
             128, nchunks=23, chunk_size=23)
     # check overflow of nchunks due to chunk_size being too small
+    # and thus stuff not fitting into the header
     nt.assert_raises(ChunkingException, calculate_nchunks,
-            blosc.BLOSC_MAX_BUFFERSIZE*23, chunk_size=1)
-    # check overflow of BLOSC_MAX_BUFFERSIZE due to nchunks being too small
+            MAX_CHUNKS+1, chunk_size=1)
+    # check overflow of chunk-size due to nchunks being too small
     nt.assert_raises(ChunkingException,
             calculate_nchunks, blosc.BLOSC_MAX_BUFFERSIZE*2+1, nchunks=2)
 
@@ -194,17 +195,27 @@ def test_decode_blosc_header():
     nt.assert_equal(expected, header)
 
 def test_create_bloscpack_header():
-    nt.assert_equal('%s\x00\x00\x00\x00' % MAGIC, create_bloscpack_header(0))
-    nt.assert_equal('%s\x01\x00\x00\x00' % MAGIC, create_bloscpack_header(1))
-    nt.assert_equal('%s\xff\xff\xff\xff' % MAGIC,
-            create_bloscpack_header(4294967295))
-    nt.assert_raises(Exception, create_bloscpack_header, 4294967296)
+    nt.assert_equal('%s\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' %
+            MAGIC, create_bloscpack_header(0))
+    nt.assert_equal('%s\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00' %
+            MAGIC, create_bloscpack_header(1))
+    nt.assert_equal('%s\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' %
+            MAGIC, create_bloscpack_header(None))
+    nt.assert_equal('%s\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\x7f' %
+            MAGIC, create_bloscpack_header(MAX_CHUNKS))
+    nt.assert_equal('%s\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' %
+            MAGIC, create_bloscpack_header(nchunks=0, format_version=2))
+    nt.assert_raises(ValueError, create_bloscpack_header, MAX_CHUNKS+1)
+    nt.assert_raises(ValueError, create_bloscpack_header, -1)
+    nt.assert_raises(ValueError, create_bloscpack_header, 'foo')
 
 def test_decode_bloscpack_header():
-    nt.assert_equal(0, decode_bloscpack_header('%s\x00\x00\x00\x00' % MAGIC))
-    nt.assert_equal(1, decode_bloscpack_header('%s\x01\x00\x00\x00' % MAGIC))
-    nt.assert_equal(4294967295,
-            decode_bloscpack_header('%s\xff\xff\xff\xff' % MAGIC))
+    nt.assert_equal((0, 1), decode_bloscpack_header(
+        '%s\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' % MAGIC))
+    nt.assert_equal((1, 1), decode_bloscpack_header(
+        '%s\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00' % MAGIC))
+    nt.assert_equal((MAX_CHUNKS, 1), decode_bloscpack_header(
+        '%s\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\x7f' % MAGIC))
     nt.assert_raises(ValueError, decode_bloscpack_header, 'blpk')
     nt.assert_raises(ValueError, decode_bloscpack_header, 'xxxxxxxx')
 

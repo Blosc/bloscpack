@@ -18,7 +18,10 @@ __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'
 MAGIC = 'blpk'
-MAX_CHUNKS = (2**32)-1
+BLOSCPACK_HEADER_LENGTH = 16
+BLOSC_HEADER_LENGTH = 16
+FORMAT_VERSION = 1
+MAX_CHUNKS = (2**63)-1
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
@@ -392,13 +395,15 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             level=DEBUG)
     return nchunks, chunk_size, last_chunk_size
 
-def create_bloscpack_header(nchunks):
+def create_bloscpack_header(nchunks=None, format_version=FORMAT_VERSION):
     """ Create the bloscpack header string.
 
     Parameters
     ----------
     nchunks : int
-        the number of chunks
+        the number of chunks, default: None
+    format_version : int
+        the version format for the compressed file
 
     Returns
     -------
@@ -408,28 +413,52 @@ def create_bloscpack_header(nchunks):
     Notes
     -----
 
-    The bloscpack header is 8 bytes as follows:
+    The bloscpack header is 16 bytes as follows:
 
-    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|
-    | b   l   p   k |    nchunks    |
+    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
+    | b   l   p   k |    version    |           nchunks             |
 
-    The first four are the magic string 'blpk' and the second four are an
-    unsigned 32 bit little-endian integer.
+    The first four are the magic string 'blpk'. The second four are an
+    unsigned 32 bit little-endian integer that encodes the format version. And
+    the last eight are a signed  64 bit little endian integer.
+
+    The value of '-1' for 'nchunks' designates an unknown size and can be
+    inserted by setting 'nchunks' to None.
 
     """
-    # this will fail if nchunks is larger than the max of an unsigned int
-    return (MAGIC + struct.pack('<I', nchunks))
+    if not 0 <= nchunks <= MAX_CHUNKS and nchunks is not None:
+        raise ValueError(
+                "'nchunks' must be in the range 0 <= n <= %d, not '%s'" %
+                (MAX_CHUNKS, str(nchunks)))
+    return (MAGIC + struct.pack('<I', format_version) +
+            struct.pack('<q', nchunks if nchunks is not None else -1))
 
 def decode_bloscpack_header(buffer_):
-    """ Check that the magic marker exists and return number of chunks. """
-    if len(buffer_) != 8:
+    """ Check that the magic marker exists and return number of chunks. 
+
+    Parameters
+    ----------
+    buffer_ : str (but probably any sequence would work)A
+        the buffer_
+
+    Returns
+    -------
+    nchunks : int
+        the number of chunks in the file, or -1 if unknowen
+    format_version : int
+        the format version of the file
+
+    """
+    if len(buffer_) != 16:
         raise ValueError(
-            'attempting to decode a bloscpack header of length other than 8')
+            "attempting to decode a bloscpack header of length '%d', not '16'"
+            % len(buffer_))
     elif buffer_[0:4] != MAGIC:
         raise ValueError(
             "the magic marker '%s' is missing from the bloscpack " % MAGIC +
             "header, instead we found: '%s'" % buffer_[0:4])
-    return struct.unpack('<I', buffer_[4:])[0]
+    return (struct.unpack('<q', buffer_[8:16])[0],
+                struct.unpack('<I', buffer_[4:8])[0])
 
 def process_compression_args(args):
     """ Extract and check the compression args after parsing by argparse.
@@ -576,19 +605,20 @@ def unpack_file(in_file, out_file):
          open(out_file, 'wb') as output_fp:
         # read the bloscpack header
         print_verbose('reading bloscpack header', level=DEBUG)
-        bloscpack_header = input_fp.read(8)
-        nchunks = decode_bloscpack_header(bloscpack_header)
+        bloscpack_header = input_fp.read(BLOSCPACK_HEADER_LENGTH)
+        nchunks, format_version = decode_bloscpack_header(bloscpack_header)
         print_verbose('nchunks: %d' % nchunks, level=DEBUG)
         for i in range(nchunks):
             print_verbose("decompressing chunk '%d'%s" %
                     (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
             print_verbose('reading blosc header', level=DEBUG)
-            blosc_header_raw = input_fp.read(16)
+            blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
             blosc_header = decode_blosc_header(blosc_header_raw)
             ctbytes = blosc_header['ctbytes']
             print_verbose('ctbytes: %s' % pretty_size(ctbytes), level=DEBUG)
-            # seek back 16 bytes in file relative to current position
-            input_fp.seek(-16, 1)
+            # seek back BLOSC_HEADER_LENGTH bytes in file relative to current
+            # position
+            input_fp.seek(-BLOSC_HEADER_LENGTH, 1)
             compressed = input_fp.read(ctbytes)
             decompressed = blosc.decompress(compressed)
             output_fp.write(decompressed)

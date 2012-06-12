@@ -245,6 +245,18 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 
 ## ∴ Changelog
 
+### ● v0.1.0-rc3 - Tue Jun 12 2012
+
+* Limit the chunk-size benchmark to a narrower range
+* After more careful experiments, a default chunk-size of ``1MB`` was deemed
+  most appropriate
+* Fixed a terrible bug, where during testing and benchmarking, temporary files
+  were not removed, oups...
+* Adapted the header to have space for more chunks, include special marker for
+  unknown chunk number (``-1``) and format version of the compressed file
+* Added a note in the README about instability of the file format
+* Various minor fixes and enhancements
+
 ### ● v0.1.0-rc2 - Sat Jun 09 2012
 
 * Default chunk-size now ``4MB``

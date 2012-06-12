@@ -229,11 +229,8 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 * document library usage
 * --equal-size argument to create large chunks of equal size
 * --max-size to create the largest possible chunks, regardless of input size
-* Use the special token -1 and a singned 64 int to denote the number of chunks
 * subcommand e or estimate to estimate the size of the uncompressed dtaa.
-* ... this allows it to be used as a filter, since the data size needs not be
-  known in advance
-* then add --raw-input and --raw-output switches to allow stuff like:
+* add --raw-input and --raw-output switches to allow stuff like:
   cat file | blpk --raw-input --raw-output compress > file.blp
 * fix the typesize default argument, possibly make it platform dependent
 * since we now have potentially small chunks, the progressbar becomes relevant

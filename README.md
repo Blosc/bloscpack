@@ -207,13 +207,21 @@ the chunk-size is a moderate ``4MB`` which should be fine, even for less
 powerful machines. The last chunk always contains the remainder and has thus
 size either equal too or less than the rest of the chunks.
 
-Bloscpack adds an 8 byte header to a compressed file, which consists of a 4
-byte magic string, ``blpk``, and a 4 byte little-endian unsigned integer which
-designates how many chunks there are.  Effectively, this limits the number of
-chunks to ``2**32-1 = 4294967295``, but this should not be relevant in
-practice. In terms of overhead, this means that for a given file bloscpack
-will add a total of 8 bytes for itself and 16 bytes for each chunk compressed
-by Blosc.
+Bloscpack adds an 16 byte header to a compressed file, which consists of a 4
+byte magic string, ``blpk``, a 4 byte little-endian unsigned integer which
+designates the file format version and lastly an 8 byte little-endian signed
+integer encoding how many chunks there are. The value of ``-1`` is reserved for
+designating files that have been created without initial knowledge of the
+number of chunks, for example in a streaming scenario. In terms
+overhead, this means that for a given file bloscpack will add a total of 16
+bytes for itself and 16 bytes for each chunk compressed by Blosc.
+
+Effectively, storing the number of chunks as a signed 8 byte integer, limits
+the number of chunks to ``2**63-1 = 9223372036854775807``, but this should not
+be relevant in practice, since, even with the moderate default value of ``1MB``
+for chunk-size, we can still stores files as large as ``10 ZB``(!) Given that
+in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
+``16EB``, bloscpack should be safe for a few more years.
 
 ## ∴ TODO
 

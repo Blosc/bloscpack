@@ -605,16 +605,15 @@ def unpack_file(in_file, out_file):
         print_verbose('reading bloscpack header', level=DEBUG)
         bloscpack_header = input_fp.read(BLOSCPACK_HEADER_LENGTH)
         nchunks, format_version = decode_bloscpack_header(bloscpack_header)
-        print_verbose('nchunks: %d' % nchunks, level=DEBUG)
-        print_verbose('format_version: %d' % format_version, level=DEBUG)
+        print_verbose('nchunks: %d, format_version: %d' %
+                (nchunks, format_version), level=DEBUG)
         for i in range(nchunks):
             print_verbose("decompressing chunk '%d'%s" %
                     (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
-            print_verbose('reading blosc header', level=DEBUG)
             blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
             blosc_header = decode_blosc_header(blosc_header_raw)
+            print_verbose('blosc_header: %s' % repr(blosc_header), level=DEBUG)
             ctbytes = blosc_header['ctbytes']
-            print_verbose('ctbytes: %s' % pretty_size(ctbytes), level=DEBUG)
             # seek back BLOSC_HEADER_LENGTH bytes in file relative to current
             # position
             input_fp.seek(-BLOSC_HEADER_LENGTH, 1)

@@ -268,7 +268,7 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 
 ## ∴ Author, Copyright and License
 
-(C) 2012 Valentin Haenel <valentin.haenel@gmx.de>
+© 2012 Valentin Haenel <valentin.haenel@gmx.de>
 
 bloscpack is licensed under the terms of the MIT License.
 

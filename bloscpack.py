@@ -25,10 +25,10 @@ MAX_CHUNKS = (2**63)-1
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
-DEFAULT_SUFFLE = True
+DEAFAULT_SHUFFLE = True
 BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
-    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SUFFLE)))
+    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEAFAULT_SHUFFLE)))
 NORMAL  = 'NORMAL'
 VERBOSE = 'VERBOSE'
 DEBUG   = 'DEBUG'
@@ -180,7 +180,7 @@ def create_parser():
                 help='compression level')
         blosc_group.add_argument('-s', '--no-shuffle',
                 action='store_false',
-                default=DEFAULT_SUFFLE,
+                default=DEAFAULT_SHUFFLE,
                 dest='shuffle',
                 help='deactivate shuffle')
         bloscpack_group = p.add_mutually_exclusive_group()

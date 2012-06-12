@@ -210,7 +210,7 @@ kind of structured data.
 
 The input is split into chunks since a) we wish to put less stress on main
 memory and b) because Blosc has a buffer limit of 2GB (May 2012). By default
-the chunk-size is a moderate ``4MB`` which should be fine, even for less
+the chunk-size is a moderate ``1MB`` which should be fine, even for less
 powerful machines. The last chunk always contains the remainder and has thus
 size either equal too or less than the rest of the chunks.
 

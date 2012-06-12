@@ -606,6 +606,7 @@ def unpack_file(in_file, out_file):
         bloscpack_header = input_fp.read(BLOSCPACK_HEADER_LENGTH)
         nchunks, format_version = decode_bloscpack_header(bloscpack_header)
         print_verbose('nchunks: %d' % nchunks, level=DEBUG)
+        print_verbose('format_version: %d' % format_version, level=DEBUG)
         for i in range(nchunks):
             print_verbose("decompressing chunk '%d'%s" %
                     (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)

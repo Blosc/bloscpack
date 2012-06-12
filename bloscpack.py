@@ -26,17 +26,15 @@ DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
 DEFAULT_SUFFLE = True
-DEFAULT_BLOSC_ARGS = {
-    'typesize' : DEFAULT_TYPESIZE,
-    'clevel'   : DEFAULT_CLEVEL,
-    'shuffle'  : DEFAULT_SUFFLE}
+BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
+DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
+    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SUFFLE)))
 NORMAL  = 'NORMAL'
 VERBOSE = 'VERBOSE'
 DEBUG   = 'DEBUG'
 LEVEL = NORMAL
 VERBOSITY_LEVELS = [NORMAL, VERBOSE, DEBUG]
 PREFIX = "bloscpack.py"
-BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 SUFFIXES = { "B": 1,
              "K": 2**10,
              "M": 2**20,

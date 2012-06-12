@@ -387,7 +387,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             "BLOSC_MAX_BUFFERSIZE : %d\n" % blosc.BLOSC_MAX_BUFFERSIZE)
     elif nchunks > MAX_CHUNKS:
         raise ChunkingException(
-                "nchunks: '%d' is greate than the MAX_CHUNKS: '%d'" %
+                "nchunks: '%d' is greater than the MAX_CHUNKS: '%d'" %
                 (nchunks, MAX_CHUNKS))
     print_verbose('nchunks: %d' % nchunks, level=VERBOSE)
     print_verbose('chunk_size: %s' % pretty_size(chunk_size), level=VERBOSE)

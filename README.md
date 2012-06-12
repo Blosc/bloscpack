@@ -122,16 +122,16 @@ Lastly there are two options to control how much output is produced,
 
 The first causes basic info to be printed, ``[-v | --verbose]``:
 
-    zsh» ./blpk -v c data.dat
+    zsh» ./blpk -v c -z 0.5G data.dat
     blpk: getting ready for compression
     blpk: input file is: data.dat
     blpk: output file is: data.dat.blp
     blpk: using 8 threads
     blpk: input file size: 1.49G
-    blpk: nchunks: 382
-    blpk: chunk_size: 4.0M
+    blpk: nchunks: 3
+    blpk: chunk_size: 512.0M
     blpk: output file size: 688.07M
-    blpk: compression ratio: 0.450935
+    blpk: compression ratio: 0.450932
     blpk: done
 
 ... and ``[-d | --debug]`` prints a detailed account of what is going on:
@@ -164,14 +164,13 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: nchunks: 3
     blpk: chunk_size: 512.0M
     blpk: last_chunk_size: 501.88M
-    blpk: bloscpack_header: 'blpk\x03\x00\x00\x00'
+    blpk: bloscpack_header: 'blpk\x01\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
     blpk: chunk '0' written, in: 512.0M out: 235.14M
     blpk: chunk '1' written, in: 512.0M out: 229.74M
     blpk: chunk '2' (last) written, in: 501.88M out: 223.19M
     blpk: output file size: 688.07M
     blpk: compression ratio: 0.450932
     blpk: done
-
 
 ## ∴ Testing
 

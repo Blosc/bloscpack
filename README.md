@@ -19,6 +19,14 @@ Repository is at: https://github.com/esc/bloscpack
 * Python 2.7
 * [python-blosc](https://github.com/FrancescAlted/python-blosc) (provides Blosc)
 
+## ∴ Stability of File Format
+
+The tool is considered alpha-stage, experimental, research software. It is not
+unlikely that **the internal storage format for the compressed files will
+change in future**. Please **do not depend critically on the files generated **
+by bloscpack. See the warranty disclaimer in the licence at the end of this
+file.
+
 ## ∴ Installation
 
 Add the ``blpk`` file to your ``$PATH`` somehow. For example by copying using

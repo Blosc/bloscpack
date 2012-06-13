@@ -21,6 +21,7 @@ MAGIC = 'blpk'
 BLOSCPACK_HEADER_LENGTH = 16
 BLOSC_HEADER_LENGTH = 16
 FORMAT_VERSION = 1
+MAX_FORMAT_VERSION = 255
 MAX_CHUNKS = (2**63)-1
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_TYPESIZE = 4
@@ -414,21 +415,30 @@ def create_bloscpack_header(nchunks=None, format_version=FORMAT_VERSION):
     The bloscpack header is 16 bytes as follows:
 
     |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
-    | b   l   p   k |    version    |           nchunks             |
+    | b   l   p   k | ^ | RESERVED  |           nchunks             |
+                   version
 
-    The first four are the magic string 'blpk'. The second four are an
-    unsigned 32 bit little-endian integer that encodes the format version. And
-    the last eight are a signed  64 bit little endian integer.
+    The first four are the magic string 'blpk'. The next one is an 8 bit
+    unsigned little-endian integer that encodes the format version. The next
+    three are reserved, and the last eight are a signed  64 bit little endian
+    integer that encodes the number of chunks
 
     The value of '-1' for 'nchunks' designates an unknown size and can be
     inserted by setting 'nchunks' to None.
+
+    Raises
+    ------
+    ValueError
+        if the nchunks argument is too large or negative
+    struct.error
+        if the format_version is too large or negative
 
     """
     if not 0 <= nchunks <= MAX_CHUNKS and nchunks is not None:
         raise ValueError(
                 "'nchunks' must be in the range 0 <= n <= %d, not '%s'" %
                 (MAX_CHUNKS, str(nchunks)))
-    return (MAGIC + struct.pack('<I', format_version) +
+    return (MAGIC + struct.pack('<B', format_version) + '\x00\x00\x00' +
             struct.pack('<q', nchunks if nchunks is not None else -1))
 
 def decode_bloscpack_header(buffer_):

@@ -6,6 +6,7 @@ import os.path as path
 import tempfile
 import contextlib
 import shutil
+import struct
 import numpy
 import nose.tools as nt
 import bloscpack
@@ -205,9 +206,19 @@ def test_create_bloscpack_header():
             MAGIC, create_bloscpack_header(MAX_CHUNKS))
     nt.assert_equal('%s\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' %
             MAGIC, create_bloscpack_header(nchunks=0, format_version=2))
+    nt.assert_equal('%s\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' %
+            MAGIC, create_bloscpack_header(nchunks=0,
+                format_version=MAX_FORMAT_VERSION))
+    nt.assert_equal('%s\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00' %
+            MAGIC, create_bloscpack_header(nchunks=1,
+                format_version=MAX_FORMAT_VERSION))
     nt.assert_raises(ValueError, create_bloscpack_header, MAX_CHUNKS+1)
     nt.assert_raises(ValueError, create_bloscpack_header, -1)
     nt.assert_raises(ValueError, create_bloscpack_header, 'foo')
+    nt.assert_raises(struct.error, create_bloscpack_header, nchunks=1,
+            format_version=MAX_FORMAT_VERSION+1)
+    nt.assert_raises(struct.error, create_bloscpack_header, nchunks=1,
+            format_version=-1)
 
 def test_decode_bloscpack_header():
     nt.assert_equal((0, 1), decode_bloscpack_header(

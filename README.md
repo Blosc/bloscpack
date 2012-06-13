@@ -14,6 +14,12 @@ and [python-blosc](https://github.com/FrancescAlted/python-blosc) bindings.
 
 Repository is at: https://github.com/esc/bloscpack
 
+## ∴ Contact
+
+There is an official Blosc blosc mailing list at:
+
+http://groups.google.com/group/blosc
+
 ## ∴ Dependencies
 
 * Python 2.7

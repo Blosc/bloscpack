@@ -248,6 +248,10 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 * fix the typesize default argument, possibly make it platform dependent
 * since we now have potentially small chunks, the progressbar becomes relevant
   again
+* possibly include total file-size in header
+* possibly include chunk-size in header
+* possibly include a checksum (adler32) in header
+* configuration file to store commonly used options on a given machine
 
 ## ∴ Changelog
 

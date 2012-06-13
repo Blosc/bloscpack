@@ -52,13 +52,13 @@ def print_verbose(message, level=VERBOSE):
 
 def error(message, exit_code=1):
     """ Print message and exit with desired code. """
-    for l in [l for l in message.split('\n') if l != '']:
-        print('%s: error: %s' % (PREFIX, l))
+    for line in [l for l in message.split('\n') if l != '']:
+        print('%s: error: %s' % (PREFIX, line))
     sys.exit(exit_code)
 
 def pretty_size(size_in_bytes):
     """ Pretty print filesize.  """
-    for suf, lim in reversed(sorted(SUFFIXES.items(),key=lambda x: x[1])):
+    for suf, lim in reversed(sorted(SUFFIXES.items(), key=lambda x: x[1])):
         if size_in_bytes < lim:
             continue
         else:
@@ -74,7 +74,6 @@ def reverse_pretty(readable):
                 (suffix, SUFFIXES.keys()))
     else:
         return int(float(readable[:-1]) * SUFFIXES[suffix])
-
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.

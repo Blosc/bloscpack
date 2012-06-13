@@ -257,6 +257,20 @@ def test_pack_unpack():
     pack_unpack(1, chunk_size=reverse_pretty('4M'))
     pack_unpack(1, chunk_size=reverse_pretty('8M'))
 
+def test_invalid_format():
+    def raising_error(message):
+        raise ValueError(message)
+    bloscpack.error = raising_error
+    # this will cause a bug if we ever reach 255 format versions
+    bloscpack.FORMAT_VERSION = MAX_FORMAT_VERSION
+    blosc_args = DEFAULT_BLOSC_ARGS
+    with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
+        create_array(1, in_file)
+        bloscpack.pack_file(in_file, out_file, blosc_args)
+        nt.assert_raises(ValueError, unpack_file, out_file, dcmp_file)
+    bloscpack.error = error
+    bloscpack.FORMAT_VERSION = FORMAT_VERSION
+
 def pack_unpack_extended():
     pack_unpack(100)
     pack_unpack(100, nchunks=23)

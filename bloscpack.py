@@ -617,6 +617,9 @@ def unpack_file(in_file, out_file):
         nchunks, format_version = decode_bloscpack_header(bloscpack_header)
         print_verbose('nchunks: %d, format_version: %d' %
                 (nchunks, format_version), level=DEBUG)
+        if FORMAT_VERSION != format_version:
+            error("format version of file was not '%s' as expected, but '%d'" %
+                    (FORMAT_VERSION, format_version))
         for i in range(nchunks):
             print_verbose("decompressing chunk '%d'%s" %
                     (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)

@@ -226,7 +226,7 @@ bytes for itself and 16 bytes for each chunk compressed by Blosc.
 Effectively, storing the number of chunks as a signed 8 byte integer, limits
 the number of chunks to ``2**63-1 = 9223372036854775807``, but this should not
 be relevant in practice, since, even with the moderate default value of ``1MB``
-for chunk-size, we can still stores files as large as ``10 ZB``(!) Given that
+for chunk-size, we can still stores files as large as ``8ZB``(!) Given that
 in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 ``16EB``, bloscpack should be safe for a few more years.
 

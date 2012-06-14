@@ -273,6 +273,7 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
   unknown chunk number (``-1``) and format version of the compressed file
 * Added a note in the README about instability of the file format
 * Various minor fixes and enhancements
+* make ``pack_unpack_extended`` use less memory
 
 ### ● v0.1.0-rc2 - Sat Jun 09 2012
 

@@ -256,7 +256,7 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 
 ## ∴ Changelog
 
-### ● v0.1.0     - Tue Jun 12 2012
+### ● v0.1.0     - Thu Jun 14 2012
 
 * Freeze the first 8 bytes of the header (hopefully for ever)
 * Fail to decompress on non-matching format version

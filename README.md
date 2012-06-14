@@ -16,9 +16,7 @@ Repository is at: https://github.com/esc/bloscpack
 
 ## ∴ Contact
 
-There is an official Blosc mailing list at:
-
-http://groups.google.com/group/blosc
+There is an official Blosc mailing list at: http://groups.google.com/group/blosc
 
 ## ∴ Dependencies
 

@@ -252,6 +252,7 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 * possibly include chunk-size in header
 * possibly include a checksum (adler32) in header
 * configuration file to store commonly used options on a given machine
+* check Python 3.x compatability
 
 ## ∴ Changelog
 

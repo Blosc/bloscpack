@@ -225,7 +225,8 @@ little-endian signed integer encoding how many chunks there are. The value of
 ``-1`` is reserved for designating files that have been created without initial
 knowledge of the number of chunks, for example in a streaming scenario. In
 terms overhead, this means that for a given file bloscpack will add a total of
-16 bytes for itself and 16 bytes for each chunk compressed by Blosc.
+16 bytes for itself and 16 bytes for each chunk compressed by Blosc. See also:
+the docstring of ``create_bloscpack_header()``.
 
 Effectively, storing the number of chunks as a signed 8 byte integer, limits
 the number of chunks to ``2**63-1 = 9223372036854775807``, but this should not

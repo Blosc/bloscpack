@@ -193,7 +193,7 @@ Extended tests:
 ## ∴ Benchmark
 
 Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
-CPU 960  @ 3.20GHz`` cpu with 4 cores and active hyperthreading yields the
+CPU 960  @ 3.20GHz`` CPU with 4 cores and active hyperthreading yields the
 following results:
 
     zsh» PYTHONPATH=. bench/blpk_vs_gzip.py
@@ -252,7 +252,7 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 * possibly include chunk-size in header
 * possibly include a checksum (adler32) in header
 * configuration file to store commonly used options on a given machine
-* check Python 3.x compatability
+* check Python 3.x compatibility
 
 ## ∴ Changelog
 

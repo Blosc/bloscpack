@@ -290,7 +290,6 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
 
     Parameters
     ----------
-
     in_file_size : int
         the size of the input file
     nchunks : int, default: None
@@ -472,7 +471,6 @@ def process_compression_args(args):
 
     Parameters
     ----------
-
     args : argparse.Namespace
         the parsed command line arguments
 
@@ -498,7 +496,6 @@ def process_decompression_args(args):
 
     Parameters
     ----------
-
     args : argparse.Namespace
         the parsed command line arguments
 

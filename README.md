@@ -183,11 +183,18 @@ Basic tests, runs quickly:
     zsh» nosetests
     [...]
 
-Extended tests using larger files, may take some time, but will be nice to
+Extended tests using a larger file, may take some time, but will be nice to
 memory:
 
     zsh» nosetests test_bloscpack.py:pack_unpack_hard
     [...]
+
+Extended tests using a huge file. This one take forever and needs around 6G of
+memory:
+
+    zsh» nosetests test_bloscpack.py:pack_unpack_extreme
+    [...]
+
 
 ## ∴ Benchmark
 

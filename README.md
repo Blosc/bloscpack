@@ -195,6 +195,13 @@ memory:
     zsh» nosetests test_bloscpack.py:pack_unpack_extreme
     [...]
 
+Note that, all compression/decompression tests create temporary files (on
+UNIXoid systems this is under ``/tmp``) which are only deleted upon successful
+completion of the respective test. This means, if test fail or you abort
+running the tests (for example using ``ctrl+c``), you may be left with large
+files polluting your temporary space. Depending on your partitioning scheme
+etc.. doing this repeatedly, may lead to you running out of space on the
+filesystem.
 
 ## ∴ Benchmark
 

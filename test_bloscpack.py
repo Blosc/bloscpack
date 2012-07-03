@@ -279,6 +279,12 @@ def pack_unpack_hard():
     # should make apprx 1536 chunks
     pack_unpack(100, chunk_size=reverse_pretty('1M'))
 
+def pack_unpack_extreme():
+    """ Test on somewhat larer arrays, uses loads of memory. """
+    # this will create a huge array, and then use the
+    # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
+    pack_unpack(1000)
+
 def pack_unpack(repeats, nchunks=None, chunk_size=None):
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):

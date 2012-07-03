@@ -313,6 +313,11 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     ChunkingException
         under various error conditions
 
+    Notes
+    -----
+    If both 'nchunks' 'chunk_size' are 'None' the chunk_size is set to be
+    'blosc.BLOSC_MAX_BUFFERSIZE'.
+
     """
     if nchunks is not None and chunk_size is not None:
         raise ValueError(

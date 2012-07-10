@@ -11,6 +11,8 @@ import os.path as path
 import argparse
 import struct
 import math
+import zlib
+import hashlib
 import blosc
 
 __version__ = '0.1.1-dev'
@@ -41,6 +43,16 @@ SUFFIXES = { "B": 1,
              "M": 2**20,
              "G": 2**30,
              "T": 2**40}
+CHECKSUMS = ['None',
+             'zlib.adler32',
+             'zlib.crc32',
+             'hashlib.md5',
+             'hashlib.sha1',
+             'hashlib.sha224',
+             'hashlib.sha256',
+             'hashlib.sha384',
+             'hashlib.sha512']
+CHECKSUMS_CONSTRUCTORS = [eval(c) for c in CHECKSUMS]
 
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """

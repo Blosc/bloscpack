@@ -43,16 +43,55 @@ SUFFIXES = { "B": 1,
              "M": 2**20,
              "G": 2**30,
              "T": 2**40}
-CHECKSUMS = ['None',
-             'zlib.adler32',
-             'zlib.crc32',
-             'hashlib.md5',
-             'hashlib.sha1',
-             'hashlib.sha224',
-             'hashlib.sha256',
-             'hashlib.sha384',
-             'hashlib.sha512']
-CHECKSUMS_CONSTRUCTORS = [eval(c) for c in CHECKSUMS]
+
+class Hash(object):
+    """ Uniform hash object.
+
+    Parameters
+    ----------
+    name : str
+        the name of the hash
+    size : int
+        the length of the digest in bytes
+    function : callable
+        the hash function implementation
+
+    Notes
+    -----
+    The 'function' argument should return the raw bytes as string.
+
+    """
+
+    def __init__(self, name, size, function):
+        self.name, self.size, self._function = name, size, function
+
+    def __call__(self, data):
+        return self._function(data)
+
+def zlib_hash(func):
+    """ Wrapper for zlib hashes. """
+    def hash(data):
+       return struct.pack('<I', func(data) & 0xffffffff)
+    return 4, hash
+
+def hashlib_hash(func):
+    """ Wrapper for hashlib hashes. """
+    def hash(data):
+        return func(data).digest()
+    return func().digest_size, hash
+
+CHECKSUMS = [Hash('None', 0, lambda data: ''),
+     Hash('adler32', *zlib_hash(zlib.adler32)),
+     Hash('crc32', *zlib_hash(zlib.crc32)),
+     Hash('md5', *hashlib_hash(hashlib.md5)),
+     Hash('sha1', *hashlib_hash(hashlib.sha1)),
+     Hash('sha224', *hashlib_hash(hashlib.sha224)),
+     Hash('sha256', *hashlib_hash(hashlib.sha256)),
+     Hash('sha384', *hashlib_hash(hashlib.sha384)),
+     Hash('sha512', *hashlib_hash(hashlib.sha512)),
+    ]
+CHECKSUMS_AVAIL = [c.name for c in CHECKSUMS]
+CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
 
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """

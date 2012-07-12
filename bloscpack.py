@@ -71,6 +71,8 @@ class Hash(object):
 def zlib_hash(func):
     """ Wrapper for zlib hashes. """
     def hash(data):
+        # The binary OR is recommended to obtain uniform hashes on all python
+        # versions and platforms. The type with be 'uint32'.
        return struct.pack('<I', func(data) & 0xffffffff)
     return 4, hash
 

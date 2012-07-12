@@ -201,7 +201,7 @@ def test_create_bloscpack_header():
     nt.assert_equal('%s\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00' %
             MAGIC, create_bloscpack_header(1))
     nt.assert_equal('%s\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' %
-            MAGIC, create_bloscpack_header(None))
+            MAGIC, create_bloscpack_header(-1))
     nt.assert_equal('%s\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\x7f' %
             MAGIC, create_bloscpack_header(MAX_CHUNKS))
     nt.assert_equal('%s\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' %
@@ -213,7 +213,7 @@ def test_create_bloscpack_header():
             MAGIC, create_bloscpack_header(nchunks=1,
                 format_version=MAX_FORMAT_VERSION))
     nt.assert_raises(ValueError, create_bloscpack_header, MAX_CHUNKS+1)
-    nt.assert_raises(ValueError, create_bloscpack_header, -1)
+    nt.assert_raises(ValueError, create_bloscpack_header, None)
     nt.assert_raises(ValueError, create_bloscpack_header, 'foo')
     nt.assert_raises(struct.error, create_bloscpack_header, nchunks=1,
             format_version=MAX_FORMAT_VERSION+1)

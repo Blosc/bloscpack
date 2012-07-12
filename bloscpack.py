@@ -397,13 +397,13 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             level=DEBUG)
     return nchunks, chunk_size, last_chunk_size
 
-def create_bloscpack_header(nchunks=None, format_version=FORMAT_VERSION):
+def create_bloscpack_header(nchunks=-1, format_version=FORMAT_VERSION):
     """ Create the bloscpack header string.
 
     Parameters
     ----------
     nchunks : int
-        the number of chunks, default: None
+        the number of chunks, default: -1
     format_version : int
         the version format for the compressed file
 
@@ -426,23 +426,22 @@ def create_bloscpack_header(nchunks=None, format_version=FORMAT_VERSION):
     three are reserved, and the last eight are a signed  64 bit little endian
     integer that encodes the number of chunks
 
-    The value of '-1' for 'nchunks' designates an unknown size and can be
-    inserted by setting 'nchunks' to None.
+    The value of '-1' for 'nchunks' designates an unknown size.
 
     Raises
     ------
     ValueError
         if the nchunks argument is too large or negative
     struct.error
-        if the format_version is too large or negative
+        if the format_version is too large or less than -1
 
     """
-    if not 0 <= nchunks <= MAX_CHUNKS and nchunks is not None:
+    if not -1 <= nchunks <= MAX_CHUNKS:
         raise ValueError(
-                "'nchunks' must be in the range 0 <= n <= %d, not '%s'" %
+                "'nchunks' must be in the range -1 <= n <= %d, not '%s'" %
                 (MAX_CHUNKS, str(nchunks)))
     return (MAGIC + struct.pack('<B', format_version) + '\x00\x00\x00' +
-            struct.pack('<q', nchunks if nchunks is not None else -1))
+            struct.pack('<q', nchunks))
 
 def decode_bloscpack_header(buffer_):
     """ Check that the magic marker exists and return number of chunks. 

@@ -18,7 +18,7 @@ __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'
 MAGIC = 'blpk'
-BLOSCPACK_HEADER_LENGTH = 16
+BLOSCPACK_HEADER_LENGTH = 32
 BLOSC_HEADER_LENGTH = 16
 FORMAT_VERSION = 1
 MAX_FORMAT_VERSION = 255

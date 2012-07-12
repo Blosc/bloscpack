@@ -338,6 +338,9 @@ def decode_blosc_header(buffer_):
 class ChunkingException(BaseException):
     pass
 
+class NoSuchChecksum(ValueError):
+    pass
+
 def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     """ Determine chunking for an input file.
 

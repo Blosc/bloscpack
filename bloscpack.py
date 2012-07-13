@@ -397,15 +397,38 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             level=DEBUG)
     return nchunks, chunk_size, last_chunk_size
 
-def create_bloscpack_header(nchunks=None, format_version=FORMAT_VERSION):
+def check_range(name, value, min_, max_):
+    """ Check that a variable is in range. """
+    if not isinstance(value, int) or not min_ <= value <= max_:
+        raise ValueError(
+                "'%s' must be in the range %s <= n <= %s, not '%s'" %
+                tuple(map(str, (name, min, max_, value))))
+
+def create_bloscpack_header(format_version=FORMAT_VERSION,
+        options='00000000',
+        checksum=0,
+        typesize=0,
+        chunk_size=-1,
+        last_chunk=-1,
+        nchunks=-1):
     """ Create the bloscpack header string.
 
     Parameters
     ----------
-    nchunks : int
-        the number of chunks, default: None
     format_version : int
         the version format for the compressed file
+    options : bitfield (string of 0s and 1s)
+        the options for this file
+    checksum : int
+        the checksum to be used
+    typesize : int
+        the typesize used for blosc in the chunks
+    chunk_size : int
+        the size of a regular chunk
+    last_chunk : int
+        the size of the last chunk
+    nchunks : int
+        the number of chunks
 
     Returns
     -------
@@ -415,34 +438,51 @@ def create_bloscpack_header(nchunks=None, format_version=FORMAT_VERSION):
     Notes
     -----
 
-    The bloscpack header is 16 bytes as follows:
-
-    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
-    | b   l   p   k | ^ | RESERVED  |           nchunks             |
-                   version
-
-    The first four are the magic string 'blpk'. The next one is an 8 bit
-    unsigned little-endian integer that encodes the format version. The next
-    three are reserved, and the last eight are a signed  64 bit little endian
-    integer that encodes the number of chunks
-
-    The value of '-1' for 'nchunks' designates an unknown size and can be
-    inserted by setting 'nchunks' to None.
+    See the file 'header_rfc.rst' distributed with the source code for
+    details on the header format.
 
     Raises
     ------
     ValueError
-        if the nchunks argument is too large or negative
+        if the nchunks argument is too large
     struct.error
         if the format_version is too large or negative
 
     """
-    if not 0 <= nchunks <= MAX_CHUNKS and nchunks is not None:
+    check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
+    if (not isinstance(options, str) or
+        not len(options) == 8 or
+        not all(map(lambda x: x in ['0', '1'], iter(options)))):
         raise ValueError(
-                "'nchunks' must be in the range 0 <= n <= %d, not '%s'" %
-                (MAX_CHUNKS, str(nchunks)))
-    return (MAGIC + struct.pack('<B', format_version) + '\x00\x00\x00' +
-            struct.pack('<q', nchunks if nchunks is not None else -1))
+                "'options' must be string of 0s and 1s of length 8, not '%s'" %
+                options)
+    # TODO: enable after merging
+    #check_range('checksum', checksum, 0, len(CHECKSUMS)
+    check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
+    check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
+    check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
+    check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
+
+    def encode_uint8(value):
+        return struct.pack('<B', value)
+    def encode_int32(value):
+        return struct.pack('<l', value)
+    def encode_int64(value):
+        return struct.pack('<q', value)
+
+    format_version = encode_uint8(format_version)
+    options = encode_uint8(int(options, 2))
+    checksum = encode_uint8(checksum)
+    typesize = encode_uint8(typesize)
+    chunk_size = encode_int32(chunk_size)
+    last_chunk = encode_int32(last_chunk)
+    nchunks = encode_int64(nchunks)
+    RESERVED = encode_int64(0)
+
+    return (MAGIC + format_version + options + checksum + typesize +
+            chunk_size + last_chunk +
+            nchunks +
+            RESERVED)
 
 def decode_bloscpack_header(buffer_):
     """ Check that the magic marker exists and return number of chunks. 

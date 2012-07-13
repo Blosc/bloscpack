@@ -455,7 +455,9 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
 
 def check_range(name, value, min_, max_):
     """ Check that a variable is in range. """
-    if not isinstance(value, int) or not min_ <= value <= max_:
+    if not isinstance(value, ( int, long )):
+        raise TypeError("'%s' must be of type 'int'" % name)
+    elif not min_ <= value <= max_:
         raise ValueError(
                 "'%s' must be in the range %s <= n <= %s, not '%s'" %
                 tuple(map(str, (name, min, max_, value))))
@@ -500,15 +502,16 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     Raises
     ------
     ValueError
-        if the nchunks argument is too large
-    struct.error
-        if the format_version is too large or negative
+        if any of the arguments have an invalid value
+    TypeError
+        if any of the arguments have the wrong type
 
     """
     check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
-    if (not isinstance(options, str) or
-        not len(options) == 8 or
-        not all(map(lambda x: x in ['0', '1'], iter(options)))):
+    if not isinstance(options, str):
+        raise TypeError("'options' must be of type 'str', not '%s'" % type(options))
+    elif (not len(options) == 8 or
+            not all(map(lambda x: x in ['0', '1'], iter(options)))):
         raise ValueError(
                 "'options' must be string of 0s and 1s of length 8, not '%s'" %
                 options)

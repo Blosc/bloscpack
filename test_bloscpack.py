@@ -224,14 +224,16 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(ValueError, create_bloscpack_header, format_version=-1)
     nt.assert_raises(ValueError, create_bloscpack_header,
             format_version=MAX_FORMAT_VERSION+1)
+    nt.assert_raises(TypeError, create_bloscpack_header, format_version='foo')
     # check checksum
     nt.assert_raises(ValueError, create_bloscpack_header, checksum=-1)
     nt.assert_raises(ValueError, create_bloscpack_header,
             checksum=len(CHECKSUMS)+1)
+    nt.assert_raises(TypeError, create_bloscpack_header, checksum='foo')
     # check options argument
     # check for non-string
-    nt.assert_raises(ValueError, create_bloscpack_header, options=0)
-    nt.assert_raises(ValueError, create_bloscpack_header, options=1)
+    nt.assert_raises(TypeError, create_bloscpack_header, options=0)
+    nt.assert_raises(TypeError, create_bloscpack_header, options=1)
     # check for lengths too small and too large
     nt.assert_raises(ValueError, create_bloscpack_header, options='0')
     nt.assert_raises(ValueError, create_bloscpack_header, options='1')
@@ -250,16 +252,16 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(ValueError, create_bloscpack_header,
             chunk_size=blosc.BLOSC_MAX_BUFFERSIZE+1)
     nt.assert_raises(ValueError, create_bloscpack_header, chunk_size=-2)
-    nt.assert_raises(ValueError, create_bloscpack_header, chunk_size='foo')
+    nt.assert_raises(TypeError, create_bloscpack_header, chunk_size='foo')
     # check last_chunk
     nt.assert_raises(ValueError, create_bloscpack_header,
             last_chunk=blosc.BLOSC_MAX_BUFFERSIZE+1)
     nt.assert_raises(ValueError, create_bloscpack_header, last_chunk=-2)
-    nt.assert_raises(ValueError, create_bloscpack_header, last_chunk='foo')
+    nt.assert_raises(TypeError, create_bloscpack_header, last_chunk='foo')
     # check value of nchunks
     nt.assert_raises(ValueError, create_bloscpack_header, nchunks=MAX_CHUNKS+1)
     nt.assert_raises(ValueError, create_bloscpack_header, nchunks=-2)
-    nt.assert_raises(ValueError, create_bloscpack_header, nchunks='foo')
+    nt.assert_raises(TypeError, create_bloscpack_header, nchunks='foo')
 
 def test_create_bloscpack_header():
     nt.assert_equal('%s\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' %

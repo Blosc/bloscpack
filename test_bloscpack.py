@@ -224,6 +224,10 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(ValueError, create_bloscpack_header, format_version=-1)
     nt.assert_raises(ValueError, create_bloscpack_header,
             format_version=MAX_FORMAT_VERSION+1)
+    # check checksum
+    nt.assert_raises(ValueError, create_bloscpack_header, checksum=-1)
+    nt.assert_raises(ValueError, create_bloscpack_header,
+            checksum=len(CHECKSUMS)+1)
     # check options argument
     # check for non-string
     nt.assert_raises(ValueError, create_bloscpack_header, options=0)

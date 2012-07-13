@@ -512,8 +512,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         raise ValueError(
                 "'options' must be string of 0s and 1s of length 8, not '%s'" %
                 options)
-    # TODO: enable after merging
-    #check_range('checksum', checksum, 0, len(CHECKSUMS)
+    check_range('checksum',   checksum, 0, len(CHECKSUMS))
     check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)

@@ -547,7 +547,7 @@ def decode_bloscpack_header(buffer_):
 
     Parameters
     ----------
-    buffer_ : str (but probably any sequence would work)A
+    buffer_ : str (but probably any sequence would work)
         the buffer_
 
     Returns

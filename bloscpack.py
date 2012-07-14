@@ -291,6 +291,11 @@ def create_parser():
 
     return parser
 
+def decode_uint8(byte):
+    return struct.unpack('<B', byte)[0]
+def decode_uint32(fourbyte):
+    return struct.unpack('<I', fourbyte)[0]
+
 def decode_blosc_header(buffer_):
     """ Read and decode header from compressed Blosc buffer.
 
@@ -323,14 +328,10 @@ def decode_blosc_header(buffer_):
     length of the data when uncompressed.
 
     """
-    def decode_byte(byte):
-        return int(byte.encode('hex'), 16)
-    def decode_uint32(fourbyte):
-        return struct.unpack('<I', fourbyte)[0]
-    return {'version': decode_byte(buffer_[0]),
-            'versionlz': decode_byte(buffer_[1]),
-            'flags': decode_byte(buffer_[2]),
-            'typesize': decode_byte(buffer_[3]),
+    return {'version': decode_uint8(buffer_[0]),
+            'versionlz': decode_uint8(buffer_[1]),
+            'flags': decode_uint8(buffer_[2]),
+            'typesize': decode_uint8(buffer_[3]),
             'nbytes': decode_uint32(buffer_[4:8]),
             'blocksize': decode_uint32(buffer_[8:12]),
             'ctbytes': decode_uint32(buffer_[12:16])}

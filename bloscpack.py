@@ -128,6 +128,11 @@ def reverse_pretty(readable):
     else:
         return int(float(readable[:-1]) * SUFFIXES[suffix])
 
+def decode_uint8(byte):
+    return struct.unpack('<B', byte)[0]
+def decode_uint32(fourbyte):
+    return struct.unpack('<I', fourbyte)[0]
+
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
 

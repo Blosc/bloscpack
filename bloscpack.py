@@ -738,7 +738,9 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
             current_chunk = input_fp.read(bytes_to_read)
             # compute the checksum
             digest = checksum_impl(current_chunk)
+            # do compression
             compressed = blosc.compress(current_chunk, **blosc_args)
+            # write compressed data and digest
             output_fp.write(compressed)
             output_fp.write(digest)
             print_verbose("chunk '%d'%s written, in: %s out: %s" %

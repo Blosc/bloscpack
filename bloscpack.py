@@ -561,8 +561,8 @@ def decode_bloscpack_header(buffer_):
 
     Parameters
     ----------
-    buffer_ : str (but probably any sequence would work)
-        the buffer_
+    buffer_ : str of length 32 (but probably any sequence would work)
+        the header
 
     Returns
     -------
@@ -572,16 +572,24 @@ def decode_bloscpack_header(buffer_):
         the format version of the file
 
     """
-    if len(buffer_) != 16:
+    if len(buffer_) != 32:
         raise ValueError(
-            "attempting to decode a bloscpack header of length '%d', not '16'"
+            "attempting to decode a bloscpack header of length '%d', not '32'"
             % len(buffer_))
     elif buffer_[0:4] != MAGIC:
         raise ValueError(
             "the magic marker '%s' is missing from the bloscpack " % MAGIC +
             "header, instead we found: '%s'" % buffer_[0:4])
-    return (struct.unpack('<q', buffer_[8:16])[0],
-                struct.unpack('<I', buffer_[4:8])[0])
+
+    return {'format_version': decode_uint8(buffer_[4]),
+            'options':       decode_bitfield(buffer_[5]),
+            'checksum':      decode_uint8(buffer_[6]),
+            'typesize':      decode_uint8(buffer_[7]),
+            'chunk_size':    decode_int32(buffer_[8:12]),
+            'last_chunk':    decode_int32(buffer_[12:16]),
+            'nchunks':       decode_int64(buffer_[16:24]),
+            'RESERVED':      decode_int64(buffer_[24:32]),
+            }
 
 def process_compression_args(args):
     """ Extract and check the compression args after parsing by argparse.

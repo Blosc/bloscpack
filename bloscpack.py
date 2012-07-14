@@ -134,6 +134,9 @@ def decode_uint8(byte):
 def decode_uint32(fourbyte):
     return struct.unpack('<I', fourbyte)[0]
 
+def decode_int32(fourbyte):
+    return struct.unpack('<i', fourbyte)[0]
+
 def encode_uint8(byte):
     return struct.pack('<B', byte)
 

@@ -132,6 +132,13 @@ def decode_uint8(byte):
     return struct.unpack('<B', byte)[0]
 def decode_uint32(fourbyte):
     return struct.unpack('<I', fourbyte)[0]
+def encode_uint8(value):
+    return struct.pack('<B', value)
+def encode_int32(value):
+    return struct.pack('<l', value)
+def encode_int64(value):
+    return struct.pack('<q', value)
+
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
@@ -296,10 +303,6 @@ def create_parser():
 
     return parser
 
-def decode_uint8(byte):
-    return struct.unpack('<B', byte)[0]
-def decode_uint32(fourbyte):
-    return struct.unpack('<I', fourbyte)[0]
 
 def decode_blosc_header(buffer_):
     """ Read and decode header from compressed Blosc buffer.
@@ -526,13 +529,6 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
-
-    def encode_uint8(value):
-        return struct.pack('<B', value)
-    def encode_int32(value):
-        return struct.pack('<l', value)
-    def encode_int64(value):
-        return struct.pack('<q', value)
 
     format_version = encode_uint8(format_version)
     options = encode_uint8(int(options, 2))

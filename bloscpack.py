@@ -13,6 +13,7 @@ import struct
 import math
 import zlib
 import hashlib
+import itertools
 import blosc
 
 __version__ = '0.1.1-dev'
@@ -26,6 +27,7 @@ FORMAT_VERSION = 1
 MAX_FORMAT_VERSION = 255
 MAX_CHUNKS = (2**63)-1
 DEFAULT_CHUNK_SIZE = '1M'
+DEFAULT_OFFSETS = True
 DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
 DEAFAULT_SHUFFLE = True
@@ -94,6 +96,7 @@ CHECKSUMS = [Hash('None', 0, lambda data: ''),
     ]
 CHECKSUMS_AVAIL = [c.name for c in CHECKSUMS]
 CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
+DEAFULT_CHECKSUM = 'adler32'
 
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
@@ -360,6 +363,9 @@ class ChunkingException(BaseException):
     pass
 
 class NoSuchChecksum(ValueError):
+    pass
+
+class ChecksumMismatch(RuntimeError):
     pass
 
 def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
@@ -669,7 +675,8 @@ def process_nthread_arg(args):
     print_verbose('using %d thread%s' %
             (args.nthreads, 's' if args.nthreads > 1 else ''))
 
-def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None):
+def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
+        offsets=DEFAULT_OFFSETS, checksum=DEAFULT_CHECKSUM):
     """ Main function for compressing a file.
 
     Parameters
@@ -684,6 +691,10 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None):
         The desired number of chunks.
     chunk_size : int, default: None
         The desired chunk size in bytes.
+    offsets : bool
+        Wheather to include offsets.
+    checkum : str
+        Which checksum to use.
 
     Notes
     -----
@@ -697,23 +708,46 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None):
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, nchunks, chunk_size)
     # calculate header
-    bloscpack_header = create_bloscpack_header(nchunks)
+    options = '00000000'
+    offsets_storage = list(itertools.repeat(0, nchunks))
+    if offsets:
+        options = '00000001'
+    # set the checksum impl
+    checksum_impl = CHECKSUMS_LOOKUP[checksum]
+    bloscpack_header = create_bloscpack_header(
+            options=options,
+            checksum=CHECKSUMS_AVAIL.index(checksum),
+            typesize=blosc_args['typesize'],
+            chunk_size=chunk_size,
+            last_chunk=last_chunk_size,
+            nchunks=nchunks
+            )
     print_verbose('bloscpack_header: %s' % repr(bloscpack_header), level=DEBUG)
     # write the chunks to the file
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:
         output_fp.write(bloscpack_header)
+        # preallocate space for the offsets
+        if offsets:
+            output_fp.write(encode_int64(-1) * nchunks)
         # if nchunks == 1 the last_chunk_size is the size of the single chunk
         for i, bytes_to_read in enumerate((
                 [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
+            # store the current position in the file
+            offsets_storage[i] = output_fp.tell()
             current_chunk = input_fp.read(bytes_to_read)
+            # compute the checksum
+            digest = checksum_impl(current_chunk)
             compressed = blosc.compress(current_chunk, **blosc_args)
             output_fp.write(compressed)
+            output_fp.write(digest)
             print_verbose("chunk '%d'%s written, in: %s out: %s" %
                     (i, ' (last)' if i == nchunks-1 else '',
                     pretty_size(len(current_chunk)),
                     pretty_size(len(compressed))),
                     level=DEBUG)
+            if len(digest) > 0:
+                print_verbose('checksum (%s): %s' % (checksum, repr(digest)))
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
@@ -734,13 +768,21 @@ def unpack_file(in_file, out_file):
          open(out_file, 'wb') as output_fp:
         # read the bloscpack header
         print_verbose('reading bloscpack header', level=DEBUG)
-        bloscpack_header = input_fp.read(BLOSCPACK_HEADER_LENGTH)
-        nchunks, format_version = decode_bloscpack_header(bloscpack_header)
-        print_verbose('nchunks: %d, format_version: %d' %
-                (nchunks, format_version), level=DEBUG)
+        bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
+        print_verbose('bloscpack_header_raw: %s' %
+                repr(bloscpack_header_raw), level=DEBUG)
+        bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
+        for arg, value in bloscpack_header.iteritems():
+            # hack the values of the bloscpack header into the namespace
+            globals()[arg] = value
+            print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
+        checksum_impl = CHECKSUMS[checksum]
         if FORMAT_VERSION != format_version:
             error("format version of file was not '%s' as expected, but '%d'" %
                     (FORMAT_VERSION, format_version))
+        # read the offsets
+        if options == '00000001':
+            offsets_raw = input_fp.read(8 * nchunks)
         for i in range(nchunks):
             print_verbose("decompressing chunk '%d'%s" %
                     (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
@@ -752,7 +794,12 @@ def unpack_file(in_file, out_file):
             # position
             input_fp.seek(-BLOSC_HEADER_LENGTH, 1)
             compressed = input_fp.read(ctbytes)
+            if checksum_impl.size > 0:
+                digest = input_fp.read(checksum_impl.size)
             decompressed = blosc.decompress(compressed)
+            target_digest = checksum_impl(decompressed)
+            if target_digest != digest:
+                raise ChecksumMismatch('TODO')
             output_fp.write(decompressed)
             print_verbose("chunk written, in: %s out: %s" %
                     (pretty_size(len(compressed)),

@@ -70,17 +70,17 @@ class Hash(object):
 
 def zlib_hash(func):
     """ Wrapper for zlib hashes. """
-    def hash(data):
+    def hash_(data):
         # The binary OR is recommended to obtain uniform hashes on all python
         # versions and platforms. The type with be 'uint32'.
        return struct.pack('<I', func(data) & 0xffffffff)
-    return 4, hash
+    return 4, hash_
 
 def hashlib_hash(func):
     """ Wrapper for hashlib hashes. """
-    def hash(data):
+    def hash_(data):
         return func(data).digest()
-    return func().digest_size, hash
+    return func().digest_size, hash_
 
 CHECKSUMS = [Hash('None', 0, lambda data: ''),
      Hash('adler32', *zlib_hash(zlib.adler32)),

@@ -793,7 +793,8 @@ def unpack_file(in_file, out_file):
             print_verbose('blosc_header: %s' % repr(blosc_header), level=DEBUG)
             ctbytes = blosc_header['ctbytes']
             # Seek back BLOSC_HEADER_LENGTH bytes in file relative to current
-            # position. Blosc needs  the header too.
+            # position. Blosc needs the header too and presumably this is
+            # better than to read the whole buffer and then concatenate it...
             input_fp.seek(-BLOSC_HEADER_LENGTH, 1)
             # read chunk
             compressed = input_fp.read(ctbytes)

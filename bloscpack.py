@@ -138,7 +138,7 @@ def encode_uint8(value):
     return struct.pack('<B', value)
 
 def encode_int32(value):
-    return struct.pack('<l', value)
+    return struct.pack('<i', value)
 
 def encode_int64(value):
     return struct.pack('<q', value)

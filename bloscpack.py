@@ -130,15 +130,18 @@ def reverse_pretty(readable):
 
 def decode_uint8(byte):
     return struct.unpack('<B', byte)[0]
+
 def decode_uint32(fourbyte):
     return struct.unpack('<I', fourbyte)[0]
+
 def encode_uint8(value):
     return struct.pack('<B', value)
+
 def encode_int32(value):
     return struct.pack('<l', value)
+
 def encode_int64(value):
     return struct.pack('<q', value)
-
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.

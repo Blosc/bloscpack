@@ -783,23 +783,29 @@ def unpack_file(in_file, out_file):
         # read the offsets
         if options == '00000001':
             offsets_raw = input_fp.read(8 * nchunks)
+        # decompress
         for i in range(nchunks):
             print_verbose("decompressing chunk '%d'%s" %
                     (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
+            # read blosc header
             blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
             blosc_header = decode_blosc_header(blosc_header_raw)
             print_verbose('blosc_header: %s' % repr(blosc_header), level=DEBUG)
             ctbytes = blosc_header['ctbytes']
-            # seek back BLOSC_HEADER_LENGTH bytes in file relative to current
-            # position
+            # Seek back BLOSC_HEADER_LENGTH bytes in file relative to current
+            # position. Blosc needs  the header too.
             input_fp.seek(-BLOSC_HEADER_LENGTH, 1)
+            # read chunk
             compressed = input_fp.read(ctbytes)
             if checksum_impl.size > 0:
                 digest = input_fp.read(checksum_impl.size)
+            # decompress buffer
             decompressed = blosc.decompress(compressed)
+            # do checksum
             target_digest = checksum_impl(decompressed)
             if target_digest != digest:
                 raise ChecksumMismatch('TODO')
+            # write decompressed chunk
             output_fp.write(decompressed)
             print_verbose("chunk written, in: %s out: %s" %
                     (pretty_size(len(compressed)),

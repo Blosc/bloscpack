@@ -264,26 +264,103 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(TypeError, create_bloscpack_header, nchunks='foo')
 
 def test_create_bloscpack_header():
-    nt.assert_equal('%s\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' %
-            MAGIC, create_bloscpack_header(0))
-    nt.assert_equal('%s\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00' %
-            MAGIC, create_bloscpack_header(1))
-    nt.assert_equal('%s\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' %
-            MAGIC, create_bloscpack_header(None))
-    nt.assert_equal('%s\x01\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\x7f' %
-            MAGIC, create_bloscpack_header(MAX_CHUNKS))
-    nt.assert_equal('%s\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' %
-            MAGIC, create_bloscpack_header(nchunks=0, format_version=2))
-    nt.assert_equal('%s\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' %
-            MAGIC, create_bloscpack_header(nchunks=0,
-                format_version=MAX_FORMAT_VERSION))
-    nt.assert_equal('%s\xff\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00' %
-            MAGIC, create_bloscpack_header(nchunks=1,
-                format_version=MAX_FORMAT_VERSION))
-    nt.assert_raises(struct.error, create_bloscpack_header, nchunks=1,
-            format_version=MAX_FORMAT_VERSION+1)
-    nt.assert_raises(struct.error, create_bloscpack_header, nchunks=1,
-            format_version=-1)
+    # test with no arguments
+    format_version =struct.pack('<B', FORMAT_VERSION)
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header())
+    # test with arbitrary format_version
+    expected = MAGIC + struct.pack('<B', 23) + \
+        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(format_version=23))
+    # test with options
+    expected = MAGIC + format_version + \
+        '\x01\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(options='00000001'))
+    expected = MAGIC + format_version + \
+        '\x02\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(options='00000010'))
+    expected = MAGIC + format_version + \
+        '\xff\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(options='11111111'))
+    # test with checksum
+    expected = MAGIC + format_version + \
+        '\x00\x01\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(checksum=1))
+    expected = MAGIC + format_version + \
+        '\x00\x08\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(checksum=8))
+    # test with typesize
+    expected = MAGIC + format_version + \
+        '\x00\x00\x01\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(typesize=1))
+    expected = MAGIC + format_version + \
+        '\x00\x00\x02\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(typesize=2))
+    expected = MAGIC + format_version + \
+        '\x00\x00\x04\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(typesize=4))
+    expected = MAGIC + format_version + \
+        '\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(typesize=255))
+    # test with chunksize
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\x01\x00\x00\x00\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(chunk_size=1))
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\x00\x00\x10\x00\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected,
+            create_bloscpack_header(chunk_size=reverse_pretty('1M')))
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\xff\xff\xff\x7f\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected,
+            create_bloscpack_header(chunk_size=blosc.BLOSC_MAX_BUFFERSIZE))
+    # test with last_chunk
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\xff\xff\xff\xff\x01\x00\x00\x00'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(last_chunk=1))
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\xff\xff\xff\xff\x00\x00\x10\x00'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected,
+            create_bloscpack_header(last_chunk=reverse_pretty('1M')))
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\x7f'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected,
+            create_bloscpack_header(last_chunk=blosc.BLOSC_MAX_BUFFERSIZE))
+    # test nchunks
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(nchunks=0))
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(nchunks=1))
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\x7f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(nchunks=127))
+    expected = MAGIC + format_version + \
+        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\xff\xff\xff\xff\xff\xff\xff\x7f\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(expected, create_bloscpack_header(nchunks=MAX_CHUNKS))
 
 def test_decode_bloscpack_header():
     nt.assert_equal((0, 1), decode_bloscpack_header(

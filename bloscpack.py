@@ -134,14 +134,14 @@ def decode_uint8(byte):
 def decode_uint32(fourbyte):
     return struct.unpack('<I', fourbyte)[0]
 
-def encode_uint8(value):
-    return struct.pack('<B', value)
+def encode_uint8(byte):
+    return struct.pack('<B', byte)
 
-def encode_int32(value):
-    return struct.pack('<i', value)
+def encode_int32(fourbyte):
+    return struct.pack('<i', fourbyte)
 
-def encode_int64(value):
-    return struct.pack('<q', value)
+def encode_int64(eightbyte):
+    return struct.pack('<q', eightbyte)
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.

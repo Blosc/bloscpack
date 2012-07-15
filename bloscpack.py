@@ -859,7 +859,8 @@ if __name__ == '__main__':
             args.chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
         try:
             pack_file(in_file, out_file, blosc_args,
-                    nchunks=args.nchunks, chunk_size=args.chunk_size)
+                    nchunks=args.nchunks, chunk_size=args.chunk_size,
+                    checksum=args.checksum)
         except ChunkingException as e:
             error(e.message)
     elif args.subcommand in ['decompress', 'd']:

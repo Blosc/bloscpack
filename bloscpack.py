@@ -94,6 +94,7 @@ CHECKSUMS = [Hash('None', 0, lambda data: ''),
     ]
 CHECKSUMS_AVAIL = [c.name for c in CHECKSUMS]
 CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
+DEFAULT_CHECKSUM = 'adler32'
 
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
@@ -251,6 +252,19 @@ def create_parser():
                 dest='chunk_size',
                 help='set desired chunk size (default: %s)' %
                 DEFAULT_CHUNK_SIZE)
+        def join_with_eol(items):
+            return ', '.join(items) + '\n'
+        checksum_format = join_with_eol(CHECKSUMS_AVAIL[0:3]) + \
+                join_with_eol(CHECKSUMS_AVAIL[3:6]) + \
+                join_with_eol(CHECKSUMS_AVAIL[6:])
+        checksum_help='set desired checksum:\n' + checksum_format
+        bloscpack_group.add_argument('-k', '--checksum',
+                metavar='<checksum>',
+                type=str,
+                choices=CHECKSUMS_AVAIL,
+                default=DEFAULT_CHECKSUM,
+                dest='checksum',
+                help=checksum_help)
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,

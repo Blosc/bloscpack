@@ -72,17 +72,17 @@ class Hash(object):
 
 def zlib_hash(func):
     """ Wrapper for zlib hashes. """
-    def hash(data):
+    def hash_(data):
         # The binary OR is recommended to obtain uniform hashes on all python
         # versions and platforms. The type with be 'uint32'.
        return struct.pack('<I', func(data) & 0xffffffff)
-    return 4, hash
+    return 4, hash_
 
 def hashlib_hash(func):
     """ Wrapper for hashlib hashes. """
-    def hash(data):
+    def hash_(data):
         return func(data).digest()
-    return func().digest_size, hash
+    return func().digest_size, hash_
 
 CHECKSUMS = [Hash('None', 0, lambda data: ''),
      Hash('adler32', *zlib_hash(zlib.adler32)),
@@ -96,7 +96,7 @@ CHECKSUMS = [Hash('None', 0, lambda data: ''),
     ]
 CHECKSUMS_AVAIL = [c.name for c in CHECKSUMS]
 CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
-DEAFULT_CHECKSUM = 'adler32'
+DEFAULT_CHECKSUM = 'adler32'
 
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
@@ -263,14 +263,14 @@ def create_parser():
                 default=DEAFAULT_SHUFFLE,
                 dest='shuffle',
                 help='deactivate shuffle')
-        bloscpack_group = p.add_mutually_exclusive_group()
-        bloscpack_group.add_argument('-c', '--nchunks',
+        bloscpack_chunking_group = p.add_mutually_exclusive_group()
+        bloscpack_chunking_group.add_argument('-c', '--nchunks',
                 metavar='[1, 2**32-1]',
                 action=CheckNchunksOption,
                 type=int,
                 default=None,
                 help='set desired number of chunks')
-        bloscpack_group.add_argument('-z', '--chunk-size',
+        bloscpack_chunking_group.add_argument('-z', '--chunk-size',
                 metavar='<size>',
                 action=CheckChunkSizeOption,
                 type=str,
@@ -278,6 +278,20 @@ def create_parser():
                 dest='chunk_size',
                 help='set desired chunk size (default: %s)' %
                 DEFAULT_CHUNK_SIZE)
+        bloscpack_group = p.add_argument_group(title='bloscpack settings')
+        def join_with_eol(items):
+            return ', '.join(items) + '\n'
+        checksum_format = join_with_eol(CHECKSUMS_AVAIL[0:3]) + \
+                join_with_eol(CHECKSUMS_AVAIL[3:6]) + \
+                join_with_eol(CHECKSUMS_AVAIL[6:])
+        checksum_help='set desired checksum:\n' + checksum_format
+        bloscpack_group.add_argument('-k', '--checksum',
+                metavar='<checksum>',
+                type=str,
+                choices=CHECKSUMS_AVAIL,
+                default=DEFAULT_CHECKSUM,
+                dest='checksum',
+                help=checksum_help)
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,
@@ -676,7 +690,7 @@ def process_nthread_arg(args):
             (args.nthreads, 's' if args.nthreads > 1 else ''))
 
 def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
-        offsets=DEFAULT_OFFSETS, checksum=DEAFULT_CHECKSUM):
+        offsets=DEFAULT_OFFSETS, checksum=DEFAULT_CHECKSUM):
     """ Main function for compressing a file.
 
     Parameters

@@ -237,14 +237,14 @@ def create_parser():
                 default=DEAFAULT_SHUFFLE,
                 dest='shuffle',
                 help='deactivate shuffle')
-        bloscpack_group = p.add_mutually_exclusive_group()
-        bloscpack_group.add_argument('-c', '--nchunks',
+        bloscpack_chunking_group = p.add_mutually_exclusive_group()
+        bloscpack_chunking_group.add_argument('-c', '--nchunks',
                 metavar='[1, 2**32-1]',
                 action=CheckNchunksOption,
                 type=int,
                 default=None,
                 help='set desired number of chunks')
-        bloscpack_group.add_argument('-z', '--chunk-size',
+        bloscpack_chunking_group.add_argument('-z', '--chunk-size',
                 metavar='<size>',
                 action=CheckChunkSizeOption,
                 type=str,
@@ -252,6 +252,7 @@ def create_parser():
                 dest='chunk_size',
                 help='set desired chunk size (default: %s)' %
                 DEFAULT_CHUNK_SIZE)
+        bloscpack_group = p.add_argument_group(title='bloscpack settings')
         def join_with_eol(items):
             return ', '.join(items) + '\n'
         checksum_format = join_with_eol(CHECKSUMS_AVAIL[0:3]) + \

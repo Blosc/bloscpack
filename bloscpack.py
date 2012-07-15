@@ -330,7 +330,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
                     "greater than the 'in_file size': %d" % in_file_size)
         elif nchunks <= 0:
             raise ChunkingException(
-                    "'nchunks' must be greate than zero, not '%d' " % nchunks)
+                    "'nchunks' must be greater than zero, not '%d' " % nchunks)
         quotient, remainder = divmod(in_file_size, nchunks)
         if nchunks == 1:
             chunk_size = 0

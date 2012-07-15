@@ -16,7 +16,7 @@ import hashlib
 import itertools
 import blosc
 
-__version__ = '0.1.1-dev'
+__version__ = '0.2.0-dev'
 __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'

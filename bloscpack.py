@@ -13,7 +13,7 @@ import struct
 import math
 import blosc
 
-__version__ = '0.1.1-dev'
+__version__ = '0.1.1'
 __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'

@@ -268,9 +268,14 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 * configuration file to store commonly used options on a given machine
 * check Python 3.x compatibility
 * make a note in the README that the chunk-size benchmark can be used to tune
-* make ``pack_unpack_extended`` use less memory
 
 ## ∴ Changelog
+
+### ● v0.1.1     - Sun Jul 15 2012
+
+* Fix the memory issue with the tests
+* Two new suites: ``hard`` and ``extreme``
+* Minor typo fixes and corrections
 
 ### ● v0.1.0     - Thu Jun 14 2012
 

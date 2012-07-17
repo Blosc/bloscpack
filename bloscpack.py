@@ -332,7 +332,6 @@ def create_parser():
 
     return parser
 
-
 def decode_blosc_header(buffer_):
     """ Read and decode header from compressed Blosc buffer.
 

@@ -483,7 +483,7 @@ def test_invalid_format():
     bloscpack.FORMAT_VERSION = FORMAT_VERSION
 
 def pack_unpack_hard():
-    """ Test on somewhat larer arrays, but be nice to memory. """
+    """ Test on somewhat larger arrays, but be nice to memory. """
     # Array is apprx. 1.5 GB large
     # should make chunk-size of apprx. 1MB
     pack_unpack(100, nchunks=1536)

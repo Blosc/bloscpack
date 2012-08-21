@@ -48,8 +48,8 @@ All entries are little-endian.
 :checksum:
     (``uint8``)
     The checksum used. The following checksums, available in the python
-    standard library should be supported and the checksum should be
-    placed after the chunk.
+    standard library should be supported. The checksum is always computed on
+    the compressed data and placed after the chunk.
 
     :``0``:
         ``no checksum``

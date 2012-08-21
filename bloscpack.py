@@ -749,10 +749,10 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
             # store the current position in the file
             offsets_storage[i] = output_fp.tell()
             current_chunk = input_fp.read(bytes_to_read)
-            # compute the checksum
-            digest = checksum_impl(current_chunk)
             # do compression
             compressed = blosc.compress(current_chunk, **blosc_args)
+            # compute the checksum on the compressed data
+            digest = checksum_impl(compressed)
             # write compressed data and digest
             output_fp.write(compressed)
             if len(digest) > 0:
@@ -815,13 +815,16 @@ def unpack_file(in_file, out_file):
             # read chunk
             compressed = input_fp.read(ctbytes)
             if checksum_impl.size > 0:
-                digest = input_fp.read(checksum_impl.size)
-            # decompress buffer
-            decompressed = blosc.decompress(compressed)
+                expected_digest = input_fp.read(checksum_impl.size)
             # do checksum
-            target_digest = checksum_impl(decompressed)
-            if target_digest != digest:
-                raise ChecksumMismatch('TODO')
+            received_digest = checksum_impl(compressed)
+            if received_digest != expected_digest:
+                raise ChecksumMismatch(
+                        "Checksum mismatch detected in chunk '%d' " % i +\
+                        "expected: '%s', received: '%s'" %
+                        (repr(expected_digest), repr(received_digest)))
+            # if checksum OK, decompress buffer
+            decompressed = blosc.decompress(compressed)
             # write decompressed chunk
             output_fp.write(decompressed)
             print_verbose("chunk written, in: %s out: %s" %

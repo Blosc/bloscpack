@@ -381,6 +381,9 @@ class NoSuchChecksum(ValueError):
 class ChecksumMismatch(RuntimeError):
     pass
 
+class FileNotFound(IOError):
+    pass
+
 def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     """ Determine chunking for an input file.
 
@@ -668,14 +671,26 @@ def process_decompression_args(args):
 def check_files(in_file, out_file, args):
     """ Check files exist/don't exist.
 
-    Warning: may call sys.exit()
+    Parameters
+    ----------
+    in_file : str:
+        the input file
+    out_file : str
+        the output file
+    args : parser args
+        any additional arguments from the parser
+
+    Raises
+    ------
+    FileNotFound
+        in case any of the files isn't found.
 
     """
     if not path.exists(in_file):
-        error("input file '%s' does not exist!" % in_file)
+        raise FileNotFound("input file '%s' does not exist!" % in_file)
     if path.exists(out_file):
         if not args.force:
-            error("output file '%s' exists!" % out_file)
+            raise FileNotFound("output file '%s' exists!" % out_file)
         else:
             print_verbose("overwriting existing file: %s" % out_file)
     print_verbose('input file is: %s' % in_file)
@@ -854,7 +869,10 @@ if __name__ == '__main__':
         print_verbose('blosc args are:', level=DEBUG)
         for arg, value in blosc_args.iteritems():
             print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
-        check_files(in_file, out_file, args)
+        try:
+            check_files(in_file, out_file, args)
+        except FileNotFound as fnf:
+            error(str(fnf))
         process_nthread_arg(args)
         # mutually exclusivity in parser protects us from both having a value
         if args.nchunks is None and args.chunk_size is None:
@@ -868,7 +886,10 @@ if __name__ == '__main__':
     elif args.subcommand in ['decompress', 'd']:
         print_verbose('getting ready for decompression')
         in_file, out_file = process_decompression_args(args)
-        check_files(in_file, out_file, args)
+        try:
+            check_files(in_file, out_file, args)
+        except FileNotFound as fnf:
+            error(str(fnf))
         process_nthread_arg(args)
         try:
             unpack_file(in_file, out_file)

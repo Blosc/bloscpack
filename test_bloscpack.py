@@ -482,6 +482,38 @@ def test_invalid_format():
     bloscpack.error = error
     bloscpack.FORMAT_VERSION = FORMAT_VERSION
 
+def test_file_corruption():
+    blosc_args = DEFAULT_BLOSC_ARGS
+    with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
+        create_array(1, in_file)
+        pack_file(in_file, out_file, blosc_args,
+                nchunks=1)
+        # now go in and modify a byte in the file
+        with open(out_file, 'r+b') as input_fp:
+            total = ""
+            # read the header
+            bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
+            total += bloscpack_header_raw
+            bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
+            # read the offsets
+            offsets_raw = input_fp.read(8 * bloscpack_header['nchunks'])
+            total += offsets_raw
+            # read the blosc header of the first chunk
+            blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
+            total += blosc_header_raw
+            # read in the rest
+            byte = input_fp.read()
+            total += byte[0:5]
+            # flip a byte
+            total += '\x00' if byte[5] == '\xff' else '\xff'
+            total += byte[6:]
+            input_fp.seek(0, 0)
+            # and rewrite the whole thing back to the file
+            input_fp.write(total)
+        # now attempt to unpack it
+        nt.assert_raises(ChecksumMismatch, unpack_file, out_file, dcmp_file)
+
+
 def pack_unpack_hard():
     """ Test on somewhat larger arrays, but be nice to memory. """
     # Array is apprx. 1.5 GB large

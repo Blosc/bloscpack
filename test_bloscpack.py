@@ -9,6 +9,7 @@ import shutil
 import struct
 import numpy
 import nose.tools as nt
+from collections import namedtuple
 import bloscpack
 from bloscpack import *
 
@@ -69,6 +70,19 @@ def test_pretty_filesieze():
 def test_parser():
     # hmmm I guess we could override the error
     parser = create_parser()
+
+def test_check_files():
+    args = namedtuple('Args', 'force')(False)
+    # check input_file exists
+    nt.assert_raises(FileNotFound, check_files,
+            'nosuchfile', 'nosuchfile', args)
+    # check that output_file does not exists
+    nt.assert_raises(FileNotFound, check_files, 'test_bloscpack.py',
+            'test_bloscpack.py', args)
+    # check that everything is fine
+    args = namedtuple('Args', 'force')(True)
+    nt.assert_equal(check_files('test_bloscpack.py',
+        'test_bloscpack.py', args), None)
 
 def test_nchunks():
     # tests for nchunks given

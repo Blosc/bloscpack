@@ -860,7 +860,8 @@ def unpack_file(in_file, out_file):
             error("format version of file was not '%s' as expected, but '%d'" %
                     (FORMAT_VERSION, format_version))
         # read the offsets
-        if options == '00000001':
+        options = decode_options(bloscpack_header['options'])
+        if options['offsets']:
             offsets_raw = input_fp.read(8 * nchunks)
         # decompress
         for i in range(nchunks):

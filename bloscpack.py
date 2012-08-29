@@ -364,13 +364,13 @@ def decode_blosc_header(buffer_):
     length of the data when uncompressed.
 
     """
-    return {'version': decode_uint8(buffer_[0]),
+    return {'version':   decode_uint8(buffer_[0]),
             'versionlz': decode_uint8(buffer_[1]),
-            'flags': decode_uint8(buffer_[2]),
-            'typesize': decode_uint8(buffer_[3]),
-            'nbytes': decode_uint32(buffer_[4:8]),
+            'flags':     decode_uint8(buffer_[2]),
+            'typesize':  decode_uint8(buffer_[3]),
+            'nbytes':    decode_uint32(buffer_[4:8]),
             'blocksize': decode_uint32(buffer_[8:12]),
-            'ctbytes': decode_uint32(buffer_[12:16])}
+            'ctbytes':   decode_uint32(buffer_[12:16])}
 
 class ChunkingException(BaseException):
     pass

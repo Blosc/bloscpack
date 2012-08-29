@@ -284,7 +284,7 @@ def create_parser():
         checksum_format = join_with_eol(CHECKSUMS_AVAIL[0:3]) + \
                 join_with_eol(CHECKSUMS_AVAIL[3:6]) + \
                 join_with_eol(CHECKSUMS_AVAIL[6:])
-        checksum_help='set desired checksum:\n' + checksum_format
+        checksum_help = 'set desired checksum:\n' + checksum_format
         bloscpack_group.add_argument('-k', '--checksum',
                 metavar='<checksum>',
                 type=str,

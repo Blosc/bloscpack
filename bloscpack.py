@@ -480,11 +480,11 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     if chunk_size > blosc.BLOSC_MAX_BUFFERSIZE \
             or last_chunk_size > blosc.BLOSC_MAX_BUFFERSIZE:
         raise ChunkingException(
-            "Your value of 'nchunks' would lead to chunk sizes bigger than " +\
-            "'BLOSC_MAX_BUFFERSIZE', please use something smaller.\n" +\
-            "nchunks : %d\n" % nchunks +\
-            "chunk_size : %d\n" % chunk_size +\
-            "last_chunk_size : %d\n" % last_chunk_size +\
+            "Your value of 'nchunks' would lead to chunk sizes bigger than " +
+            "'BLOSC_MAX_BUFFERSIZE', please use something smaller.\n" +
+            "nchunks : %d\n" % nchunks +
+            "chunk_size : %d\n" % chunk_size +
+            "last_chunk_size : %d\n" % last_chunk_size +
             "BLOSC_MAX_BUFFERSIZE : %d\n" % blosc.BLOSC_MAX_BUFFERSIZE)
     elif nchunks > MAX_CHUNKS:
         raise ChunkingException(

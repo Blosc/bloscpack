@@ -771,7 +771,7 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
         The desired chunk size in bytes.
     offsets : bool
         Wheather to include offsets.
-    checkum : str
+    checksum : str
         Which checksum to use.
 
     Notes

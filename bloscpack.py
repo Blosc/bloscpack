@@ -506,6 +506,31 @@ def check_range(name, value, min_, max_):
                 "'%s' must be in the range %s <= n <= %s, not '%s'" %
                 tuple(map(str, (name, min, max_, value))))
 
+def _check_options(options):
+    """ Check the options bitfield.
+
+    Parameters
+    ----------
+    options : str
+
+    Raises
+    ------
+    TypeError
+        if options is not a string
+    ValueError
+        either if any character in option is not a zero or a one, or if options
+        is not of length 8
+    """
+
+    if not isinstance(options, str):
+        raise TypeError("'options' must be of type 'str', not '%s'" %
+                type(options))
+    elif (not len(options) == 8 or
+            not all(map(lambda x: x in ['0', '1'], iter(options)))):
+        raise ValueError(
+                "'options' must be string of 0s and 1s of length 8, not '%s'" %
+                options)
+
 def create_options(offsets=DEFAULT_OFFSETS):
     """ Create the options bitfield.
 
@@ -565,14 +590,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
 
     """
     check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
-    if not isinstance(options, str):
-        raise TypeError("'options' must be of type 'str', not '%s'" %
-                type(options))
-    elif (not len(options) == 8 or
-            not all(map(lambda x: x in ['0', '1'], iter(options)))):
-        raise ValueError(
-                "'options' must be string of 0s and 1s of length 8, not '%s'" %
-                options)
+    _check_options(options)
     check_range('checksum',   checksum, 0, len(CHECKSUMS))
     check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)

@@ -580,7 +580,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
             RESERVED)
 
 def decode_bloscpack_header(buffer_):
-    """ Check that the magic marker exists and return number of chunks. 
+    """ Check that the magic marker exists and return number of chunks.
 
     Parameters
     ----------

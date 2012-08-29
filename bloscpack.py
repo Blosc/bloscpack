@@ -638,10 +638,22 @@ def decode_bloscpack_header(buffer_):
 
     Returns
     -------
-    nchunks : int
-        the number of chunks in the file, or -1 if unknowen
     format_version : int
-        the format version of the file
+        the version format for the compressed file
+    options : bitfield (string of 0s and 1s)
+        the options for this file
+    checksum : int
+        the checksum to be used
+    typesize : int
+        the typesize used for blosc in the chunks
+    chunk_size : int
+        the size of a regular chunk
+    last_chunk : int
+        the size of the last chunk
+    nchunks : int
+        the number of chunks
+    RESERVED : int
+        the RESERVED field from the header, should be zero
 
     """
     if len(buffer_) != 32:

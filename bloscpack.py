@@ -187,8 +187,8 @@ def create_parser():
     ## print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version',
             action='version',
-            version='%(prog)s:\t' + ("'%s'\n" % __version__) + \
-                    "python-blosc:\t'%s'\n"   % blosc.version.__version__ + \
+            version='%(prog)s:\t' + ("'%s'\n" % __version__) +
+                    "python-blosc:\t'%s'\n"   % blosc.version.__version__ +
                     "blosc:\t\t'%s'\n"        % blosc.BLOSC_VERSION_STRING)
     output_group = parser.add_mutually_exclusive_group()
     output_group.add_argument('-v', '--verbose',
@@ -203,7 +203,7 @@ def create_parser():
     global_group.add_argument('-f', '--force',
             action='store_true',
             default=False,
-            help='disable overwrite checks for existing files\n' + \
+            help='disable overwrite checks for existing files\n' +
             '(use with caution)')
     class CheckThreadOption(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):

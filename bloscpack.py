@@ -619,13 +619,13 @@ def decode_bloscpack_header(buffer_):
             "header, instead we found: '%s'" % buffer_[0:4])
 
     return {'format_version': decode_uint8(buffer_[4]),
-            'options':       decode_bitfield(buffer_[5]),
-            'checksum':      decode_uint8(buffer_[6]),
-            'typesize':      decode_uint8(buffer_[7]),
-            'chunk_size':    decode_int32(buffer_[8:12]),
-            'last_chunk':    decode_int32(buffer_[12:16]),
-            'nchunks':       decode_int64(buffer_[16:24]),
-            'RESERVED':      decode_int64(buffer_[24:32]),
+            'options':        decode_bitfield(buffer_[5]),
+            'checksum':       decode_uint8(buffer_[6]),
+            'typesize':       decode_uint8(buffer_[7]),
+            'chunk_size':     decode_int32(buffer_[8:12]),
+            'last_chunk':     decode_int32(buffer_[12:16]),
+            'nchunks':        decode_int64(buffer_[16:24]),
+            'RESERVED':       decode_int64(buffer_[24:32]),
             }
 
 def process_compression_args(args):

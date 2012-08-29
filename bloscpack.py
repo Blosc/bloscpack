@@ -505,6 +505,16 @@ def check_range(name, value, min_, max_):
                 "'%s' must be in the range %s <= n <= %s, not '%s'" %
                 tuple(map(str, (name, min, max_, value))))
 
+def create_options(offsets=DEFAULT_OFFSETS):
+    """ Create the options bitfield.
+
+    Parameters
+    ----------
+    offsets : bool
+    """
+    return "".join([str(int(i)) for i in
+        [False, False, False, False, False, False, False, offsets]])
+
 def create_bloscpack_header(format_version=FORMAT_VERSION,
         options='00000000',
         checksum=0,

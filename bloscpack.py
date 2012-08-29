@@ -498,7 +498,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
 
 def check_range(name, value, min_, max_):
     """ Check that a variable is in range. """
-    if not isinstance(value, ( int, long )):
+    if not isinstance(value, (int, long)):
         raise TypeError("'%s' must be of type 'int'" % name)
     elif not min_ <= value <= max_:
         raise ValueError(

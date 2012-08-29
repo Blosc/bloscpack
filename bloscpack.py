@@ -836,7 +836,7 @@ def unpack_file(in_file, out_file):
             received_digest = checksum_impl(compressed)
             if received_digest != expected_digest:
                 raise ChecksumMismatch(
-                        "Checksum mismatch detected in chunk '%d' " % i +\
+                        "Checksum mismatch detected in chunk '%d' " % i +
                         "expected: '%s', received: '%s'" %
                         (repr(expected_digest), repr(received_digest)))
             # if checksum OK, decompress buffer

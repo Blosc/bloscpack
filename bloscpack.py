@@ -552,7 +552,8 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     """
     check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
     if not isinstance(options, str):
-        raise TypeError("'options' must be of type 'str', not '%s'" % type(options))
+        raise TypeError("'options' must be of type 'str', not '%s'" %
+                type(options))
     elif (not len(options) == 8 or
             not all(map(lambda x: x in ['0', '1'], iter(options)))):
         raise ValueError(

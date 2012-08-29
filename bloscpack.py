@@ -541,8 +541,25 @@ def create_options(offsets=DEFAULT_OFFSETS):
     return "".join([str(int(i)) for i in
         [False, False, False, False, False, False, False, offsets]])
 
+def decode_options(options):
+    """ Parse the options bitfield.
+
+    Parameters
+    ----------
+    options : str
+        the options bitfield
+
+    Returns
+    -------
+    options : dict mapping str -> bool
+    """
+
+    _check_options(options)
+    return {'offsets': bool(int(options[7]))}
+
 # default options created here programatically
 DEFAULT_OPTIONS = create_options()
+
 
 def create_bloscpack_header(format_version=FORMAT_VERSION,
         options='00000000',

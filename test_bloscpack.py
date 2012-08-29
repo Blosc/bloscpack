@@ -238,6 +238,11 @@ def test_create_options():
     nt.assert_equal('00000001', create_options())
     nt.assert_equal('00000000', create_options(offsets=False))
 
+def test_decode_options():
+    nt.assert_equal({'offsets': True}, decode_options('00000001'))
+    nt.assert_equal({'offsets': False}, decode_options('00000000'))
+
+
 def test_create_bloscpack_header_arguments():
     # check format_version
     nt.assert_raises(ValueError, create_bloscpack_header, format_version=-1)

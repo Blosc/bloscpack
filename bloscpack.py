@@ -75,7 +75,7 @@ def zlib_hash(func):
     def hash_(data):
         # The binary OR is recommended to obtain uniform hashes on all python
         # versions and platforms. The type with be 'uint32'.
-       return struct.pack('<I', func(data) & 0xffffffff)
+        return struct.pack('<I', func(data) & 0xffffffff)
     return 4, hash_
 
 def hashlib_hash(func):
@@ -187,8 +187,8 @@ def create_parser():
     ## print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version',
             action='version',
-            version='%(prog)s:\t' + ("'%s'\n" % __version__) + \
-                    "python-blosc:\t'%s'\n"   % blosc.version.__version__ + \
+            version='%(prog)s:\t' + ("'%s'\n" % __version__) +
+                    "python-blosc:\t'%s'\n"   % blosc.version.__version__ +
                     "blosc:\t\t'%s'\n"        % blosc.BLOSC_VERSION_STRING)
     output_group = parser.add_mutually_exclusive_group()
     output_group.add_argument('-v', '--verbose',
@@ -203,7 +203,7 @@ def create_parser():
     global_group.add_argument('-f', '--force',
             action='store_true',
             default=False,
-            help='disable overwrite checks for existing files\n' + \
+            help='disable overwrite checks for existing files\n' +
             '(use with caution)')
     class CheckThreadOption(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
@@ -284,7 +284,7 @@ def create_parser():
         checksum_format = join_with_eol(CHECKSUMS_AVAIL[0:3]) + \
                 join_with_eol(CHECKSUMS_AVAIL[3:6]) + \
                 join_with_eol(CHECKSUMS_AVAIL[6:])
-        checksum_help='set desired checksum:\n' + checksum_format
+        checksum_help = 'set desired checksum:\n' + checksum_format
         bloscpack_group.add_argument('-k', '--checksum',
                 metavar='<checksum>',
                 type=str,
@@ -465,7 +465,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             nchunks = quotient + 1
             last_chunk_size = remainder
     elif nchunks is None and chunk_size is None:
-        nchunks =  int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE))
+        nchunks = int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE))
         quotient, remainder = divmod(in_file_size, blosc.BLOSC_MAX_BUFFERSIZE)
         if in_file_size == blosc.BLOSC_MAX_BUFFERSIZE:
             nchunks = 1
@@ -480,11 +480,11 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     if chunk_size > blosc.BLOSC_MAX_BUFFERSIZE \
             or last_chunk_size > blosc.BLOSC_MAX_BUFFERSIZE:
         raise ChunkingException(
-            "Your value of 'nchunks' would lead to chunk sizes bigger than " +\
-            "'BLOSC_MAX_BUFFERSIZE', please use something smaller.\n" +\
-            "nchunks : %d\n" % nchunks +\
-            "chunk_size : %d\n" % chunk_size +\
-            "last_chunk_size : %d\n" % last_chunk_size +\
+            "Your value of 'nchunks' would lead to chunk sizes bigger than " +
+            "'BLOSC_MAX_BUFFERSIZE', please use something smaller.\n" +
+            "nchunks : %d\n" % nchunks +
+            "chunk_size : %d\n" % chunk_size +
+            "last_chunk_size : %d\n" % last_chunk_size +
             "BLOSC_MAX_BUFFERSIZE : %d\n" % blosc.BLOSC_MAX_BUFFERSIZE)
     elif nchunks > MAX_CHUNKS:
         raise ChunkingException(
@@ -498,7 +498,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
 
 def check_range(name, value, min_, max_):
     """ Check that a variable is in range. """
-    if not isinstance(value, ( int, long )):
+    if not isinstance(value, (int, long)):
         raise TypeError("'%s' must be of type 'int'" % name)
     elif not min_ <= value <= max_:
         raise ValueError(
@@ -552,7 +552,8 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     """
     check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
     if not isinstance(options, str):
-        raise TypeError("'options' must be of type 'str', not '%s'" % type(options))
+        raise TypeError("'options' must be of type 'str', not '%s'" %
+                type(options))
     elif (not len(options) == 8 or
             not all(map(lambda x: x in ['0', '1'], iter(options)))):
         raise ValueError(
@@ -579,7 +580,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
             RESERVED)
 
 def decode_bloscpack_header(buffer_):
-    """ Check that the magic marker exists and return number of chunks. 
+    """ Check that the magic marker exists and return number of chunks.
 
     Parameters
     ----------
@@ -835,7 +836,7 @@ def unpack_file(in_file, out_file):
             received_digest = checksum_impl(compressed)
             if received_digest != expected_digest:
                 raise ChecksumMismatch(
-                        "Checksum mismatch detected in chunk '%d' " % i +\
+                        "Checksum mismatch detected in chunk '%d' " % i +
                         "expected: '%s', received: '%s'" %
                         (repr(expected_digest), repr(received_digest)))
             # if checksum OK, decompress buffer

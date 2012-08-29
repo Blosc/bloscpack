@@ -28,6 +28,7 @@ MAX_FORMAT_VERSION = 255
 MAX_CHUNKS = (2**63)-1
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_OFFSETS = True
+DEFAULT_OPTIONS = None  # created programatically later on
 DEFAULT_TYPESIZE = 4
 DEFAULT_CLEVEL = 7
 DEAFAULT_SHUFFLE = True
@@ -514,6 +515,9 @@ def create_options(offsets=DEFAULT_OFFSETS):
     """
     return "".join([str(int(i)) for i in
         [False, False, False, False, False, False, False, offsets]])
+
+# default options created here programatically
+DEFAULT_OPTIONS = create_options()
 
 def create_bloscpack_header(format_version=FORMAT_VERSION,
         options='00000000',

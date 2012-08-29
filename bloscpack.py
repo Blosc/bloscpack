@@ -751,10 +751,8 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, nchunks, chunk_size)
     # calculate header
-    options = '00000000'
+    options = create_options(offsets=offsets)
     offsets_storage = list(itertools.repeat(0, nchunks))
-    if offsets:
-        options = '00000001'
     # set the checksum impl
     checksum_impl = CHECKSUMS_LOOKUP[checksum]
     bloscpack_header = create_bloscpack_header(

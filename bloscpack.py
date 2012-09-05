@@ -14,6 +14,7 @@ import math
 import zlib
 import hashlib
 import itertools
+from collections import OrderedDict
 import blosc
 
 __version__ = '0.2.0-dev'
@@ -41,11 +42,12 @@ DEBUG   = 'DEBUG'
 LEVEL = NORMAL
 VERBOSITY_LEVELS = [NORMAL, VERBOSE, DEBUG]
 PREFIX = "bloscpack.py"
-SUFFIXES = { "B": 1,
-             "K": 2**10,
-             "M": 2**20,
-             "G": 2**30,
-             "T": 2**40}
+SUFFIXES = OrderedDict((
+             ("B", 2**0 ),
+             ("K", 2**10),
+             ("M", 2**20),
+             ("G", 2**30),
+             ("T", 2**40)))
 
 class Hash(object):
     """ Uniform hash object.

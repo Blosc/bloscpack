@@ -188,6 +188,7 @@ def test_nchunks():
     # check that giving both arguments raises an error
     nt.assert_raises(ValueError, calculate_nchunks,
             128, nchunks=23, chunk_size=23)
+
     # check overflow of nchunks due to chunk_size being too small
     # and thus stuff not fitting into the header
     nt.assert_raises(ChunkingException, calculate_nchunks,
@@ -195,6 +196,13 @@ def test_nchunks():
     # check overflow of chunk-size due to nchunks being too small
     nt.assert_raises(ChunkingException,
             calculate_nchunks, blosc.BLOSC_MAX_BUFFERSIZE*2+1, nchunks=2)
+
+    # check underflow due to nchunks being too large
+    nt.assert_raises(ChunkingException, calculate_nchunks,
+            128, nchunks=129)
+    # check underflow due to chunk_size being too large
+    nt.assert_raises(ChunkingException, calculate_nchunks,
+            128, chunk_size=129)
 
 def test_decode_blosc_header():
     array_ = numpy.linspace(0, 100, 2e4).tostring()

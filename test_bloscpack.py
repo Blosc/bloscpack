@@ -129,6 +129,9 @@ def test_nchunks():
     nt.assert_equal((4, 2, 2), calculate_nchunks(8, nchunks=4))
     nt.assert_equal((7, 3, 2), calculate_nchunks(20, nchunks=7))
 
+    # the special case of no remainder and an empty last chunk
+    nt.assert_equal((5, 4, 0), calculate_nchunks(20, nchunks=7))
+
     # check for nchunks bigger than in_file_size
     nt.assert_raises(ChunkingException, calculate_nchunks,
             23, nchunks=24)

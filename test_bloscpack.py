@@ -492,6 +492,38 @@ def test_pack_unpack():
     pack_unpack(1, chunk_size=reverse_pretty('4M'))
     pack_unpack(1, chunk_size=reverse_pretty('8M'))
 
+def test_offsets():
+    blosc_args = DEFAULT_BLOSC_ARGS
+    with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
+        create_array(1, in_file)
+        bloscpack.pack_file(in_file, out_file, blosc_args, nchunks=6)
+        with open(out_file, 'r+b') as input_fp:
+            bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
+            bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
+            nchunks = bloscpack_header['nchunks']
+            offsets_raw = input_fp.read(8 * nchunks)
+            offsets = [decode_int64(offsets_raw[j - 8: j])
+                    for j in xrange(8, nchunks * 8 + 1, 8)]
+            # First chunks should start after header and offsets
+            first = BLOSCPACK_HEADER_LENGTH + 8 * nchunks
+            # We assume that the others are correct
+            nt.assert_equal(offsets[0], first)
+            nt.assert_equal([80, 1875276, 3604440, 5213381, 6742711, 8271898],
+                    offsets)
+            # try to read the second header
+            input_fp.seek(1875276, 0)
+            blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
+            expected = {'versionlz': 1,
+                        'blocksize': 131072,
+                        'ctbytes':   1729160,
+                        'version':   2,
+                        'flags':     1,
+                        'nbytes':    3200000,
+                        'typesize':  4}
+            blosc_header = decode_blosc_header(blosc_header_raw)
+            nt.assert_equal(expected, blosc_header)
+
+
 def test_invalid_format():
     def raising_error(message):
         raise ValueError(message)

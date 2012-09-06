@@ -847,8 +847,13 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
                     pretty_size(len(current_chunk)),
                     pretty_size(len(compressed))),
                     level=DEBUG)
+            tail_mess = ""
             if len(digest) > 0:
-                print_verbose('checksum (%s): %s' % (checksum, repr(digest)))
+                tail_mess += ('checksum (%s): %s ' % (checksum, repr(digest)))
+            if offsets:
+                tail_mess += ("offset: '%d'" % offsets_storage[i])
+            if len(tail_mess) > 0:
+                print_verbose(tail_mess)
         if offsets:
             # seek to 32 bits into the file
             output_fp.seek(BLOSCPACK_HEADER_LENGTH, 0)

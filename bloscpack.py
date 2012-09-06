@@ -14,6 +14,7 @@ import math
 import zlib
 import hashlib
 import itertools
+from collections import OrderedDict
 import blosc
 
 __version__ = '0.2.0-dev'
@@ -41,11 +42,12 @@ DEBUG   = 'DEBUG'
 LEVEL = NORMAL
 VERBOSITY_LEVELS = [NORMAL, VERBOSE, DEBUG]
 PREFIX = "bloscpack.py"
-SUFFIXES = { "B": 1,
-             "K": 2**10,
-             "M": 2**20,
-             "G": 2**30,
-             "T": 2**40}
+SUFFIXES = OrderedDict((
+             ("B", 2**0 ),
+             ("K", 2**10),
+             ("M", 2**20),
+             ("G", 2**30),
+             ("T", 2**40)))
 
 class Hash(object):
     """ Uniform hash object.
@@ -293,6 +295,11 @@ def create_parser():
                 default=DEFAULT_CHECKSUM,
                 dest='checksum',
                 help=checksum_help)
+        bloscpack_group.add_argument('-o', '--no-offsets',
+                action='store_false',
+                default=DEFAULT_OFFSETS,
+                dest='offsets',
+                help='deactivate offsets')
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,
@@ -839,6 +846,15 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
                     level=DEBUG)
             if len(digest) > 0:
                 print_verbose('checksum (%s): %s' % (checksum, repr(digest)))
+        if offsets:
+            # seek to 32 bits into the file
+            output_fp.seek(BLOSCPACK_HEADER_LENGTH, 0)
+            print_verbose("Writing '%d' offsets: '%s'" %
+                    (len(offsets_storage), repr(offsets_storage)))
+            # write the offsets encoded into the reserved space in the file
+            encoded_offsets = "".join([encode_int64(i) for i in offsets_storage])
+            print_verbose("Raw offsets: %s" % repr(encoded_offsets))
+            output_fp.write(encoded_offsets)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
@@ -875,6 +891,10 @@ def unpack_file(in_file, out_file):
         options = decode_options(bloscpack_header['options'])
         if options['offsets']:
             offsets_raw = input_fp.read(8 * nchunks)
+            print_verbose('Read raw offsets: %s' % repr(offsets_raw))
+            offset_storage = [decode_int64(offsets_raw[j-8:j]) for j in
+                    xrange(8, nchunks*8+1, 8)]
+            print_verbose('Offsets: %s' % offset_storage)
         # decompress
         for i in range(nchunks):
             print_verbose("decompressing chunk '%d'%s" %
@@ -940,7 +960,9 @@ if __name__ == '__main__':
             args.chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
         try:
             pack_file(in_file, out_file, blosc_args,
-                    nchunks=args.nchunks, chunk_size=args.chunk_size,
+                    nchunks=args.nchunks,
+                    chunk_size=args.chunk_size,
+                    offsets=args.offsets,
                     checksum=args.checksum)
         except ChunkingException as e:
             error(e.message)

@@ -843,7 +843,7 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
             if len(digest) > 0:
                 output_fp.write(digest)
             print_verbose("chunk '%d'%s written, in: %s out: %s" %
-                    (i, ' (last)' if i == nchunks-1 else '',
+                    (i, ' (last)' if i == nchunks - 1 else '',
                     pretty_size(len(current_chunk)),
                     pretty_size(len(compressed))),
                     level=DEBUG)

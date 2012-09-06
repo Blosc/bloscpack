@@ -806,7 +806,8 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
             calculate_nchunks(in_file_size, nchunks, chunk_size)
     # calculate header
     options = create_options(offsets=offsets)
-    offsets_storage = list(itertools.repeat(0, nchunks))
+    if offsets:
+        offsets_storage = list(itertools.repeat(0, nchunks))
     # set the checksum impl
     checksum_impl = CHECKSUMS_LOOKUP[checksum]
     bloscpack_header = create_bloscpack_header(
@@ -829,7 +830,8 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
         for i, bytes_to_read in enumerate((
                 [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
             # store the current position in the file
-            offsets_storage[i] = output_fp.tell()
+            if offsets:
+                offsets_storage[i] = output_fp.tell()
             current_chunk = input_fp.read(bytes_to_read)
             # do compression
             compressed = blosc.compress(current_chunk, **blosc_args)

@@ -117,6 +117,8 @@ def error(message, exit_code=1):
 
 def pretty_size(size_in_bytes):
     """ Pretty print filesize.  """
+    if size_in_bytes == 0:
+        return "0B"
     for suf, lim in reversed(sorted(SUFFIXES.items(), key=lambda x: x[1])):
         if size_in_bytes < lim:
             continue

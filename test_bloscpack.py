@@ -54,11 +54,13 @@ def test_error():
 
 def test_pretty_filesieze():
 
+    nt.assert_equal('0B', pretty_size(0))
     nt.assert_equal('9.0T', pretty_size(9898989898879))
     nt.assert_equal('4.78G', pretty_size(5129898234))
     nt.assert_equal('12.3M', pretty_size(12898234))
     nt.assert_equal('966.7K', pretty_size(989898))
     nt.assert_equal('128.0B', pretty_size(128))
+    nt.assert_equal(0, reverse_pretty('0B'))
     nt.assert_equal(8, reverse_pretty('8B'))
     nt.assert_equal(8192, reverse_pretty('8K'))
     nt.assert_equal(134217728, reverse_pretty('128M'))

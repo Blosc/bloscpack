@@ -810,7 +810,7 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
         offsets_storage = list(itertools.repeat(0, nchunks))
     # set the checksum impl
     checksum_impl = CHECKSUMS_LOOKUP[checksum]
-    bloscpack_header = create_bloscpack_header(
+    raw_bloscpack_header = create_bloscpack_header(
             options=options,
             checksum=CHECKSUMS_AVAIL.index(checksum),
             typesize=blosc_args['typesize'],
@@ -818,11 +818,12 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
             last_chunk=last_chunk_size,
             nchunks=nchunks
             )
-    print_verbose('bloscpack_header: %s' % repr(bloscpack_header), level=DEBUG)
+    print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
+            level=DEBUG)
     # write the chunks to the file
     with open(in_file, 'rb') as input_fp, \
          open(out_file, 'wb') as output_fp:
-        output_fp.write(bloscpack_header)
+        output_fp.write(raw_bloscpack_header)
         # preallocate space for the offsets
         if offsets:
             output_fp.write(encode_int64(-1) * nchunks)

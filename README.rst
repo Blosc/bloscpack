@@ -45,7 +45,7 @@ dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``::
 
     zsh» cp -L blpk ~/bin
 
-Or, of course, use the standard ``setup.py``:
+Or, of course, use the standard ``setup.py``::
 
     zsh» python setup.py install
 
@@ -58,12 +58,12 @@ Bloscpack has a number of global options and two subcommands: ``[c |
 compress]`` and ``[d | decompress]`` which each have their own options.
 
 
-Help for global options and subcommands:
+Help for global options and subcommands::
 
     zsh» ./blpk --help
     [...]
 
-Help for each one of the subcommands:
+Help for each one of the subcommands::
 
     zsh» ./blpk compress --help
     [...]
@@ -73,29 +73,29 @@ Help for each one of the subcommands:
 Examples
 --------
 
-Basic compression:
+Basic compression::
 
     zsh» ./blpk c data.dat
 
 ... will compress the file ``data.dat`` to ``data.dat.blp``
 
-Basic decompression:
+Basic decompression::
 
     zsh» ./blpk d data.dat.blp data.dcmp
 
 ... will decompress the file ``data.dat.blp`` to the file ``data.dcmp``. If you
 leave out the ``[<out_file>]`` argument, Bloscpack will complain that the file
-``data.dat`` exists already and refuse to overwrite it:
+``data.dat`` exists already and refuse to overwrite it::
 
     zsh» ./blpk d data.dat.blp
     blpk: error: output file 'data.dat' exists!
 
 If you know what you are doing, you can use the global option ``[-f |
---force]`` to override the overwrite checks:
+--force]`` to override the overwrite checks::
 
     zsh» ./blpk -f d data.dat.blp
 
-Incidentally this works for compression too:
+Incidentally this works for compression too::
 
     zsh» ./blpk c data.dat
     blpk: error: output file 'data.dat.blp' exists!
@@ -148,7 +148,7 @@ There are two options that influence how the data is stored:
 
 Lastly there are two options to control how much output is produced,
 
-The first causes basic info to be printed, ``[-v | --verbose]``:
+The first causes basic info to be printed, ``[-v | --verbose]``::
 
     zsh» ./blpk -v c -z 0.5G data.dat
     blpk: getting ready for compression
@@ -162,7 +162,7 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: compression ratio: 0.450932
     blpk: done
 
-... and ``[-d | --debug]`` prints a detailed account of what is going on:
+... and ``[-d | --debug]`` prints a detailed account of what is going on::
 
     zsh» ./blpk -d c -z 0.5G data.dat
     blpk: command line argument parsing complete
@@ -203,19 +203,19 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
 Testing
 -------
 
-Basic tests, runs quickly:
+Basic tests, runs quickly::
 
     zsh» nosetests
     [...]
 
 Extended tests using a larger file, may take some time, but will be nice to
-memory:
+memory::
 
     zsh» nosetests test_bloscpack.py:pack_unpack_hard
     [...]
 
 Extended tests using a huge file. This one take forever and needs around 6G of
-memory:
+memory::
 
     zsh» nosetests test_bloscpack.py:pack_unpack_extreme
     [...]
@@ -233,7 +233,7 @@ Benchmark
 
 Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
 CPU 960  @ 3.20GHz`` CPU with 4 cores and active hyperthreading yields the
-following results:
+following results::
 
     zsh» PYTHONPATH=. bench/blpk_vs_gzip.py
     create the test data..........

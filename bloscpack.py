@@ -923,14 +923,18 @@ def unpack_file(in_file, out_file):
             # read chunk
             compressed = input_fp.read(ctbytes)
             if checksum_impl.size > 0:
+                # do checksum
                 expected_digest = input_fp.read(checksum_impl.size)
-            # do checksum
-            received_digest = checksum_impl(compressed)
-            if received_digest != expected_digest:
-                raise ChecksumMismatch(
-                        "Checksum mismatch detected in chunk '%d' " % i +
-                        "expected: '%s', received: '%s'" %
-                        (repr(expected_digest), repr(received_digest)))
+                received_digest = checksum_impl(compressed)
+                if received_digest != expected_digest:
+                    raise ChecksumMismatch(
+                            "Checksum mismatch detected in chunk '%d' " % i +
+                            "expected: '%s', received: '%s'" %
+                            (repr(expected_digest), repr(received_digest)))
+                else:
+                    print_verbose('checksum OK (%s): %s ' %
+                            (checksum_impl.name, repr(received_digest)),
+                            level=DEBUG)
             # if checksum OK, decompress buffer
             decompressed = blosc.decompress(compressed)
             # write decompressed chunk

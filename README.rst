@@ -23,7 +23,7 @@ There is an official Blosc mailing list at: http://groups.google.com/group/blosc
 ## Dependencies
 
 * Python 2.7
-* [python-blosc (at least 29f168a)](https://github.com/FrancescAlted/python-blosc) (provides Blosc)
+* `python-blosc (at least 29f168a) <https://github.com/FrancescAlted/python-blosc>`_ (provides Blosc)
 
 ## Stability of File Format
 

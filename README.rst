@@ -51,7 +51,8 @@ Or, of course, use the standard ``setup.py``:
 
 ... which may require superuser privileges.
 
-## Usage
+Usage
+-----
 
 Bloscpack has a number of global options and two subcommands: ``[c |
 compress]`` and ``[d | decompress]`` which each have their own options.

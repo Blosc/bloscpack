@@ -855,15 +855,16 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
             if offsets:
                 tail_mess += ("offset: '%d'" % offsets_storage[i])
             if len(tail_mess) > 0:
-                print_verbose(tail_mess)
+                print_verbose(tail_mess, level=DEBUG)
         if offsets:
             # seek to 32 bits into the file
             output_fp.seek(BLOSCPACK_HEADER_LENGTH, 0)
             print_verbose("Writing '%d' offsets: '%s'" %
-                    (len(offsets_storage), repr(offsets_storage)))
+                    (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
             # write the offsets encoded into the reserved space in the file
             encoded_offsets = "".join([encode_int64(i) for i in offsets_storage])
-            print_verbose("Raw offsets: %s" % repr(encoded_offsets))
+            print_verbose("Raw offsets: %s" % repr(encoded_offsets),
+                    level=DEBUG)
             output_fp.write(encoded_offsets)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
@@ -901,10 +902,11 @@ def unpack_file(in_file, out_file):
         options = decode_options(bloscpack_header['options'])
         if options['offsets']:
             offsets_raw = input_fp.read(8 * nchunks)
-            print_verbose('Read raw offsets: %s' % repr(offsets_raw))
+            print_verbose('Read raw offsets: %s' % repr(offsets_raw),
+                    level=DEBUG)
             offset_storage = [decode_int64(offsets_raw[j-8:j]) for j in
                     xrange(8, nchunks*8+1, 8)]
-            print_verbose('Offsets: %s' % offset_storage)
+            print_verbose('Offsets: %s' % offset_storage, level=DEBUG)
         # decompress
         for i in range(nchunks):
             print_verbose("decompressing chunk '%d'%s" %

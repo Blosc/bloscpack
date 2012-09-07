@@ -1,4 +1,4 @@
-#  bloscpack
+#  Bloscpack
 
 Command line interface to Blosc via python-blosc
 
@@ -28,7 +28,7 @@ There is an official Blosc mailing list at: http://groups.google.com/group/blosc
 The tool is considered alpha-stage, experimental, research software. It is not
 unlikely that **the internal storage format for the compressed files will
 change in future**. Please **do not depend critically on the files generated**
-by bloscpack. See the warranty disclaimer in the licence at the end of this
+by Bloscpack. See the warranty disclaimer in the licence at the end of this
 file.
 
 ## Installation
@@ -75,7 +75,7 @@ Basic decompression:
     zsh» ./blpk d data.dat.blp data.dcmp
 
 ... will decompress the file ``data.dat.blp`` to the file ``data.dcmp``. If you
-leave out the ``[<out_file>]`` argument, bloscpack will complain that the file
+leave out the ``[<out_file>]`` argument, Bloscpack will complain that the file
 ``data.dat`` exists already and refuse to overwrite it:
 
     zsh» ./blpk d data.dat.blp
@@ -111,7 +111,7 @@ directly to Blosc:
   Deactivate shuffle:
   ``zsh» ./blpk c -s data.dat``
 
-In addition, there are two mutually exclusive options for bloscpack itself,
+In addition, there are two mutually exclusive options for Bloscpack itself,
 that govern how the file is split into chunks:
 
 * ``[-z | --chunk-size]``
@@ -254,7 +254,7 @@ designates the file format version, three reserved bytes and lastly an 8 byte
 little-endian signed integer encoding how many chunks there are. The value of
 ``-1`` is reserved for designating files that have been created without initial
 knowledge of the number of chunks, for example in a streaming scenario. In
-terms overhead, this means that for a given file bloscpack will add a total of
+terms overhead, this means that for a given file Bloscpack will add a total of
 16 bytes for itself and 16 bytes for each chunk compressed by Blosc. See also:
 the docstring of ``create_bloscpack_header()``.
 
@@ -263,7 +263,7 @@ the number of chunks to ``2**63-1 = 9223372036854775807``, but this should not
 be relevant in practice, since, even with the moderate default value of ``1MB``
 for chunk-size, we can still stores files as large as ``8ZB``(!) Given that
 in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
-``16EB``, bloscpack should be safe for a few more years.
+``16EB``, Bloscpack should be safe for a few more years.
 
 ## TODO
 
@@ -326,13 +326,13 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 ## Thanks
 
 * Fracesc Alted for writing Blosc in the first place and for providing
-  code-review and feedback on bloscpack
+  code-review and feedback on Bloscpack
 
 ## Author, Copyright and License
 
 © 2012 Valentin Haenel <valentin.haenel@gmx.de>
 
-bloscpack is licensed under the terms of the MIT License.
+Bloscpack is licensed under the terms of the MIT License.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

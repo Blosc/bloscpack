@@ -838,19 +838,19 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
             current_chunk = input_fp.read(bytes_to_read)
             # do compression
             compressed = blosc.compress(current_chunk, **blosc_args)
-            # compute the checksum on the compressed data
-            digest = checksum_impl(compressed)
-            # write compressed data and digest
+            # write compressed data
             output_fp.write(compressed)
-            if len(digest) > 0:
-                output_fp.write(digest)
             print_verbose("chunk '%d'%s written, in: %s out: %s" %
                     (i, ' (last)' if i == nchunks - 1 else '',
                     pretty_size(len(current_chunk)),
                     pretty_size(len(compressed))),
                     level=DEBUG)
             tail_mess = ""
-            if len(digest) > 0:
+            if checksum_impl.size > 0:
+                # compute the checksum on the compressed data
+                digest = checksum_impl(compressed)
+                # write digest
+                output_fp.write(digest)
                 tail_mess += ('checksum (%s): %s ' % (checksum, repr(digest)))
             if offsets:
                 tail_mess += ("offset: '%d'" % offsets_storage[i])

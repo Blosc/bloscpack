@@ -12,20 +12,24 @@ blocking and shuffeling compressor. The interface is realized by using the
 `argparse <http://docs.python.org/dev/library/argparse.html>`_ library
 and `python-blosc <https://github.com/FrancescAlted/python-blosc>`_ bindings.
 
-## Website
+Website
+-------
 
 Repository is at: https://github.com/esc/bloscpack
 
-## Contact
+Contact
+-------
 
 There is an official Blosc mailing list at: http://groups.google.com/group/blosc
 
-## Dependencies
+Dependencies
+------------
 
 * Python 2.7
 * `python-blosc (at least 29f168a) <https://github.com/FrancescAlted/python-blosc>`_ (provides Blosc)
 
-## Stability of File Format
+Stability of File Format
+------------------------
 
 The tool is considered alpha-stage, experimental, research software. It is not
 unlikely that **the internal storage format for the compressed files will
@@ -33,7 +37,8 @@ change in future**. Please **do not depend critically on the files generated**
 by Bloscpack. See the warranty disclaimer in the licence at the end of this
 file.
 
-## Installation
+Installation
+------------
 
 Add the ``blpk`` file to your ``$PATH`` somehow. For example by copying using
 dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``:
@@ -64,7 +69,8 @@ Help for each one of the subcommands:
     zsh» ./blpk decompress --help
     [...]
 
-## Examples
+Examples
+--------
 
 Basic compression:
 
@@ -193,7 +199,8 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: compression ratio: 0.450932
     blpk: done
 
-## Testing
+Testing
+-------
 
 Basic tests, runs quickly:
 
@@ -220,7 +227,8 @@ files polluting your temporary space. Depending on your partitioning scheme
 etc.. doing this repeatedly, may lead to you running out of space on the
 filesystem.
 
-## Benchmark
+Benchmark
+---------
 
 Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
 CPU 960  @ 3.20GHz`` CPU with 4 cores and active hyperthreading yields the
@@ -242,7 +250,8 @@ As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
 kind of structured data.
 
-## Implementation Details
+Implementation Details
+----------------------
 
 The input is split into chunks since a) we wish to put less stress on main
 memory and b) because Blosc has a buffer limit of 2GB (May 2012). By default
@@ -267,7 +276,8 @@ for chunk-size, we can still stores files as large as ``8ZB``(!) Given that
 in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 ``16EB``, Bloscpack should be safe for a few more years.
 
-## TODO
+TODO
+----
 
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage
@@ -283,21 +293,25 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 * check Python 3.x compatibility
 * make a note in the README that the chunk-size benchmark can be used to tune
 
-## Changelog
+Changelog
+---------
 
-### v0.1.1     - Sun Jul 15 2012
+v0.1.1     - Sun Jul 15 2012
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Fix the memory issue with the tests
 * Two new suites: ``hard`` and ``extreme``
 * Minor typo fixes and corrections
 
-### v0.1.0     - Thu Jun 14 2012
+v0.1.0     - Thu Jun 14 2012
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Freeze the first 8 bytes of the header (hopefully for ever)
 * Fail to decompress on non-matching format version
 * Minor typo fixes and corrections
 
-### v0.1.0-rc3 - Tue Jun 12 2012
+v0.1.0-rc3 - Tue Jun 12 2012
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Limit the chunk-size benchmark to a narrower range
 * After more careful experiments, a default chunk-size of ``1MB`` was deemed
@@ -309,7 +323,8 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 * Added a note in the README about instability of the file format
 * Various minor fixes and enhancements
 
-### v0.1.0-rc2 - Sat Jun 09 2012
+v0.1.0-rc2 - Sat Jun 09 2012
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Default chunk-size now ``4MB``
 * Human readable chunk-size argument
@@ -318,19 +333,22 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 * Benchmark to measure the effect of chunk-size
 * Various minor fixes and enhancements
 
-### v0.1.0-rc1 - Sun May 27 2012
+v0.1.0-rc1 - Sun May 27 2012
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Initial version
 * Compression/decompression
 * Command line argument parser
 * README, setup.py, tests and benchmark
 
-## Thanks
+Thanks
+------
 
 * Fracesc Alted for writing Blosc in the first place and for providing
   code-review and feedback on Bloscpack
 
-## Author, Copyright and License
+Author, Copyright and License
+-----------------------------
 
 © 2012 Valentin Haenel <valentin.haenel@gmx.de>
 

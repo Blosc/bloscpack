@@ -122,6 +122,21 @@ that govern how the file is split into chunks:
   Desired number of chunks:
   ``zsh» ./blpk -d c -c 2 data.dat``
 
+There are two options that influence how the data is stored:
+
+* ``[-k | --checksum <checksum>]``
+  Chose which checksum to use. The following values are permissible:
+  ``None``, ``adler32``, ``crc32``, ``md5``,
+  ``sha1``, ``sha224``, ``sha256``, ``sha384``,
+  ``sha512``, (default: ``adler32``). As described in the header format, each
+  compressed chunk can be stored with a checksum, which aids corruption
+  detection on decompression.
+
+* ``[-o | --no-offsets]``
+  By default, offsets to the individual chunks are stored. These are included
+  to allow for partial decompression in the future. This option disables that
+  feature.
+
 Lastly there are two options to control how much output is produced,
 
 The first causes basic info to be printed, ``[-v | --verbose]``:
@@ -256,15 +271,12 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 * document library usage
 * --equal-size argument to create large chunks of equal size
 * --max-size to create the largest possible chunks, regardless of input size
-* subcommand e or estimate to estimate the size of the uncompressed dtaa.
+* subcommand e or estimate to estimate the size of the uncompressed data.
 * add --raw-input and --raw-output switches to allow stuff like:
   cat file | blpk --raw-input --raw-output compress > file.blp
 * fix the typesize default argument, possibly make it platform dependent
 * since we now have potentially small chunks, the progressbar becomes relevant
   again
-* possibly include total file-size in header
-* possibly include chunk-size in header
-* possibly include a checksum (adler32) in header
 * configuration file to store commonly used options on a given machine
 * check Python 3.x compatibility
 * make a note in the README that the chunk-size benchmark can be used to tune

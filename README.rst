@@ -283,6 +283,13 @@ TODO
 * --equal-size argument to create large chunks of equal size
 * --max-size to create the largest possible chunks, regardless of input size
 * subcommand e or estimate to estimate the size of the uncompressed data.
+* subcommand v or verify to verify the integrity of the data
+* subcommend i or info to print information of the file, e.g. decoded header
+  and offsets
+* Refactor compression and decompression to use file_pointers instead of
+  file_name strings. This would allow using cStringIO to create in-memory
+  file-like containers. Great for testing and maybe other use-cases too.
+* partial decompression?
 * add --raw-input and --raw-output switches to allow stuff like:
   cat file | blpk --raw-input --raw-output compress > file.blp
 * fix the typesize default argument, possibly make it platform dependent

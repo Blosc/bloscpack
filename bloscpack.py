@@ -125,6 +125,10 @@ def pretty_size(size_in_bytes):
         else:
             return str(round(size_in_bytes/lim, 2))+suf
 
+def double_pretty_size(size_in_bytes):
+    """ Pretty print filesize including size in bytes. """
+    return ("%s (%dB)" %(pretty_size(size_in_bytes), size_in_bytes))
+
 def reverse_pretty(readable):
     """ Reverse pretty printed file size. """
     # otherwise we assume it has a suffix
@@ -501,8 +505,8 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
                 "nchunks: '%d' is greater than the MAX_CHUNKS: '%d'" %
                 (nchunks, MAX_CHUNKS))
     print_verbose('nchunks: %d' % nchunks, level=VERBOSE)
-    print_verbose('chunk_size: %s' % pretty_size(chunk_size), level=VERBOSE)
-    print_verbose('last_chunk_size: %s' % pretty_size(last_chunk_size),
+    print_verbose('chunk_size: %s' % double_pretty_size(chunk_size), level=VERBOSE)
+    print_verbose('last_chunk_size: %s' % double_pretty_size(last_chunk_size),
             level=DEBUG)
     return nchunks, chunk_size, last_chunk_size
 
@@ -803,7 +807,7 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
     """
     # calculate chunk sizes
     in_file_size = path.getsize(in_file)
-    print_verbose('input file size: %s' % pretty_size(in_file_size))
+    print_verbose('input file size: %s' % double_pretty_size(in_file_size))
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, nchunks, chunk_size)
     # calculate header
@@ -842,8 +846,8 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
             output_fp.write(compressed)
             print_verbose("chunk '%d'%s written, in: %s out: %s" %
                     (i, ' (last)' if i == nchunks - 1 else '',
-                    pretty_size(len(current_chunk)),
-                    pretty_size(len(compressed))),
+                    double_pretty_size(len(current_chunk)),
+                    double_pretty_size(len(compressed))),
                     level=DEBUG)
             tail_mess = ""
             if checksum_impl.size > 0:
@@ -867,7 +871,7 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
                     level=DEBUG)
             output_fp.write(encoded_offsets)
     out_file_size = path.getsize(out_file)
-    print_verbose('output file size: %s' % pretty_size(out_file_size))
+    print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
 def unpack_file(in_file, out_file):
@@ -957,7 +961,11 @@ if __name__ == '__main__':
     print_verbose('command line argument parsing complete', level=DEBUG)
     print_verbose('command line arguments are: ', level=DEBUG)
     for arg, val in vars(args).iteritems():
-        print_verbose('\t%s: %s' % (arg, str(val)), level=DEBUG)
+        if arg == 'chunk_size':
+            print_verbose('\t%s: %s' % (arg, double_pretty_size(val)),
+                    level=DEBUG)
+        else:
+            print_verbose('\t%s: %s' % (arg, str(val)), level=DEBUG)
 
     # compression and decompression handled via subparsers
     if args.subcommand in ['compress', 'c']:

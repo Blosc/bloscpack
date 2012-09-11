@@ -260,16 +260,6 @@ the chunk-size is a moderate ``1MB`` which should be fine, even for less
 powerful machines. The last chunk always contains the remainder and has thus
 size either equal too or less than the rest of the chunks.
 
-Bloscpack adds an 16 byte header to a compressed file, which consists of a 4
-byte magic string, ``blpk``, a single byte little-endian unsigned integer which
-designates the file format version, three reserved bytes and lastly an 8 byte
-little-endian signed integer encoding how many chunks there are. The value of
-``-1`` is reserved for designating files that have been created without initial
-knowledge of the number of chunks, for example in a streaming scenario. In
-terms overhead, this means that for a given file Bloscpack will add a total of
-16 bytes for itself and 16 bytes for each chunk compressed by Blosc. See also:
-the docstring of ``create_bloscpack_header()``.
-
 Effectively, storing the number of chunks as a signed 8 byte integer, limits
 the number of chunks to ``2**63-1 = 9223372036854775807``, but this should not
 be relevant in practice, since, even with the moderate default value of ``1MB``

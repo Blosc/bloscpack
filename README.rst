@@ -150,7 +150,7 @@ Lastly there are two options to control how much output is produced,
 
 The first causes basic info to be printed, ``[-v | --verbose]``::
 
-    zsh» ./blpk -v c -z 0.5G data.dat
+    zsh» ./blpk --verbose compress --chunk-size 0.5G data.dat
     blpk: getting ready for compression
     blpk: input file is: data.dat
     blpk: output file is: data.dat.blp
@@ -164,14 +164,16 @@ The first causes basic info to be printed, ``[-v | --verbose]``::
 
 ... and ``[-d | --debug]`` prints a detailed account of what is going on::
 
-    zsh» ./blpk -d c -z 0.5G data.dat
+    zsh» ./blpk --debug compress --chunk-size 0.5G data.dat
     blpk: command line argument parsing complete
     blpk: command line arguments are:
     blpk:   nchunks: None
     blpk:   force: False
     blpk:   verbose: False
+    blpk:   offsets: True
+    blpk:   checksum: adler32
+    blpk:   subcommand: compress
     blpk:   out_file: None
-    blpk:   subcommand: c
     blpk:   in_file: data.dat
     blpk:   chunk_size: 536870912
     blpk:   debug: True
@@ -192,13 +194,19 @@ The first causes basic info to be printed, ``[-v | --verbose]``::
     blpk: nchunks: 3
     blpk: chunk_size: 512.0M
     blpk: last_chunk_size: 501.88M
-    blpk: bloscpack_header: 'blpk\x01\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
+    blpk: raw_bloscpack_header: 'blpk\x01\x01\x01\x04\x00\x00\x00 \x00\x10^\x1f\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
     blpk: chunk '0' written, in: 512.0M out: 235.14M
+    blpk: checksum (adler32): '\x93:\xbd\xfb' offset: '56'
     blpk: chunk '1' written, in: 512.0M out: 229.74M
+    blpk: checksum (adler32): '5\xc2\x8f\xa3' offset: '246563546'
     blpk: chunk '2' (last) written, in: 501.88M out: 223.19M
+    blpk: checksum (adler32): '\xf1U\xfc\xa3' offset: '487459567'
+    blpk: Writing '3' offsets: '[56, 246563546, 487459567]'
+    blpk: Raw offsets: '8\x00\x00\x00\x00\x00\x00\x00\xdaB\xb2\x0e\x00\x00\x00\x00\xef\n\x0e\x1d\x00\x00\x00\x00'
     blpk: output file size: 688.07M
     blpk: compression ratio: 0.450932
     blpk: done
+
 
 Testing
 -------

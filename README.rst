@@ -301,6 +301,14 @@ TODO
 
 Changelog
 ---------
+* v0.2.0-rc1 - Xxx Xxx XX XXXX
+
+  * Implement new header format as described in RFC
+  * Implement checksumming compressed chunks with various checksums
+  * Implement offsets of the chunks into the file
+  * Efforts to make the library re-entrant, better control of side-effects
+  * README is now rst not md (flirting with sphinx)
+  * Tons of trivial fixes, typos, wording, refactoring, renaming, pep8 etc..
 
 * v0.1.1     - Sun Jul 15 2012
 

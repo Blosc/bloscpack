@@ -1,92 +1,101 @@
-# ∴ bloscpack
+Bloscpack
+=========
 
 Command line interface to Blosc via python-blosc
 
-## ∴ Description
+Description
+-----------
 
 This script provides a command line interface to
-[Blosc](http://blosc.pytables.org/trac), a high performance, multi-threaded,
+`Blosc <http://blosc.pytables.org/trac>`_, a high performance, multi-threaded,
 blocking and shuffeling compressor. The interface is realized by using the
-[argparse](http://docs.python.org/dev/library/argparse.html) library
-and [python-blosc](https://github.com/FrancescAlted/python-blosc) bindings.
+`argparse <http://docs.python.org/dev/library/argparse.html>`_ library
+and `python-blosc <https://github.com/FrancescAlted/python-blosc>`_ bindings.
 
-## ∴ Website
+Website
+-------
 
 Repository is at: https://github.com/esc/bloscpack
 
-## ∴ Contact
+Contact
+-------
 
 There is an official Blosc mailing list at: http://groups.google.com/group/blosc
 
-## ∴ Dependencies
+Dependencies
+------------
 
 * Python 2.7
-* [python-blosc](https://github.com/FrancescAlted/python-blosc) (provides Blosc)
+* `python-blosc (at least 29f168a) <https://github.com/FrancescAlted/python-blosc>`_ (provides Blosc)
 
-## ∴ Stability of File Format
+Stability of File Format
+------------------------
 
 The tool is considered alpha-stage, experimental, research software. It is not
 unlikely that **the internal storage format for the compressed files will
 change in future**. Please **do not depend critically on the files generated**
-by bloscpack. See the warranty disclaimer in the licence at the end of this
+by Bloscpack. See the warranty disclaimer in the licence at the end of this
 file.
 
-## ∴ Installation
+Installation
+------------
 
 Add the ``blpk`` file to your ``$PATH`` somehow. For example by copying using
-dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``:
+dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``::
 
     zsh» cp -L blpk ~/bin
 
-Or, of course, use the standard ``setup.py``:
+Or, of course, use the standard ``setup.py``::
 
     zsh» python setup.py install
 
 ... which may require superuser privileges.
 
-## ∴ Usage
+Usage
+-----
 
 Bloscpack has a number of global options and two subcommands: ``[c |
 compress]`` and ``[d | decompress]`` which each have their own options.
 
 
-Help for global options and subcommands:
+Help for global options and subcommands::
 
     zsh» ./blpk --help
     [...]
 
-Help for each one of the subcommands:
+Help for each one of the subcommands::
 
     zsh» ./blpk compress --help
     [...]
     zsh» ./blpk decompress --help
     [...]
 
-## ∴ Examples
+Examples
+--------
 
-Basic compression:
+Basic compression::
 
     zsh» ./blpk c data.dat
 
 ... will compress the file ``data.dat`` to ``data.dat.blp``
 
-Basic decompression:
+Basic decompression::
 
     zsh» ./blpk d data.dat.blp data.dcmp
 
 ... will decompress the file ``data.dat.blp`` to the file ``data.dcmp``. If you
-leave out the ``[<out_file>]`` argument, bloscpack will complain that the file
-``data.dat`` exists already and refuse to overwrite it:
+leave out the ``[<out_file>]`` argument, Bloscpack will complain that the file
+``data.dat`` exists already and refuse to overwrite it::
 
     zsh» ./blpk d data.dat.blp
     blpk: error: output file 'data.dat' exists!
 
 If you know what you are doing, you can use the global option ``[-f |
---force]`` to override the overwrite checks:
+--force]`` to override the overwrite checks::
 
     zsh» ./blpk -f d data.dat.blp
 
-Incidentally this works for compression too:
+Incidentally this works for compression too::
 
     zsh» ./blpk c data.dat
     blpk: error: output file 'data.dat.blp' exists!
@@ -111,7 +120,7 @@ directly to Blosc:
   Deactivate shuffle:
   ``zsh» ./blpk c -s data.dat``
 
-In addition, there are two mutually exclusive options for bloscpack itself,
+In addition, there are two mutually exclusive options for Bloscpack itself,
 that govern how the file is split into chunks:
 
 * ``[-z | --chunk-size]``
@@ -139,9 +148,9 @@ There are two options that influence how the data is stored:
 
 Lastly there are two options to control how much output is produced,
 
-The first causes basic info to be printed, ``[-v | --verbose]``:
+The first causes basic info to be printed, ``[-v | --verbose]``::
 
-    zsh» ./blpk -v c -z 0.5G data.dat
+    zsh» ./blpk --verbose compress --chunk-size 0.5G data.dat
     blpk: getting ready for compression
     blpk: input file is: data.dat
     blpk: output file is: data.dat.blp
@@ -153,16 +162,18 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: compression ratio: 0.450932
     blpk: done
 
-... and ``[-d | --debug]`` prints a detailed account of what is going on:
+... and ``[-d | --debug]`` prints a detailed account of what is going on::
 
-    zsh» ./blpk -d c -z 0.5G data.dat
+    zsh» ./blpk --debug compress --chunk-size 0.5G data.dat
     blpk: command line argument parsing complete
     blpk: command line arguments are:
     blpk:   nchunks: None
     blpk:   force: False
     blpk:   verbose: False
+    blpk:   offsets: True
+    blpk:   checksum: adler32
+    blpk:   subcommand: compress
     blpk:   out_file: None
-    blpk:   subcommand: c
     blpk:   in_file: data.dat
     blpk:   chunk_size: 536870912
     blpk:   debug: True
@@ -183,29 +194,36 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: nchunks: 3
     blpk: chunk_size: 512.0M
     blpk: last_chunk_size: 501.88M
-    blpk: bloscpack_header: 'blpk\x01\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00'
+    blpk: raw_bloscpack_header: 'blpk\x01\x01\x01\x04\x00\x00\x00 \x00\x10^\x1f\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
     blpk: chunk '0' written, in: 512.0M out: 235.14M
+    blpk: checksum (adler32): '\x93:\xbd\xfb' offset: '56'
     blpk: chunk '1' written, in: 512.0M out: 229.74M
+    blpk: checksum (adler32): '5\xc2\x8f\xa3' offset: '246563546'
     blpk: chunk '2' (last) written, in: 501.88M out: 223.19M
+    blpk: checksum (adler32): '\xf1U\xfc\xa3' offset: '487459567'
+    blpk: Writing '3' offsets: '[56, 246563546, 487459567]'
+    blpk: Raw offsets: '8\x00\x00\x00\x00\x00\x00\x00\xdaB\xb2\x0e\x00\x00\x00\x00\xef\n\x0e\x1d\x00\x00\x00\x00'
     blpk: output file size: 688.07M
     blpk: compression ratio: 0.450932
     blpk: done
 
-## ∴ Testing
 
-Basic tests, runs quickly:
+Testing
+-------
+
+Basic tests, runs quickly::
 
     zsh» nosetests
     [...]
 
 Extended tests using a larger file, may take some time, but will be nice to
-memory:
+memory::
 
     zsh» nosetests test_bloscpack.py:pack_unpack_hard
     [...]
 
 Extended tests using a huge file. This one take forever and needs around 6G of
-memory:
+memory::
 
     zsh» nosetests test_bloscpack.py:pack_unpack_extreme
     [...]
@@ -218,11 +236,12 @@ files polluting your temporary space. Depending on your partitioning scheme
 etc.. doing this repeatedly, may lead to you running out of space on the
 filesystem.
 
-## ∴ Benchmark
+Benchmark
+---------
 
 Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
 CPU 960  @ 3.20GHz`` CPU with 4 cores and active hyperthreading yields the
-following results:
+following results::
 
     zsh» PYTHONPATH=. bench/blpk_vs_gzip.py
     create the test data..........
@@ -240,7 +259,8 @@ As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
 kind of structured data.
 
-## ∴ Implementation Details
+Implementation Details
+----------------------
 
 The input is split into chunks since a) we wish to put less stress on main
 memory and b) because Blosc has a buffer limit of 2GB (May 2012). By default
@@ -248,24 +268,15 @@ the chunk-size is a moderate ``1MB`` which should be fine, even for less
 powerful machines. The last chunk always contains the remainder and has thus
 size either equal too or less than the rest of the chunks.
 
-Bloscpack adds an 16 byte header to a compressed file, which consists of a 4
-byte magic string, ``blpk``, a single byte little-endian unsigned integer which
-designates the file format version, three reserved bytes and lastly an 8 byte
-little-endian signed integer encoding how many chunks there are. The value of
-``-1`` is reserved for designating files that have been created without initial
-knowledge of the number of chunks, for example in a streaming scenario. In
-terms overhead, this means that for a given file bloscpack will add a total of
-16 bytes for itself and 16 bytes for each chunk compressed by Blosc. See also:
-the docstring of ``create_bloscpack_header()``.
-
 Effectively, storing the number of chunks as a signed 8 byte integer, limits
 the number of chunks to ``2**63-1 = 9223372036854775807``, but this should not
 be relevant in practice, since, even with the moderate default value of ``1MB``
 for chunk-size, we can still stores files as large as ``8ZB``(!) Given that
 in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
-``16EB``, bloscpack should be safe for a few more years.
+``16EB``, Bloscpack should be safe for a few more years.
 
-## ∴ TODO
+TODO
+----
 
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage
@@ -281,58 +292,64 @@ in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 * check Python 3.x compatibility
 * make a note in the README that the chunk-size benchmark can be used to tune
 
-## ∴ Changelog
+Changelog
+---------
 
-### ● v0.1.1     - Sun Jul 15 2012
+* v0.1.1     - Sun Jul 15 2012
 
-* Fix the memory issue with the tests
-* Two new suites: ``hard`` and ``extreme``
-* Minor typo fixes and corrections
+  * Fix the memory issue with the tests
+  * Two new suites: ``hard`` and ``extreme``
+  * Minor typo fixes and corrections
 
-### ● v0.1.0     - Thu Jun 14 2012
+* v0.1.0     - Thu Jun 14 2012
 
-* Freeze the first 8 bytes of the header (hopefully for ever)
-* Fail to decompress on non-matching format version
-* Minor typo fixes and corrections
+  * Freeze the first 8 bytes of the header (hopefully for ever)
+  * Fail to decompress on non-matching format version
+  * Minor typo fixes and corrections
 
-### ● v0.1.0-rc3 - Tue Jun 12 2012
+* v0.1.0-rc3 - Tue Jun 12 2012
 
-* Limit the chunk-size benchmark to a narrower range
-* After more careful experiments, a default chunk-size of ``1MB`` was deemed
-  most appropriate
-* Fixed a terrible bug, where during testing and benchmarking, temporary files
-  were not removed, oups...
-* Adapted the header to have space for more chunks, include special marker for
-  unknown chunk number (``-1``) and format version of the compressed file
-* Added a note in the README about instability of the file format
-* Various minor fixes and enhancements
+  * Limit the chunk-size benchmark to a narrower range
+  * After more careful experiments, a default chunk-size of ``1MB`` was
+    deemed most appropriate
 
-### ● v0.1.0-rc2 - Sat Jun 09 2012
+  * Fixed a terrible bug, where during testing and benchmarking, temporary
+    files were not removed, oups...
 
-* Default chunk-size now ``4MB``
-* Human readable chunk-size argument
-* Last chunk now contains remainder
-* Pure python benchmark to compare against gzip
-* Benchmark to measure the effect of chunk-size
-* Various minor fixes and enhancements
+  * Adapted the header to have space for more chunks, include special marker
+    for unknown chunk number (``-1``) and format version of the compressed
+    file
+  * Added a note in the README about instability of the file format
+  * Various minor fixes and enhancements
 
-### ● v0.1.0-rc1 - Sun May 27 2012
+* v0.1.0-rc2 - Sat Jun 09 2012
 
-* Initial version
-* Compression/decompression
-* Command line argument parser
-* README, setup.py, tests and benchmark
+  * Default chunk-size now ``4MB``
+  * Human readable chunk-size argument
+  * Last chunk now contains remainder
+  * Pure python benchmark to compare against gzip
+  * Benchmark to measure the effect of chunk-size
+  * Various minor fixes and enhancements
 
-## ∴ Thanks
+* v0.1.0-rc1 - Sun May 27 2012
+
+  * Initial version
+  * Compression/decompression
+  * Command line argument parser
+  * README, setup.py, tests and benchmark
+
+Thanks
+------
 
 * Fracesc Alted for writing Blosc in the first place and for providing
-  code-review and feedback on bloscpack
+  code-review and feedback on Bloscpack
 
-## ∴ Author, Copyright and License
+Author, Copyright and License
+-----------------------------
 
 © 2012 Valentin Haenel <valentin.haenel@gmx.de>
 
-bloscpack is licensed under the terms of the MIT License.
+Bloscpack is licensed under the terms of the MIT License.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

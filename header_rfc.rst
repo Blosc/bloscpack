@@ -4,13 +4,13 @@ RFC for the new Bloscpack Header
 :Author: Valentin Haenel
 :Contact: valentin.haenel@gmx.de
 
-The following 32 bit header is proposed for bloscpack as of version ``0.2.0``.
+The following 32 bit header is proposed for Bloscpack as of version ``0.2.0``.
 The design goals of the new header format are to contain as much information as
 possible to achieve interesting things in the future and to be as general as
 possible such that the new persistence layer of CArray is compatible with
-bloscpack.
+Bloscpack.
 
-The following ascii representation shows the layout of the header::
+The following ASCII representation shows the layout of the header::
 
     |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
     | b   l   p   k | ^ | ^ | ^ | ^ |   chunk-size  |  last-chunk   |
@@ -36,7 +36,7 @@ All entries are little-endian.
 
 :version:
     (``uint8``)
-    format version of the bloscpack header, to ensure exceptions in case of
+    format version of the Bloscpack header, to ensure exceptions in case of
     forward incompatibilities.
 :options:
     (``bitfield``)
@@ -88,11 +88,12 @@ All entries are little-endian.
     The total number of chunks used in the file. Given a chunk-size of one
     byte, the total number of chunks is ``2**63``. This amounts to a maximum
     file-size of 8EB (``8EB = 2*63 bytes``) which should be enough for the next
-    couple of years. Again, ``-1`` denotes that the number of chunks was not
-    known at the time of creation.
+    couple of years. Again, ``-1`` denotes that the number of is unknown.
 
 The overall file-size can be computed as ``chunk-size * (nchunks - 1) +
-last-chunk-size``.
+last-chunk-size``. In a streaming scenario ``-1`` can be used as a placeholder.
+For example if the total number of chunks, or the size of the last chunk is not
+known at the time the header is created.
 
 Description of the offsets entries
 --------------------------------
@@ -100,10 +101,23 @@ Description of the offsets entries
 Offsets of the chunks into the file are to be used for accelerated seeking. The
 offsets (if activated) follow the header. Each offset is a 64 bit signed
 little-endian integer (``int64``). A value of ``-1`` denotes an unknown offset.
-Each offset denotes the exact position of the chunk in the file such that
-seeking to the offset, will position the file pointer such that, reading the
-next 16 bytes gives the blosc header, which is at the start of the desired
-chunk. The layout of the file is then::
+Initially, all offsets should be initialized to ``-1`` and filled in after
+writing all chunks. Thus, If the compression of the file fails prematurely or
+is aborted, all offsets should have the value ``-1``.  Each offset denotes the
+exact position of the chunk in the file such that seeking to the offset, will
+position the file pointer such that, reading the next 16 bytes gives the Blosc
+header, which is at the start of the desired chunk. The layout of the file is
+then::
 
     |-bloscpack-header-|-offset-|-offset-|...|-chunk-|-chunk-|...|
 
+Overhead
+--------
+
+Depending on which configuration for the file is used a constant, or linear
+overhead may be added to the file. The Bloscpack header adds 32 bytes in any
+case. If the data is non-compressible, Blosc will add 16 bytes of header to
+each chunk. If used, both the checksum and the offsets will add overhead to the
+file. The offsets add 8 bytes per chunk and the checksum adds a fixed constant
+value which depends on the checksum to each chunk. For example, 32 bytes for
+the ``adler32`` checksum.

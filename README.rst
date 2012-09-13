@@ -240,16 +240,16 @@ Benchmark
 ---------
 
 Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
-CPU 960  @ 3.20GHz`` CPU with 4 cores and active hyperthreading yields the
-following results::
+CPU 960  @ 3.20GHz`` CPU with 4 cores, 6GB of memory and active hyperthreading
+yields the following results::
 
-    zsh» PYTHONPATH=. bench/blpk_vs_gzip.py
+    zsh» PYTHONPATH=. ./bench/blpk_vs_gzip.py
     create the test data..........
     Input file size: 1.49G
     Will now run bloscpack...
-    Time: 6.69 seconds
-    Output file size: 557.93M
-    Ratio: 0.37
+    Time: 4.56 seconds
+    Output file size: 198.43M
+    Ratio: 0.13
     Will now run gzip...
     Time: 141.38 seconds
     Output file size: 924.05M

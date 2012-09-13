@@ -103,7 +103,7 @@ Incidentally this works for compression too::
 
 By default, the number of threads that Blosc uses is determined by the number
 of cores detected on your system. You can change this using the ``[-n |
---nthreads]`` option:
+--nthreads]`` option::
 
     zsh» ./blpk -n 1 c data.dat
 

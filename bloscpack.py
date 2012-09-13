@@ -982,7 +982,15 @@ if __name__ == '__main__':
         process_nthread_arg(args)
         # mutually exclusivity in parser protects us from both having a value
         if args.nchunks is None and args.chunk_size is None:
-            args.chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
+            in_file_size = path.getsize(in_file)
+            if in_file_size > reverse_pretty(DEFAULT_CHUNK_SIZE):
+                args.chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
+                print_verbose("Using default chunk-size: '%s'" %
+                        DEFAULT_CHUNK_SIZE, level=DEBUG)
+            else:
+                args.nchunks = 1
+                print_verbose("File was smaller than the default " +
+                        "chunk-size, using a single chunk")
         try:
             pack_file(in_file, out_file, blosc_args,
                     nchunks=args.nchunks,

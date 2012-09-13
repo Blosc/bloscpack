@@ -301,7 +301,8 @@ TODO
 
 Changelog
 ---------
-* v0.2.0-rc1 - Xxx Xxx XX XXXX
+
+* v0.2.0-rc1 - Thu Sep 13 2012
 
   * Implement new header format as described in RFC
   * Implement checksumming compressed chunks with various checksums

@@ -962,7 +962,7 @@ if __name__ == '__main__':
     print_verbose('command line argument parsing complete', level=DEBUG)
     print_verbose('command line arguments are: ', level=DEBUG)
     for arg, val in vars(args).iteritems():
-        if arg == 'chunk_size':
+        if arg == 'chunk_size' and val is not None:
             print_verbose('\t%s: %s' % (arg, double_pretty_size(val)),
                     level=DEBUG)
         else:

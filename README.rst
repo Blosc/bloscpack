@@ -292,7 +292,6 @@ TODO
 * partial decompression?
 * add --raw-input and --raw-output switches to allow stuff like:
   cat file | blpk --raw-input --raw-output compress > file.blp
-* fix the typesize default argument, possibly make it platform dependent
 * since we now have potentially small chunks, the progressbar becomes relevant
   again
 * configuration file to store commonly used options on a given machine

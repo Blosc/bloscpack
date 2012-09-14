@@ -522,18 +522,18 @@ def test_offsets():
             first = BLOSCPACK_HEADER_LENGTH + 8 * nchunks
             # We assume that the others are correct
             nt.assert_equal(offsets[0], first)
-            nt.assert_equal([80, 1875276, 3604440, 5213381, 6742711, 8271898],
+            nt.assert_equal([80, 585990, 1071780, 1546083, 2003986, 2460350],
                     offsets)
             # try to read the second header
-            input_fp.seek(1875276, 0)
+            input_fp.seek(585990, 0)
             blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
             expected = {'versionlz': 1,
                         'blocksize': 131072,
-                        'ctbytes':   1729160,
+                        'ctbytes':   485786,
                         'version':   2,
                         'flags':     1,
                         'nbytes':    3200000,
-                        'typesize':  4}
+                        'typesize':  8}
             blosc_header = decode_blosc_header(blosc_header_raw)
             nt.assert_equal(expected, blosc_header)
 

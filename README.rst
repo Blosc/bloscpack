@@ -26,7 +26,7 @@ Dependencies
 ------------
 
 * Python 2.7
-* `python-blosc  <https://github.com/FrancescAlted/python-blosc>`_  `(at least v1.0.4) <https://github.com/FrancescAlted/python-blosc/tree/v1.0.://github.com/FrancescAlted/python-blosc/tree/v1.0.4>`_ (provides Blosc)
+* `python-blosc  <https://github.com/FrancescAlted/python-blosc>`_  `(at least v1.0.4) <https://github.com/FrancescAlted/python-blosc/tree/v1.0.4>`_ (provides Blosc)
 
 Stability of File Format
 ------------------------

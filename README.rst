@@ -301,6 +301,12 @@ TODO
 Changelog
 ---------
 
+* v0.2.0-rc2 - Xxx Xxx XX XXXX
+
+  * Don't bail out if the file is smaller than default chunk
+  * Set the default ``typesize`` to ``8`` bytes
+  * Minor bugfixes and corrections
+
 * v0.2.0-rc1 - Thu Sep 13 2012
 
   * Implement new header format as described in RFC

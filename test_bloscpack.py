@@ -596,7 +596,7 @@ def pack_unpack_extreme():
     """ Test on somewhat larer arrays, uses loads of memory. """
     # this will create a huge array, and then use the
     # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
-    pack_unpack(1000)
+    pack_unpack(300, progress=True)
 
 def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
     blosc_args = DEFAULT_BLOSC_ARGS

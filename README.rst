@@ -222,10 +222,10 @@ memory::
     zsh» nosetests test_bloscpack.py:pack_unpack_hard
     [...]
 
-Extended tests using a huge file. This one take forever and needs around 6G of
-memory::
+Extended tests using a huge file. This one take forever and needs loads (5G-6G)
+of memory and loads of disk-space (10G). Use ``-s`` to print progress::
 
-    zsh» nosetests test_bloscpack.py:pack_unpack_extreme
+    zsh» nosetests -s test_bloscpack.py:pack_unpack_extreme
     [...]
 
 Note that, all compression/decompression tests create temporary files (on

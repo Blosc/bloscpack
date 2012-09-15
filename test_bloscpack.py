@@ -598,13 +598,21 @@ def pack_unpack_extreme():
     # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
     pack_unpack(1000)
 
-def pack_unpack(repeats, nchunks=None, chunk_size=None):
+def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
+        if progress:
+            print("Creating test array")
         create_array(repeats, in_file)
+        if progress:
+            print("Compressing")
         pack_file(in_file, out_file, blosc_args,
                 nchunks=nchunks, chunk_size=chunk_size)
+        if progress:
+            print("Decompressing")
         unpack_file(out_file, dcmp_file)
+        if progress:
+            print("Verifying")
         cmp(in_file, dcmp_file)
 
 def cmp(file1, file2):

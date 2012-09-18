@@ -308,6 +308,8 @@ Changelog
 
   * Don't bail out if the file is smaller than default chunk
   * Set the default ``typesize`` to ``8`` bytes
+  * Upgrade dependencies to python-blosc ``v1.0.5`` and fix tests
+  * Make extreme test less resource intensive
   * Minor bugfixes and corrections
 
 * v0.2.0-rc1 - Thu Sep 13 2012

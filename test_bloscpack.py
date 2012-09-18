@@ -363,7 +363,7 @@ def test_create_bloscpack_header():
     nt.assert_equal(expected,
             create_bloscpack_header(chunk_size=reverse_pretty('1M')))
     expected = MAGIC + format_version + \
-        '\x00\x00\x00\xff\xff\xff\x7f\xff\xff\xff\xff'+ \
+        '\x00\x00\x00\xef\xff\xff\x7f\xff\xff\xff\xff'+ \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
     nt.assert_equal(expected,
             create_bloscpack_header(chunk_size=blosc.BLOSC_MAX_BUFFERSIZE))
@@ -378,7 +378,7 @@ def test_create_bloscpack_header():
     nt.assert_equal(expected,
             create_bloscpack_header(last_chunk=reverse_pretty('1M')))
     expected = MAGIC + format_version + \
-        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\x7f'+ \
+        '\x00\x00\x00\xff\xff\xff\xff\xef\xff\xff\x7f'+ \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
     nt.assert_equal(expected,
             create_bloscpack_header(last_chunk=blosc.BLOSC_MAX_BUFFERSIZE))
@@ -458,7 +458,7 @@ def test_decode_bloscpack_header():
             decode_bloscpack_header(copy_and_set_input(8, '\x00\x00\x10\x00')))
     nt.assert_equal(
             copy_and_set_return('chunk_size', blosc.BLOSC_MAX_BUFFERSIZE),
-            decode_bloscpack_header(copy_and_set_input(8, '\xff\xff\xff\x7f')))
+            decode_bloscpack_header(copy_and_set_input(8, '\xef\xff\xff\x7f')))
     # check with last_chunk
     nt.assert_equal(copy_and_set_return('last_chunk', 1),
             decode_bloscpack_header(copy_and_set_input(12, '\x01\x00\x00\x00')))
@@ -466,7 +466,7 @@ def test_decode_bloscpack_header():
             decode_bloscpack_header(copy_and_set_input(12, '\x00\x00\x10\x00')))
     nt.assert_equal(
             copy_and_set_return('last_chunk', blosc.BLOSC_MAX_BUFFERSIZE),
-            decode_bloscpack_header(copy_and_set_input(12, '\xff\xff\xff\x7f')))
+            decode_bloscpack_header(copy_and_set_input(12, '\xef\xff\xff\x7f')))
     # check with nchunks
     nt.assert_equal(copy_and_set_return('nchunks', 1),
             decode_bloscpack_header(copy_and_set_input(16,

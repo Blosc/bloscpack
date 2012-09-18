@@ -304,6 +304,10 @@ TODO
 Changelog
 ---------
 
+* v0.2.0     - Xxx Xxx XX XXXX
+
+  * 
+
 * v0.2.0-rc2 - Tue Sep 18 2012
 
   * Don't bail out if the file is smaller than default chunk

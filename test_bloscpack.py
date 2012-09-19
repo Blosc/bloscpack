@@ -489,7 +489,7 @@ def create_array(repeats, in_file, progress=None):
 
 @contextlib.contextmanager
 def create_tmp_files():
-    tdir = tempfile.mkdtemp()
+    tdir = tempfile.mkdtemp(prefix='blpk')
     in_file = path.join(tdir, 'file')
     out_file = path.join(tdir, 'file.blp')
     dcmp_file = path.join(tdir, 'file.dcmp')

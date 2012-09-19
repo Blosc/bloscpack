@@ -229,12 +229,14 @@ of memory and loads of disk-space (10G). Use ``-s`` to print progress::
     [...]
 
 Note that, all compression/decompression tests create temporary files (on
-UNIXoid systems this is under ``/tmp``) which are only deleted upon successful
-completion of the respective test. This means, if test fail or you abort
-running the tests (for example using ``ctrl+c``), you may be left with large
-files polluting your temporary space. Depending on your partitioning scheme
-etc.. doing this repeatedly, may lead to you running out of space on the
-filesystem.
+UNIXoid systems this is under ``/tmp/blpk*``) which are deleted upon completion
+of the respective test, both successful and unsuccessful, or when the test is
+aborted with e.g. ``ctrl-c`` (using ``atexit`` magic).
+
+Under rare circumstances, for example when aborting the deletion which is
+triggered on abort you may be left with large files polluting your temporary
+space.  Depending on your partitioning scheme etc.. doing this repeatedly, may
+lead to you running out of space on the file-system.
 
 Benchmark
 ---------

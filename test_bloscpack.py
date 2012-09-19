@@ -588,9 +588,9 @@ def pack_unpack_hard():
     """ Test on somewhat larger arrays, but be nice to memory. """
     # Array is apprx. 1.5 GB large
     # should make chunk-size of apprx. 1MB
-    pack_unpack(100, nchunks=1536)
+    pack_unpack(100, nchunks=1536, progress=True)
     # should make apprx 1536 chunks
-    pack_unpack(100, chunk_size=reverse_pretty('1M'))
+    pack_unpack(100, chunk_size=reverse_pretty('1M'), progress=True)
 
 def pack_unpack_extreme():
     """ Test on somewhat larer arrays, uses loads of memory. """

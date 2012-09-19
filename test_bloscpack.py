@@ -7,6 +7,7 @@ import tempfile
 import contextlib
 import shutil
 import struct
+import atexit
 import numpy
 import nose.tools as nt
 from collections import namedtuple
@@ -487,13 +488,24 @@ def create_array(repeats, in_file, progress=None):
             if progress is not None:
                 progress(i)
 
+def atexit_tmpremover(dirname):
+    try:
+        shutil.rmtree(dirname)
+        print("Removed temporary directory on abort: %s" % dirname)
+    except OSError:
+        # if the temp dir was removed already, by the context manager
+        pass
+
 @contextlib.contextmanager
 def create_tmp_files():
     tdir = tempfile.mkdtemp(prefix='blpk')
     in_file = path.join(tdir, 'file')
     out_file = path.join(tdir, 'file.blp')
     dcmp_file = path.join(tdir, 'file.dcmp')
+    # register the temp dir remover, safeguard against abort
+    atexit.register(atexit_tmpremover, tdir)
     yield tdir, in_file, out_file, dcmp_file
+    # context manager remover
     shutil.rmtree(tdir)
 
 def test_pack_unpack():

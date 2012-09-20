@@ -572,26 +572,23 @@ def test_file_corruption():
                 nchunks=1)
         # now go in and modify a byte in the file
         with open(out_file, 'r+b') as input_fp:
-            total = ""
             # read the header
             bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
-            total += bloscpack_header_raw
             bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
             # read the offsets
-            offsets_raw = input_fp.read(8 * bloscpack_header['nchunks'])
-            total += offsets_raw
+            input_fp.read(8 * bloscpack_header['nchunks'])
             # read the blosc header of the first chunk
-            blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
-            total += blosc_header_raw
-            # read in the rest
-            byte = input_fp.read()
-            total += byte[0:5]
-            # flip a byte
-            total += '\x00' if byte[5] == '\xff' else '\xff'
-            total += byte[6:]
-            input_fp.seek(0, 0)
-            # and rewrite the whole thing back to the file
-            input_fp.write(total)
+            input_fp.read(BLOSC_HEADER_LENGTH)
+            # read four bytes
+            input_fp.read(4)
+            # read the fifth byte
+            fifth = input_fp.read(1)
+            # figure out what to replcae it by
+            replace = '\x00' if fifth == '\xff' else '\xff'
+            # seek one byte back relative to current position
+            input_fp.seek(-1, 1)
+            # write the flipped byte
+            input_fp.write(replace)
         # now attempt to unpack it
         nt.assert_raises(ChecksumMismatch, unpack_file, out_file, dcmp_file)
 

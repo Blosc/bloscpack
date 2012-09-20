@@ -428,6 +428,7 @@ Changelog
 
   * Use ``atexit`` magic to remove test data on abort
   * Change prefix of temp directory to ``/tmp/blpk*``
+  * Merge header RFC into monolithic readme
 
 * v0.2.0-rc2 - Tue Sep 18 2012
 

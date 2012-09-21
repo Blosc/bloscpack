@@ -424,7 +424,7 @@ TODO
 Changelog
 ---------
 
-* v0.2.0     - Xxx Xxx XX XXXX
+* v0.2.0     - Fri Sep 21 2012
 
   * Use ``atexit`` magic to remove test data on abort
   * Change prefix of temp directory to ``/tmp/blpk*``

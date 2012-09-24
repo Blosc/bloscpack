@@ -17,7 +17,7 @@ import itertools
 from collections import OrderedDict
 import blosc
 
-__version__ = '0.2.0'
+__version__ = '0.3.0-dev'
 __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 EXTENSION = '.blp'

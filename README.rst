@@ -402,8 +402,6 @@ TODO
 * document library usage
 * --equal-size argument to create large chunks of equal size, or 'equal' as
   possible argument.
-* --max-size to create the largest possible chunks, regardless of input size,
-  or 'max' as possible argument.
 * subcommand e or estimate to estimate the size of the uncompressed data.
 * subcommand v or verify to verify the integrity of the data
 * subcommend i or info to print information of the file, e.g. decoded header

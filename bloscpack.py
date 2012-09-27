@@ -246,13 +246,17 @@ def create_parser():
             setattr(namespace, self.dest, value)
     class CheckChunkSizeOption(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
-            try:
-                # try to get the value as bytes
-                value = reverse_pretty(value)
-            except ValueError as ve:
-                error('%s error: %s' % (option_string, ve.message))
-            if value < 0:
-                error('%s must be > 0 ' % option_string)
+            if value == 'max':
+                value = blosc.BLOSC_MAX_BUFFERSIZE
+            else:
+                try:
+                    # try to get the value as bytes
+                    value = reverse_pretty(value)
+                except ValueError as ve:
+                    error('%s error: %s' % (option_string, ve.message +
+                        " or 'max'"))
+                if value < 0:
+                    error('%s must be > 0 ' % option_string)
             setattr(namespace, self.dest, value)
     for p in [compress_parser, c_parser]:
         blosc_group = p.add_argument_group(title='blosc settings')
@@ -285,7 +289,7 @@ def create_parser():
                 type=str,
                 default=None,
                 dest='chunk_size',
-                help='set desired chunk size (default: %s)' %
+                help="set desired chunk size or 'max' (default: %s)" %
                 DEFAULT_CHUNK_SIZE)
         bloscpack_group = p.add_argument_group(title='bloscpack settings')
         def join_with_eol(items):

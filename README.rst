@@ -408,6 +408,9 @@ TODO
 * Refactor compression and decompression to use file_pointers instead of
   file_name strings. This would allow using cStringIO to create in-memory
   file-like containers. Great for testing and maybe other use-cases too.
+* Deafaults everywhere. To improve the semantics of future library usage,
+  whenever we see a keyword argument that has a defined default, that default
+  should be used. Should make the whole thing more coherent.
 * partial decompression?
 * add --raw-input and --raw-output switches to allow stuff like:
   cat file | blpk --raw-input --raw-output compress > file.blp

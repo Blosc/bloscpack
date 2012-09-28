@@ -163,34 +163,19 @@ def test_calculate_nchunks():
     nt.assert_equal((2, 8, 1), calculate_nchunks(9, chunk_size=8))
     nt.assert_equal((1, 0, 9), calculate_nchunks(9, chunk_size=9))
 
-    # perhaps zero length files should not be supported
-    nt.assert_equal((0,0,  0),
-            calculate_nchunks(0))
     # single byte file
     nt.assert_equal((1,0,  1),
-            calculate_nchunks(1))
-
-    # just less than max
-    nt.assert_equal((1,0,  blosc.BLOSC_MAX_BUFFERSIZE-1),
-            calculate_nchunks(blosc.BLOSC_MAX_BUFFERSIZE-1))
-    # exactly max
-    nt.assert_equal((1,0,  blosc.BLOSC_MAX_BUFFERSIZE),
-            calculate_nchunks(blosc.BLOSC_MAX_BUFFERSIZE))
-    # just more than max
-    nt.assert_equal((2, blosc.BLOSC_MAX_BUFFERSIZE, 1),
-            calculate_nchunks(blosc.BLOSC_MAX_BUFFERSIZE+1))
-    # max plus half max
-    nt.assert_equal(
-            (2, blosc.BLOSC_MAX_BUFFERSIZE, blosc.BLOSC_MAX_BUFFERSIZE/2),
-            calculate_nchunks(blosc.BLOSC_MAX_BUFFERSIZE+
-                blosc.BLOSC_MAX_BUFFERSIZE/2))
-    # 4 * max +1
-    nt.assert_equal((5, blosc.BLOSC_MAX_BUFFERSIZE, 1),
-            calculate_nchunks(4*blosc.BLOSC_MAX_BUFFERSIZE+1))
+            calculate_nchunks(1, nchunks=1))
 
     # check that giving both arguments raises an error
     nt.assert_raises(ValueError, calculate_nchunks,
             128, nchunks=23, chunk_size=23)
+
+    # check that giving neither argument raises an error
+    nt.assert_raises(ValueError, calculate_nchunks, 128)
+
+    # check that a zero length file raises and error
+    nt.assert_raises(ValueError, calculate_nchunks, 0)
 
     # check overflow of nchunks due to chunk_size being too small
     # and thus stuff not fitting into the header

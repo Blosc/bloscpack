@@ -432,13 +432,18 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
 
     Notes
     -----
-    If both 'nchunks' 'chunk_size' are 'None' the chunk_size is set to be
-    'blosc.BLOSC_MAX_BUFFERSIZE'.
+    You must specify either 'nchunks' or 'chunk_size' but not neither or both.
 
     """
     if nchunks is not None and chunk_size is not None:
         raise ValueError(
                 "either specify 'nchunks' or 'chunk_size', but not both")
+    elif nchunks is None and chunk_size is None:
+        raise ValueError(
+                "you must specify either 'nchunks' or 'chunk_size'")
+    elif in_file_size <= 0:
+        raise ValueError(
+                "'in_file_size' must be greater than zero")
     elif nchunks is not None and chunk_size is None:
         print_verbose("'nchunks' proposed", level=DEBUG)
         if nchunks > in_file_size:
@@ -449,15 +454,20 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             raise ChunkingException(
                     "'nchunks' must be greater than zero, not '%d' " % nchunks)
         quotient, remainder = divmod(in_file_size, nchunks)
+        # user wants a single chunk
         if nchunks == 1:
             chunk_size = 0
             last_chunk_size = in_file_size
+        # perfect fit
         elif remainder == 0:
             chunk_size = quotient
             last_chunk_size = chunk_size
+        # user wants two chunks
         elif nchunks == 2:
             chunk_size = quotient
             last_chunk_size = in_file_size - chunk_size
+        # multiple chunks, if the nchunks is quite small, we may have a tiny
+        # remainder and hence tiny last chunk
         else:
             chunk_size = in_file_size//(nchunks-1)
             last_chunk_size = in_file_size - chunk_size * (nchunks-1)
@@ -472,29 +482,19 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
                     "'chunk_size' must be greater than zero, not '%d' " %
                     chunk_size)
         quotient, remainder = divmod(in_file_size, chunk_size)
+        # the user wants a single chunk
         if chunk_size == in_file_size:
             nchunks = 1
             chunk_size = 0
             last_chunk_size = in_file_size
+        # no remainder, perfect fit
         elif remainder == 0:
             nchunks = quotient
             last_chunk_size = chunk_size
+        # with a remainder
         else:
             nchunks = quotient + 1
             last_chunk_size = remainder
-    elif nchunks is None and chunk_size is None:
-        nchunks = int(math.ceil(in_file_size/blosc.BLOSC_MAX_BUFFERSIZE))
-        quotient, remainder = divmod(in_file_size, blosc.BLOSC_MAX_BUFFERSIZE)
-        if in_file_size == blosc.BLOSC_MAX_BUFFERSIZE:
-            nchunks = 1
-            chunk_size = 0
-            last_chunk_size = blosc.BLOSC_MAX_BUFFERSIZE
-        elif quotient == 0:
-            chunk_size = 0
-            last_chunk_size = in_file_size
-        else:
-            chunk_size = blosc.BLOSC_MAX_BUFFERSIZE
-            last_chunk_size = in_file_size % blosc.BLOSC_MAX_BUFFERSIZE
     if chunk_size > blosc.BLOSC_MAX_BUFFERSIZE \
             or last_chunk_size > blosc.BLOSC_MAX_BUFFERSIZE:
         raise ChunkingException(

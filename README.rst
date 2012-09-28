@@ -419,7 +419,6 @@ TODO
 * configuration file to store commonly used options on a given machine
 * check Python 3.x compatibility
 * make a note in the README that the chunk-size benchmark can be used to tune
-* print the compression ratio for each chunk too
 * print the compression time, either as verbose or debug
 * PyPi upload
 * Announcement RST

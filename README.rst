@@ -161,7 +161,6 @@ The first causes basic info to be printed, ``[-v | --verbose]``::
     blpk: output file size: 161.9M (169759818B)
     blpk: compression ratio: 0.106100
     blpk: done
-    ./blpk --verbos
 
 ... and ``[-d | --debug]`` prints a detailed account of what is going on::
 

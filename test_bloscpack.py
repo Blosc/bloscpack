@@ -87,7 +87,7 @@ def test_check_files():
     nt.assert_equal(check_files('test_bloscpack.py',
         'test_bloscpack.py', args), None)
 
-def test_nchunks():
+def test_calculate_nchunks():
     # tests for nchunks given
     # odd with no remainder
     nt.assert_equal((3, 3, 3), calculate_nchunks(9, nchunks=3))

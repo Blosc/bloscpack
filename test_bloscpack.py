@@ -164,7 +164,7 @@ def test_calculate_nchunks():
     nt.assert_equal((1, 0, 9), calculate_nchunks(9, chunk_size=9))
 
     # single byte file
-    nt.assert_equal((1,0,  1),
+    nt.assert_equal((1, 0,  1),
             calculate_nchunks(1, nchunks=1))
 
     # check that giving both arguments raises an error

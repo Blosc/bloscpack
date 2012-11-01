@@ -267,8 +267,11 @@ Bloscpack Header Format
 The input is split into chunks since a) we wish to put less stress on main
 memory and b) because Blosc has a buffer limit of 2GB (Version ``1.0.0`` and
 above). By default the chunk-size is a moderate ``1MB`` which should be fine,
-even for less powerful machines. The last chunk always contains the remainder
-and has thus size either equal too or less than the rest of the chunks.
+even for less powerful machines. When specifying the desired chunk-size, the
+last chunk always contains the remainder and has thus size either equal too or
+less than the rest of the chunks. When specifying a desired nchunks you may end
+up with a final chunks that is either larger than or smaller than the other
+chunks and may even be zero.
 
 The following 32 bit header is used for Bloscpack as of version ``0.2.0``.
 The design goals of the new header format are to contain as much information as

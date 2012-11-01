@@ -454,6 +454,8 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             raise ChunkingException(
                     "'nchunks' must be greater than zero, not '%d' " % nchunks)
         quotient, remainder = divmod(in_file_size, nchunks)
+        # WARNING: this is the most horrible piece of code in bloscpack
+        # if you can do better, please, please send me patches
         # user wants a single chunk
         if nchunks == 1:
             chunk_size = 0

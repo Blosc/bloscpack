@@ -990,11 +990,13 @@ if __name__ == '__main__':
         process_nthread_arg(args)
         # mutually exclusivity in parser protects us from both having a value
         if args.nchunks is None and args.chunk_size is None:
+            # file is larger than the default size... use it
             in_file_size = path.getsize(in_file)
             if in_file_size > reverse_pretty(DEFAULT_CHUNK_SIZE):
                 args.chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
                 print_verbose("Using default chunk-size: '%s'" %
                         DEFAULT_CHUNK_SIZE, level=DEBUG)
+            # file is smaller than the default size, make a single chunk
             else:
                 args.nchunks = 1
                 print_verbose("File was smaller than the default " +

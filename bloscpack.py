@@ -849,11 +849,12 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
             compressed = blosc.compress(current_chunk, **blosc_args)
             # write compressed data
             output_fp.write(compressed)
-            print_verbose("chunk '%d'%s written, in: %s out: %s ratio: %0.3f" %
+            print_verbose("chunk '%d'%s written, in: %s out: %s ratio: %s" %
                     (i, ' (last)' if i == nchunks - 1 else '',
                     double_pretty_size(len(current_chunk)),
                     double_pretty_size(len(compressed)),
-                    len(compressed) / len(current_chunk)),
+                    "%0.3f" % (len(compressed) / len(current_chunk))
+                    if len(current_chunk) != 0 else "N/A"),
                     level=DEBUG)
             tail_mess = ""
             if checksum_impl.size > 0:

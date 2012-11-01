@@ -494,7 +494,6 @@ def create_tmp_files():
     shutil.rmtree(tdir)
 
 def test_pack_unpack():
-    pack_unpack(1)
     pack_unpack(1, nchunks=20)
     pack_unpack(1, nchunks=1)
     pack_unpack(1, nchunks=100)
@@ -544,7 +543,7 @@ def test_invalid_format():
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        bloscpack.pack_file(in_file, out_file, blosc_args)
+        bloscpack.pack_file(in_file, out_file, blosc_args, nchunks=1)
         nt.assert_raises(ValueError, unpack_file, out_file, dcmp_file)
     bloscpack.error = error
     bloscpack.FORMAT_VERSION = FORMAT_VERSION

@@ -426,7 +426,6 @@ TODO
 * Announcement RST
 * Announce on scipy/numpy lists, comp.compression, freshmeat, ohloh ...
 * Debian packages (for python-blosc and bloscpack)
-* Investigate the bug that last chunk may be largest when using two chunks.
 
 
 Changelog

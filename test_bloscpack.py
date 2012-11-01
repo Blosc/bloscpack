@@ -87,7 +87,7 @@ def test_check_files():
     nt.assert_equal(check_files('test_bloscpack.py',
         'test_bloscpack.py', args), None)
 
-def test_nchunks():
+def test_calculate_nchunks():
     # tests for nchunks given
     # odd with no remainder
     nt.assert_equal((3, 3, 3), calculate_nchunks(9, nchunks=3))
@@ -163,34 +163,19 @@ def test_nchunks():
     nt.assert_equal((2, 8, 1), calculate_nchunks(9, chunk_size=8))
     nt.assert_equal((1, 0, 9), calculate_nchunks(9, chunk_size=9))
 
-    # perhaps zero length files should not be supported
-    nt.assert_equal((0,0,  0),
-            calculate_nchunks(0))
     # single byte file
-    nt.assert_equal((1,0,  1),
-            calculate_nchunks(1))
-
-    # just less than max
-    nt.assert_equal((1,0,  blosc.BLOSC_MAX_BUFFERSIZE-1),
-            calculate_nchunks(blosc.BLOSC_MAX_BUFFERSIZE-1))
-    # exactly max
-    nt.assert_equal((1,0,  blosc.BLOSC_MAX_BUFFERSIZE),
-            calculate_nchunks(blosc.BLOSC_MAX_BUFFERSIZE))
-    # just more than max
-    nt.assert_equal((2, blosc.BLOSC_MAX_BUFFERSIZE, 1),
-            calculate_nchunks(blosc.BLOSC_MAX_BUFFERSIZE+1))
-    # max plus half max
-    nt.assert_equal(
-            (2, blosc.BLOSC_MAX_BUFFERSIZE, blosc.BLOSC_MAX_BUFFERSIZE/2),
-            calculate_nchunks(blosc.BLOSC_MAX_BUFFERSIZE+
-                blosc.BLOSC_MAX_BUFFERSIZE/2))
-    # 4 * max +1
-    nt.assert_equal((5, blosc.BLOSC_MAX_BUFFERSIZE, 1),
-            calculate_nchunks(4*blosc.BLOSC_MAX_BUFFERSIZE+1))
+    nt.assert_equal((1, 0,  1),
+            calculate_nchunks(1, nchunks=1))
 
     # check that giving both arguments raises an error
     nt.assert_raises(ValueError, calculate_nchunks,
             128, nchunks=23, chunk_size=23)
+
+    # check that giving neither argument raises an error
+    nt.assert_raises(ValueError, calculate_nchunks, 128)
+
+    # check that a zero length file raises and error
+    nt.assert_raises(ValueError, calculate_nchunks, 0)
 
     # check overflow of nchunks due to chunk_size being too small
     # and thus stuff not fitting into the header
@@ -509,7 +494,6 @@ def create_tmp_files():
     shutil.rmtree(tdir)
 
 def test_pack_unpack():
-    pack_unpack(1)
     pack_unpack(1, nchunks=20)
     pack_unpack(1, nchunks=1)
     pack_unpack(1, nchunks=100)
@@ -559,7 +543,7 @@ def test_invalid_format():
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        bloscpack.pack_file(in_file, out_file, blosc_args)
+        bloscpack.pack_file(in_file, out_file, blosc_args, nchunks=1)
         nt.assert_raises(ValueError, unpack_file, out_file, dcmp_file)
     bloscpack.error = error
     bloscpack.FORMAT_VERSION = FORMAT_VERSION

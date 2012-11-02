@@ -401,6 +401,7 @@ the ``adler32`` checksum.
 TODO
 ----
 
+* Introduce an appendix as discuessed per mailinglist
 * quiet verbosity level
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage

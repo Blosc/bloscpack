@@ -401,6 +401,7 @@ the ``adler32`` checksum.
 TODO
 ----
 
+* quiet verbosity level
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage
 * subcommand e or estimate to estimate the size of the uncompressed data.

@@ -41,7 +41,9 @@ Installation
 ------------
 
 Add the ``blpk`` file to your ``$PATH`` somehow. For example by copying using
-dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``::
+dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``:
+
+.. code-block:: shell
 
     zsh» cp -L blpk ~/bin
 

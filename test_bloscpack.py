@@ -627,7 +627,8 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """
     chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
-    with open(file1, 'rb') as afp, open(file2, 'rb') as bfp:
+    with open_two_file(open(file1, 'rb'), open(file2, 'rb')) as \
+            (afp, bfp):
         while True:
             a = afp.read(chunk_size)
             b = bfp.read(chunk_size)

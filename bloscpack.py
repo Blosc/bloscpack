@@ -14,6 +14,7 @@ import math
 import zlib
 import hashlib
 import itertools
+import contextlib
 try:
     from collections import OrderedDict
 except ImportError:
@@ -166,6 +167,13 @@ def encode_int32(fourbyte):
 
 def encode_int64(eightbyte):
     return struct.pack('<q', eightbyte)
+
+@contextlib.contextmanager
+def open_two_file(input_fp, output_fp):
+    """ Hack for making with statement work on two files with 2.6. """
+    yield input_fp, output_fp
+    input_fp.close()
+    output_fp.close()
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
@@ -831,8 +839,8 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)
     # write the chunks to the file
-    with open(in_file, 'rb') as input_fp, \
-         open(out_file, 'wb') as output_fp:
+    with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
+            (input_fp, output_fp):
         output_fp.write(raw_bloscpack_header)
         # preallocate space for the offsets
         if offsets:
@@ -890,8 +898,8 @@ def unpack_file(in_file, out_file):
     """
     in_file_size = path.getsize(in_file)
     print_verbose('input file size: %s' % pretty_size(in_file_size))
-    with open(in_file, 'rb') as input_fp, \
-         open(out_file, 'wb') as output_fp:
+    with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
+            (input_fp, output_fp):
         # read the bloscpack header
         print_verbose('reading bloscpack header', level=DEBUG)
         bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)

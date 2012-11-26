@@ -14,7 +14,10 @@ import math
 import zlib
 import hashlib
 import itertools
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 import blosc
 
 __version__ = '0.2.0'

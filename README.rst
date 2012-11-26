@@ -424,6 +424,11 @@ TODO
 Changelog
 ---------
 
+* v0.2.1     - Mon Nov 26 2012
+
+  * Backport to Python 2.6
+  * Typo fixes in documentation
+
 * v0.2.0     - Fri Sep 21 2012
 
   * Use ``atexit`` magic to remove test data on abort

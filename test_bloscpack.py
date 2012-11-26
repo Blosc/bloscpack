@@ -219,13 +219,13 @@ def test_decode_blosc_header():
                 'typesize': blosc_args['typesize']}
     nt.assert_equal(expected, header)
     # uncompressible data
-    array_ = numpy.asarray(numpy.random.randn(2e3),
-            dtype=numpy.float16).tostring()
+    array_ = numpy.asarray(numpy.random.randn(23),
+            dtype=numpy.float32).tostring()
     blosc_args['shuffle'] = True
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
-                'blocksize': 4000,
+                'blocksize': 88,
                 'ctbytes': len(array_) + 16, # original + 16 header bytes
                 'version': 2,
                 'flags': 3, # 1 for shuffle 2 for non-compressed
@@ -611,7 +611,8 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """
     chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
-    with open(file1, 'rb') as afp, open(file2, 'rb') as bfp:
+    with open_two_file(open(file1, 'rb'), open(file2, 'rb')) as \
+            (afp, bfp):
         while True:
             a = afp.read(chunk_size)
             b = bfp.read(chunk_size)

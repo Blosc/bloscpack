@@ -25,7 +25,7 @@ There is an official Blosc mailing list at: http://groups.google.com/group/blosc
 Dependencies
 ------------
 
-* Python 2.7
+* Python 2.6 (requires ``ordereddict`` and ``argparse``) or Python 2.7
 * `python-blosc  <https://github.com/FrancescAlted/python-blosc>`_  `(at least v1.0.5) <https://github.com/FrancescAlted/python-blosc/tree/v1.0.5>`_ (provides Blosc)
 
 Stability of File Format

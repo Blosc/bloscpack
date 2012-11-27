@@ -823,9 +823,26 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
     determined automatically if not present.
 
     """
-    # calculate chunk sizes
     in_file_size = path.getsize(in_file)
     print_verbose('input file size: %s' % double_pretty_size(in_file_size))
+    with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
+            (input_fp, output_fp):
+        _pack_fp(input_fp, output_fp, in_file_size,
+                blosc_args, nchunks, chunk_size,
+                offsets, checksum)
+    out_file_size = path.getsize(out_file)
+    print_verbose('output file size: %s' % double_pretty_size(out_file_size))
+    print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
+
+def _pack_fp(input_fp, output_fp, in_file_size,
+        blosc_args, nchunks, chunk_size,
+        offsets, checksum):
+    """ Helper function for pack_file.
+
+    Use file_points, which could potentially be cStringIO objects.
+
+    """
+    # calculate chunk sizes
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, nchunks, chunk_size)
     # calculate header
@@ -845,56 +862,52 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)
     # write the chunks to the file
-    with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
-            (input_fp, output_fp):
-        output_fp.write(raw_bloscpack_header)
-        # preallocate space for the offsets
+    output_fp.write(raw_bloscpack_header)
+    # preallocate space for the offsets
+    if offsets:
+        output_fp.write(encode_int64(-1) * nchunks)
+    # if nchunks == 1 the last_chunk_size is the size of the single chunk
+    for i, bytes_to_read in enumerate((
+            [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
+        # store the current position in the file
         if offsets:
-            output_fp.write(encode_int64(-1) * nchunks)
-        # if nchunks == 1 the last_chunk_size is the size of the single chunk
-        for i, bytes_to_read in enumerate((
-                [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
-            # store the current position in the file
-            if offsets:
-                offsets_storage[i] = output_fp.tell()
-            current_chunk = input_fp.read(bytes_to_read)
-            # do compression
-            compressed = blosc.compress(current_chunk, **blosc_args)
-            # write compressed data
-            output_fp.write(compressed)
-            print_verbose("chunk '%d'%s written, in: %s out: %s ratio: %s" %
-                    (i, ' (last)' if i == nchunks - 1 else '',
-                    double_pretty_size(len(current_chunk)),
-                    double_pretty_size(len(compressed)),
-                    "%0.3f" % (len(compressed) / len(current_chunk))
-                    if len(current_chunk) != 0 else "N/A"),
-                    level=DEBUG)
-            tail_mess = ""
-            if checksum_impl.size > 0:
-                # compute the checksum on the compressed data
-                digest = checksum_impl(compressed)
-                # write digest
-                output_fp.write(digest)
-                tail_mess += ('checksum (%s): %s ' % (checksum, repr(digest)))
-            if offsets:
-                tail_mess += ("offset: '%d'" % offsets_storage[i])
-            if len(tail_mess) > 0:
-                print_verbose(tail_mess, level=DEBUG)
+            offsets_storage[i] = output_fp.tell()
+        current_chunk = input_fp.read(bytes_to_read)
+        # do compression
+        compressed = blosc.compress(current_chunk, **blosc_args)
+        # write compressed data
+        output_fp.write(compressed)
+        print_verbose("chunk '%d'%s written, in: %s out: %s ratio: %s" %
+                (i, ' (last)' if i == nchunks - 1 else '',
+                double_pretty_size(len(current_chunk)),
+                double_pretty_size(len(compressed)),
+                "%0.3f" % (len(compressed) / len(current_chunk))
+                if len(current_chunk) != 0 else "N/A"),
+                level=DEBUG)
+        tail_mess = ""
+        if checksum_impl.size > 0:
+            # compute the checksum on the compressed data
+            digest = checksum_impl(compressed)
+            # write digest
+            output_fp.write(digest)
+            tail_mess += ('checksum (%s): %s ' % (checksum, repr(digest)))
         if offsets:
-            # seek to 32 bits into the file
-            output_fp.seek(BLOSCPACK_HEADER_LENGTH, 0)
-            print_verbose("Writing '%d' offsets: '%s'" %
-                    (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
-            # write the offsets encoded into the reserved space in the file
-            encoded_offsets = "".join([encode_int64(i) for i in offsets_storage])
-            print_verbose("Raw offsets: %s" % repr(encoded_offsets),
-                    level=DEBUG)
-            output_fp.write(encoded_offsets)
-    out_file_size = path.getsize(out_file)
-    print_verbose('output file size: %s' % double_pretty_size(out_file_size))
-    print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
+            tail_mess += ("offset: '%d'" % offsets_storage[i])
+        if len(tail_mess) > 0:
+            print_verbose(tail_mess, level=DEBUG)
+    if offsets:
+        # seek to 32 bits into the file
+        output_fp.seek(BLOSCPACK_HEADER_LENGTH, 0)
+        print_verbose("Writing '%d' offsets: '%s'" %
+                (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
+        # write the offsets encoded into the reserved space in the file
+        encoded_offsets = "".join([encode_int64(i) for i in offsets_storage])
+        print_verbose("Raw offsets: %s" % repr(encoded_offsets),
+                level=DEBUG)
+        output_fp.write(encoded_offsets)
 
 def unpack_file(in_file, out_file):
+
     """ Main function for decompressing a file.
 
     Parameters
@@ -908,67 +921,70 @@ def unpack_file(in_file, out_file):
     print_verbose('input file size: %s' % pretty_size(in_file_size))
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
-        # read the bloscpack header
-        print_verbose('reading bloscpack header', level=DEBUG)
-        bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
-        print_verbose('bloscpack_header_raw: %s' %
-                repr(bloscpack_header_raw), level=DEBUG)
-        bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
-        for arg, value in bloscpack_header.iteritems():
-            # hack the values of the bloscpack header into the namespace
-            globals()[arg] = value
-            print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
-        checksum_impl = CHECKSUMS[checksum]
-        if FORMAT_VERSION != format_version:
-            error("format version of file was not '%s' as expected, but '%d'" %
-                    (FORMAT_VERSION, format_version))
-        # read the offsets
-        options = decode_options(bloscpack_header['options'])
-        if options['offsets']:
-            offsets_raw = input_fp.read(8 * nchunks)
-            print_verbose('Read raw offsets: %s' % repr(offsets_raw),
-                    level=DEBUG)
-            offset_storage = [decode_int64(offsets_raw[j-8:j]) for j in
-                    xrange(8, nchunks*8+1, 8)]
-            print_verbose('Offsets: %s' % offset_storage, level=DEBUG)
-        # decompress
-        for i in range(nchunks):
-            print_verbose("decompressing chunk '%d'%s" %
-                    (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
-            # read blosc header
-            blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
-            blosc_header = decode_blosc_header(blosc_header_raw)
-            print_verbose('blosc_header: %s' % repr(blosc_header), level=DEBUG)
-            ctbytes = blosc_header['ctbytes']
-            # Seek back BLOSC_HEADER_LENGTH bytes in file relative to current
-            # position. Blosc needs the header too and presumably this is
-            # better than to read the whole buffer and then concatenate it...
-            input_fp.seek(-BLOSC_HEADER_LENGTH, 1)
-            # read chunk
-            compressed = input_fp.read(ctbytes)
-            if checksum_impl.size > 0:
-                # do checksum
-                expected_digest = input_fp.read(checksum_impl.size)
-                received_digest = checksum_impl(compressed)
-                if received_digest != expected_digest:
-                    raise ChecksumMismatch(
-                            "Checksum mismatch detected in chunk '%d' " % i +
-                            "expected: '%s', received: '%s'" %
-                            (repr(expected_digest), repr(received_digest)))
-                else:
-                    print_verbose('checksum OK (%s): %s ' %
-                            (checksum_impl.name, repr(received_digest)),
-                            level=DEBUG)
-            # if checksum OK, decompress buffer
-            decompressed = blosc.decompress(compressed)
-            # write decompressed chunk
-            output_fp.write(decompressed)
-            print_verbose("chunk written, in: %s out: %s" %
-                    (pretty_size(len(compressed)),
-                        pretty_size(len(decompressed))), level=DEBUG)
+        _unpack_fp(input_fp, output_fp)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
     print_verbose('decompression ratio: %f' % (out_file_size/in_file_size))
+
+def _unpack_fp(input_fp, output_fp):
+    # read the bloscpack header
+    print_verbose('reading bloscpack header', level=DEBUG)
+    bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
+    print_verbose('bloscpack_header_raw: %s' %
+            repr(bloscpack_header_raw), level=DEBUG)
+    bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
+    for arg, value in bloscpack_header.iteritems():
+        # hack the values of the bloscpack header into the namespace
+        globals()[arg] = value
+        print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
+    checksum_impl = CHECKSUMS[checksum]
+    if FORMAT_VERSION != format_version:
+        error("format version of file was not '%s' as expected, but '%d'" %
+                (FORMAT_VERSION, format_version))
+    # read the offsets
+    options = decode_options(bloscpack_header['options'])
+    if options['offsets']:
+        offsets_raw = input_fp.read(8 * nchunks)
+        print_verbose('Read raw offsets: %s' % repr(offsets_raw),
+                level=DEBUG)
+        offset_storage = [decode_int64(offsets_raw[j-8:j]) for j in
+                xrange(8, nchunks*8+1, 8)]
+        print_verbose('Offsets: %s' % offset_storage, level=DEBUG)
+    # decompress
+    for i in range(nchunks):
+        print_verbose("decompressing chunk '%d'%s" %
+                (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
+        # read blosc header
+        blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
+        blosc_header = decode_blosc_header(blosc_header_raw)
+        print_verbose('blosc_header: %s' % repr(blosc_header), level=DEBUG)
+        ctbytes = blosc_header['ctbytes']
+        # Seek back BLOSC_HEADER_LENGTH bytes in file relative to current
+        # position. Blosc needs the header too and presumably this is
+        # better than to read the whole buffer and then concatenate it...
+        input_fp.seek(-BLOSC_HEADER_LENGTH, 1)
+        # read chunk
+        compressed = input_fp.read(ctbytes)
+        if checksum_impl.size > 0:
+            # do checksum
+            expected_digest = input_fp.read(checksum_impl.size)
+            received_digest = checksum_impl(compressed)
+            if received_digest != expected_digest:
+                raise ChecksumMismatch(
+                        "Checksum mismatch detected in chunk '%d' " % i +
+                        "expected: '%s', received: '%s'" %
+                        (repr(expected_digest), repr(received_digest)))
+            else:
+                print_verbose('checksum OK (%s): %s ' %
+                        (checksum_impl.name, repr(received_digest)),
+                        level=DEBUG)
+        # if checksum OK, decompress buffer
+        decompressed = blosc.decompress(compressed)
+        # write decompressed chunk
+        output_fp.write(decompressed)
+        print_verbose("chunk written, in: %s out: %s" %
+                (pretty_size(len(compressed)),
+                    pretty_size(len(decompressed))), level=DEBUG)
 
 if __name__ == '__main__':
     parser = create_parser()

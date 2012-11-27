@@ -11,6 +11,7 @@ import atexit
 import numpy
 import nose.tools as nt
 from collections import namedtuple
+from cStringIO import StringIO
 import bloscpack
 from bloscpack import *
 
@@ -467,11 +468,14 @@ def test_decode_bloscpack_header():
 
 def create_array(repeats, in_file, progress=None):
     with open(in_file, 'w') as in_fp:
-        for i in range(repeats):
-            array_ = numpy.linspace(i, i+1, 2e6)
-            in_fp.write(array_.tostring())
-            if progress is not None:
-                progress(i)
+        create_array_fp(repeats, in_fp, progress=progress)
+
+def create_array_fp(repeats, in_fp, progress=None):
+    for i in range(repeats):
+        array_ = numpy.linspace(i, i+1, 2e6)
+        in_fp.write(array_.tostring())
+        if progress is not None:
+            progress(i)
 
 def atexit_tmpremover(dirname):
     try:
@@ -492,15 +496,6 @@ def create_tmp_files():
     yield tdir, in_file, out_file, dcmp_file
     # context manager remover
     shutil.rmtree(tdir)
-
-def test_pack_unpack():
-    pack_unpack(1, nchunks=20)
-    pack_unpack(1, nchunks=1)
-    pack_unpack(1, nchunks=100)
-    pack_unpack(1, chunk_size=reverse_pretty('1M'))
-    pack_unpack(1, chunk_size=reverse_pretty('2M'))
-    pack_unpack(1, chunk_size=reverse_pretty('4M'))
-    pack_unpack(1, chunk_size=reverse_pretty('8M'))
 
 def test_offsets():
     blosc_args = DEFAULT_BLOSC_ARGS
@@ -576,21 +571,6 @@ def test_file_corruption():
         # now attempt to unpack it
         nt.assert_raises(ChecksumMismatch, unpack_file, out_file, dcmp_file)
 
-
-def pack_unpack_hard():
-    """ Test on somewhat larger arrays, but be nice to memory. """
-    # Array is apprx. 1.5 GB large
-    # should make chunk-size of apprx. 1MB
-    pack_unpack(100, nchunks=1536, progress=True)
-    # should make apprx 1536 chunks
-    pack_unpack(100, chunk_size=reverse_pretty('1M'), progress=True)
-
-def pack_unpack_extreme():
-    """ Test on somewhat larer arrays, uses loads of memory. """
-    # this will create a huge array, and then use the
-    # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
-    pack_unpack(300, progress=True)
-
 def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
@@ -608,15 +588,73 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
             print("Verifying")
         cmp(in_file, dcmp_file)
 
+def pack_unpack_fp(repeats, nchunks=None, chunk_size=None, progress=False):
+    blosc_args = DEFAULT_BLOSC_ARGS
+    offsets = DEFAULT_OFFSETS
+    checksum = DEFAULT_CHECKSUM
+    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
+    if progress:
+        print("Creating test array")
+    create_array_fp(repeats, in_fp)
+    in_fp_size = in_fp.tell()
+    if progress:
+        print("Compressing")
+    in_fp.seek(0)
+    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
+            blosc_args,
+            nchunks, chunk_size, offsets, checksum)
+    out_fp.seek(0)
+    if progress:
+        print("Decompressing")
+    bloscpack._unpack_fp(out_fp, dcmp_fp)
+    if progress:
+        print("Verifying")
+    cmp_fp(in_fp, dcmp_fp)
+
+def test_pack_unpack():
+    pack_unpack(1, nchunks=20)
+    pack_unpack(1, nchunks=1)
+    pack_unpack(1, nchunks=100)
+    pack_unpack(1, chunk_size=reverse_pretty('1M'))
+    pack_unpack(1, chunk_size=reverse_pretty('2M'))
+    pack_unpack(1, chunk_size=reverse_pretty('4M'))
+    pack_unpack(1, chunk_size=reverse_pretty('8M'))
+
+def test_pack_unpack_fp():
+    pack_unpack_fp(1, nchunks=20)
+    pack_unpack_fp(1, nchunks=1)
+    pack_unpack_fp(1, nchunks=100)
+    pack_unpack_fp(1, chunk_size=reverse_pretty('1M'))
+    pack_unpack_fp(1, chunk_size=reverse_pretty('2M'))
+    pack_unpack_fp(1, chunk_size=reverse_pretty('4M'))
+    pack_unpack_fp(1, chunk_size=reverse_pretty('8M'))
+
+def pack_unpack_hard():
+    """ Test on somewhat larger arrays, but be nice to memory. """
+    # Array is apprx. 1.5 GB large
+    # should make chunk-size of apprx. 1MB
+    pack_unpack(100, nchunks=1536, progress=True)
+    # should make apprx 1536 chunks
+    pack_unpack(100, chunk_size=reverse_pretty('1M'), progress=True)
+
+def pack_unpack_extreme():
+    """ Test on somewhat larer arrays, uses loads of memory. """
+    # this will create a huge array, and then use the
+    # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
+    pack_unpack(300, progress=True)
+
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """
-    chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
     with open_two_file(open(file1, 'rb'), open(file2, 'rb')) as \
-            (afp, bfp):
-        while True:
-            a = afp.read(chunk_size)
-            b = bfp.read(chunk_size)
-            if a == '' and b == '':
-                return True
-            else:
-                nt.assert_equal(a, b)
+            (fp1, fp2):
+        cmp_fp(fp1, fp2)
+
+def cmp_fp(fp1, fp2):
+    chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
+    while True:
+        a = fp1.read(chunk_size)
+        b = fp2.read(chunk_size)
+        if a == '' and b == '':
+            return True
+        else:
+            nt.assert_equal(a, b)

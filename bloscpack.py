@@ -919,6 +919,14 @@ def unpack_file(in_file, out_file):
         the name of the input file
     out_file : str
         the name of the output file
+
+    Raises
+    ------
+
+    FormatVersionMismatch
+        if the file has an unmatching format version number
+    ChecksumMismatch
+        if any of the chunks fail to produce the correct checksum
     """
     in_file_size = path.getsize(in_file)
     print_verbose('input file size: %s' % pretty_size(in_file_size))

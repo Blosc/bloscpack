@@ -610,13 +610,16 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
 
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """
-    chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
     with open_two_file(open(file1, 'rb'), open(file2, 'rb')) as \
-            (afp, bfp):
-        while True:
-            a = afp.read(chunk_size)
-            b = bfp.read(chunk_size)
-            if a == '' and b == '':
-                return True
-            else:
-                nt.assert_equal(a, b)
+            (fp1, fp2):
+        cmp_fp(fp1, fp2)
+
+def cmp_fp(fp1, fp2):
+    chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
+    while True:
+        a = fp1.read(chunk_size)
+        b = fp2.read(chunk_size)
+        if a == '' and b == '':
+            return True
+        else:
+            nt.assert_equal(a, b)

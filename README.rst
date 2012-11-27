@@ -410,9 +410,6 @@ TODO
 * subcommand v or verify to verify the integrity of the data
 * subcommend i or info to print information of the file, e.g. decoded header
   and offsets
-* Refactor compression and decompression to use file_pointers instead of
-  file_name strings. This would allow using cStringIO to create in-memory
-  file-like containers. Great for testing and maybe other use-cases too.
 * Deafaults everywhere. To improve the semantics of future library usage,
   whenever we see a keyword argument that has a defined default, that default
   should be used. Should make the whole thing more coherent.
@@ -433,6 +430,11 @@ TODO
 
 Changelog
 ---------
+
+* v0.3.0-rc1 - XXX XXX XX XXXX
+
+* Refactor compression and decompression to use file pointers instead of
+  file name strings, allows using StringIO/cStringIO.
 
 * v0.2.1     - Mon Nov 26 2012
 

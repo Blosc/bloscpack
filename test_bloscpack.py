@@ -11,6 +11,7 @@ import atexit
 import numpy
 import nose.tools as nt
 from collections import namedtuple
+from cStringIO import StringIO
 import bloscpack
 from bloscpack import *
 
@@ -467,11 +468,14 @@ def test_decode_bloscpack_header():
 
 def create_array(repeats, in_file, progress=None):
     with open(in_file, 'w') as in_fp:
-        for i in range(repeats):
-            array_ = numpy.linspace(i, i+1, 2e6)
-            in_fp.write(array_.tostring())
-            if progress is not None:
-                progress(i)
+        create_array_fp(repeats, in_fp, progress=progress)
+
+def create_array_fp(repeats, in_fp, progress=None):
+    for i in range(repeats):
+        array_ = numpy.linspace(i, i+1, 2e6)
+        in_fp.write(array_.tostring())
+        if progress is not None:
+            progress(i)
 
 def atexit_tmpremover(dirname):
     try:
@@ -607,6 +611,38 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
         if progress:
             print("Verifying")
         cmp(in_file, dcmp_file)
+
+def test_pack_unpack_fp():
+    pack_unpack_fp(1, nchunks=20)
+    pack_unpack_fp(1, nchunks=1)
+    pack_unpack_fp(1, nchunks=100)
+    pack_unpack_fp(1, chunk_size=reverse_pretty('1M'))
+    pack_unpack_fp(1, chunk_size=reverse_pretty('2M'))
+    pack_unpack_fp(1, chunk_size=reverse_pretty('4M'))
+    pack_unpack_fp(1, chunk_size=reverse_pretty('8M'))
+
+def pack_unpack_fp(repeats, nchunks=None, chunk_size=None, progress=False):
+    blosc_args = DEFAULT_BLOSC_ARGS
+    offsets = DEFAULT_OFFSETS
+    checksum = DEFAULT_CHECKSUM
+    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
+    if progress:
+        print("Creating test array")
+    create_array_fp(repeats, in_fp)
+    in_fp_size = in_fp.tell()
+    if progress:
+        print("Compressing")
+    in_fp.seek(0)
+    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
+            blosc_args,
+            nchunks, chunk_size, offsets, checksum)
+    out_fp.seek(0)
+    if progress:
+        print("Decompressing")
+    bloscpack._unpack_fp(out_fp, dcmp_fp)
+    if progress:
+        print("Verifying")
+    cmp_fp(in_fp, dcmp_fp)
 
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """

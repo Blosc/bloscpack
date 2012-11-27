@@ -820,6 +820,12 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
     checksum : str
         Which checksum to use.
 
+    Raises
+    ------
+
+    ChunkingException
+        if there was a problem caculating the chunks
+
     Notes
     -----
     The parameters 'nchunks' and 'chunk_size' are mutually exclusive. Will be

@@ -481,7 +481,7 @@ def create_array_fp(repeats, in_fp, progress=False):
     for i in range(repeats):
         array_ = numpy.linspace(i, i+1, 2e6)
         in_fp.write(array_.tostring())
-        if progress is not None:
+        if progress:
             progress(i)
     if progress:
         print('done')

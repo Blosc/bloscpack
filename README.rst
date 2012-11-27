@@ -426,6 +426,7 @@ TODO
 * Announcement RST
 * Announce on scipy/numpy lists, comp.compression, freshmeat, ohloh ...
 * Debian packages (for python-blosc and bloscpack)
+* Use cram to test the command-line user interface
 
 
 Changelog

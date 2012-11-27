@@ -437,6 +437,7 @@ Changelog
 
   * Refactor compression and decompression to use file pointers instead of
     file name strings, allows using StringIO/cStringIO.
+  * Sanitize calculation of nchunks and chunk-size a little
 
 * v0.2.1     - Mon Nov 26 2012
 

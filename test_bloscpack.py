@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
+from __future__ import print_function
+
 import os.path as path
 import tempfile
 import contextlib
@@ -466,16 +468,23 @@ def test_decode_bloscpack_header():
             decode_bloscpack_header(copy_and_set_input(16,
                 '\xff\xff\xff\xff\xff\xff\xff\x7f')))
 
-def create_array(repeats, in_file, progress=None):
+def create_array(repeats, in_file, progress=False):
     with open(in_file, 'w') as in_fp:
         create_array_fp(repeats, in_fp, progress=progress)
 
-def create_array_fp(repeats, in_fp, progress=None):
+def create_array_fp(repeats, in_fp, progress=False):
+    if progress:
+        def progress(i):
+            if i % 10 == 0:
+                print('.', end='')
+            sys.stdout.flush()
     for i in range(repeats):
         array_ = numpy.linspace(i, i+1, 2e6)
         in_fp.write(array_.tostring())
         if progress is not None:
             progress(i)
+    if progress:
+        print('done')
 
 def atexit_tmpremover(dirname):
     try:
@@ -576,7 +585,7 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         if progress:
             print("Creating test array")
-        create_array(repeats, in_file)
+        create_array(repeats, in_file, progress=progress)
         if progress:
             print("Compressing")
         pack_file(in_file, out_file, blosc_args,
@@ -595,7 +604,7 @@ def pack_unpack_fp(repeats, nchunks=None, chunk_size=None, progress=False):
     in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
     if progress:
         print("Creating test array")
-    create_array_fp(repeats, in_fp)
+    create_array_fp(repeats, in_fp, progress=progress)
     in_fp_size = in_fp.tell()
     if progress:
         print("Compressing")

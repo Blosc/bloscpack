@@ -1063,8 +1063,10 @@ if __name__ == '__main__':
         process_nthread_arg(args)
         try:
             unpack_file(in_file, out_file)
-        except ValueError as ve:
-            error(ve.message)
+        except FormatVersionMismatch as fvm:
+            error(fvm.message)
+        except ChecksumMismatch as csm:
+            error(csm.message)
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

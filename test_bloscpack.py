@@ -539,17 +539,13 @@ def test_offsets():
 
 
 def test_invalid_format():
-    def raising_error(message):
-        raise ValueError(message)
-    bloscpack.error = raising_error
     # this will cause a bug if we ever reach 255 format versions
     bloscpack.FORMAT_VERSION = MAX_FORMAT_VERSION
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
         bloscpack.pack_file(in_file, out_file, blosc_args, nchunks=1)
-        nt.assert_raises(ValueError, unpack_file, out_file, dcmp_file)
-    bloscpack.error = error
+        nt.assert_raises(FormatVersionMismatch, unpack_file, out_file, dcmp_file)
     bloscpack.FORMAT_VERSION = FORMAT_VERSION
 
 def test_file_corruption():

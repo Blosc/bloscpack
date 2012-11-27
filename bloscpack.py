@@ -407,6 +407,9 @@ class ChunkingException(BaseException):
 class NoSuchChecksum(ValueError):
     pass
 
+class FormatVersionMismatch(RuntimeError):
+    pass
+
 class ChecksumMismatch(RuntimeError):
     pass
 
@@ -939,7 +942,7 @@ def _unpack_fp(input_fp, output_fp):
         print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
     checksum_impl = CHECKSUMS[checksum]
     if FORMAT_VERSION != format_version:
-        error("format version of file was not '%s' as expected, but '%d'" %
+        raise FormatVersionMismatch("format version of file was not '%s' as expected, but '%d'" %
                 (FORMAT_VERSION, format_version))
     # read the offsets
     options = decode_options(bloscpack_header['options'])

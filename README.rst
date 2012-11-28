@@ -341,6 +341,8 @@ All entries are little-endian.
 
     :``bit 0 (0x01)``:
         If the offsets to the chunks are present in this file.
+    :``bit 1 (0x02)``:
+        If metadata is present in this file.
 
 :checksum:
     (``uint8``)

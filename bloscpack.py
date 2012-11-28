@@ -377,15 +377,15 @@ def decode_blosc_header(buffer_):
     Notes
     -----
 
-    The Blosc 1.1.3 header is 16 bytes as follows::
+    The Blosc header (as of v1.0.0) is 16 bytes as follows::
 
         |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
-        ^   ^   ^   ^ |     nbytes    |   blocksize   |    ctbytes    |
-        |   |   |   |
-        |   |   |   +--typesize
-        |   |   +------flags
-        |   +----------versionlz
-        +--------------version
+          ^   ^   ^   ^ |     nbytes    |   blocksize   |    ctbytes    |
+          |   |   |   |
+          |   |   |   +--typesize
+          |   |   +------flags
+          |   +----------versionlz
+          +--------------version
 
     The first four are simply bytes, the last three are are each unsigned ints
     (uint32) each occupying 4 bytes. The header is always little-endian.

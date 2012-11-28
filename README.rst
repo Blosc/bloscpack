@@ -262,8 +262,8 @@ As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
 kind of structured data.
 
-Bloscpack Header Format
------------------------
+Bloscpack Format
+----------------
 
 The input is split into chunks since a) we wish to put less stress on main
 memory and b) because Blosc has a buffer limit of 2GB (Version ``1.0.0`` and
@@ -274,6 +274,26 @@ less than the rest of the chunks. When specifying a desired nchunks you may end
 up with a final chunks that is either larger than or smaller than the other
 chunks and may even be zero.
 
+In addition to the chunks some additional information must be added to the file
+for housekeeping:
+
+:header:
+    a 32 bit header containing various pieces of information
+:offsets:
+    a variable length section containing chunk offsets
+:meta:
+    a variable length metadata section, may contain user data
+:chunk:
+    the blosc chunk
+:checksum:
+    a checksum following the chunk, if desired
+
+The layout of the file is then::
+
+    |-header-|-offsets-|-meta-|-chunk-|-check-|-chunk-|-check-|...|
+
+Description of the header
+~~~~~~~~~~~~~~~~~~~~~~~~~
 The following 32 bit header is used for Bloscpack as of version ``0.3.0``.
 The design goals of the new header format are to contain as much information as
 possible to achieve interesting things in the future and to be as general as
@@ -383,10 +403,7 @@ writing all chunks. Thus, If the compression of the file fails prematurely or
 is aborted, all offsets should have the value ``-1``.  Each offset denotes the
 exact position of the chunk in the file such that seeking to the offset, will
 position the file pointer such that, reading the next 16 bytes gives the Blosc
-header, which is at the start of the desired chunk. The layout of the file is
-then::
-
-    |-bloscpack-header-|-offset-|-offset-|...|-chunk-|-chunk-|...|
+header, which is at the start of the desired chunk.
 
 Overhead
 ~~~~~~~~

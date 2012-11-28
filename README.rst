@@ -428,10 +428,11 @@ Overhead
 Depending on which configuration for the file is used a constant, or linear
 overhead may be added to the file. The Bloscpack header adds 32 bytes in any
 case. If the data is non-compressible, Blosc will add 16 bytes of header to
-each chunk. If used, both the checksum and the offsets will add overhead to the
-file. The offsets add 8 bytes per chunk and the checksum adds a fixed constant
-value which depends on the checksum to each chunk. For example, 32 bytes for
-the ``adler32`` checksum.
+each chunk. The metadata section obviously adds a constant overhead, and if
+used, both the checksum and the offsets will add overhead to the file. The
+offsets add 8 bytes per chunk and the checksum adds a fixed constant value
+which depends on the checksum to each chunk. For example, 32 bytes for the
+``adler32`` checksum.
 
 TODO
 ----

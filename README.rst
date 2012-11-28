@@ -279,10 +279,10 @@ for housekeeping:
 
 :header:
     a 32 bit header containing various pieces of information
-:offsets:
-    a variable length section containing chunk offsets
 :meta:
     a variable length metadata section, may contain user data
+:offsets:
+    a variable length section containing chunk offsets
 :chunk:
     the blosc chunk
 :checksum:
@@ -290,7 +290,7 @@ for housekeeping:
 
 The layout of the file is then::
 
-    |-header-|-offsets-|-meta-|-chunk-|-check-|-chunk-|-check-|...|
+    |-header-|-meta-|-offsets-|-chunk-|-check-|-chunk-|-check-|...|
 
 Description of the header
 ~~~~~~~~~~~~~~~~~~~~~~~~~

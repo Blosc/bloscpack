@@ -294,11 +294,11 @@ The layout of the file is then::
 
 Description of the header
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-The following 32 bit header is used for Bloscpack as of version ``0.3.0``.
-The design goals of the new header format are to contain as much information as
+The following 32 bit header is used for Bloscpack as of version ``0.3.0``.  The
+design goals of the new header format are to contain as much information as
 possible to achieve interesting things in the future and to be as general as
-possible such that the new persistence layer of CArray is compatible with
-Bloscpack.
+possible such that the new persistence layer of CArray and potentially other
+such tools are compatible with Bloscpack.
 
 The following ASCII representation shows the layout of the header::
 

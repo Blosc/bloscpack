@@ -394,18 +394,33 @@ last-chunk-size``. In a streaming scenario ``-1`` can be used as a placeholder.
 For example if the total number of chunks, or the size of the last chunk is not
 known at the time the header is created.
 
+
+Description of the metadata section
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This section goes after the header, and it is just a JSON serialized
+version of the metadata that is to be saved. As JSON has its
+limitations as any other serializer, only a subset of Python
+structures can be stored, so probably some additional object handling
+must be done prior to serialize some metadata.
+
+Example of metadata stored::
+
+  {'dtype': 'float64', 'shape': [1024], 'others': []}
+
 Description of the offsets entries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Offsets of the chunks into the file are to be used for accelerated seeking. The
-offsets (if activated) follow the header. Each offset is a 64 bit signed
-little-endian integer (``int64``). A value of ``-1`` denotes an unknown offset.
-Initially, all offsets should be initialized to ``-1`` and filled in after
-writing all chunks. Thus, If the compression of the file fails prematurely or
-is aborted, all offsets should have the value ``-1``.  Each offset denotes the
-exact position of the chunk in the file such that seeking to the offset, will
-position the file pointer such that, reading the next 16 bytes gives the Blosc
-header, which is at the start of the desired chunk.
+Following the metadata section, comes a variable length section of chunk
+offsest. Offsets of the chunks into the file are to be used for accelerated
+seeking. The offsets (if activated) follow the header. Each offset is a 64 bit
+signed little-endian integer (``int64``). A value of ``-1`` denotes an unknown
+offset. Initially, all offsets should be initialized to ``-1`` and filled in
+after writing all chunks. Thus, If the compression of the file fails
+prematurely or is aborted, all offsets should have the value ``-1``.  Each
+offset denotes the exact position of the chunk in the file such that seeking to
+the offset, will position the file pointer such that, reading the next 16 bytes
+gives the Blosc header, which is at the start of the desired chunk.
 
 Overhead
 ~~~~~~~~

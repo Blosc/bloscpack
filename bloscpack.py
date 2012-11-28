@@ -377,20 +377,8 @@ def decode_blosc_header(buffer_):
     Notes
     -----
 
-    The Blosc header (as of v1.0.0) is 16 bytes as follows::
-
-        |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
-          ^   ^   ^   ^ |     nbytes    |   blocksize   |    ctbytes    |
-          |   |   |   |
-          |   |   |   +--typesize
-          |   |   +------flags
-          |   +----------versionlz
-          +--------------version
-
-    The first four are simply bytes, the last three are are each unsigned ints
-    (uint32) each occupying 4 bytes. The header is always little-endian.
-    'ctbytes' is the length of the buffer including header and nbytes is the
-    length of the data when uncompressed.
+    Please see the readme for a precise descripttion of the blosc header
+    format.
 
     """
     return {'version':   decode_uint8(buffer_[0]),

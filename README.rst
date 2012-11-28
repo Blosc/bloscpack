@@ -274,7 +274,7 @@ less than the rest of the chunks. When specifying a desired nchunks you may end
 up with a final chunks that is either larger than or smaller than the other
 chunks and may even be zero.
 
-The following 32 bit header is used for Bloscpack as of version ``0.2.0``.
+The following 32 bit header is used for Bloscpack as of version ``0.3.0``.
 The design goals of the new header format are to contain as much information as
 possible to achieve interesting things in the future and to be as general as
 possible such that the new persistence layer of CArray is compatible with

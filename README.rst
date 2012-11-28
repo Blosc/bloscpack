@@ -422,6 +422,25 @@ offset denotes the exact position of the chunk in the file such that seeking to
 the offset, will position the file pointer such that, reading the next 16 bytes
 gives the Blosc header, which is at the start of the desired chunk.
 
+Description of the chunk format
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As mentioned previously, each chunk is just a blosc compressed string including
+header. The Blosc header (as of ``v1.0.0``) is 16 bytes as follows::
+
+    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
+      ^   ^   ^   ^ |     nbytes    |   blocksize   |    ctbytes    |
+      |   |   |   |
+      |   |   |   +--typesize
+      |   |   +------flags
+      |   +----------versionlz
+      +--------------version
+
+The first four are simply bytes, the last three are are each unsigned ints
+(``uint32``) each occupying 4 bytes. The header is always little-endian.
+``ctbytes`` is the length of the buffer including header and ``nbytes`` is the
+length of the data when uncompressed.
+
 Overhead
 ~~~~~~~~
 

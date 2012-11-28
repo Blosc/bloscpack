@@ -412,7 +412,7 @@ Description of the offsets entries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Following the metadata section, comes a variable length section of chunk
-offsest. Offsets of the chunks into the file are to be used for accelerated
+offsets. Offsets of the chunks into the file are to be used for accelerated
 seeking. The offsets (if activated) follow the header. Each offset is a 64 bit
 signed little-endian integer (``int64``). A value of ``-1`` denotes an unknown
 offset. Initially, all offsets should be initialized to ``-1`` and filled in

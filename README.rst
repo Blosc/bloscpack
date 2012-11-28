@@ -168,7 +168,7 @@ The first causes basic info to be printed, ``[-v | --verbose]``::
 
     zsh» ./blpk --debug compress --chunk-size 0.5G data.dat
     blpk: command line argument parsing complete
-    blpk: command line arguments are: 
+    blpk: command line arguments are:
     blpk:   nchunks: None
     blpk:   force: False
     blpk:   verbose: False

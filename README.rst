@@ -126,7 +126,7 @@ that govern how the file is split into chunks:
 
 * ``[-z | --chunk-size]``
   Desired approximate size of the chunks, where you can use human readable
-  strings like ``8M`` or ``128K`` or ``max`` to use the maximim chunk size of
+  strings like ``8M`` or ``128K`` or ``max`` to use the maximum chunk size of
   apprx. ``2GB`` (default: ``1MB``):
   ``zsh» ./blpk -d c -z 128K data.dat``
 * ``[-c | --nchunks]``
@@ -425,7 +425,7 @@ gives the Blosc header, which is at the start of the desired chunk.
 Description of the chunk format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As mentioned previously, each chunk is just a blosc compressed string including
+As mentioned previously, each chunk is just a Blosc compressed string including
 header. The Blosc header (as of ``v1.0.0``) is 16 bytes as follows::
 
     |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
@@ -456,15 +456,15 @@ which depends on the checksum to each chunk. For example, 32 bytes for the
 TODO
 ----
 
-* Introduce an appendix as discuessed per mailinglist
+* Introduce an appendix as discussed per mailinglist
 * quiet verbosity level
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage
 * subcommand e or estimate to estimate the size of the uncompressed data.
 * subcommand v or verify to verify the integrity of the data
-* subcommend i or info to print information of the file, e.g. decoded header
+* subcommand i or info to print information of the file, e.g. decoded header
   and offsets
-* Deafaults everywhere. To improve the semantics of future library usage,
+* Defaults everywhere. To improve the semantics of future library usage,
   whenever we see a keyword argument that has a defined default, that default
   should be used. Should make the whole thing more coherent.
 * partial decompression?

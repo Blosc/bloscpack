@@ -815,7 +815,8 @@ def process_nthread_arg(args):
     print_verbose('using %d thread%s' %
             (args.nthreads, 's' if args.nthreads > 1 else ''))
 
-def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
+def pack_file(in_file, out_file, blosc_args,
+        metadata=None, nchunks=None, chunk_size=None,
         offsets=DEFAULT_OFFSETS, checksum=DEFAULT_CHECKSUM):
     """ Main function for compressing a file.
 
@@ -827,6 +828,8 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
         the name of the output file
     blosc_args : dict
         dictionary of blosc keyword args
+    metadata : str
+        the metadata string
     nchunks : int, default: None
         The desired number of chunks.
     chunk_size : int, default: None
@@ -848,14 +851,14 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
         _pack_fp(input_fp, output_fp, in_file_size,
-                blosc_args, nchunks, chunk_size,
+                blosc_args, metadata, nchunks, chunk_size,
                 offsets, checksum)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
-def _pack_fp(input_fp, output_fp, in_file_size,
-        blosc_args, nchunks, chunk_size,
+def _pack_fp(input_fp, output_fp, in_file_size, 
+        blosc_args, metadata, nchunks, chunk_size,
         offsets, checksum):
     """ Helper function for pack_file.
 
@@ -866,7 +869,10 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, nchunks, chunk_size)
     # calculate header
-    options = create_options(offsets=offsets)
+    options = create_options(offsets=offsets,
+            metadata=True if metadata is not None else False)
+    # compute the length of the metadata
+    meta_size = len(metadata) if metadata is not None else 0
     if offsets:
         offsets_storage = list(itertools.repeat(0, nchunks))
     # set the checksum impl
@@ -877,12 +883,17 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             typesize=blosc_args['typesize'],
             chunk_size=chunk_size,
             last_chunk=last_chunk_size,
-            nchunks=nchunks
+            nchunks=nchunks,
+            meta_size=meta_size
             )
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)
     # write the chunks to the file
     output_fp.write(raw_bloscpack_header)
+    # write the metadata to the file
+    if metadata:
+        output_fp.write(metadata)
+        print_verbose("Wrote metadata of size '%s' '%s'" % (meta_size, metadata))
     # preallocate space for the offsets
     if offsets:
         output_fp.write(encode_int64(-1) * nchunks)
@@ -917,7 +928,7 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             print_verbose(tail_mess, level=DEBUG)
     if offsets:
         # seek to 32 bits into the file
-        output_fp.seek(BLOSCPACK_HEADER_LENGTH, 0)
+        output_fp.seek(BLOSCPACK_HEADER_LENGTH+meta_size, 0)
         print_verbose("Writing '%d' offsets: '%s'" %
                 (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
         # write the offsets encoded into the reserved space in the file

@@ -825,11 +825,6 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
     ChunkingException
         if there was a problem caculating the chunks
 
-    Notes
-    -----
-    The parameters 'nchunks' and 'chunk_size' are mutually exclusive. Will be
-    determined automatically if not present.
-
     """
     in_file_size = path.getsize(in_file)
     print_verbose('input file size: %s' % double_pretty_size(in_file_size))

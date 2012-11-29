@@ -857,7 +857,7 @@ def pack_file(in_file, out_file, blosc_args,
     print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
-def _pack_fp(input_fp, output_fp, in_file_size, 
+def _pack_fp(input_fp, output_fp, in_file_size,
         blosc_args, metadata, nchunks, chunk_size,
         offsets, checksum):
     """ Helper function for pack_file.
@@ -948,6 +948,11 @@ def unpack_file(in_file, out_file):
     out_file : str
         the name of the output file
 
+    Returns
+    -------
+    metadata : str
+        the metadata contained in the file if present
+
     Raises
     ------
 
@@ -960,10 +965,11 @@ def unpack_file(in_file, out_file):
     print_verbose('input file size: %s' % pretty_size(in_file_size))
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
-        _unpack_fp(input_fp, output_fp)
+        metadata = _unpack_fp(input_fp, output_fp)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
     print_verbose('decompression ratio: %f' % (out_file_size/in_file_size))
+    return metadata
 
 def _unpack_fp(input_fp, output_fp):
     # read the bloscpack header
@@ -982,6 +988,15 @@ def _unpack_fp(input_fp, output_fp):
                 (FORMAT_VERSION, format_version))
     # read the offsets
     options = decode_options(bloscpack_header['options'])
+    # read the metadata
+    if not options['metadata'] and meta_size > 0:
+        raise MetaDataMismatch("options indicated no metadata, "
+                "but the meta-size was greater than zero")
+    elif options['metadata']:
+        metadata = input_fp.read(meta_size)
+        print_verbose("read metadata of size: '%s'" % meta_size)
+    else:
+        metadata = None
     if options['offsets']:
         offsets_raw = input_fp.read(8 * nchunks)
         print_verbose('Read raw offsets: %s' % repr(offsets_raw),
@@ -1024,6 +1039,7 @@ def _unpack_fp(input_fp, output_fp):
         print_verbose("chunk written, in: %s out: %s" %
                 (pretty_size(len(compressed)),
                     pretty_size(len(decompressed))), level=DEBUG)
+    return metadata
 
 if __name__ == '__main__':
     parser = create_parser()

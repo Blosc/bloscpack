@@ -1083,8 +1083,11 @@ if __name__ == '__main__':
                 args.nchunks = 1
                 print_verbose("File was smaller than the default " +
                         "chunk-size, using a single chunk")
+        metadata = process_metadata_args(args)
         try:
-            pack_file(in_file, out_file, blosc_args,
+            pack_file(in_file, out_file,
+                    blosc_args,
+                    metadata,
                     nchunks=args.nchunks,
                     chunk_size=args.chunk_size,
                     offsets=args.offsets,
@@ -1100,11 +1103,15 @@ if __name__ == '__main__':
             error(str(fnf))
         process_nthread_arg(args)
         try:
-            unpack_file(in_file, out_file)
+            metadata = unpack_file(in_file, out_file)
+            if metadata:
+                print metadata
         except FormatVersionMismatch as fvm:
             error(fvm.message)
         except ChecksumMismatch as csm:
             error(csm.message)
+        except MetaDataMismatch as mdm:
+            error(mdm.message)
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

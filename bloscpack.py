@@ -582,7 +582,9 @@ def decode_options(options):
     """
 
     _check_options(options)
-    return {'offsets': bool(int(options[7]))}
+    return {'offsets': bool(int(options[7])),
+            'metadata': bool(int(options[6]))
+            }
 
 # default options created here programatically
 DEFAULT_OPTIONS = create_options()

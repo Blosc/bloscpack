@@ -250,8 +250,14 @@ def test_create_options():
     nt.assert_equal('00000011', create_options(offsets=True, metadata=True))
 
 def test_decode_options():
-    nt.assert_equal({'offsets': True}, decode_options('00000001'))
-    nt.assert_equal({'offsets': False}, decode_options('00000000'))
+    nt.assert_equal({'offsets': False, 'metadata': False},
+            decode_options('00000000'))
+    nt.assert_equal({'offsets': False, 'metadata': True},
+            decode_options('00000010'))
+    nt.assert_equal({'offsets': True, 'metadata': False},
+            decode_options('00000001'))
+    nt.assert_equal({'offsets': True, 'metadata': True},
+            decode_options('00000011'))
 
 
 def test_create_bloscpack_header_arguments():

@@ -629,8 +629,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     Notes
     -----
 
-    See the file 'header_rfc.rst' distributed with the source code for
-    details on the header format.
+    See the README distributed for details on the header format.
 
     Raises
     ------

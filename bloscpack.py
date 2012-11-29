@@ -668,8 +668,8 @@ def decode_bloscpack_header(buffer_):
     -------
     format_version : int
         the version format for the compressed file
-    options : bitfield (string of 0s and 1s)
-        the options for this file
+    options : dict
+        the options for this file, decoded from the bitfield
     checksum : int
         the checksum to be used
     typesize : int

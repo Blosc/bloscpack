@@ -407,6 +407,9 @@ class FormatVersionMismatch(RuntimeError):
 class ChecksumMismatch(RuntimeError):
     pass
 
+class MetaDataMismatch(RuntimeError):
+    pass
+
 class FileNotFound(IOError):
     pass
 

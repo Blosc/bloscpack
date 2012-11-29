@@ -321,6 +321,11 @@ def create_parser():
                 default=DEFAULT_OFFSETS,
                 dest='offsets',
                 help='deactivate offsets')
+        bloscpack_group.add_argument('-m', '--metadata',
+                metavar='<metadata>',
+                type=str,
+                dest='metadata',
+                help="file containing the metadata")
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,

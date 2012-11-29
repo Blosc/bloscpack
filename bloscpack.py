@@ -558,7 +558,7 @@ def _check_options(options):
                 "'options' must be string of 0s and 1s of length 8, not '%s'" %
                 options)
 
-def create_options(offsets=DEFAULT_OFFSETS):
+def create_options(offsets=DEFAULT_OFFSETS, metadata=False):
     """ Create the options bitfield.
 
     Parameters
@@ -566,7 +566,7 @@ def create_options(offsets=DEFAULT_OFFSETS):
     offsets : bool
     """
     return "".join([str(int(i)) for i in
-        [False, False, False, False, False, False, False, offsets]])
+        [False, False, False, False, False, False, metadata, offsets]])
 
 def decode_options(options):
     """ Parse the options bitfield.

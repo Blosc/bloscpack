@@ -237,9 +237,17 @@ def test_decode_blosc_header():
     nt.assert_equal(expected, header)
 
 def test_create_options():
-    nt.assert_equal('00000001', create_options(offsets=True))
     nt.assert_equal('00000001', create_options())
+    nt.assert_equal('00000001', create_options(offsets=True))
     nt.assert_equal('00000000', create_options(offsets=False))
+
+    nt.assert_equal('00000001', create_options(metadata=False))
+    nt.assert_equal('00000011', create_options(metadata=True))
+
+    nt.assert_equal('00000000', create_options(offsets=False, metadata=False))
+    nt.assert_equal('00000010', create_options(offsets=False, metadata=True))
+    nt.assert_equal('00000001', create_options(offsets=True, metadata=False))
+    nt.assert_equal('00000011', create_options(offsets=True, metadata=True))
 
 def test_decode_options():
     nt.assert_equal({'offsets': True}, decode_options('00000001'))

@@ -311,7 +311,7 @@ The following ASCII representation shows the layout of the header::
          typesize ----------------+
 
     |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
-    |            nchunks            |            RESERVED           |
+    |            nchunks            |   meta-size   |               |
 
 The first 4 bytes are the magic string ``blpk``. Then there are 4 bytes, the
 first three are described below and the last one is reserved. This is followed
@@ -388,6 +388,10 @@ All entries are little-endian.
     byte, the total number of chunks is ``2**63``. This amounts to a maximum
     file-size of 8EB (``8EB = 2*63 bytes``) which should be enough for the next
     couple of years. Again, ``-1`` denotes that the number of is unknown.
+:meta-size:
+    (``int32``)
+    Denotes the size of the metadata section. The value ``0`` means there is no
+    metadata section.
 
 The overall file-size can be computed as ``chunk-size * (nchunks - 1) +
 last-chunk-size``. In a streaming scenario ``-1`` can be used as a placeholder.

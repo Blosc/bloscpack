@@ -772,6 +772,14 @@ def process_decompression_args(args):
                     (in_file, EXTENSION))
     return in_file, out_file
 
+def process_metadata_args(args):
+    if args.metadata is not None:
+        try:
+            with open(args.metadata, 'r') as metadata_file:
+                return metadata_file.read().strip()
+        except IOError as ioe:
+            error(ioe.message)
+
 def check_files(in_file, out_file, args):
     """ Check files exist/don't exist.
 

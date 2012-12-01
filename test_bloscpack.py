@@ -434,6 +434,7 @@ def test_decode_bloscpack_header():
             'chunk_size':    -1,
             'last_chunk':    -1,
             'nchunks':       -1,
+            'meta_size':     0,
             'RESERVED':      0,
             }
     def copy_and_set_return(key, value):
@@ -642,7 +643,7 @@ def pack_unpack_fp(repeats, nchunks=None, chunk_size=None, progress=False):
         print("Compressing")
     in_fp.seek(0)
     bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            blosc_args,
+            blosc_args, None,
             nchunks, chunk_size, offsets, checksum)
     out_fp.seek(0)
     if progress:

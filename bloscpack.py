@@ -1019,7 +1019,10 @@ def _unpack_fp(input_fp, output_fp):
                 "but not metadata")
     elif options['metadata']:
         metadata = input_fp.read(meta_size)
-        print_verbose("read metadata of size: '%s'" % meta_size)
+        if options['compress_meta']:
+            metadata = zlib.decompress(metadata)
+        print_verbose("read %s metadata of size: '%s'" %
+                ('compressed' if options['compress_meta'] else '', meta_size))
     else:
         metadata = None
     if options['offsets']:

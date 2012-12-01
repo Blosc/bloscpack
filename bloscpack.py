@@ -34,6 +34,7 @@ MAX_CHUNKS = (2**63)-1
 MAX_META_SIZE = (2**31-1) # int32 max val
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_OFFSETS = True
+DEFAULT_COMPRESS_META = False
 DEFAULT_OPTIONS = None  # created programatically later on
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
@@ -327,6 +328,11 @@ def create_parser():
                 type=str,
                 dest='metadata',
                 help="file containing the metadata")
+        bloscpack_group.add_argument('-p', '--compress-meta',
+                action='store_true',
+                default=DEFAULT_COMPRESS_META,
+                dest='compress_meta',
+                help='compress metadata')
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,
@@ -562,7 +568,8 @@ def _check_options(options):
                 "'options' must be string of 0s and 1s of length 8, not '%s'" %
                 options)
 
-def create_options(offsets=DEFAULT_OFFSETS, metadata=False, compress_meta=False):
+def create_options(offsets=DEFAULT_OFFSETS, metadata=False,
+        compress_meta=DEFAULT_COMPRESS_META):
     """ Create the options bitfield.
 
     Parameters
@@ -906,7 +913,9 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     # write the metadata to the file
     if metadata:
         output_fp.write(metadata)
-        print_verbose("Wrote metadata of size '%s' '%s'" % (meta_size, metadata))
+        print_verbose("Wrote %s metadata of size '%s': %s" %
+                ('compressed' if compress_meta else '',
+                    meta_size, repr(metadata)))
     # preallocate space for the offsets
     if offsets:
         output_fp.write(encode_int64(-1) * nchunks)
@@ -1104,6 +1113,7 @@ if __name__ == '__main__':
             pack_file(in_file, out_file,
                     blosc_args,
                     metadata,
+                    compress_meta=args.compress_meta,
                     nchunks=args.nchunks,
                     chunk_size=args.chunk_size,
                     offsets=args.offsets,

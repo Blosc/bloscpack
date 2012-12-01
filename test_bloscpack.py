@@ -574,6 +574,10 @@ def test_offsets():
             blosc_header = decode_blosc_header(blosc_header_raw)
             nt.assert_equal(expected, blosc_header)
 
+def test_metadata():
+    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
+    received_metadata = pack_unpack_fp(1, nchunks=20, metadata=test_metadata)
+    nt.assert_equal(test_metadata, received_metadata)
 
 def test_invalid_format():
     # this will cause a bug if we ever reach 255 format versions
@@ -630,7 +634,8 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
             print("Verifying")
         cmp(in_file, dcmp_file)
 
-def pack_unpack_fp(repeats, nchunks=None, chunk_size=None, progress=False):
+def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
+        progress=False, metadata=None):
     blosc_args = DEFAULT_BLOSC_ARGS
     offsets = DEFAULT_OFFSETS
     checksum = DEFAULT_CHECKSUM
@@ -643,15 +648,17 @@ def pack_unpack_fp(repeats, nchunks=None, chunk_size=None, progress=False):
         print("Compressing")
     in_fp.seek(0)
     bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            blosc_args, None,
+            blosc_args, metadata,
             nchunks, chunk_size, offsets, checksum)
     out_fp.seek(0)
     if progress:
         print("Decompressing")
-    bloscpack._unpack_fp(out_fp, dcmp_fp)
+    metadata = bloscpack._unpack_fp(out_fp, dcmp_fp)
     if progress:
         print("Verifying")
     cmp_fp(in_fp, dcmp_fp)
+    if metadata:
+        return metadata
 
 def test_pack_unpack():
     pack_unpack(1, nchunks=20)

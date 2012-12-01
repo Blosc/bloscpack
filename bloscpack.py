@@ -568,6 +568,7 @@ def create_options(offsets=DEFAULT_OFFSETS, metadata=False):
     Parameters
     ----------
     offsets : bool
+    metadata : bool
     """
     return "".join([str(int(i)) for i in
         [False, False, False, False, False, False, metadata, offsets]])

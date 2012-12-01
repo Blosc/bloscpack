@@ -562,16 +562,20 @@ def _check_options(options):
                 "'options' must be string of 0s and 1s of length 8, not '%s'" %
                 options)
 
-def create_options(offsets=DEFAULT_OFFSETS, metadata=False):
+def create_options(offsets=DEFAULT_OFFSETS, metadata=False, compress_meta=False):
     """ Create the options bitfield.
 
     Parameters
     ----------
     offsets : bool
     metadata : bool
+    compress_meta : bool
     """
+    if compress_meta and not metadata:
+        raise ValueError(
+                "'compress_meta' was 'True' but 'metadata' was 'False'")
     return "".join([str(int(i)) for i in
-        [False, False, False, False, False, False, metadata, offsets]])
+        [False, False, False, False, False, compress_meta, metadata, offsets]])
 
 def decode_options(options):
     """ Parse the options bitfield.
@@ -588,7 +592,8 @@ def decode_options(options):
 
     _check_options(options)
     return {'offsets': bool(int(options[7])),
-            'metadata': bool(int(options[6]))
+            'metadata': bool(int(options[6])),
+            'compress_meta': bool(int(options[5]))
             }
 
 # default options created here programatically
@@ -817,7 +822,8 @@ def process_nthread_arg(args):
             (args.nthreads, 's' if args.nthreads > 1 else ''))
 
 def pack_file(in_file, out_file, blosc_args,
-        metadata=None, nchunks=None, chunk_size=None,
+        metadata=None, compress_meta=False,
+        nchunks=None, chunk_size=None,
         offsets=DEFAULT_OFFSETS, checksum=DEFAULT_CHECKSUM):
     """ Main function for compressing a file.
 
@@ -852,14 +858,16 @@ def pack_file(in_file, out_file, blosc_args,
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
         _pack_fp(input_fp, output_fp, in_file_size,
-                blosc_args, metadata, nchunks, chunk_size,
+                blosc_args, metadata, compress_meta,
+                nchunks, chunk_size,
                 offsets, checksum)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
 def _pack_fp(input_fp, output_fp, in_file_size,
-        blosc_args, metadata, nchunks, chunk_size,
+        blosc_args, metadata, compress_meta,
+        nchunks, chunk_size,
         offsets, checksum):
     """ Helper function for pack_file.
 
@@ -871,7 +879,11 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             calculate_nchunks(in_file_size, nchunks, chunk_size)
     # calculate header
     options = create_options(offsets=offsets,
-            metadata=True if metadata is not None else False)
+            metadata=True if metadata is not None else False,
+            compress_meta=compress_meta)
+    # compress metadata if requested
+    if compress_meta:
+        metadata = zlib.compress(metadata, 6)
     # compute the length of the metadata
     meta_size = len(metadata) if metadata is not None else 0
     if offsets:
@@ -993,6 +1005,9 @@ def _unpack_fp(input_fp, output_fp):
     if meta_size > 0 and not options['metadata']:
         raise MetaDataMismatch("options indicated no metadata, "
                 "but the meta-size was greater than zero")
+    elif options['compress_meta'] and not options['metadata']:
+        raise MetaDataMismatch("options indicated metadata to be compressed, "
+                "but not metadata")
     elif options['metadata']:
         metadata = input_fp.read(meta_size)
         print_verbose("read metadata of size: '%s'" % meta_size)

@@ -579,6 +579,28 @@ def test_metadata():
     received_metadata = pack_unpack_fp(1, nchunks=20, metadata=test_metadata)
     nt.assert_equal(test_metadata, received_metadata)
 
+def test_metadata_mismatch():
+    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
+    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
+    create_array_fp(1, in_fp)
+    in_fp_size = in_fp.tell()
+    in_fp.seek(0)
+    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
+            DEFAULT_BLOSC_ARGS,
+            test_metadata,
+            1,
+            None,
+            DEFAULT_OFFSETS,
+            DEFAULT_CHECKSUM)
+    # remove the metadata bit
+    options = create_options(metadata=False)
+    options_binary = encode_uint8(int(options, 2))
+    out_fp.seek(5)
+    out_fp.write(options_binary)
+    out_fp.seek(0)
+    nt.assert_raises(MetaDataMismatch, bloscpack._unpack_fp, out_fp, dcmp_fp)
+
+
 def test_invalid_format():
     # this will cause a bug if we ever reach 255 format versions
     bloscpack.FORMAT_VERSION = MAX_FORMAT_VERSION

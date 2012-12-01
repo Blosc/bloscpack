@@ -990,7 +990,7 @@ def _unpack_fp(input_fp, output_fp):
     # read the offsets
     options = decode_options(bloscpack_header['options'])
     # read the metadata
-    if not options['metadata'] and meta_size > 0:
+    if meta_size > 0 and not options['metadata']:
         raise MetaDataMismatch("options indicated no metadata, "
                 "but the meta-size was greater than zero")
     elif options['metadata']:

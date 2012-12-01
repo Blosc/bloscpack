@@ -1105,7 +1105,7 @@ if __name__ == '__main__':
         try:
             metadata = unpack_file(in_file, out_file)
             if metadata:
-                print metadata
+                print_verbose("Metadata is:\n'%s'" % metadata, level=NORMAL)
         except FormatVersionMismatch as fvm:
             error(fvm.message)
         except ChecksumMismatch as csm:

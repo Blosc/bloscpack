@@ -343,6 +343,8 @@ All entries are little-endian.
         If the offsets to the chunks are present in this file.
     :``bit 1 (0x02)``:
         If metadata is present in this file.
+    :``bit 2 (0x04)``:
+        If metadata is compressed.
 
 :checksum:
     (``uint8``)
@@ -411,6 +413,9 @@ must be done prior to serialize some metadata.
 Example of metadata stored::
 
   {'dtype': 'float64', 'shape': [1024], 'others': []}
+
+The metadata may be compressed with ``zlib`` compression level ``6``. The third
+bit in the options bitfield will signifiy if this is the case.
 
 Description of the offsets entries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

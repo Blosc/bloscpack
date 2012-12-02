@@ -249,16 +249,54 @@ def test_create_options():
     nt.assert_equal('00000001', create_options(offsets=True, metadata=False))
     nt.assert_equal('00000011', create_options(offsets=True, metadata=True))
 
+    nt.assert_equal('00000010', create_options(offsets=False, metadata=True,
+        compress_meta=False))
+    nt.assert_equal('00000011', create_options(offsets=True, metadata=True,
+        compress_meta=False))
+    nt.assert_equal('00000110', create_options(offsets=False, metadata=True,
+        compress_meta=True))
+    nt.assert_equal('00000111', create_options(offsets=True, metadata=True,
+        compress_meta=True))
+
+    nt.assert_raises(ValueError, create_options, metadata=False,
+            compress_meta=True)
+
 def test_decode_options():
-    nt.assert_equal({'offsets': False, 'metadata': False},
+    nt.assert_equal({'offsets': False,
+        'metadata': False,
+        'compress_meta': False},
             decode_options('00000000'))
-    nt.assert_equal({'offsets': False, 'metadata': True},
+    nt.assert_equal({'offsets': False,
+        'metadata': True,
+        'compress_meta': False},
             decode_options('00000010'))
-    nt.assert_equal({'offsets': True, 'metadata': False},
+    nt.assert_equal({'offsets': True,
+        'metadata': False,
+        'compress_meta': False},
             decode_options('00000001'))
-    nt.assert_equal({'offsets': True, 'metadata': True},
+    nt.assert_equal({'offsets': True,
+        'metadata': True,
+        'compress_meta': False},
             decode_options('00000011'))
 
+    # although strictly, if metadata is False but compress_meta is True, this
+    # should already raise an error here
+    nt.assert_equal({'offsets': False,
+        'metadata': False,
+        'compress_meta': True},
+            decode_options('00000100'))
+    nt.assert_equal({'offsets': False,
+        'metadata': True,
+        'compress_meta': True},
+            decode_options('00000110'))
+    nt.assert_equal({'offsets': True,
+        'metadata': False,
+        'compress_meta': True},
+            decode_options('00000101'))
+    nt.assert_equal({'offsets': True,
+        'metadata': True,
+        'compress_meta': True},
+            decode_options('00000111'))
 
 def test_create_bloscpack_header_arguments():
     # check format_version
@@ -588,6 +626,7 @@ def test_metadata_mismatch():
     bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
             DEFAULT_BLOSC_ARGS,
             test_metadata,
+            False,
             1,
             None,
             DEFAULT_OFFSETS,
@@ -670,7 +709,7 @@ def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
         print("Compressing")
     in_fp.seek(0)
     bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            blosc_args, metadata,
+            blosc_args, metadata, False,
             nchunks, chunk_size, offsets, checksum)
     out_fp.seek(0)
     if progress:

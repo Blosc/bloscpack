@@ -890,7 +890,19 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             compress_meta=compress_meta)
     # compress metadata if requested
     if compress_meta:
-        metadata = zlib.compress(metadata, 6)
+        metadata_compressed = zlib.compress(metadata, 6)
+        meta_comp_size = len(metadata_compressed)
+        meta_size = len(metadata)
+        # be opportunistic, avoid compression if not beneficial
+        if meta_size < meta_comp_size:
+            options = create_options(offsets=offsets,
+                    metadata=True,
+                    compress_meta=False)
+            print_verbose('metadata compression requested, but it was not '
+                    'beneficial, deactivating',
+                    level=DEBUG)
+        else:
+            metadata = metadata_compressed
     # compute the length of the metadata
     meta_size = len(metadata) if metadata is not None else 0
     if offsets:

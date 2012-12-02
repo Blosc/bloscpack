@@ -28,11 +28,13 @@ EXTENSION = '.blp'
 MAGIC = 'blpk'
 BLOSCPACK_HEADER_LENGTH = 32
 BLOSC_HEADER_LENGTH = 16
-FORMAT_VERSION = 2
+FORMAT_VERSION = 3
 MAX_FORMAT_VERSION = 255
 MAX_CHUNKS = (2**63)-1
+MAX_META_SIZE = (2**31-1) # int32 max val
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_OFFSETS = True
+DEFAULT_COMPRESS_META = False
 DEFAULT_OPTIONS = None  # created programatically later on
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
@@ -321,6 +323,16 @@ def create_parser():
                 default=DEFAULT_OFFSETS,
                 dest='offsets',
                 help='deactivate offsets')
+        bloscpack_group.add_argument('-m', '--metadata',
+                metavar='<metadata>',
+                type=str,
+                dest='metadata',
+                help="file containing the metadata")
+        bloscpack_group.add_argument('-p', '--compress-meta',
+                action='store_true',
+                default=DEFAULT_COMPRESS_META,
+                dest='compress_meta',
+                help='compress metadata')
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,
@@ -377,20 +389,8 @@ def decode_blosc_header(buffer_):
     Notes
     -----
 
-    The Blosc 1.1.3 header is 16 bytes as follows::
-
-        |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
-        ^   ^   ^   ^ |     nbytes    |   blocksize   |    ctbytes    |
-        |   |   |   |
-        |   |   |   +--typesize
-        |   |   +------flags
-        |   +----------versionlz
-        +--------------version
-
-    The first four are simply bytes, the last three are are each unsigned ints
-    (uint32) each occupying 4 bytes. The header is always little-endian.
-    'ctbytes' is the length of the buffer including header and nbytes is the
-    length of the data when uncompressed.
+    Please see the readme for a precise descripttion of the blosc header
+    format.
 
     """
     return {'version':   decode_uint8(buffer_[0]),
@@ -411,6 +411,9 @@ class FormatVersionMismatch(RuntimeError):
     pass
 
 class ChecksumMismatch(RuntimeError):
+    pass
+
+class MetaDataMismatch(RuntimeError):
     pass
 
 class FileNotFound(IOError):
@@ -565,15 +568,21 @@ def _check_options(options):
                 "'options' must be string of 0s and 1s of length 8, not '%s'" %
                 options)
 
-def create_options(offsets=DEFAULT_OFFSETS):
+def create_options(offsets=DEFAULT_OFFSETS, metadata=False,
+        compress_meta=DEFAULT_COMPRESS_META):
     """ Create the options bitfield.
 
     Parameters
     ----------
     offsets : bool
+    metadata : bool
+    compress_meta : bool
     """
+    if compress_meta and not metadata:
+        raise ValueError(
+                "'compress_meta' was 'True' but 'metadata' was 'False'")
     return "".join([str(int(i)) for i in
-        [False, False, False, False, False, False, False, offsets]])
+        [False, False, False, False, False, compress_meta, metadata, offsets]])
 
 def decode_options(options):
     """ Parse the options bitfield.
@@ -589,7 +598,10 @@ def decode_options(options):
     """
 
     _check_options(options)
-    return {'offsets': bool(int(options[7]))}
+    return {'offsets': bool(int(options[7])),
+            'metadata': bool(int(options[6])),
+            'compress_meta': bool(int(options[5]))
+            }
 
 # default options created here programatically
 DEFAULT_OPTIONS = create_options()
@@ -601,7 +613,8 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         typesize=0,
         chunk_size=-1,
         last_chunk=-1,
-        nchunks=-1):
+        nchunks=-1,
+        meta_size=0):
     """ Create the bloscpack header string.
 
     Parameters
@@ -620,6 +633,8 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         the size of the last chunk
     nchunks : int
         the number of chunks
+    meta_size : int
+        the size of the metadata
 
     Returns
     -------
@@ -646,6 +661,11 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
+    check_range('meta_size',  meta_size,   0, MAX_META_SIZE)
+
+    if options[6] == 0 and meta_size > 0:
+        raise ValueError(
+                'No metadata in options, but meta_size is greater than zero')
 
     format_version = encode_uint8(format_version)
     options = encode_uint8(int(options, 2))
@@ -654,11 +674,12 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     chunk_size = encode_int32(chunk_size)
     last_chunk = encode_int32(last_chunk)
     nchunks = encode_int64(nchunks)
-    RESERVED = encode_int64(0)
+    meta_size = encode_int32(meta_size)
+    RESERVED = encode_int32(0)
 
     return (MAGIC + format_version + options + checksum + typesize +
             chunk_size + last_chunk +
-            nchunks +
+            nchunks + meta_size +
             RESERVED)
 
 def decode_bloscpack_header(buffer_):
@@ -673,8 +694,8 @@ def decode_bloscpack_header(buffer_):
     -------
     format_version : int
         the version format for the compressed file
-    options : bitfield (string of 0s and 1s)
-        the options for this file
+    options : dict
+        the options for this file, decoded from the bitfield
     checksum : int
         the checksum to be used
     typesize : int
@@ -705,7 +726,8 @@ def decode_bloscpack_header(buffer_):
             'chunk_size':     decode_int32(buffer_[8:12]),
             'last_chunk':     decode_int32(buffer_[12:16]),
             'nchunks':        decode_int64(buffer_[16:24]),
-            'RESERVED':       decode_int64(buffer_[24:32]),
+            'meta_size':      decode_int32(buffer_[24:28]),
+            'RESERVED':       decode_int32(buffer_[28:32]),
             }
 
 def process_compression_args(args):
@@ -763,6 +785,14 @@ def process_decompression_args(args):
                     (in_file, EXTENSION))
     return in_file, out_file
 
+def process_metadata_args(args):
+    if args.metadata is not None:
+        try:
+            with open(args.metadata, 'r') as metadata_file:
+                return metadata_file.read().strip()
+        except IOError as ioe:
+            error(ioe.message)
+
 def check_files(in_file, out_file, args):
     """ Check files exist/don't exist.
 
@@ -798,7 +828,9 @@ def process_nthread_arg(args):
     print_verbose('using %d thread%s' %
             (args.nthreads, 's' if args.nthreads > 1 else ''))
 
-def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
+def pack_file(in_file, out_file, blosc_args,
+        metadata=None, compress_meta=False,
+        nchunks=None, chunk_size=None,
         offsets=DEFAULT_OFFSETS, checksum=DEFAULT_CHECKSUM):
     """ Main function for compressing a file.
 
@@ -810,6 +842,8 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
         the name of the output file
     blosc_args : dict
         dictionary of blosc keyword args
+    metadata : str
+        the metadata string
     nchunks : int, default: None
         The desired number of chunks.
     chunk_size : int, default: None
@@ -831,14 +865,16 @@ def pack_file(in_file, out_file, blosc_args, nchunks=None, chunk_size=None,
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
         _pack_fp(input_fp, output_fp, in_file_size,
-                blosc_args, nchunks, chunk_size,
+                blosc_args, metadata, compress_meta,
+                nchunks, chunk_size,
                 offsets, checksum)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
 def _pack_fp(input_fp, output_fp, in_file_size,
-        blosc_args, nchunks, chunk_size,
+        blosc_args, metadata, compress_meta,
+        nchunks, chunk_size,
         offsets, checksum):
     """ Helper function for pack_file.
 
@@ -849,7 +885,26 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, nchunks, chunk_size)
     # calculate header
-    options = create_options(offsets=offsets)
+    options = create_options(offsets=offsets,
+            metadata=True if metadata is not None else False,
+            compress_meta=compress_meta)
+    # compress metadata if requested
+    if compress_meta:
+        metadata_compressed = zlib.compress(metadata, 6)
+        meta_comp_size = len(metadata_compressed)
+        meta_size = len(metadata)
+        # be opportunistic, avoid compression if not beneficial
+        if meta_size < meta_comp_size:
+            options = create_options(offsets=offsets,
+                    metadata=True,
+                    compress_meta=False)
+            print_verbose('metadata compression requested, but it was not '
+                    'beneficial, deactivating',
+                    level=DEBUG)
+        else:
+            metadata = metadata_compressed
+    # compute the length of the metadata
+    meta_size = len(metadata) if metadata is not None else 0
     if offsets:
         offsets_storage = list(itertools.repeat(0, nchunks))
     # set the checksum impl
@@ -860,12 +915,19 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             typesize=blosc_args['typesize'],
             chunk_size=chunk_size,
             last_chunk=last_chunk_size,
-            nchunks=nchunks
+            nchunks=nchunks,
+            meta_size=meta_size
             )
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)
     # write the chunks to the file
     output_fp.write(raw_bloscpack_header)
+    # write the metadata to the file
+    if metadata:
+        output_fp.write(metadata)
+        print_verbose("Wrote %s metadata of size '%s': %s" %
+                ('compressed' if compress_meta else '',
+                    meta_size, repr(metadata)))
     # preallocate space for the offsets
     if offsets:
         output_fp.write(encode_int64(-1) * nchunks)
@@ -900,7 +962,7 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             print_verbose(tail_mess, level=DEBUG)
     if offsets:
         # seek to 32 bits into the file
-        output_fp.seek(BLOSCPACK_HEADER_LENGTH, 0)
+        output_fp.seek(BLOSCPACK_HEADER_LENGTH+meta_size, 0)
         print_verbose("Writing '%d' offsets: '%s'" %
                 (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
         # write the offsets encoded into the reserved space in the file
@@ -920,6 +982,11 @@ def unpack_file(in_file, out_file):
     out_file : str
         the name of the output file
 
+    Returns
+    -------
+    metadata : str
+        the metadata contained in the file if present
+
     Raises
     ------
 
@@ -932,10 +999,11 @@ def unpack_file(in_file, out_file):
     print_verbose('input file size: %s' % pretty_size(in_file_size))
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
-        _unpack_fp(input_fp, output_fp)
+        metadata = _unpack_fp(input_fp, output_fp)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
     print_verbose('decompression ratio: %f' % (out_file_size/in_file_size))
+    return metadata
 
 def _unpack_fp(input_fp, output_fp):
     # read the bloscpack header
@@ -954,6 +1022,21 @@ def _unpack_fp(input_fp, output_fp):
                 (FORMAT_VERSION, format_version))
     # read the offsets
     options = decode_options(bloscpack_header['options'])
+    # read the metadata
+    if meta_size > 0 and not options['metadata']:
+        raise MetaDataMismatch("options indicated no metadata, "
+                "but the meta-size was greater than zero")
+    elif options['compress_meta'] and not options['metadata']:
+        raise MetaDataMismatch("options indicated metadata to be compressed, "
+                "but not metadata")
+    elif options['metadata']:
+        metadata = input_fp.read(meta_size)
+        if options['compress_meta']:
+            metadata = zlib.decompress(metadata)
+        print_verbose("read %s metadata of size: '%s'" %
+                ('compressed' if options['compress_meta'] else '', meta_size))
+    else:
+        metadata = None
     if options['offsets']:
         offsets_raw = input_fp.read(8 * nchunks)
         print_verbose('Read raw offsets: %s' % repr(offsets_raw),
@@ -996,6 +1079,7 @@ def _unpack_fp(input_fp, output_fp):
         print_verbose("chunk written, in: %s out: %s" %
                 (pretty_size(len(compressed)),
                     pretty_size(len(decompressed))), level=DEBUG)
+    return metadata
 
 if __name__ == '__main__':
     parser = create_parser()
@@ -1039,8 +1123,12 @@ if __name__ == '__main__':
                 args.nchunks = 1
                 print_verbose("File was smaller than the default " +
                         "chunk-size, using a single chunk")
+        metadata = process_metadata_args(args)
         try:
-            pack_file(in_file, out_file, blosc_args,
+            pack_file(in_file, out_file,
+                    blosc_args,
+                    metadata,
+                    compress_meta=args.compress_meta,
                     nchunks=args.nchunks,
                     chunk_size=args.chunk_size,
                     offsets=args.offsets,
@@ -1056,11 +1144,15 @@ if __name__ == '__main__':
             error(str(fnf))
         process_nthread_arg(args)
         try:
-            unpack_file(in_file, out_file)
+            metadata = unpack_file(in_file, out_file)
+            if metadata:
+                print_verbose("Metadata is:\n'%s'" % metadata, level=NORMAL)
         except FormatVersionMismatch as fvm:
             error(fvm.message)
         except ChecksumMismatch as csm:
             error(csm.message)
+        except MetaDataMismatch as mdm:
+            error(mdm.message)
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

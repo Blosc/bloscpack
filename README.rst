@@ -126,7 +126,7 @@ that govern how the file is split into chunks:
 
 * ``[-z | --chunk-size]``
   Desired approximate size of the chunks, where you can use human readable
-  strings like ``8M`` or ``128K`` or ``max`` to use the maximim chunk size of
+  strings like ``8M`` or ``128K`` or ``max`` to use the maximum chunk size of
   apprx. ``2GB`` (default: ``1MB``):
   ``zsh» ./blpk -d c -z 128K data.dat``
 * ``[-c | --nchunks]``
@@ -168,7 +168,7 @@ The first causes basic info to be printed, ``[-v | --verbose]``::
 
     zsh» ./blpk --debug compress --chunk-size 0.5G data.dat
     blpk: command line argument parsing complete
-    blpk: command line arguments are: 
+    blpk: command line arguments are:
     blpk:   nchunks: None
     blpk:   force: False
     blpk:   verbose: False
@@ -262,8 +262,8 @@ As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
 kind of structured data.
 
-Bloscpack Header Format
------------------------
+Bloscpack Format
+----------------
 
 The input is split into chunks since a) we wish to put less stress on main
 memory and b) because Blosc has a buffer limit of 2GB (Version ``1.0.0`` and
@@ -274,11 +274,31 @@ less than the rest of the chunks. When specifying a desired nchunks you may end
 up with a final chunks that is either larger than or smaller than the other
 chunks and may even be zero.
 
-The following 32 bit header is used for Bloscpack as of version ``0.2.0``.
-The design goals of the new header format are to contain as much information as
+In addition to the chunks some additional information must be added to the file
+for housekeeping:
+
+:header:
+    a 32 bit header containing various pieces of information
+:meta:
+    a variable length metadata section, may contain user data
+:offsets:
+    a variable length section containing chunk offsets
+:chunk:
+    the blosc chunk
+:checksum:
+    a checksum following the chunk, if desired
+
+The layout of the file is then::
+
+    |-header-|-meta-|-offsets-|-chunk-|-check-|-chunk-|-check-|...|
+
+Description of the header
+~~~~~~~~~~~~~~~~~~~~~~~~~
+The following 32 bit header is used for Bloscpack as of version ``0.3.0``.  The
+design goals of the new header format are to contain as much information as
 possible to achieve interesting things in the future and to be as general as
-possible such that the new persistence layer of CArray is compatible with
-Bloscpack.
+possible such that the new persistence layer of CArray and potentially other
+such tools are compatible with Bloscpack.
 
 The following ASCII representation shows the layout of the header::
 
@@ -291,7 +311,7 @@ The following ASCII representation shows the layout of the header::
          typesize ----------------+
 
     |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
-    |            nchunks            |            RESERVED           |
+    |            nchunks            |   meta-size   |               |
 
 The first 4 bytes are the magic string ``blpk``. Then there are 4 bytes, the
 first three are described below and the last one is reserved. This is followed
@@ -302,7 +322,7 @@ future versions of the format.
 Effectively, storing the number of chunks as a signed 8 byte integer, limits
 the number of chunks to ``2**63-1 = 9223372036854775807``, but this should not
 be relevant in practice, since, even with the moderate default value of ``1MB``
-for chunk-size, we can still stores files as large as ``8ZB`` (!) Given that
+for chunk-size, we can still store files as large as ``8ZB`` (!) Given that
 in 2012 the maximum size of a single file in the Zettabye File System (zfs) is
 ``16EB``, Bloscpack should be safe for a few more years.
 
@@ -321,6 +341,10 @@ All entries are little-endian.
 
     :``bit 0 (0x01)``:
         If the offsets to the chunks are present in this file.
+    :``bit 1 (0x02)``:
+        If metadata is present in this file.
+    :``bit 2 (0x04)``:
+        If metadata is compressed.
 
 :checksum:
     (``uint8``)
@@ -366,27 +390,68 @@ All entries are little-endian.
     byte, the total number of chunks is ``2**63``. This amounts to a maximum
     file-size of 8EB (``8EB = 2*63 bytes``) which should be enough for the next
     couple of years. Again, ``-1`` denotes that the number of is unknown.
+:meta-size:
+    (``int32``)
+    Denotes the size of the metadata section. The value ``0`` means there is no
+    metadata section.
 
 The overall file-size can be computed as ``chunk-size * (nchunks - 1) +
 last-chunk-size``. In a streaming scenario ``-1`` can be used as a placeholder.
 For example if the total number of chunks, or the size of the last chunk is not
 known at the time the header is created.
 
+
+Description of the metadata section
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This section goes after the header and can contain any string. Ideally it would
+be just a JSON serialized version of the metadata (e.g. numpy array metadata)
+that is to be saved. As JSON has its limitations as any other serializer, only
+a subset of Python structures can be stored, so probably some additional object
+handling must be done prior to serialize some metadata.
+
+Example of metadata stored::
+
+  {'dtype': 'float64', 'shape': [1024], 'others': []}
+
+The metadata may be compressed with ``zlib`` compression level ``6``. The third
+bit in the options bitfield will signify if this is the case. If compression
+is requested, but not beneficial, because the compressed size would be larger
+than the uncompressed size, compression of the metadata is automatically
+deactivated.
+
 Description of the offsets entries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Offsets of the chunks into the file are to be used for accelerated seeking. The
-offsets (if activated) follow the header. Each offset is a 64 bit signed
-little-endian integer (``int64``). A value of ``-1`` denotes an unknown offset.
-Initially, all offsets should be initialized to ``-1`` and filled in after
-writing all chunks. Thus, If the compression of the file fails prematurely or
-is aborted, all offsets should have the value ``-1``.  Each offset denotes the
-exact position of the chunk in the file such that seeking to the offset, will
-position the file pointer such that, reading the next 16 bytes gives the Blosc
-header, which is at the start of the desired chunk. The layout of the file is
-then::
+Following the metadata section, comes a variable length section of chunk
+offsets. Offsets of the chunks into the file are to be used for accelerated
+seeking. The offsets (if activated) follow the header. Each offset is a 64 bit
+signed little-endian integer (``int64``). A value of ``-1`` denotes an unknown
+offset. Initially, all offsets should be initialized to ``-1`` and filled in
+after writing all chunks. Thus, If the compression of the file fails
+prematurely or is aborted, all offsets should have the value ``-1``.  Each
+offset denotes the exact position of the chunk in the file such that seeking to
+the offset, will position the file pointer such that, reading the next 16 bytes
+gives the Blosc header, which is at the start of the desired chunk.
 
-    |-bloscpack-header-|-offset-|-offset-|...|-chunk-|-chunk-|...|
+Description of the chunk format
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As mentioned previously, each chunk is just a Blosc compressed string including
+header. The Blosc header (as of ``v1.0.0``) is 16 bytes as follows::
+
+    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
+      ^   ^   ^   ^ |     nbytes    |   blocksize   |    ctbytes    |
+      |   |   |   |
+      |   |   |   +--typesize
+      |   |   +------flags
+      |   +----------versionlz
+      +--------------version
+
+The first four are simply bytes, the last three are are each unsigned ints
+(``uint32``) each occupying 4 bytes. The header is always little-endian.
+``ctbytes`` is the length of the buffer including header and ``nbytes`` is the
+length of the data when uncompressed.
 
 Overhead
 ~~~~~~~~
@@ -394,23 +459,24 @@ Overhead
 Depending on which configuration for the file is used a constant, or linear
 overhead may be added to the file. The Bloscpack header adds 32 bytes in any
 case. If the data is non-compressible, Blosc will add 16 bytes of header to
-each chunk. If used, both the checksum and the offsets will add overhead to the
-file. The offsets add 8 bytes per chunk and the checksum adds a fixed constant
-value which depends on the checksum to each chunk. For example, 32 bytes for
-the ``adler32`` checksum.
+each chunk. The metadata section obviously adds a constant overhead, and if
+used, both the checksum and the offsets will add overhead to the file. The
+offsets add 8 bytes per chunk and the checksum adds a fixed constant value
+which depends on the checksum to each chunk. For example, 32 bytes for the
+``adler32`` checksum.
 
 TODO
 ----
 
-* Introduce an appendix as discuessed per mailinglist
+* Introduce an appendix as discussed per mailinglist
 * quiet verbosity level
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage
 * subcommand e or estimate to estimate the size of the uncompressed data.
 * subcommand v or verify to verify the integrity of the data
-* subcommend i or info to print information of the file, e.g. decoded header
+* subcommand i or info to print information of the file, e.g. decoded header
   and offsets
-* Deafaults everywhere. To improve the semantics of future library usage,
+* Defaults everywhere. To improve the semantics of future library usage,
   whenever we see a keyword argument that has a defined default, that default
   should be used. Should make the whole thing more coherent.
 * partial decompression?

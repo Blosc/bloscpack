@@ -617,6 +617,12 @@ def test_metadata():
     received_metadata = pack_unpack_fp(1, nchunks=20, metadata=test_metadata)
     nt.assert_equal(test_metadata, received_metadata)
 
+    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
+    received_metadata = pack_unpack_fp(1, nchunks=20, metadata=test_metadata,
+            compress_meta=True)
+    nt.assert_equal(test_metadata, received_metadata)
+
+
 def test_metadata_mismatch():
     test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
     in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
@@ -639,6 +645,51 @@ def test_metadata_mismatch():
     out_fp.seek(0)
     nt.assert_raises(MetaDataMismatch, bloscpack._unpack_fp, out_fp, dcmp_fp)
 
+def test_metadata_opportunisitic_compression():
+    # make up some metadata that can be compressed with benefit
+    test_metadata = ("{'dtype': 'float64', 'shape': [1024], 'others': [],"
+            "'original_container': 'carray'}")
+    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
+    create_array_fp(1, in_fp)
+    in_fp_size = in_fp.tell()
+    in_fp.seek(0)
+    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
+            DEFAULT_BLOSC_ARGS,
+            test_metadata,
+            True,
+            1,
+            None,
+            DEFAULT_OFFSETS,
+            DEFAULT_CHECKSUM)
+    out_fp.seek(0)
+    raw_header = out_fp.read(32)
+    header = decode_bloscpack_header(raw_header)
+    raw_options = header['options']
+    options = decode_options(raw_options)
+    nt.assert_true(options['compress_meta'])
+
+    # now do the same thing, but use badly compressible metadata
+    test_metadata = "abc"
+    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
+    create_array_fp(1, in_fp)
+    in_fp_size = in_fp.tell()
+    in_fp.seek(0)
+    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
+            DEFAULT_BLOSC_ARGS,
+            test_metadata,
+            True,
+            1,
+            None,
+            DEFAULT_OFFSETS,
+            DEFAULT_CHECKSUM)
+    out_fp.seek(0)
+    raw_header = out_fp.read(32)
+    header = decode_bloscpack_header(raw_header)
+    raw_options = header['options']
+    options = decode_options(raw_options)
+    # bloscpack should have decided that there is no benefit to compressing the
+    # metadata and thus deactivated it
+    nt.assert_false(options['compress_meta'])
 
 def test_invalid_format():
     # this will cause a bug if we ever reach 255 format versions
@@ -696,7 +747,7 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
         cmp(in_file, dcmp_file)
 
 def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
-        progress=False, metadata=None):
+        progress=False, metadata=None, compress_meta=False):
     blosc_args = DEFAULT_BLOSC_ARGS
     offsets = DEFAULT_OFFSETS
     checksum = DEFAULT_CHECKSUM
@@ -709,7 +760,7 @@ def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
         print("Compressing")
     in_fp.seek(0)
     bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            blosc_args, metadata, False,
+            blosc_args, metadata, compress_meta,
             nchunks, chunk_size, offsets, checksum)
     out_fp.seek(0)
     if progress:

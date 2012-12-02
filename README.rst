@@ -404,18 +404,21 @@ known at the time the header is created.
 Description of the metadata section
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This section goes after the header, and it is just a JSON serialized
-version of the metadata that is to be saved. As JSON has its
-limitations as any other serializer, only a subset of Python
-structures can be stored, so probably some additional object handling
-must be done prior to serialize some metadata.
+This section goes after the header and can contain any string. Ideally it would
+be just a JSON serialized version of the metadata (e.g. numpy array metadata)
+that is to be saved. As JSON has its limitations as any other serializer, only
+a subset of Python structures can be stored, so probably some additional object
+handling must be done prior to serialize some metadata.
 
 Example of metadata stored::
 
   {'dtype': 'float64', 'shape': [1024], 'others': []}
 
 The metadata may be compressed with ``zlib`` compression level ``6``. The third
-bit in the options bitfield will signifiy if this is the case.
+bit in the options bitfield will signify if this is the case. If compression
+is requested, but not beneficial, because the compressed size would be larger
+than the uncompressed size, compression of the metadata is automatically
+deactivated.
 
 Description of the offsets entries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

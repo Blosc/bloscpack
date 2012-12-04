@@ -403,21 +403,64 @@ known at the time the header is created.
 Description of the metadata section
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This section goes after the header and can contain any string. Ideally it would
-be just a JSON serialized version of the metadata (e.g. numpy array metadata)
-that is to be saved. As JSON has its limitations as any other serializer, only
-a subset of Python structures can be stored, so probably some additional object
-handling must be done prior to serialize some metadata.
+This section goes after the header. It consists of a metadata-section header
+followed by a serialized and potentially compressed data section, followed by
+preallocated space to resize the data section, possibly followed by a checksum.
+
+The layout of the section is thus::
+
+    |-metadata-header-|-data-|-prealloc-|-checksum-|
+
+The header has the following layout::
+
+    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
+    |  magic-format-string  | ^ | ^ |   meta-size   | max-meta-size |
+                              |   |
+          version ------------+   |
+          options ----------------+
+
+:magic-format-string:
+    (``6 byte ASCII string``)
+    The data will usually be some kind of binary serialized string data, for
+    example ``JSON``, ``BSON``, ``YAML`` or Protocol-Buffers. The format
+    identifier is to be placed in this field.
+:version:
+    (``unit8``)
+    The version identifier of the metadata header.
+:options:
+    (``bitfield``)
+    A bitfield which allows for setting certain options in this metadata
+    section.
+
+    :``bit 0 (0x01)``:
+        If metadata is compressed with ``zlib`` at level ``6``.
+    :``bit 1 (0x02)``:
+        If there is a checksum at the end. If a checksum is used it will be the
+        same as the checksum used on the chunks in the rest of the file.
+:meta-size:
+    (``int32``)
+    The size of the data section.
+:max-meta-size:
+    (``int32``)
+    The total allocated space for the data section.
+
+The total space left for enlarging the metadata section is simply
+``max-meta-size - meta-size``.
 
 Example of metadata stored::
 
   {'dtype': 'float64', 'shape': [1024], 'others': []}
 
-The metadata may be compressed with ``zlib`` compression level ``6``. The third
-bit in the options bitfield will signify if this is the case. If compression
-is requested, but not beneficial, because the compressed size would be larger
-than the uncompressed size, compression of the metadata is automatically
-deactivated.
+Of course the format is free and any metadata could potentially be stored here,
+for example numpy array metadata.
+
+If compression is requested, but not beneficial, because the compressed size
+would be larger than the uncompressed size, compression of the metadata is
+automatically deactivated.
+
+As JSON and any other of the suggested serializers has limitations, only a
+subset of Python structures can be stored, so probably some additional object
+handling must be done prior to serialize some metadata.
 
 Description of the offsets entries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

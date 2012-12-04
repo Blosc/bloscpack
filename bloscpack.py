@@ -10,7 +10,6 @@ import sys
 import os.path as path
 import argparse
 import struct
-import math
 import zlib
 import hashlib
 import itertools

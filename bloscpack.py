@@ -37,10 +37,10 @@ DEFAULT_COMPRESS_META = False
 DEFAULT_OPTIONS = None  # created programatically later on
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
-DEAFAULT_SHUFFLE = True
+DEFAULT_SHUFFLE = True
 BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
-    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEAFAULT_SHUFFLE)))
+    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE)))
 NORMAL  = 'NORMAL'
 VERBOSE = 'VERBOSE'
 DEBUG   = 'DEBUG'
@@ -285,7 +285,7 @@ def create_parser():
                 help='compression level')
         blosc_group.add_argument('-s', '--no-shuffle',
                 action='store_false',
-                default=DEAFAULT_SHUFFLE,
+                default=DEFAULT_SHUFFLE,
                 dest='shuffle',
                 help='deactivate shuffle')
         bloscpack_chunking_group = p.add_mutually_exclusive_group()

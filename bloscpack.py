@@ -600,7 +600,7 @@ def decode_options(options):
     """
 
     _check_options(options)
-    #TODO check certain elements are zero
+    _check_options_zero(options, range(6))
     return {'offsets': bool(int(options[7])),
             'metadata': bool(int(options[6])),
             }

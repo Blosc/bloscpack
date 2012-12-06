@@ -264,6 +264,14 @@ def test_decode_options():
         'metadata': True},
             decode_options('00000011'))
 
+    nt.assert_raises(ValueError, decode_options, '0000000')
+    nt.assert_raises(ValueError, decode_options, '000000000')
+    nt.assert_raises(ValueError, decode_options, '0000000a')
+    nt.assert_raises(ValueError, decode_options, 'abc')
+
+    nt.assert_raises(ValueError, decode_options, '00000100')
+    nt.assert_raises(ValueError, decode_options, '00001100')
+    nt.assert_raises(ValueError, decode_options, '11111100')
 
 def test_create_metadata_options():
     nt.assert_equal('00000000', create_metadata_options())

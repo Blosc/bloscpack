@@ -565,7 +565,7 @@ def _pad_with_nulls(str_, len_):
     len_ : int
         the final desired length
     """
-    return str_ + len_ - len(str_) * '\x00'
+    return str_ + ("\x00" * (len_ - len(str_)))
 
 
 def _check_options(options):
@@ -758,7 +758,7 @@ def decode_bloscpack_header(buffer_):
             'RESERVED':       decode_int32(buffer_[28:32]),
             }
 
-def create_metadata_header(magic_format_string='        ',
+def create_metadata_header(magic_format_string='',
        options="00000000",
        checksum=0,
        codec=0,
@@ -766,7 +766,7 @@ def create_metadata_header(magic_format_string='        ',
        meta_size=0,
        max_meta_size=0,
        meta_ucomp_size=0,
-       user_codec='        ',
+       user_codec='',
        ):
     _check_str('magic-format_string', magic_format_string, 8)
     _check_options(options)

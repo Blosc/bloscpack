@@ -511,6 +511,15 @@ def test_decode_bloscpack_header():
             decode_bloscpack_header(copy_and_set_input(16,
                 '\xff\xff\xff\xff\xff\xff\xff\x7f')))
 
+
+def test_create_metadata_header():
+    expected = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'\
+               '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    print(len(expected))
+    print(len(create_metadata_header()))
+    nt.assert_equal(expected, create_metadata_header())
+
+
 def create_array(repeats, in_file, progress=False):
     with open(in_file, 'w') as in_fp:
         create_array_fp(repeats, in_fp, progress=progress)

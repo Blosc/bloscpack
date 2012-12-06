@@ -164,6 +164,9 @@ def decode_bitfield(byte):
 def encode_uint8(byte):
     return struct.pack('<B', byte)
 
+def encode_uint32(byte):
+    return struct.pack('<I', byte)
+
 def encode_int32(fourbyte):
     return struct.pack('<i', fourbyte)
 

@@ -265,11 +265,11 @@ def test_decode_options():
             decode_options('00000011'))
 
 
-def test_create_metadata_option():
+def test_create_metadata_options():
     nt.assert_equal('00000000', create_metadata_options())
 
 
-def test_decode_metadata_option():
+def test_decode_metadata_options():
     nt.assert_equal({}, decode_metadata_options('00000000'))
     nt.assert_raises(ValueError, decode_metadata_options, '0000000')
     nt.assert_raises(ValueError, decode_metadata_options, '000000000')

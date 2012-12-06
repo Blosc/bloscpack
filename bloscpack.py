@@ -754,8 +754,7 @@ def decode_bloscpack_header(buffer_):
             'chunk_size':     decode_int32(buffer_[8:12]),
             'last_chunk':     decode_int32(buffer_[12:16]),
             'nchunks':        decode_int64(buffer_[16:24]),
-            'meta_size':      decode_int32(buffer_[24:28]),
-            'RESERVED':       decode_int32(buffer_[28:32]),
+            'RESERVED':       decode_int64(buffer_[24:32]),
             }
 
 def create_metadata_header(magic_format_string='',

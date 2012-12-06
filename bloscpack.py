@@ -37,6 +37,7 @@ DEFAULT_COMPRESS_META = False
 DEFAULT_OPTIONS = None  # created programatically later on
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
+MAX_CLEVEL = 9
 DEFAULT_SHUFFLE = True
 BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
@@ -542,6 +543,28 @@ def check_range(name, value, min_, max_):
                 "'%s' must be in the range %s <= n <= %s, not '%s'" %
                 tuple(map(str, (name, min, max_, value))))
 
+
+def _check_str(name, value, max_len):
+    if not isinstance(value, str):
+        raise TypeError("'%s' must be of type 'int'" % name)
+    elif len(value) > max_len:
+        raise ValueError("'%s' can be of max length '%i' but is: '%s'" %
+                (name, max_len, len(value)))
+
+
+def _pad_with_nulls(str_, len_):
+    """ Pad string with null bytes.
+
+    Parameters
+    ----------
+    str_ : str
+        the string to pad
+    len_ : int
+        the final desired length
+    """
+    return str_ + len_ - len(str_) * '\x00'
+
+
 def _check_options(options):
     """ Check the options bitfield.
 
@@ -731,6 +754,39 @@ def decode_bloscpack_header(buffer_):
             'meta_size':      decode_int32(buffer_[24:28]),
             'RESERVED':       decode_int32(buffer_[28:32]),
             }
+
+def create_metadata_header(magic_format_string='        ',
+       options="00000000",
+       checksum=0,
+       codec=0,
+       level=0,
+       meta_size=0,
+       max_meta_size=0,
+       meta_ucomp_size=0,
+       user_codec='        ',
+       ):
+    _check_str('magic-format_string', magic_format_string, 8)
+    _check_options(options)
+    check_range('meta-checksum',   checksum,      0, len(CHECKSUMS))
+    check_range('meta-codec',      codec,         0, 1)
+    check_range('meta-level',      level,         0, MAX_CLEVEL)
+    check_range('meta-size',       meta_size,     0, MAX_META_SIZE)
+    check_range('max-meta-size',   max_meta_size, 0, MAX_META_SIZE)
+    check_range('meta-ucomp-size', max_meta_size, 0, MAX_META_SIZE)
+    _check_str('user-codec',       user_codec,    8)
+
+    magic_format_string = _pad_with_nulls(magic_format_string, 8)
+    options             = encode_uint8(int(options, 2))
+    checksum            = encode_uint8(checksum)
+    codec               = encode_uint8(codec)
+    level               = encode_uint8(level)
+    meta_size           = encode_uint32(meta_size)
+    max_meta_size       = encode_uint32(max_meta_size)
+    meta_ucomp_size     = encode_uint32(meta_ucomp_size)
+    user_codec          = _pad_with_nulls(user_codec, 8)
+
+    return magic_format_string + options + checksum + codec + level + \
+            meta_size + max_meta_size + meta_ucomp_size + user_codec
 
 def process_compression_args(args):
     """ Extract and check the compression args after parsing by argparse.

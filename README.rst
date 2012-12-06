@@ -413,54 +413,74 @@ The layout of the section is thus::
 
 The header has the following layout::
 
-    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
-    |  magic-format-string  | ^ | ^ |   meta-size   | max-meta-size |
-                              |   |
-          version ------------+   |
-          options ----------------+
+   |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
+   |      magic-format-string      | ^ | ^ | ^ | ^ |   meta-size   |
+                                     |   |   |   |
+                 options  -----------+   |   |   |
+                 checksum ---------------+   |   |
+                 codec    -------------------+   |
+                 level    -----------------------+
+
+   |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
+   | max-meta-size |meta-ucomp-size|            user-codec         |
 
 :magic-format-string:
-    (``6 byte ASCII string``)
+    (``8 byte ASCII string``)
     The data will usually be some kind of binary serialized string data, for
     example ``JSON``, ``BSON``, ``YAML`` or Protocol-Buffers. The format
     identifier is to be placed in this field.
-:version:
-    (``unit8``)
-    The version identifier of the metadata header.
 :options:
     (``bitfield``)
     A bitfield which allows for setting certain options in this metadata
-    section.
+    section. Currently unused
+:checksum:
+    The checksum used for the metadata. The same checksums as for the data are
+    available.
+:codec:
+    (``unit8``)
+    The codec used for compressing the metadata. As of Bloscpack version
+    ``0.3.0`` the following codecs are supported.
 
-    :``bit 0 (0x01)``:
-        If metadata is compressed with ``zlib`` at level ``6``.
-    :``bit 1 (0x02)``:
-        If there is a checksum at the end. If a checksum is used it will be the
-        same as the checksum used on the chunks in the rest of the file.
+    :``0``:
+        no code
+    :``1``:
+        ``zlib`` (``DEFLATE``)
+
+:level:
+    (``unit8``)
+    The compression level used for the codec. If ``codec`` is ``0`` i.e. the
+    metadata is not compressed, this must be ``0`` too.
 :meta-size:
-    (``int32``)
+    (``uint32``)
     The size of the data section.
 :max-meta-size:
-    (``int32``)
+    (``uint32``)
     The total allocated space for the data section.
+:meta-comp-size:
+    (``uint32``)
+    If the metadata is compressed, this gives the total space the metadata
+    would occupy when uncompressed. Must be ``0`` if the metadata is not
+    compressed.
+:user-codec:
+    Space reserved for usage of additional codecs. E.g. 4 byte magic string for
+    codec identification and 4 bytes for encoding of codec parameters.
 
-The total space left for enlarging the metadata section is simply
+The total space left for enlarging the metadata section is simply:
 ``max-meta-size - meta-size``.
 
-Example of metadata stored::
+JSON Example of serialized metadata::
 
-  {'dtype': 'float64', 'shape': [1024], 'others': []}
-
-Of course the format is free and any metadata could potentially be stored here,
-for example numpy array metadata.
+  '{"dtype": "float64", "shape": [1024], "others": []}'
 
 If compression is requested, but not beneficial, because the compressed size
 would be larger than the uncompressed size, compression of the metadata is
 automatically deactivated.
 
-As JSON and any other of the suggested serializers has limitations, only a
+As of Bloscpack version ``0.3.0`` only the JSON serializer is supported and
+used the string ``JSON`` followed by four whitespace bytes as identifier.
+Since JSON and any other of the suggested serializers has limitations, only a
 subset of Python structures can be stored, so probably some additional object
-handling must be done prior to serialize some metadata.
+handling must be done prior to serialize certain kinds of metadata.
 
 Description of the offsets entries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

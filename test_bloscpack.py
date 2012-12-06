@@ -332,12 +332,6 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(ValueError, create_bloscpack_header, nchunks=MAX_CHUNKS+1)
     nt.assert_raises(ValueError, create_bloscpack_header, nchunks=-2)
     nt.assert_raises(TypeError, create_bloscpack_header, nchunks='foo')
-    # errors caused by metadata
-    nt.assert_raises(ValueError, create_bloscpack_header, meta_size=-1)
-    nt.assert_raises(ValueError, create_bloscpack_header, options='0000010',
-            meta_size=1)
-    nt.assert_raises(ValueError, create_bloscpack_header, options='0000010',
-            meta_size=MAX_META_SIZE)
 
 def test_create_bloscpack_header():
     # test with no arguments
@@ -437,22 +431,6 @@ def test_create_bloscpack_header():
         '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
         '\xff\xff\xff\xff\xff\xff\xff\x7f\x00\x00\x00\x00\x00\x00\x00\x00'
     nt.assert_equal(expected, create_bloscpack_header(nchunks=MAX_CHUNKS))
-    # test with meta_size
-    expected = MAGIC + format_version + \
-        '\x02\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
-        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(options='00000010',
-            meta_size=0))
-    expected = MAGIC + format_version + \
-        '\x02\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
-        '\xff\xff\xff\xff\xff\xff\xff\xff\x01\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(options='00000010',
-            meta_size=1))
-    expected = MAGIC + format_version + \
-        '\x02\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
-        '\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x7f\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(options='00000010',
-            meta_size=MAX_META_SIZE))
 
 def test_decode_bloscpack_header():
     no_arg_return  = {
@@ -463,7 +441,6 @@ def test_decode_bloscpack_header():
             'chunk_size':    -1,
             'last_chunk':    -1,
             'nchunks':       -1,
-            'meta_size':     0,
             'RESERVED':      0,
             }
     def copy_and_set_return(key, value):

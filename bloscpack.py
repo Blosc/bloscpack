@@ -625,8 +625,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         typesize=0,
         chunk_size=-1,
         last_chunk=-1,
-        nchunks=-1,
-        meta_size=0):
+        nchunks=-1):
     """ Create the bloscpack header string.
 
     Parameters
@@ -645,8 +644,6 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         the size of the last chunk
     nchunks : int
         the number of chunks
-    meta_size : int
-        the size of the metadata
 
     Returns
     -------
@@ -673,11 +670,6 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
-    check_range('meta_size',  meta_size,   0, MAX_META_SIZE)
-
-    if options[6] == 0 and meta_size > 0:
-        raise ValueError(
-                'No metadata in options, but meta_size is greater than zero')
 
     format_version = encode_uint8(format_version)
     options = encode_uint8(int(options, 2))
@@ -686,13 +678,11 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     chunk_size = encode_int32(chunk_size)
     last_chunk = encode_int32(last_chunk)
     nchunks = encode_int64(nchunks)
-    meta_size = encode_int32(meta_size)
-    RESERVED = encode_int32(0)
+    RESERVED = encode_int64(0)
 
     return (MAGIC + format_version + options + checksum + typesize +
             chunk_size + last_chunk +
-            nchunks + meta_size +
-            RESERVED)
+            nchunks + RESERVED)
 
 def decode_bloscpack_header(buffer_):
     """ Check that the magic marker exists and return number of chunks.
@@ -927,7 +917,6 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             chunk_size=chunk_size,
             last_chunk=last_chunk_size,
             nchunks=nchunks,
-            meta_size=meta_size
             )
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)

@@ -298,6 +298,23 @@ def test_decode_options():
         'compress_meta': True},
             decode_options('00000111'))
 
+
+def test_create_metadata_option():
+    nt.assert_equal('00000000', create_metadata_options())
+
+
+def test_decode_metadata_option():
+    nt.assert_equal({}, decode_metadata_options('00000000'))
+    nt.assert_raises(ValueError, decode_metadata_options, '0000000')
+    nt.assert_raises(ValueError, decode_metadata_options, '000000000')
+    nt.assert_raises(ValueError, decode_metadata_options, '0000000a')
+    nt.assert_raises(ValueError, decode_metadata_options, 'abc')
+
+    nt.assert_raises(ValueError, decode_metadata_options, '00000001')
+    nt.assert_raises(ValueError, decode_metadata_options, '00001111')
+    nt.assert_raises(ValueError, decode_metadata_options, '11111111')
+
+
 def test_create_bloscpack_header_arguments():
     # check format_version
     nt.assert_raises(ValueError, create_bloscpack_header, format_version=-1)

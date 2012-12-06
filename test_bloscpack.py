@@ -520,6 +520,23 @@ def test_create_metadata_header():
     nt.assert_equal(expected, create_metadata_header())
 
 
+def test_decode_metadata_header():
+    no_arg_return  = {
+            'magic_format_string': '',
+            'options':             '00000000',
+            'checksum':            0,
+            'codec':               0,
+            'level':               0,
+            'meta_size':           0,
+            'max_meta_size':       0,
+            'meta_ucomp_size':     0,
+            'user_codec':          '',
+            }
+    no_arg_input = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'\
+               '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(no_arg_return, decode_metadata_header(no_arg_input))
+
+
 def create_array(repeats, in_file, progress=False):
     with open(in_file, 'w') as in_fp:
         create_array_fp(repeats, in_fp, progress=progress)

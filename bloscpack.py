@@ -161,6 +161,9 @@ def decode_int64(eightbyte):
 def decode_bitfield(byte):
     return bin(decode_uint8(byte))[2:].rjust(8,'0')
 
+def decode_magic_string(str_):
+    return str_.strip('\x00')
+
 def encode_uint8(byte):
     return struct.pack('<B', byte)
 
@@ -789,6 +792,23 @@ def create_metadata_header(magic_format_string='',
 
     return magic_format_string + options + checksum + codec + level + \
             meta_size + max_meta_size + meta_ucomp_size + user_codec
+
+def decode_metadata_header(buffer_):
+    if len(buffer_) != 32:
+        raise ValueError(
+            "attempting to decode a bloscpack metadata header of length '%d', not '32'"
+            % len(buffer_))
+    return {'magic_format_string': decode_magic_string(buffer_[:8]),
+            'options':             decode_bitfield(buffer_[8]),
+            'checksum':            decode_uint8(buffer_[9]),
+            'codec':               decode_uint8(buffer_[10]),
+            'level':               decode_uint8(buffer_[11]),
+            'meta_size':           decode_uint32(buffer_[12:16]),
+            'max_meta_size':       decode_uint32(buffer_[16:20]),
+            'meta_ucomp_size':     decode_uint32(buffer_[20:24]),
+            'user_codec':           decode_magic_string(buffer_[24:32])
+            }
+
 
 def process_compression_args(args):
     """ Extract and check the compression args after parsing by argparse.

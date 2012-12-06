@@ -567,6 +567,14 @@ def _check_options(options):
                 "'options' must be string of 0s and 1s of length 8, not '%s'" %
                 options)
 
+
+def _check_options_zero(options, indices):
+    for i in indices:
+        if options[i] != '0':
+            raise ValueError(
+                'Element %i was non-zero when attempting to decode options')
+
+
 def create_options(offsets=DEFAULT_OFFSETS, metadata=False,
         compress_meta=DEFAULT_COMPRESS_META):
     """ Create the options bitfield.

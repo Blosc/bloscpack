@@ -414,7 +414,7 @@ The layout of the section is thus::
 The header has the following layout::
 
    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
-   |      magic-format-string      | ^ | ^ | ^ | ^ |   meta-size   |
+   |         magic-format          | ^ | ^ | ^ | ^ |   meta-size   |
                                      |   |   |   |
                  options  -----------+   |   |   |
                  checksum ---------------+   |   |
@@ -424,7 +424,7 @@ The header has the following layout::
    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
    | max-meta-size |meta-ucomp-size|            user-codec         |
 
-:magic-format-string:
+:magic-format:
     (``8 byte ASCII string``)
     The data will usually be some kind of binary serialized string data, for
     example ``JSON``, ``BSON``, ``YAML`` or Protocol-Buffers. The format

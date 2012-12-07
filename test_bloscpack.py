@@ -41,6 +41,13 @@ def test_hashes():
     for i,csum in enumerate(CHECKSUMS):
         nt.assert_equal(csum("\x23\x42\xbe\xef"), csum_targets[i])
 
+def test_codecs():
+    nt.assert_equal(CODECS_AVAIL, ['zlib'])
+    random_str = "4KzGCl7SxTsYLaerommsMWyZg1TXbV6wsR9Xk"
+    for i,c in enumerate(CODECS):
+        nt.assert_equal(random_str, c.decompress(
+            c.compress(random_str, DEFAULT_LEVEL)))
+
 def test_print_verbose():
     nt.assert_raises(TypeError, print_verbose, 'message', 'MAXIMUM')
     bloscpack.LEVEL = DEBUG

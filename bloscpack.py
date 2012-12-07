@@ -115,6 +115,36 @@ CHECKSUMS_AVAIL = [c.name for c in CHECKSUMS]
 CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
 DEFAULT_CHECKSUM = 'adler32'
 
+class Codec(object):
+    """ Uniform codec object.
+
+    Parameters
+    ----------
+    name : str
+        the name of the codec
+    compress : callable
+        a compression function taking data and level as args
+    decompress : callable
+        a decompression function taking data as arg
+
+    """
+
+    def __init__(self, name, compress, decompress):
+        self.name = name
+        self._compress = compress
+        self._decompress = decompress
+
+    def compress(self, data, level):
+        return self._compress(data, level)
+
+    def decompress(self, data):
+        return self._decompress(data)
+
+CODECS = [Codec('zlib', zlib.compress, zlib.decompress)]
+CODECS_AVAIL = [c.name for c in CODECS]
+CODECS_LOOKUP = dict(((c.name, c) for c in CODECS))
+
+
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
     if level not in VERBOSITY_LEVELS:

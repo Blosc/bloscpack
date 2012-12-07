@@ -442,9 +442,9 @@ The header has the following layout::
     ``0.3.0`` the following codecs are supported.
 
     :``0``:
-        no code
+        no codec
     :``1``:
-        ``zlib`` (``DEFLATE``)
+        ``zlib`` (DEFLATE)
 
 :level:
     (``unit8``)

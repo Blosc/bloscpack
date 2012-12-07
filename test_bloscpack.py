@@ -529,7 +529,7 @@ def test_decode_metadata_header():
             'level':               0,
             'meta_size':           0,
             'max_meta_size':       0,
-            'meta_ucomp_size':     0,
+            'meta_comp_size':      0,
             'user_codec':          '',
             }
     no_arg_input = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'\

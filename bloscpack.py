@@ -767,7 +767,7 @@ def create_metadata_header(magic_format_string='',
        level=0,
        meta_size=0,
        max_meta_size=0,
-       meta_ucomp_size=0,
+       meta_comp_size=0,
        user_codec='',
        ):
     _check_str('magic-format_string', magic_format_string, 8)
@@ -777,7 +777,7 @@ def create_metadata_header(magic_format_string='',
     check_range('meta-level',      level,         0, MAX_CLEVEL)
     check_range('meta-size',       meta_size,     0, MAX_META_SIZE)
     check_range('max-meta-size',   max_meta_size, 0, MAX_META_SIZE)
-    check_range('meta-ucomp-size', max_meta_size, 0, MAX_META_SIZE)
+    check_range('meta-comp-size', max_meta_size, 0, MAX_META_SIZE)
     _check_str('user-codec',       user_codec,    8)
 
     magic_format_string = _pad_with_nulls(magic_format_string, 8)
@@ -787,11 +787,11 @@ def create_metadata_header(magic_format_string='',
     level               = encode_uint8(level)
     meta_size           = encode_uint32(meta_size)
     max_meta_size       = encode_uint32(max_meta_size)
-    meta_ucomp_size     = encode_uint32(meta_ucomp_size)
+    meta_comp_size     = encode_uint32(meta_comp_size)
     user_codec          = _pad_with_nulls(user_codec, 8)
 
     return magic_format_string + options + checksum + codec + level + \
-            meta_size + max_meta_size + meta_ucomp_size + user_codec
+            meta_size + max_meta_size + meta_comp_size + user_codec
 
 def decode_metadata_header(buffer_):
     if len(buffer_) != 32:
@@ -805,8 +805,8 @@ def decode_metadata_header(buffer_):
             'level':               decode_uint8(buffer_[11]),
             'meta_size':           decode_uint32(buffer_[12:16]),
             'max_meta_size':       decode_uint32(buffer_[16:20]),
-            'meta_ucomp_size':     decode_uint32(buffer_[20:24]),
-            'user_codec':           decode_magic_string(buffer_[24:32])
+            'meta_comp_size':      decode_uint32(buffer_[20:24]),
+            'user_codec':          decode_magic_string(buffer_[24:32])
             }
 
 

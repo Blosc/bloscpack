@@ -452,21 +452,22 @@ The header has the following layout::
     metadata is not compressed, this must be ``0`` too.
 :meta-size:
     (``uint32``)
-    The size of the data section.
+    The size of the uncompressed metadata.
 :max-meta-size:
     (``uint32``)
     The total allocated space for the data section.
 :meta-comp-size:
     (``uint32``)
     If the metadata is compressed, this gives the total space the metadata
-    would occupy when uncompressed. Must be ``0`` if the metadata is not
-    compressed.
+    occupies. If the data is not compressed this is the same as ``meta-size``.
+    In a sense this is the true amount of space in the metadata section that is
+    used.
 :user-codec:
     Space reserved for usage of additional codecs. E.g. 4 byte magic string for
     codec identification and 4 bytes for encoding of codec parameters.
 
 The total space left for enlarging the metadata section is simply:
-``max-meta-size - meta-size``.
+``max-meta-size - meta-comp-size``.
 
 JSON Example of serialized metadata::
 

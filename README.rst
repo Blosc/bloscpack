@@ -422,7 +422,7 @@ The header has the following layout::
                  level    -----------------------+
 
    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
-   | max-meta-size |meta-ucomp-size|            user-codec         |
+   | max-meta-size |meta-comp-size |            user-codec         |
 
 :magic-format:
     (``8 byte ASCII string``)

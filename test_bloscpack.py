@@ -529,7 +529,7 @@ def test_create_metadata_header():
 
 def test_decode_metadata_header():
     no_arg_return  = {
-            'magic_format_string': '',
+            'magic_format': '',
             'options':             '00000000',
             'checksum':            0,
             'codec':               0,

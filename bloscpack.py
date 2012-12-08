@@ -30,7 +30,7 @@ BLOSC_HEADER_LENGTH = 16
 FORMAT_VERSION = 3
 MAX_FORMAT_VERSION = 255
 MAX_CHUNKS = (2**63)-1
-MAX_META_SIZE = (2**31-1) # int32 max val
+MAX_META_SIZE = (2**32-1) # uint32 max val
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_OFFSETS = True
 DEFAULT_COMPRESS_META = False
@@ -836,7 +836,7 @@ def decode_metadata_header(buffer_):
         raise ValueError(
             "attempting to decode a bloscpack metadata header of length '%d', not '32'"
             % len(buffer_))
-    return {'magic_format_string': decode_magic_string(buffer_[:8]),
+    return {'magic_format':        decode_magic_string(buffer_[:8]),
             'options':             decode_bitfield(buffer_[8]),
             'checksum':            decode_uint8(buffer_[9]),
             'codec':               decode_uint8(buffer_[10]),

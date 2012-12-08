@@ -798,7 +798,7 @@ def decode_bloscpack_header(buffer_):
             'RESERVED':       decode_int64(buffer_[24:32]),
             }
 
-def create_metadata_header(magic_format_string='',
+def create_metadata_header(magic_format='',
        options="00000000",
        checksum=0,
        codec=0,
@@ -808,27 +808,27 @@ def create_metadata_header(magic_format_string='',
        meta_comp_size=0,
        user_codec='',
        ):
-    _check_str('magic-format_string', magic_format_string, 8)
+    _check_str('magic-format',     magic_format,  8)
     _check_options(options)
     check_range('meta-checksum',   checksum,      0, len(CHECKSUMS))
     check_range('meta-codec',      codec,         0, 1)
     check_range('meta-level',      level,         0, MAX_CLEVEL)
     check_range('meta-size',       meta_size,     0, MAX_META_SIZE)
     check_range('max-meta-size',   max_meta_size, 0, MAX_META_SIZE)
-    check_range('meta-comp-size', max_meta_size, 0, MAX_META_SIZE)
+    check_range('meta-comp-size',  max_meta_size, 0, MAX_META_SIZE)
     _check_str('user-codec',       user_codec,    8)
 
-    magic_format_string = _pad_with_nulls(magic_format_string, 8)
+    magic_format        = _pad_with_nulls(magic_format, 8)
     options             = encode_uint8(int(options, 2))
     checksum            = encode_uint8(checksum)
     codec               = encode_uint8(codec)
     level               = encode_uint8(level)
     meta_size           = encode_uint32(meta_size)
     max_meta_size       = encode_uint32(max_meta_size)
-    meta_comp_size     = encode_uint32(meta_comp_size)
+    meta_comp_size      = encode_uint32(meta_comp_size)
     user_codec          = _pad_with_nulls(user_codec, 8)
 
-    return magic_format_string + options + checksum + codec + level + \
+    return magic_format + options + checksum + codec + level + \
             meta_size + max_meta_size + meta_comp_size + user_codec
 
 def decode_metadata_header(buffer_):

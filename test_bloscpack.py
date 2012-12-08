@@ -520,12 +520,45 @@ def test_decode_bloscpack_header():
 
 
 def test_create_metadata_header():
-    expected = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'\
-               '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-    print(len(expected))
-    print(len(create_metadata_header()))
-    nt.assert_equal(expected, create_metadata_header())
+    raw = '\x00\x00\x00\x00\x00\x00\x00\x00'\
+          '\x00\x00\x00\x00\x00\x00\x00\x00'\
+          '\x00\x00\x00\x00\x00\x00\x00\x00'\
+          '\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(raw, create_metadata_header())
 
+    def mod_raw(offset, value):
+        return raw[0:offset] + value + \
+            raw[offset+len(value):]
+
+    nt.assert_equal(mod_raw(0, 'JSON'),
+            create_metadata_header(magic_format='JSON'))
+
+    nt.assert_equal(mod_raw(9, '\x01'),
+            create_metadata_header(checksum=1))
+
+    nt.assert_equal(mod_raw(10, '\x01'),
+            create_metadata_header(codec=1))
+
+    nt.assert_equal(mod_raw(11, '\x01'),
+            create_metadata_header(level=1))
+
+    nt.assert_equal(mod_raw(12, '\x01'),
+            create_metadata_header(meta_size=1))
+    nt.assert_equal(mod_raw(12, '\xff\xff\xff\xff'),
+            create_metadata_header(meta_size=MAX_META_SIZE))
+
+    nt.assert_equal(mod_raw(16, '\x01'),
+            create_metadata_header(max_meta_size=1))
+    nt.assert_equal(mod_raw(16, '\xff\xff\xff\xff'),
+            create_metadata_header(max_meta_size=MAX_META_SIZE))
+
+    nt.assert_equal(mod_raw(20, '\x01'),
+            create_metadata_header(meta_comp_size=1))
+    nt.assert_equal(mod_raw(20, '\xff\xff\xff\xff'),
+            create_metadata_header(meta_comp_size=MAX_META_SIZE))
+
+    nt.assert_equal(mod_raw(24, 'sesame'),
+            create_metadata_header(user_codec='sesame'))
 
 def test_decode_metadata_header():
     no_arg_return  = {

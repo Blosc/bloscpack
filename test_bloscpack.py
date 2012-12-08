@@ -529,7 +529,7 @@ def test_create_metadata_header():
 
 def test_decode_metadata_header():
     no_arg_return  = {
-            'magic_format': '',
+            'magic_format':        '',
             'options':             '00000000',
             'checksum':            0,
             'codec':               0,
@@ -539,10 +539,59 @@ def test_decode_metadata_header():
             'meta_comp_size':      0,
             'user_codec':          '',
             }
-    no_arg_input = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'\
-               '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    no_arg_input = '\x00\x00\x00\x00\x00\x00\x00\x00'\
+                   '\x00\x00\x00\x00\x00\x00\x00\x00'\
+                   '\x00\x00\x00\x00\x00\x00\x00\x00'\
+                   '\x00\x00\x00\x00\x00\x00\x00\x00'
     nt.assert_equal(no_arg_return, decode_metadata_header(no_arg_input))
 
+    def copy_and_set_return(key, value):
+        copy_ = no_arg_return.copy()
+        copy_[key] = value
+        return copy_
+
+    def copy_and_set_input(offset, value):
+        return no_arg_input[0:offset] + value + \
+            no_arg_input[offset+len(value):]
+
+    nt.assert_equal(copy_and_set_return('magic_format', 'JSON'),
+            decode_metadata_header(copy_and_set_input(0, 'JSON')))
+
+    nt.assert_equal(copy_and_set_return('checksum', 1),
+            decode_metadata_header(copy_and_set_input(9, '\x01')))
+
+    nt.assert_equal(copy_and_set_return('codec', 1),
+            decode_metadata_header(copy_and_set_input(10, '\x01')))
+
+    nt.assert_equal(copy_and_set_return('level', 1),
+            decode_metadata_header(copy_and_set_input(11, '\x01')))
+
+    nt.assert_equal(copy_and_set_return('meta_size', 1),
+            decode_metadata_header(copy_and_set_input(12, '\x01\x00\x00\x00')))
+
+    nt.assert_equal(copy_and_set_return('meta_size', MAX_META_SIZE),
+            decode_metadata_header(copy_and_set_input(12, '\xff\xff\xff\xff')))
+
+    nt.assert_equal(copy_and_set_return('max_meta_size', 1),
+            decode_metadata_header(copy_and_set_input(16, '\x01\x00\x00\x00')))
+
+    nt.assert_equal(copy_and_set_return('max_meta_size', MAX_META_SIZE),
+            decode_metadata_header(copy_and_set_input(16, '\xff\xff\xff\xff')))
+
+    nt.assert_equal(copy_and_set_return('max_meta_size', 1),
+            decode_metadata_header(copy_and_set_input(16, '\x01\x00\x00\x00')))
+
+    nt.assert_equal(copy_and_set_return('max_meta_size', MAX_META_SIZE),
+            decode_metadata_header(copy_and_set_input(16, '\xff\xff\xff\xff')))
+
+    nt.assert_equal(copy_and_set_return('meta_comp_size', 1),
+            decode_metadata_header(copy_and_set_input(20, '\x01\x00\x00\x00')))
+
+    nt.assert_equal(copy_and_set_return('meta_comp_size', MAX_META_SIZE),
+            decode_metadata_header(copy_and_set_input(20, '\xff\xff\xff\xff')))
+
+    nt.assert_equal(copy_and_set_return('user_codec', 'sesame'),
+            decode_metadata_header(copy_and_set_input(24, 'sesame')))
 
 def create_array(repeats, in_file, progress=False):
     with open(in_file, 'w') as in_fp:

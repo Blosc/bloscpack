@@ -23,26 +23,38 @@ import blosc
 __version__ = '0.3.0-dev'
 __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
-EXTENSION = '.blp'
-MAGIC = 'blpk'
-BLOSCPACK_HEADER_LENGTH = 32
-BLOSC_HEADER_LENGTH = 16
-METADATA_HEADER_LENGTH = 32
+# miscellaneous
 FORMAT_VERSION = 3
+MAGIC = 'blpk'
+EXTENSION = '.blp'
+PREFIX = "bloscpack.py"
+
+# header lengths
+BLOSC_HEADER_LENGTH = 16
+BLOSCPACK_HEADER_LENGTH = 32
+METADATA_HEADER_LENGTH = 32
+
+# maximum values
 MAX_FORMAT_VERSION = 255
 MAX_CHUNKS = (2**63)-1
 MAX_META_SIZE = (2**32-1) # uint32 max val
+
+# Bloscpack args
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_OFFSETS = True
 DEFAULT_CHECKSUM = 'adler32'
 DEFAULT_OPTIONS = None  # created programatically later on
+
+# Blosc args
+BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
 MAX_CLEVEL = 9
 DEFAULT_SHUFFLE = True
-BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
     (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE)))
+
+# metadata args
 METADATA_ARGS = ['magic_format', 'checksum', 'codec', 'level']
 DEFAULT_MAGIC_FORMAT = 'JSON'
 DEFAULT_METADATA_CHECKSUM = 'adler32'
@@ -51,12 +63,15 @@ DEFAULT_LEVEL = 6
 DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
     (DEFAULT_MAGIC_FORMAT, DEFAULT_METADATA_CHECKSUM,
     DEFAULT_CODEC, DEFAULT_LEVEL)))
+
+# verbosity levels
 NORMAL  = 'NORMAL'
 VERBOSE = 'VERBOSE'
 DEBUG   = 'DEBUG'
 LEVEL = NORMAL
 VERBOSITY_LEVELS = [NORMAL, VERBOSE, DEBUG]
-PREFIX = "bloscpack.py"
+
+# lookup table for human readable sizes
 SUFFIXES = OrderedDict((
              ("B", 2**0 ),
              ("K", 2**10),

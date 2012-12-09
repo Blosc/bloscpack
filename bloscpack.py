@@ -153,17 +153,17 @@ CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
 
 
 def _check_valid_checksum(checksum):
-    """ Check the validity of the checksum.
+    """ Check the validity of a checksum.
 
     Parameters
     ----------
     checksum : str
-        ensure that the string is a valid checksum
+        the string descriptor of the checksum
 
     Raises
     ------
     ValueError
-        if no suck checksum exists.
+        if no such checksum exists.
     """
     if checksum not in CHECKSUMS_AVAIL:
         raise NoSuchChecksum("checksum '%s' does not exist" % checksum)

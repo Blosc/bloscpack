@@ -1219,7 +1219,6 @@ def _unpack_fp(input_fp, output_fp):
         raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
         metadata_header = decode_metadata_header(raw_metadata_header)
         metadata = input_fp.read(metadata_header['meta_comp_size'])
-        print metadata_header['checksum']
         if metadata_header['checksum'] != 'None':
             metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header['checksum']]
             metadata_expected_digest = input_fp.read(metadata_checksum_impl.size)

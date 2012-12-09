@@ -951,7 +951,8 @@ def process_nthread_arg(args):
 def pack_file(in_file, out_file, blosc_args,
         metadata=None,
         nchunks=None, chunk_size=None,
-        offsets=DEFAULT_OFFSETS, checksum=DEFAULT_CHECKSUM):
+        offsets=DEFAULT_OFFSETS, checksum=DEFAULT_CHECKSUM,
+        metadata_opts=DEFAULT_METADATA_OPTIONS):
     """ Main function for compressing a file.
 
     Parameters
@@ -972,6 +973,8 @@ def pack_file(in_file, out_file, blosc_args,
         Wheather to include offsets.
     checksum : str
         Which checksum to use.
+    metadata_opts : dict
+        The metadata options
 
     Raises
     ------
@@ -987,7 +990,7 @@ def pack_file(in_file, out_file, blosc_args,
         _pack_fp(input_fp, output_fp, in_file_size,
                 blosc_args, metadata,
                 nchunks, chunk_size,
-                offsets, checksum)
+                offsets, checksum, metadata_opts)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
@@ -995,7 +998,7 @@ def pack_file(in_file, out_file, blosc_args,
 def _pack_fp(input_fp, output_fp, in_file_size,
         blosc_args, metadata,
         nchunks, chunk_size,
-        offsets, checksum):
+        offsets, checksum, metadata_opts):
     """ Helper function for pack_file.
 
     Use file_points, which could potentially be cStringIO objects.
@@ -1007,23 +1010,39 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     # calculate header
     options = create_options(offsets=offsets,
             metadata=True if metadata is not None else False)
-    # compress metadata if requested
-    #if compress_meta:
-    #    metadata_compressed = zlib.compress(metadata, 6)
-    #    meta_comp_size = len(metadata_compressed)
-    #    meta_size = len(metadata)
-    #    # be opportunistic, avoid compression if not beneficial
-    #    if meta_size < meta_comp_size:
-    #        options = create_options(offsets=offsets,
-    #                metadata=True,
-    #                compress_meta=False)
-    #        print_verbose('metadata compression requested, but it was not '
-    #                'beneficial, deactivating',
-    #                level=DEBUG)
-    #    else:
-    #        metadata = metadata_compressed
-    # compute the length of the metadata
-    meta_size = len(metadata) if metadata is not None else 0
+    # deal with metadata
+    if metadata is not None:
+        if metadata_opts['codec'] != CODECS_AVAIL[0]:
+            codec = CODECS_LOOKUP[metadata_opts['codec']]
+            codec_id = CODECS_AVAIL.index(metadata_opts['codec'])
+            metadata_compressed = codec.compress(metadata,
+                    metadata_opts['level'])
+            meta_size = len(metadata)
+            meta_comp_size = len(metadata_compressed)
+            # be opportunistic, avoid compression if not beneficial
+            if meta_size < meta_comp_size:
+                metadata_opts['codec'] = 'None'
+                meta_comp_size = meta_size
+                codec_id = 0
+                print_verbose('metadata compression requested, but it was not '
+                        'beneficial, deactivating',
+                        level=DEBUG)
+            else:
+                metadata = metadata_compressed
+        else:
+            meta_size = len(metadata)
+            meta_comp_size = meta_size
+            codec_id = 0
+        # create metadata header
+        raw_metadata_header = create_metadata_header(
+                magic_format=metadata_opts['magic_format'],
+                checksum=0,
+                codec=codec_id,
+                level=metadata_opts['level'],
+                meta_size=meta_size,
+                max_meta_size=meta_comp_size,
+                meta_comp_size=meta_comp_size)
+        # TODO handle the checksum
     if offsets:
         offsets_storage = list(itertools.repeat(0, nchunks))
     # set the checksum impl
@@ -1041,11 +1060,13 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     # write the chunks to the file
     output_fp.write(raw_bloscpack_header)
     # write the metadata to the file
-    if metadata:
+    if metadata is not None:
+        output_fp.write(raw_metadata_header)
         output_fp.write(metadata)
-        #print_verbose("Wrote %s metadata of size '%s': %s" %
-        #        ('compressed' if compress_meta else '',
-        #            meta_size, repr(metadata)))
+        # TODO checksum
+        print_verbose("Wrote %s metadata of size '%s': %s" %
+                ('compressed' if metadata_opts['codec'] != 'None' else
+                    'uncompressed', meta_comp_size, repr(metadata)))
     # preallocate space for the offsets
     if offsets:
         output_fp.write(encode_int64(-1) * nchunks)
@@ -1141,18 +1162,18 @@ def _unpack_fp(input_fp, output_fp):
     # read the offsets
     options = decode_options(bloscpack_header['options'])
     # read the metadata
-    if meta_size > 0 and not options['metadata']:
-        raise MetaDataMismatch("options indicated no metadata, "
-                "but the meta-size was greater than zero")
-    #elif options['compress_meta'] and not options['metadata']:
-    #    raise MetaDataMismatch("options indicated metadata to be compressed, "
-    #            "but not metadata")
-    elif options['metadata']:
-        metadata = input_fp.read(meta_size)
-        #if options['compress_meta']:
-        #    metadata = zlib.decompress(metadata)
-        #print_verbose("read %s metadata of size: '%s'" %
-        #        ('compressed' if options['compress_meta'] else '', meta_size))
+    if options['metadata']:
+        raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
+        metadata_header = decode_metadata_header(raw_metadata_header)
+        metadata = input_fp.read(metadata_header['meta_comp_size'])
+        # TODO this should be done properly
+        if metadata_header['codec'] != 0:
+            codec = CODECS[0]
+            metadata = codec.decompress(metadata)
+        print_verbose("read %s metadata of size: '%s'" %
+                ('compressed' if metadata_header['codec'] != 0 else
+                    'uncompressed', metadata_header['meta_comp_size']))
+        # TODO handle metadata checksum
     else:
         metadata = None
     if options['offsets']:
@@ -1245,12 +1266,13 @@ if __name__ == '__main__':
         try:
             pack_file(in_file, out_file,
                     blosc_args,
+                    # TODO handle the checksum
                     metadata,
-                    compress_meta=args.compress_meta,
                     nchunks=args.nchunks,
                     chunk_size=args.chunk_size,
                     offsets=args.offsets,
-                    checksum=args.checksum)
+                    checksum=args.checksum,
+                    metadata_opts=DEFAULT_METADATA_ARGS)
         except ChunkingException as e:
             error(e.message)
     elif args.subcommand in ['decompress', 'd']:

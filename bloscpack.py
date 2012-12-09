@@ -79,6 +79,27 @@ SUFFIXES = OrderedDict((
              ("G", 2**30),
              ("T", 2**40)))
 
+
+class ChunkingException(BaseException):
+    pass
+
+
+class NoSuchChecksum(ValueError):
+    pass
+
+
+class FormatVersionMismatch(RuntimeError):
+    pass
+
+
+class ChecksumMismatch(RuntimeError):
+    pass
+
+
+class FileNotFound(IOError):
+    pass
+
+
 class Hash(object):
     """ Uniform hash object.
 
@@ -474,20 +495,6 @@ def decode_blosc_header(buffer_):
             'blocksize': decode_uint32(buffer_[8:12]),
             'ctbytes':   decode_uint32(buffer_[12:16])}
 
-class ChunkingException(BaseException):
-    pass
-
-class NoSuchChecksum(ValueError):
-    pass
-
-class FormatVersionMismatch(RuntimeError):
-    pass
-
-class ChecksumMismatch(RuntimeError):
-    pass
-
-class FileNotFound(IOError):
-    pass
 
 def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     """ Determine chunking for an input file.

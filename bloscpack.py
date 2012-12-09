@@ -116,6 +116,24 @@ CHECKSUMS_AVAIL = [c.name for c in CHECKSUMS]
 CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
 DEFAULT_CHECKSUM = 'adler32'
 
+
+def _check_valid_checksum(checksum):
+    """ Check the validity of the checksum.
+
+    Parameters
+    ----------
+    checksum : str
+        ensure that the string is a valid checksum
+
+    Raises
+    ------
+    ValueError
+        if no suck checksum exists.
+    """
+    if checksum not in CHECKSUMS_AVAIL:
+        raise NoSuchChecksum("checksum '%s' does not exist" % checksum)
+
+
 class Codec(object):
     """ Uniform codec object.
 
@@ -799,7 +817,7 @@ def decode_bloscpack_header(buffer_):
 
 def create_metadata_header(magic_format='',
        options="00000000",
-       checksum=0,
+       checksum='None',
        codec=0,
        level=0,
        meta_size=0,
@@ -809,7 +827,7 @@ def create_metadata_header(magic_format='',
        ):
     _check_str('magic-format',     magic_format,  8)
     _check_options(options)
-    check_range('meta-checksum',   checksum,      0, len(CHECKSUMS))
+    _check_valid_checksum(checksum)
     check_range('meta-codec',      codec,         0, 1)
     check_range('meta-level',      level,         0, MAX_CLEVEL)
     check_range('meta-size',       meta_size,     0, MAX_META_SIZE)
@@ -819,7 +837,7 @@ def create_metadata_header(magic_format='',
 
     magic_format        = _pad_with_nulls(magic_format, 8)
     options             = encode_uint8(int(options, 2))
-    checksum            = encode_uint8(checksum)
+    checksum            = encode_uint8(CHECKSUMS_AVAIL.index(checksum))
     codec               = encode_uint8(codec)
     level               = encode_uint8(level)
     meta_size           = encode_uint32(meta_size)
@@ -837,7 +855,7 @@ def decode_metadata_header(buffer_):
             % len(buffer_))
     return {'magic_format':        decode_magic_string(buffer_[:8]),
             'options':             decode_bitfield(buffer_[8]),
-            'checksum':            decode_uint8(buffer_[9]),
+            'checksum':            CHECKSUMS_AVAIL[decode_uint8(buffer_[9])],
             'codec':               decode_uint8(buffer_[10]),
             'level':               decode_uint8(buffer_[11]),
             'meta_size':           decode_uint32(buffer_[12:16]),
@@ -1037,7 +1055,7 @@ def _pack_fp(input_fp, output_fp, in_file_size,
         # create metadata header
         raw_metadata_header = create_metadata_header(
                 magic_format=metadata_opts['magic_format'],
-                checksum=0,
+                checksum=metadata_opts['checksum'],
                 codec=codec_id,
                 level=metadata_opts['level'],
                 meta_size=meta_size,

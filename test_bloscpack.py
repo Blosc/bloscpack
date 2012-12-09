@@ -534,7 +534,7 @@ def test_create_metadata_header():
             create_metadata_header(magic_format='JSON'))
 
     nt.assert_equal(mod_raw(9, '\x01'),
-            create_metadata_header(checksum=1))
+            create_metadata_header(checksum='adler32'))
 
     nt.assert_equal(mod_raw(10, '\x01'),
             create_metadata_header(codec=1))
@@ -564,7 +564,7 @@ def test_decode_metadata_header():
     no_arg_return  = {
             'magic_format':        '',
             'options':             '00000000',
-            'checksum':            0,
+            'checksum':            'None',
             'codec':               0,
             'level':               0,
             'meta_size':           0,
@@ -590,7 +590,7 @@ def test_decode_metadata_header():
     nt.assert_equal(copy_and_set_return('magic_format', 'JSON'),
             decode_metadata_header(copy_and_set_input(0, 'JSON')))
 
-    nt.assert_equal(copy_and_set_return('checksum', 1),
+    nt.assert_equal(copy_and_set_return('checksum', 'adler32'),
             decode_metadata_header(copy_and_set_input(9, '\x01')))
 
     nt.assert_equal(copy_and_set_return('codec', 1),

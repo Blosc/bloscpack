@@ -141,7 +141,8 @@ class Codec(object):
     def decompress(self, data):
         return self._decompress(data)
 
-CODECS = [Codec('zlib', zlib.compress, zlib.decompress)]
+CODECS = [Codec('None', lambda data, level: data, lambda data: data),
+          Codec('zlib', zlib.compress, zlib.decompress)]
 CODECS_AVAIL = [c.name for c in CODECS]
 CODECS_LOOKUP = dict(((c.name, c) for c in CODECS))
 

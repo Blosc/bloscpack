@@ -41,6 +41,13 @@ def test_hashes():
     for i,csum in enumerate(CHECKSUMS):
         nt.assert_equal(csum("\x23\x42\xbe\xef"), csum_targets[i])
 
+def test_codecs():
+    nt.assert_equal(CODECS_AVAIL, ['None', 'zlib'])
+    random_str = "4KzGCl7SxTsYLaerommsMWyZg1TXbV6wsR9Xk"
+    for i,c in enumerate(CODECS):
+        nt.assert_equal(random_str, c.decompress(
+            c.compress(random_str, DEFAULT_LEVEL)))
+
 def test_print_verbose():
     nt.assert_raises(TypeError, print_verbose, 'message', 'MAXIMUM')
     bloscpack.LEVEL = DEBUG
@@ -249,54 +256,45 @@ def test_create_options():
     nt.assert_equal('00000001', create_options(offsets=True, metadata=False))
     nt.assert_equal('00000011', create_options(offsets=True, metadata=True))
 
-    nt.assert_equal('00000010', create_options(offsets=False, metadata=True,
-        compress_meta=False))
-    nt.assert_equal('00000011', create_options(offsets=True, metadata=True,
-        compress_meta=False))
-    nt.assert_equal('00000110', create_options(offsets=False, metadata=True,
-        compress_meta=True))
-    nt.assert_equal('00000111', create_options(offsets=True, metadata=True,
-        compress_meta=True))
-
-    nt.assert_raises(ValueError, create_options, metadata=False,
-            compress_meta=True)
 
 def test_decode_options():
     nt.assert_equal({'offsets': False,
-        'metadata': False,
-        'compress_meta': False},
+        'metadata': False},
             decode_options('00000000'))
     nt.assert_equal({'offsets': False,
-        'metadata': True,
-        'compress_meta': False},
+        'metadata': True},
             decode_options('00000010'))
     nt.assert_equal({'offsets': True,
-        'metadata': False,
-        'compress_meta': False},
+        'metadata': False},
             decode_options('00000001'))
     nt.assert_equal({'offsets': True,
-        'metadata': True,
-        'compress_meta': False},
+        'metadata': True},
             decode_options('00000011'))
 
-    # although strictly, if metadata is False but compress_meta is True, this
-    # should already raise an error here
-    nt.assert_equal({'offsets': False,
-        'metadata': False,
-        'compress_meta': True},
-            decode_options('00000100'))
-    nt.assert_equal({'offsets': False,
-        'metadata': True,
-        'compress_meta': True},
-            decode_options('00000110'))
-    nt.assert_equal({'offsets': True,
-        'metadata': False,
-        'compress_meta': True},
-            decode_options('00000101'))
-    nt.assert_equal({'offsets': True,
-        'metadata': True,
-        'compress_meta': True},
-            decode_options('00000111'))
+    nt.assert_raises(ValueError, decode_options, '0000000')
+    nt.assert_raises(ValueError, decode_options, '000000000')
+    nt.assert_raises(ValueError, decode_options, '0000000a')
+    nt.assert_raises(ValueError, decode_options, 'abc')
+
+    nt.assert_raises(ValueError, decode_options, '00000100')
+    nt.assert_raises(ValueError, decode_options, '00001100')
+    nt.assert_raises(ValueError, decode_options, '11111100')
+
+def test_create_metadata_options():
+    nt.assert_equal('00000000', create_metadata_options())
+
+
+def test_decode_metadata_options():
+    nt.assert_equal({}, decode_metadata_options('00000000'))
+    nt.assert_raises(ValueError, decode_metadata_options, '0000000')
+    nt.assert_raises(ValueError, decode_metadata_options, '000000000')
+    nt.assert_raises(ValueError, decode_metadata_options, '0000000a')
+    nt.assert_raises(ValueError, decode_metadata_options, 'abc')
+
+    nt.assert_raises(ValueError, decode_metadata_options, '00000001')
+    nt.assert_raises(ValueError, decode_metadata_options, '00001111')
+    nt.assert_raises(ValueError, decode_metadata_options, '11111111')
+
 
 def test_create_bloscpack_header_arguments():
     # check format_version
@@ -341,12 +339,6 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(ValueError, create_bloscpack_header, nchunks=MAX_CHUNKS+1)
     nt.assert_raises(ValueError, create_bloscpack_header, nchunks=-2)
     nt.assert_raises(TypeError, create_bloscpack_header, nchunks='foo')
-    # errors caused by metadata
-    nt.assert_raises(ValueError, create_bloscpack_header, meta_size=-1)
-    nt.assert_raises(ValueError, create_bloscpack_header, options='0000010',
-            meta_size=1)
-    nt.assert_raises(ValueError, create_bloscpack_header, options='0000010',
-            meta_size=MAX_META_SIZE)
 
 def test_create_bloscpack_header():
     # test with no arguments
@@ -446,22 +438,6 @@ def test_create_bloscpack_header():
         '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
         '\xff\xff\xff\xff\xff\xff\xff\x7f\x00\x00\x00\x00\x00\x00\x00\x00'
     nt.assert_equal(expected, create_bloscpack_header(nchunks=MAX_CHUNKS))
-    # test with meta_size
-    expected = MAGIC + format_version + \
-        '\x02\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
-        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(options='00000010',
-            meta_size=0))
-    expected = MAGIC + format_version + \
-        '\x02\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
-        '\xff\xff\xff\xff\xff\xff\xff\xff\x01\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(options='00000010',
-            meta_size=1))
-    expected = MAGIC + format_version + \
-        '\x02\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
-        '\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x7f\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(options='00000010',
-            meta_size=MAX_META_SIZE))
 
 def test_decode_bloscpack_header():
     no_arg_return  = {
@@ -472,7 +448,6 @@ def test_decode_bloscpack_header():
             'chunk_size':    -1,
             'last_chunk':    -1,
             'nchunks':       -1,
-            'meta_size':     0,
             'RESERVED':      0,
             }
     def copy_and_set_return(key, value):
@@ -542,6 +517,114 @@ def test_decode_bloscpack_header():
             copy_and_set_return('nchunks', MAX_CHUNKS),
             decode_bloscpack_header(copy_and_set_input(16,
                 '\xff\xff\xff\xff\xff\xff\xff\x7f')))
+
+
+def test_create_metadata_header():
+    raw = '\x00\x00\x00\x00\x00\x00\x00\x00'\
+          '\x00\x00\x00\x00\x00\x00\x00\x00'\
+          '\x00\x00\x00\x00\x00\x00\x00\x00'\
+          '\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(raw, create_metadata_header())
+
+    def mod_raw(offset, value):
+        return raw[0:offset] + value + \
+            raw[offset+len(value):]
+
+    nt.assert_equal(mod_raw(0, 'JSON'),
+            create_metadata_header(magic_format='JSON'))
+
+    nt.assert_equal(mod_raw(9, '\x01'),
+            create_metadata_header(checksum='adler32'))
+
+    nt.assert_equal(mod_raw(10, '\x01'),
+            create_metadata_header(codec='zlib'))
+
+    nt.assert_equal(mod_raw(11, '\x01'),
+            create_metadata_header(level=1))
+
+    nt.assert_equal(mod_raw(12, '\x01'),
+            create_metadata_header(meta_size=1))
+    nt.assert_equal(mod_raw(12, '\xff\xff\xff\xff'),
+            create_metadata_header(meta_size=MAX_META_SIZE))
+
+    nt.assert_equal(mod_raw(16, '\x01'),
+            create_metadata_header(max_meta_size=1))
+    nt.assert_equal(mod_raw(16, '\xff\xff\xff\xff'),
+            create_metadata_header(max_meta_size=MAX_META_SIZE))
+
+    nt.assert_equal(mod_raw(20, '\x01'),
+            create_metadata_header(meta_comp_size=1))
+    nt.assert_equal(mod_raw(20, '\xff\xff\xff\xff'),
+            create_metadata_header(meta_comp_size=MAX_META_SIZE))
+
+    nt.assert_equal(mod_raw(24, 'sesame'),
+            create_metadata_header(user_codec='sesame'))
+
+def test_decode_metadata_header():
+    no_arg_return  = {
+            'magic_format':        '',
+            'options':             '00000000',
+            'checksum':            'None',
+            'codec':               'None',
+            'level':               0,
+            'meta_size':           0,
+            'max_meta_size':       0,
+            'meta_comp_size':      0,
+            'user_codec':          '',
+            }
+    no_arg_input = '\x00\x00\x00\x00\x00\x00\x00\x00'\
+                   '\x00\x00\x00\x00\x00\x00\x00\x00'\
+                   '\x00\x00\x00\x00\x00\x00\x00\x00'\
+                   '\x00\x00\x00\x00\x00\x00\x00\x00'
+    nt.assert_equal(no_arg_return, decode_metadata_header(no_arg_input))
+
+    def copy_and_set_return(key, value):
+        copy_ = no_arg_return.copy()
+        copy_[key] = value
+        return copy_
+
+    def copy_and_set_input(offset, value):
+        return no_arg_input[0:offset] + value + \
+            no_arg_input[offset+len(value):]
+
+    nt.assert_equal(copy_and_set_return('magic_format', 'JSON'),
+            decode_metadata_header(copy_and_set_input(0, 'JSON')))
+
+    nt.assert_equal(copy_and_set_return('checksum', 'adler32'),
+            decode_metadata_header(copy_and_set_input(9, '\x01')))
+
+    nt.assert_equal(copy_and_set_return('codec', 'zlib'),
+            decode_metadata_header(copy_and_set_input(10, '\x01')))
+
+    nt.assert_equal(copy_and_set_return('level', 1),
+            decode_metadata_header(copy_and_set_input(11, '\x01')))
+
+    nt.assert_equal(copy_and_set_return('meta_size', 1),
+            decode_metadata_header(copy_and_set_input(12, '\x01\x00\x00\x00')))
+
+    nt.assert_equal(copy_and_set_return('meta_size', MAX_META_SIZE),
+            decode_metadata_header(copy_and_set_input(12, '\xff\xff\xff\xff')))
+
+    nt.assert_equal(copy_and_set_return('max_meta_size', 1),
+            decode_metadata_header(copy_and_set_input(16, '\x01\x00\x00\x00')))
+
+    nt.assert_equal(copy_and_set_return('max_meta_size', MAX_META_SIZE),
+            decode_metadata_header(copy_and_set_input(16, '\xff\xff\xff\xff')))
+
+    nt.assert_equal(copy_and_set_return('max_meta_size', 1),
+            decode_metadata_header(copy_and_set_input(16, '\x01\x00\x00\x00')))
+
+    nt.assert_equal(copy_and_set_return('max_meta_size', MAX_META_SIZE),
+            decode_metadata_header(copy_and_set_input(16, '\xff\xff\xff\xff')))
+
+    nt.assert_equal(copy_and_set_return('meta_comp_size', 1),
+            decode_metadata_header(copy_and_set_input(20, '\x01\x00\x00\x00')))
+
+    nt.assert_equal(copy_and_set_return('meta_comp_size', MAX_META_SIZE),
+            decode_metadata_header(copy_and_set_input(20, '\xff\xff\xff\xff')))
+
+    nt.assert_equal(copy_and_set_return('user_codec', 'sesame'),
+            decode_metadata_header(copy_and_set_input(24, 'sesame')))
 
 def create_array(repeats, in_file, progress=False):
     with open(in_file, 'w') as in_fp:
@@ -617,33 +700,27 @@ def test_metadata():
     received_metadata = pack_unpack_fp(1, nchunks=20, metadata=test_metadata)
     nt.assert_equal(test_metadata, received_metadata)
 
-    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
-    received_metadata = pack_unpack_fp(1, nchunks=20, metadata=test_metadata,
-            compress_meta=True)
-    nt.assert_equal(test_metadata, received_metadata)
-
-
-def test_metadata_mismatch():
-    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
-    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
-    create_array_fp(1, in_fp)
-    in_fp_size = in_fp.tell()
-    in_fp.seek(0)
-    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            DEFAULT_BLOSC_ARGS,
-            test_metadata,
-            False,
-            1,
-            None,
-            DEFAULT_OFFSETS,
-            DEFAULT_CHECKSUM)
-    # remove the metadata bit
-    options = create_options(metadata=False)
-    options_binary = encode_uint8(int(options, 2))
-    out_fp.seek(5)
-    out_fp.write(options_binary)
-    out_fp.seek(0)
-    nt.assert_raises(MetaDataMismatch, bloscpack._unpack_fp, out_fp, dcmp_fp)
+#def test_metadata_mismatch():
+#    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
+#    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
+#    create_array_fp(1, in_fp)
+#    in_fp_size = in_fp.tell()
+#    in_fp.seek(0)
+#    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
+#            DEFAULT_BLOSC_ARGS,
+#            test_metadata,
+#            1,
+#            None,
+#            DEFAULT_OFFSETS,
+#            DEFAULT_CHECKSUM,
+#            DEFAULT_METADATA_ARGS.copy())
+#    # remove the metadata bit
+#    options = create_options(metadata=False)
+#    options_binary = encode_uint8(int(options, 2))
+#    out_fp.seek(5)
+#    out_fp.write(options_binary)
+#    out_fp.seek(0)
+#    nt.assert_raises(MetaDataMismatch, bloscpack._unpack_fp, out_fp, dcmp_fp)
 
 def test_metadata_opportunisitic_compression():
     # make up some metadata that can be compressed with benefit
@@ -656,17 +733,17 @@ def test_metadata_opportunisitic_compression():
     bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
             DEFAULT_BLOSC_ARGS,
             test_metadata,
-            True,
             1,
             None,
             DEFAULT_OFFSETS,
-            DEFAULT_CHECKSUM)
+            DEFAULT_CHECKSUM,
+            DEFAULT_METADATA_ARGS.copy())
     out_fp.seek(0)
     raw_header = out_fp.read(32)
     header = decode_bloscpack_header(raw_header)
     raw_options = header['options']
     options = decode_options(raw_options)
-    nt.assert_true(options['compress_meta'])
+    #nt.assert_true(options['compress_meta'])
 
     # now do the same thing, but use badly compressible metadata
     test_metadata = "abc"
@@ -677,11 +754,11 @@ def test_metadata_opportunisitic_compression():
     bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
             DEFAULT_BLOSC_ARGS,
             test_metadata,
-            True,
             1,
             None,
             DEFAULT_OFFSETS,
-            DEFAULT_CHECKSUM)
+            DEFAULT_CHECKSUM,
+            DEFAULT_METADATA_ARGS.copy())
     out_fp.seek(0)
     raw_header = out_fp.read(32)
     header = decode_bloscpack_header(raw_header)
@@ -689,7 +766,7 @@ def test_metadata_opportunisitic_compression():
     options = decode_options(raw_options)
     # bloscpack should have decided that there is no benefit to compressing the
     # metadata and thus deactivated it
-    nt.assert_false(options['compress_meta'])
+    #nt.assert_false(options['compress_meta'])
 
 def test_invalid_format():
     # this will cause a bug if we ever reach 255 format versions
@@ -747,7 +824,7 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
         cmp(in_file, dcmp_file)
 
 def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
-        progress=False, metadata=None, compress_meta=False):
+        progress=False, metadata=None):
     blosc_args = DEFAULT_BLOSC_ARGS
     offsets = DEFAULT_OFFSETS
     checksum = DEFAULT_CHECKSUM
@@ -760,8 +837,9 @@ def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
         print("Compressing")
     in_fp.seek(0)
     bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            blosc_args, metadata, compress_meta,
-            nchunks, chunk_size, offsets, checksum)
+            blosc_args, metadata,
+            nchunks, chunk_size, offsets, checksum,
+            DEFAULT_METADATA_ARGS.copy())
     out_fp.seek(0)
     if progress:
         print("Decompressing")

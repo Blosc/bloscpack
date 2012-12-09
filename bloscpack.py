@@ -6,15 +6,14 @@
 
 from __future__ import division
 
-import sys
-import os.path as path
 import argparse
-import struct
-import math
-import zlib
+import contextlib
 import hashlib
 import itertools
-import contextlib
+import os.path as path
+import struct
+import sys
+import zlib
 try:
     from collections import OrderedDict
 except ImportError:
@@ -24,36 +23,86 @@ import blosc
 __version__ = '0.3.0-dev'
 __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
-EXTENSION = '.blp'
-MAGIC = 'blpk'
-BLOSCPACK_HEADER_LENGTH = 32
-BLOSC_HEADER_LENGTH = 16
+# miscellaneous
 FORMAT_VERSION = 3
+MAGIC = 'blpk'
+EXTENSION = '.blp'
+PREFIX = "bloscpack.py"
+
+# header lengths
+BLOSC_HEADER_LENGTH = 16
+BLOSCPACK_HEADER_LENGTH = 32
+METADATA_HEADER_LENGTH = 32
+
+# maximum values
 MAX_FORMAT_VERSION = 255
 MAX_CHUNKS = (2**63)-1
-MAX_META_SIZE = (2**31-1) # int32 max val
+MAX_META_SIZE = (2**32-1) # uint32 max val
+
+# Bloscpack args
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_OFFSETS = True
-DEFAULT_COMPRESS_META = False
+DEFAULT_CHECKSUM = 'adler32'
 DEFAULT_OPTIONS = None  # created programatically later on
+
+# Blosc args
+BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
-DEAFAULT_SHUFFLE = True
-BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
+MAX_CLEVEL = 9
+DEFAULT_SHUFFLE = True
 DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
-    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEAFAULT_SHUFFLE)))
+    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE)))
+
+# metadata args
+METADATA_ARGS = ['magic_format', 'checksum', 'codec', 'level']
+DEFAULT_MAGIC_FORMAT = 'JSON'
+DEFAULT_METADATA_CHECKSUM = 'adler32'
+DEFAULT_CODEC = 'zlib'
+DEFAULT_LEVEL = 6
+DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
+    (DEFAULT_MAGIC_FORMAT, DEFAULT_METADATA_CHECKSUM,
+    DEFAULT_CODEC, DEFAULT_LEVEL)))
+
+# verbosity levels
 NORMAL  = 'NORMAL'
 VERBOSE = 'VERBOSE'
 DEBUG   = 'DEBUG'
 LEVEL = NORMAL
 VERBOSITY_LEVELS = [NORMAL, VERBOSE, DEBUG]
-PREFIX = "bloscpack.py"
+
+# lookup table for human readable sizes
 SUFFIXES = OrderedDict((
              ("B", 2**0 ),
              ("K", 2**10),
              ("M", 2**20),
              ("G", 2**30),
              ("T", 2**40)))
+
+
+class ChunkingException(BaseException):
+    pass
+
+
+class NoSuchChecksum(ValueError):
+    pass
+
+
+class NoSuchCodec(ValueError):
+    pass
+
+
+class FormatVersionMismatch(RuntimeError):
+    pass
+
+
+class ChecksumMismatch(RuntimeError):
+    pass
+
+
+class FileNotFound(IOError):
+    pass
+
 
 class Hash(object):
     """ Uniform hash object.
@@ -105,7 +154,72 @@ CHECKSUMS = [Hash('None', 0, lambda data: ''),
     ]
 CHECKSUMS_AVAIL = [c.name for c in CHECKSUMS]
 CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
-DEFAULT_CHECKSUM = 'adler32'
+
+
+def _check_valid_checksum(checksum):
+    """ Check the validity of a checksum.
+
+    Parameters
+    ----------
+    checksum : str
+        the string descriptor of the checksum
+
+    Raises
+    ------
+    ValueError
+        if no such checksum exists.
+    """
+    if checksum not in CHECKSUMS_AVAIL:
+        raise NoSuchChecksum("checksum '%s' does not exist" % checksum)
+
+
+class Codec(object):
+    """ Uniform codec object.
+
+    Parameters
+    ----------
+    name : str
+        the name of the codec
+    compress : callable
+        a compression function taking data and level as args
+    decompress : callable
+        a decompression function taking data as arg
+
+    """
+
+    def __init__(self, name, compress, decompress):
+        self.name = name
+        self._compress = compress
+        self._decompress = decompress
+
+    def compress(self, data, level):
+        return self._compress(data, level)
+
+    def decompress(self, data):
+        return self._decompress(data)
+
+CODECS = [Codec('None', lambda data, level: data, lambda data: data),
+          Codec('zlib', zlib.compress, zlib.decompress)]
+CODECS_AVAIL = [c.name for c in CODECS]
+CODECS_LOOKUP = dict(((c.name, c) for c in CODECS))
+
+
+def _check_valid_codec(codec):
+    """ Check the validity of a codec.
+
+    Parameters
+    ----------
+    codec : str
+        the string descriptor of the codec
+
+    Raises
+    ------
+    ValueError
+        if no such checksum exists.
+    """
+    if codec not in CODECS_AVAIL:
+        raise NoSuchCodec("codec '%s' does not exist" % codec)
+
 
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
@@ -161,8 +275,14 @@ def decode_int64(eightbyte):
 def decode_bitfield(byte):
     return bin(decode_uint8(byte))[2:].rjust(8,'0')
 
+def decode_magic_string(str_):
+    return str_.strip('\x00')
+
 def encode_uint8(byte):
     return struct.pack('<B', byte)
+
+def encode_uint32(byte):
+    return struct.pack('<I', byte)
 
 def encode_int32(fourbyte):
     return struct.pack('<i', fourbyte)
@@ -286,7 +406,7 @@ def create_parser():
                 help='compression level')
         blosc_group.add_argument('-s', '--no-shuffle',
                 action='store_false',
-                default=DEAFAULT_SHUFFLE,
+                default=DEFAULT_SHUFFLE,
                 dest='shuffle',
                 help='deactivate shuffle')
         bloscpack_chunking_group = p.add_mutually_exclusive_group()
@@ -328,11 +448,6 @@ def create_parser():
                 type=str,
                 dest='metadata',
                 help="file containing the metadata")
-        bloscpack_group.add_argument('-p', '--compress-meta',
-                action='store_true',
-                default=DEFAULT_COMPRESS_META,
-                dest='compress_meta',
-                help='compress metadata')
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,
@@ -401,23 +516,6 @@ def decode_blosc_header(buffer_):
             'blocksize': decode_uint32(buffer_[8:12]),
             'ctbytes':   decode_uint32(buffer_[12:16])}
 
-class ChunkingException(BaseException):
-    pass
-
-class NoSuchChecksum(ValueError):
-    pass
-
-class FormatVersionMismatch(RuntimeError):
-    pass
-
-class ChecksumMismatch(RuntimeError):
-    pass
-
-class MetaDataMismatch(RuntimeError):
-    pass
-
-class FileNotFound(IOError):
-    pass
 
 def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     """ Determine chunking for an input file.
@@ -543,6 +641,28 @@ def check_range(name, value, min_, max_):
                 "'%s' must be in the range %s <= n <= %s, not '%s'" %
                 tuple(map(str, (name, min, max_, value))))
 
+
+def _check_str(name, value, max_len):
+    if not isinstance(value, str):
+        raise TypeError("'%s' must be of type 'int'" % name)
+    elif len(value) > max_len:
+        raise ValueError("'%s' can be of max length '%i' but is: '%s'" %
+                (name, max_len, len(value)))
+
+
+def _pad_with_nulls(str_, len_):
+    """ Pad string with null bytes.
+
+    Parameters
+    ----------
+    str_ : str
+        the string to pad
+    len_ : int
+        the final desired length
+    """
+    return str_ + ("\x00" * (len_ - len(str_)))
+
+
 def _check_options(options):
     """ Check the options bitfield.
 
@@ -568,21 +688,24 @@ def _check_options(options):
                 "'options' must be string of 0s and 1s of length 8, not '%s'" %
                 options)
 
-def create_options(offsets=DEFAULT_OFFSETS, metadata=False,
-        compress_meta=DEFAULT_COMPRESS_META):
+
+def _check_options_zero(options, indices):
+    for i in indices:
+        if options[i] != '0':
+            raise ValueError(
+                'Element %i was non-zero when attempting to decode options')
+
+
+def create_options(offsets=DEFAULT_OFFSETS, metadata=False):
     """ Create the options bitfield.
 
     Parameters
     ----------
     offsets : bool
     metadata : bool
-    compress_meta : bool
     """
-    if compress_meta and not metadata:
-        raise ValueError(
-                "'compress_meta' was 'True' but 'metadata' was 'False'")
     return "".join([str(int(i)) for i in
-        [False, False, False, False, False, compress_meta, metadata, offsets]])
+        [False, False, False, False, False, False, metadata, offsets]])
 
 def decode_options(options):
     """ Parse the options bitfield.
@@ -598,13 +721,23 @@ def decode_options(options):
     """
 
     _check_options(options)
+    _check_options_zero(options, range(6))
     return {'offsets': bool(int(options[7])),
             'metadata': bool(int(options[6])),
-            'compress_meta': bool(int(options[5]))
             }
+
+def create_metadata_options():
+    """ Create the metadata options bitfield. """
+    return "00000000"
+
+def decode_metadata_options(options):
+    _check_options(options)
+    _check_options_zero(options, range(8))
+    return {}
 
 # default options created here programatically
 DEFAULT_OPTIONS = create_options()
+DEFAULT_METADATA_OPTIONS = create_metadata_options()
 
 
 def create_bloscpack_header(format_version=FORMAT_VERSION,
@@ -613,8 +746,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         typesize=0,
         chunk_size=-1,
         last_chunk=-1,
-        nchunks=-1,
-        meta_size=0):
+        nchunks=-1):
     """ Create the bloscpack header string.
 
     Parameters
@@ -633,8 +765,6 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         the size of the last chunk
     nchunks : int
         the number of chunks
-    meta_size : int
-        the size of the metadata
 
     Returns
     -------
@@ -661,11 +791,6 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
-    check_range('meta_size',  meta_size,   0, MAX_META_SIZE)
-
-    if options[6] == 0 and meta_size > 0:
-        raise ValueError(
-                'No metadata in options, but meta_size is greater than zero')
 
     format_version = encode_uint8(format_version)
     options = encode_uint8(int(options, 2))
@@ -674,13 +799,11 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     chunk_size = encode_int32(chunk_size)
     last_chunk = encode_int32(last_chunk)
     nchunks = encode_int64(nchunks)
-    meta_size = encode_int32(meta_size)
-    RESERVED = encode_int32(0)
+    RESERVED = encode_int64(0)
 
     return (MAGIC + format_version + options + checksum + typesize +
             chunk_size + last_chunk +
-            nchunks + meta_size +
-            RESERVED)
+            nchunks + RESERVED)
 
 def decode_bloscpack_header(buffer_):
     """ Check that the magic marker exists and return number of chunks.
@@ -710,10 +833,10 @@ def decode_bloscpack_header(buffer_):
         the RESERVED field from the header, should be zero
 
     """
-    if len(buffer_) != 32:
+    if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
         raise ValueError(
-            "attempting to decode a bloscpack header of length '%d', not '32'"
-            % len(buffer_))
+            "attempting to decode a bloscpack header of length '%d', not '%d'"
+            % (len(buffer_), BLOSCPACK_HEADER_LENGTH))
     elif buffer_[0:4] != MAGIC:
         raise ValueError(
             "the magic marker '%s' is missing from the bloscpack " % MAGIC +
@@ -726,9 +849,58 @@ def decode_bloscpack_header(buffer_):
             'chunk_size':     decode_int32(buffer_[8:12]),
             'last_chunk':     decode_int32(buffer_[12:16]),
             'nchunks':        decode_int64(buffer_[16:24]),
-            'meta_size':      decode_int32(buffer_[24:28]),
-            'RESERVED':       decode_int32(buffer_[28:32]),
+            'RESERVED':       decode_int64(buffer_[24:32]),
             }
+
+def create_metadata_header(magic_format='',
+       options="00000000",
+       checksum='None',
+       codec='None',
+       level=0,
+       meta_size=0,
+       max_meta_size=0,
+       meta_comp_size=0,
+       user_codec='',
+       ):
+    _check_str('magic-format',     magic_format,  8)
+    _check_options(options)
+    _check_valid_checksum(checksum)
+    _check_valid_codec(codec)
+    check_range('meta-level',      level,         0, MAX_CLEVEL)
+    check_range('meta-size',       meta_size,     0, MAX_META_SIZE)
+    check_range('max-meta-size',   max_meta_size, 0, MAX_META_SIZE)
+    check_range('meta-comp-size',  max_meta_size, 0, MAX_META_SIZE)
+    _check_str('user-codec',       user_codec,    8)
+
+    magic_format        = _pad_with_nulls(magic_format, 8)
+    options             = encode_uint8(int(options, 2))
+    checksum            = encode_uint8(CHECKSUMS_AVAIL.index(checksum))
+    codec               = encode_uint8(CODECS_AVAIL.index(codec))
+    level               = encode_uint8(level)
+    meta_size           = encode_uint32(meta_size)
+    max_meta_size       = encode_uint32(max_meta_size)
+    meta_comp_size      = encode_uint32(meta_comp_size)
+    user_codec          = _pad_with_nulls(user_codec, 8)
+
+    return magic_format + options + checksum + codec + level + \
+            meta_size + max_meta_size + meta_comp_size + user_codec
+
+def decode_metadata_header(buffer_):
+    if len(buffer_) != 32:
+        raise ValueError(
+            "attempting to decode a bloscpack metadata header of length '%d', not '32'"
+            % len(buffer_))
+    return {'magic_format':        decode_magic_string(buffer_[:8]),
+            'options':             decode_bitfield(buffer_[8]),
+            'checksum':            CHECKSUMS_AVAIL[decode_uint8(buffer_[9])],
+            'codec':               CODECS_AVAIL[decode_uint8(buffer_[10])],
+            'level':               decode_uint8(buffer_[11]),
+            'meta_size':           decode_uint32(buffer_[12:16]),
+            'max_meta_size':       decode_uint32(buffer_[16:20]),
+            'meta_comp_size':      decode_uint32(buffer_[20:24]),
+            'user_codec':          decode_magic_string(buffer_[24:32])
+            }
+
 
 def process_compression_args(args):
     """ Extract and check the compression args after parsing by argparse.
@@ -829,9 +1001,10 @@ def process_nthread_arg(args):
             (args.nthreads, 's' if args.nthreads > 1 else ''))
 
 def pack_file(in_file, out_file, blosc_args,
-        metadata=None, compress_meta=False,
+        metadata=None,
         nchunks=None, chunk_size=None,
-        offsets=DEFAULT_OFFSETS, checksum=DEFAULT_CHECKSUM):
+        offsets=DEFAULT_OFFSETS, checksum=DEFAULT_CHECKSUM,
+        metadata_args=DEFAULT_METADATA_ARGS):
     """ Main function for compressing a file.
 
     Parameters
@@ -852,6 +1025,8 @@ def pack_file(in_file, out_file, blosc_args,
         Wheather to include offsets.
     checksum : str
         Which checksum to use.
+    metadata_args : dict
+        The metadata options
 
     Raises
     ------
@@ -865,17 +1040,17 @@ def pack_file(in_file, out_file, blosc_args,
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
         _pack_fp(input_fp, output_fp, in_file_size,
-                blosc_args, metadata, compress_meta,
+                blosc_args, metadata,
                 nchunks, chunk_size,
-                offsets, checksum)
+                offsets, checksum, metadata_args)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
 def _pack_fp(input_fp, output_fp, in_file_size,
-        blosc_args, metadata, compress_meta,
+        blosc_args, metadata,
         nchunks, chunk_size,
-        offsets, checksum):
+        offsets, checksum, metadata_args):
     """ Helper function for pack_file.
 
     Use file_points, which could potentially be cStringIO objects.
@@ -886,27 +1061,7 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             calculate_nchunks(in_file_size, nchunks, chunk_size)
     # calculate header
     options = create_options(offsets=offsets,
-            metadata=True if metadata is not None else False,
-            compress_meta=compress_meta)
-    # compress metadata if requested
-    if compress_meta:
-        metadata_compressed = zlib.compress(metadata, 6)
-        meta_comp_size = len(metadata_compressed)
-        meta_size = len(metadata)
-        # be opportunistic, avoid compression if not beneficial
-        if meta_size < meta_comp_size:
-            options = create_options(offsets=offsets,
-                    metadata=True,
-                    compress_meta=False)
-            print_verbose('metadata compression requested, but it was not '
-                    'beneficial, deactivating',
-                    level=DEBUG)
-        else:
-            metadata = metadata_compressed
-    # compute the length of the metadata
-    meta_size = len(metadata) if metadata is not None else 0
-    if offsets:
-        offsets_storage = list(itertools.repeat(0, nchunks))
+            metadata=True if metadata is not None else False)
     # set the checksum impl
     checksum_impl = CHECKSUMS_LOOKUP[checksum]
     raw_bloscpack_header = create_bloscpack_header(
@@ -916,20 +1071,64 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             chunk_size=chunk_size,
             last_chunk=last_chunk_size,
             nchunks=nchunks,
-            meta_size=meta_size
             )
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)
     # write the chunks to the file
     output_fp.write(raw_bloscpack_header)
-    # write the metadata to the file
-    if metadata:
+    # need to store how much space was used by metadata, for seeking later
+    metadata_total = 0
+    # deal with metadata
+    if metadata is not None:
+        print_verbose('metadata args are:', level=DEBUG)
+        for arg, value in metadata_args.iteritems():
+            print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
+        metadata_total += METADATA_HEADER_LENGTH
+        if metadata_args['codec'] != CODECS_AVAIL[0]:
+            codec = CODECS_LOOKUP[metadata_args['codec']]
+            metadata_compressed = codec.compress(metadata,
+                    metadata_args['level'])
+            meta_size = len(metadata)
+            meta_comp_size = len(metadata_compressed)
+            # be opportunistic, avoid compression if not beneficial
+            if meta_size < meta_comp_size:
+                metadata_args['codec'] = 'None'
+                meta_comp_size = meta_size
+                print_verbose('metadata compression requested, but it was not '
+                        'beneficial, deactivating',
+                        level=DEBUG)
+            else:
+                metadata = metadata_compressed
+        else:
+            meta_size = len(metadata)
+            meta_comp_size = meta_size
+        print_verbose("Raw %s metadata of size '%s': %s" %
+                ('compressed' if metadata_args['codec'] != 'None' else
+                    'uncompressed', meta_comp_size, repr(metadata)),
+                level=DEBUG)
+        # TODO handle preallocation
+        metadata_total += meta_comp_size
+        # create metadata header
+        raw_metadata_header = create_metadata_header(
+                magic_format=metadata_args['magic_format'],
+                checksum=metadata_args['checksum'],
+                codec=metadata_args['codec'],
+                level=metadata_args['level'],
+                meta_size=meta_size,
+                max_meta_size=meta_comp_size,
+                meta_comp_size=meta_comp_size)
+        print_verbose('raw_metadata_header: %s' % repr(raw_metadata_header),
+                level=DEBUG)
+        output_fp.write(raw_metadata_header)
         output_fp.write(metadata)
-        print_verbose("Wrote %s metadata of size '%s': %s" %
-                ('compressed' if compress_meta else '',
-                    meta_size, repr(metadata)))
+        if metadata_args['checksum'] != CHECKSUMS_AVAIL[0]:
+            metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_args['checksum']]
+            metadata_digest = metadata_checksum_impl(metadata)
+            metadata_total += metadata_checksum_impl.size
+            output_fp.write(metadata_digest)
     # preallocate space for the offsets
     if offsets:
+        offsets_storage = list(itertools.repeat(0, nchunks))
         output_fp.write(encode_int64(-1) * nchunks)
     # if nchunks == 1 the last_chunk_size is the size of the single chunk
     for i, bytes_to_read in enumerate((
@@ -961,8 +1160,7 @@ def _pack_fp(input_fp, output_fp, in_file_size,
         if len(tail_mess) > 0:
             print_verbose(tail_mess, level=DEBUG)
     if offsets:
-        # seek to 32 bits into the file
-        output_fp.seek(BLOSCPACK_HEADER_LENGTH+meta_size, 0)
+        output_fp.seek(BLOSCPACK_HEADER_LENGTH + metadata_total, 0)
         print_verbose("Writing '%d' offsets: '%s'" %
                 (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
         # write the offsets encoded into the reserved space in the file
@@ -1012,6 +1210,7 @@ def _unpack_fp(input_fp, output_fp):
     print_verbose('bloscpack_header_raw: %s' %
             repr(bloscpack_header_raw), level=DEBUG)
     bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
+    print_verbose("bloscpack header: ", level=DEBUG)
     for arg, value in bloscpack_header.iteritems():
         # hack the values of the bloscpack header into the namespace
         globals()[arg] = value
@@ -1023,18 +1222,36 @@ def _unpack_fp(input_fp, output_fp):
     # read the offsets
     options = decode_options(bloscpack_header['options'])
     # read the metadata
-    if meta_size > 0 and not options['metadata']:
-        raise MetaDataMismatch("options indicated no metadata, "
-                "but the meta-size was greater than zero")
-    elif options['compress_meta'] and not options['metadata']:
-        raise MetaDataMismatch("options indicated metadata to be compressed, "
-                "but not metadata")
-    elif options['metadata']:
-        metadata = input_fp.read(meta_size)
-        if options['compress_meta']:
-            metadata = zlib.decompress(metadata)
+    if options['metadata']:
+        raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
+        print_verbose("raw metadata header: '%s'" % repr(raw_metadata_header),
+                level=DEBUG)
+        metadata_header = decode_metadata_header(raw_metadata_header)
+        print_verbose("metadata header: ", level=DEBUG)
+        for arg, value in metadata_header.iteritems():
+            print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
+        metadata = input_fp.read(metadata_header['meta_comp_size'])
+        if metadata_header['checksum'] != 'None':
+            metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header['checksum']]
+            metadata_expected_digest = input_fp.read(metadata_checksum_impl.size)
+            metadata_received_digest = metadata_checksum_impl(metadata)
+            if metadata_received_digest != metadata_expected_digest:
+                raise ChecksumMismatch(
+                        "Checksum mismatch detected in metadata "
+                        "expected: '%s', received: '%s'" %
+                        (repr(metadata_expected_digest),
+                         repr(metadata_received_digest)))
+            else:
+                print_verbose('metadata checksum OK (%s): %s ' %
+                        (metadata_checksum_impl.name,
+                            repr(metadata_received_digest)),
+                        level=DEBUG)
+        if metadata_header['codec'] != 'None':
+            metadata_codec_impl = CODECS_LOOKUP[metadata_header['codec']]
+            metadata = metadata_codec_impl.decompress(metadata)
         print_verbose("read %s metadata of size: '%s'" %
-                ('compressed' if options['compress_meta'] else '', meta_size))
+                ('compressed' if metadata_header['codec'] != 0 else
+                    'uncompressed', metadata_header['meta_comp_size']))
     else:
         metadata = None
     if options['offsets']:
@@ -1127,12 +1344,13 @@ if __name__ == '__main__':
         try:
             pack_file(in_file, out_file,
                     blosc_args,
+                    # TODO handle the checksum
                     metadata,
-                    compress_meta=args.compress_meta,
                     nchunks=args.nchunks,
                     chunk_size=args.chunk_size,
                     offsets=args.offsets,
-                    checksum=args.checksum)
+                    checksum=args.checksum,
+                    metadata_args=DEFAULT_METADATA_ARGS)
         except ChunkingException as e:
             error(e.message)
     elif args.subcommand in ['decompress', 'd']:
@@ -1151,8 +1369,6 @@ if __name__ == '__main__':
             error(fvm.message)
         except ChecksumMismatch as csm:
             error(csm.message)
-        except MetaDataMismatch as mdm:
-            error(mdm.message)
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

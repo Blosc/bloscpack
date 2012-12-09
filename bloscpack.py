@@ -778,10 +778,10 @@ def decode_bloscpack_header(buffer_):
         the RESERVED field from the header, should be zero
 
     """
-    if len(buffer_) != 32:
+    if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
         raise ValueError(
-            "attempting to decode a bloscpack header of length '%d', not '32'"
-            % len(buffer_))
+            "attempting to decode a bloscpack header of length '%d', not '%d'"
+            % (len(buffer_), BLOSCPACK_HEADER_LENGTH))
     elif buffer_[0:4] != MAGIC:
         raise ValueError(
             "the magic marker '%s' is missing from the bloscpack " % MAGIC +

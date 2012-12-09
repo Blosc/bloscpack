@@ -1231,10 +1231,8 @@ def _unpack_fp(input_fp, output_fp):
                         (repr(metadata_expected_digest),
                          repr(metadata_received_digest)))
         if metadata_header['codec'] != 'None':
-            codec = CODECS[0]
-            metadata = codec.decompress(metadata)
-
-
+            metadata_codec_impl = CODECS_LOOKUP[metadata_header['codec']]
+            metadata = metadata_codec_impl.decompress(metadata)
         print_verbose("read %s metadata of size: '%s'" %
                 ('compressed' if metadata_header['codec'] != 0 else
                     'uncompressed', metadata_header['meta_comp_size']))

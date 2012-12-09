@@ -1110,8 +1110,13 @@ def _pack_fp(input_fp, output_fp, in_file_size,
                 meta_size=meta_size,
                 max_meta_size=meta_comp_size,
                 meta_comp_size=meta_comp_size)
+        if metadata_opts['checksum'] != CHECKSUMS_AVAIL[0]:
+            metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_opts['checksum']]
+            metadata_digest = metadata_checksum_impl(metadata)
+            metadata_total += metadata_checksum_impl.size
         output_fp.write(raw_metadata_header)
         output_fp.write(metadata)
+        output_fp.write(metadata_digest)
         print_verbose("Wrote %s metadata of size '%s': %s" %
                 ('compressed' if metadata_opts['codec'] != 'None' else
                     'uncompressed', meta_comp_size, repr(metadata)))
@@ -1149,7 +1154,6 @@ def _pack_fp(input_fp, output_fp, in_file_size,
         if len(tail_mess) > 0:
             print_verbose(tail_mess, level=DEBUG)
     if offsets:
-        # seek to 32 bits into the file
         output_fp.seek(BLOSCPACK_HEADER_LENGTH + metadata_total, 0)
         print_verbose("Writing '%d' offsets: '%s'" %
                 (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
@@ -1215,14 +1219,25 @@ def _unpack_fp(input_fp, output_fp):
         raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
         metadata_header = decode_metadata_header(raw_metadata_header)
         metadata = input_fp.read(metadata_header['meta_comp_size'])
-        # TODO this should be done properly
-        if metadata_header['codec'] != 0:
+        print metadata_header['checksum']
+        if metadata_header['checksum'] != 'None':
+            metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header['checksum']]
+            metadata_expected_digest = input_fp.read(metadata_checksum_impl.size)
+            metadata_received_digest = metadata_checksum_impl(metadata)
+            if metadata_received_digest != metadata_expected_digest:
+                raise ChecksumMismatch(
+                        "Checksum mismatch detected in metadata "
+                        "expected: '%s', received: '%s'" %
+                        (repr(metadata_expected_digest),
+                         repr(metadata_received_digest)))
+        if metadata_header['codec'] != 'None':
             codec = CODECS[0]
             metadata = codec.decompress(metadata)
+
+
         print_verbose("read %s metadata of size: '%s'" %
                 ('compressed' if metadata_header['codec'] != 0 else
                     'uncompressed', metadata_header['meta_comp_size']))
-        # TODO handle metadata checksum
     else:
         metadata = None
     if options['offsets']:

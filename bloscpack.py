@@ -88,6 +88,10 @@ class NoSuchChecksum(ValueError):
     pass
 
 
+class NoSuchCodec(ValueError):
+    pass
+
+
 class FormatVersionMismatch(RuntimeError):
     pass
 
@@ -198,6 +202,23 @@ CODECS = [Codec('None', lambda data, level: data, lambda data: data),
           Codec('zlib', zlib.compress, zlib.decompress)]
 CODECS_AVAIL = [c.name for c in CODECS]
 CODECS_LOOKUP = dict(((c.name, c) for c in CODECS))
+
+
+def _check_valid_codec(codec):
+    """ Check the validity of a codec.
+
+    Parameters
+    ----------
+    codec : str
+        the string descriptor of the codec
+
+    Raises
+    ------
+    ValueError
+        if no such checksum exists.
+    """
+    if codec not in CODECS_AVAIL:
+        raise NoSuchCodec("codec '%s' does not exist" % codec)
 
 
 def print_verbose(message, level=VERBOSE):

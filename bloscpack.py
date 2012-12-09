@@ -34,6 +34,7 @@ MAX_CHUNKS = (2**63)-1
 MAX_META_SIZE = (2**32-1) # uint32 max val
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_OFFSETS = True
+DEFAULT_CHECKSUM = 'adler32'
 DEFAULT_COMPRESS_META = False
 DEFAULT_OPTIONS = None  # created programatically later on
 DEFAULT_TYPESIZE = 8
@@ -114,7 +115,6 @@ CHECKSUMS = [Hash('None', 0, lambda data: ''),
     ]
 CHECKSUMS_AVAIL = [c.name for c in CHECKSUMS]
 CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
-DEFAULT_CHECKSUM = 'adler32'
 
 
 def _check_valid_checksum(checksum):

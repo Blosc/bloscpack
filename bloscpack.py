@@ -35,7 +35,6 @@ MAX_META_SIZE = (2**32-1) # uint32 max val
 DEFAULT_CHUNK_SIZE = '1M'
 DEFAULT_OFFSETS = True
 DEFAULT_CHECKSUM = 'adler32'
-DEFAULT_COMPRESS_META = False
 DEFAULT_OPTIONS = None  # created programatically later on
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
@@ -392,11 +391,6 @@ def create_parser():
                 type=str,
                 dest='metadata',
                 help="file containing the metadata")
-        bloscpack_group.add_argument('-p', '--compress-meta',
-                action='store_true',
-                default=DEFAULT_COMPRESS_META,
-                dest='compress_meta',
-                help='compress metadata')
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,

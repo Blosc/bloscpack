@@ -537,7 +537,7 @@ def test_create_metadata_header():
             create_metadata_header(checksum='adler32'))
 
     nt.assert_equal(mod_raw(10, '\x01'),
-            create_metadata_header(codec=1))
+            create_metadata_header(codec='zlib'))
 
     nt.assert_equal(mod_raw(11, '\x01'),
             create_metadata_header(level=1))
@@ -565,7 +565,7 @@ def test_decode_metadata_header():
             'magic_format':        '',
             'options':             '00000000',
             'checksum':            'None',
-            'codec':               0,
+            'codec':               'None',
             'level':               0,
             'meta_size':           0,
             'max_meta_size':       0,
@@ -593,7 +593,7 @@ def test_decode_metadata_header():
     nt.assert_equal(copy_and_set_return('checksum', 'adler32'),
             decode_metadata_header(copy_and_set_input(9, '\x01')))
 
-    nt.assert_equal(copy_and_set_return('codec', 1),
+    nt.assert_equal(copy_and_set_return('codec', 'zlib'),
             decode_metadata_header(copy_and_set_input(10, '\x01')))
 
     nt.assert_equal(copy_and_set_return('level', 1),

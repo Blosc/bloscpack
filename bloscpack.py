@@ -855,7 +855,7 @@ def decode_bloscpack_header(buffer_):
 def create_metadata_header(magic_format='',
        options="00000000",
        checksum='None',
-       codec=0,
+       codec='None',
        level=0,
        meta_size=0,
        max_meta_size=0,
@@ -865,7 +865,7 @@ def create_metadata_header(magic_format='',
     _check_str('magic-format',     magic_format,  8)
     _check_options(options)
     _check_valid_checksum(checksum)
-    check_range('meta-codec',      codec,         0, 1)
+    _check_valid_codec(codec)
     check_range('meta-level',      level,         0, MAX_CLEVEL)
     check_range('meta-size',       meta_size,     0, MAX_META_SIZE)
     check_range('max-meta-size',   max_meta_size, 0, MAX_META_SIZE)
@@ -875,7 +875,7 @@ def create_metadata_header(magic_format='',
     magic_format        = _pad_with_nulls(magic_format, 8)
     options             = encode_uint8(int(options, 2))
     checksum            = encode_uint8(CHECKSUMS_AVAIL.index(checksum))
-    codec               = encode_uint8(codec)
+    codec               = encode_uint8(CODECS_AVAIL.index(codec))
     level               = encode_uint8(level)
     meta_size           = encode_uint32(meta_size)
     max_meta_size       = encode_uint32(max_meta_size)
@@ -893,7 +893,7 @@ def decode_metadata_header(buffer_):
     return {'magic_format':        decode_magic_string(buffer_[:8]),
             'options':             decode_bitfield(buffer_[8]),
             'checksum':            CHECKSUMS_AVAIL[decode_uint8(buffer_[9])],
-            'codec':               decode_uint8(buffer_[10]),
+            'codec':               CODECS_AVAIL[decode_uint8(buffer_[10])],
             'level':               decode_uint8(buffer_[11]),
             'meta_size':           decode_uint32(buffer_[12:16]),
             'max_meta_size':       decode_uint32(buffer_[16:20]),
@@ -1069,7 +1069,6 @@ def _pack_fp(input_fp, output_fp, in_file_size,
         metadata_total += METADATA_HEADER_LENGTH
         if metadata_opts['codec'] != CODECS_AVAIL[0]:
             codec = CODECS_LOOKUP[metadata_opts['codec']]
-            codec_id = CODECS_AVAIL.index(metadata_opts['codec'])
             metadata_compressed = codec.compress(metadata,
                     metadata_opts['level'])
             meta_size = len(metadata)
@@ -1087,13 +1086,12 @@ def _pack_fp(input_fp, output_fp, in_file_size,
         else:
             meta_size = len(metadata)
             meta_comp_size = meta_size
-            codec_id = 0
         metadata_total += meta_comp_size
         # create metadata header
         raw_metadata_header = create_metadata_header(
                 magic_format=metadata_opts['magic_format'],
                 checksum=metadata_opts['checksum'],
-                codec=codec_id,
+                codec=metadata_opts['codec'],
                 level=metadata_opts['level'],
                 meta_size=meta_size,
                 max_meta_size=meta_comp_size,

@@ -6,14 +6,14 @@
 
 from __future__ import division
 
-import sys
-import os.path as path
 import argparse
-import struct
-import zlib
+import contextlib
 import hashlib
 import itertools
-import contextlib
+import os.path as path
+import struct
+import sys
+import zlib
 try:
     from collections import OrderedDict
 except ImportError:

@@ -1104,7 +1104,8 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             meta_comp_size = meta_size
         print_verbose("Raw %s metadata of size '%s': %s" %
                 ('compressed' if metadata_opts['codec'] != 'None' else
-                    'uncompressed', meta_comp_size, repr(metadata)))
+                    'uncompressed', meta_comp_size, repr(metadata)),
+                level=DEBUG)
         # TODO handle preallocation
         metadata_total += meta_comp_size
         # create metadata header

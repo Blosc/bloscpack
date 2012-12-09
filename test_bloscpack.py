@@ -42,7 +42,7 @@ def test_hashes():
         nt.assert_equal(csum("\x23\x42\xbe\xef"), csum_targets[i])
 
 def test_codecs():
-    nt.assert_equal(CODECS_AVAIL, ['zlib'])
+    nt.assert_equal(CODECS_AVAIL, ['None', 'zlib'])
     random_str = "4KzGCl7SxTsYLaerommsMWyZg1TXbV6wsR9Xk"
     for i,c in enumerate(CODECS):
         nt.assert_equal(random_str, c.decompress(

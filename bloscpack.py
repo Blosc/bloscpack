@@ -459,9 +459,6 @@ class FormatVersionMismatch(RuntimeError):
 class ChecksumMismatch(RuntimeError):
     pass
 
-class MetaDataMismatch(RuntimeError):
-    pass
-
 class FileNotFound(IOError):
     pass
 
@@ -1295,8 +1292,6 @@ if __name__ == '__main__':
             error(fvm.message)
         except ChecksumMismatch as csm:
             error(csm.message)
-        except MetaDataMismatch as mdm:
-            error(mdm.message)
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

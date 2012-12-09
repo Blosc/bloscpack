@@ -1062,6 +1062,20 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     # calculate header
     options = create_options(offsets=offsets,
             metadata=True if metadata is not None else False)
+    # set the checksum impl
+    checksum_impl = CHECKSUMS_LOOKUP[checksum]
+    raw_bloscpack_header = create_bloscpack_header(
+            options=options,
+            checksum=CHECKSUMS_AVAIL.index(checksum),
+            typesize=blosc_args['typesize'],
+            chunk_size=chunk_size,
+            last_chunk=last_chunk_size,
+            nchunks=nchunks,
+            )
+    print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
+            level=DEBUG)
+    # write the chunks to the file
+    output_fp.write(raw_bloscpack_header)
     # need to store how much space was used by metadata, for seeking later
     metadata_total = 0
     # deal with metadata
@@ -1077,7 +1091,6 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             if meta_size < meta_comp_size:
                 metadata_opts['codec'] = 'None'
                 meta_comp_size = meta_size
-                codec_id = 0
                 print_verbose('metadata compression requested, but it was not '
                         'beneficial, deactivating',
                         level=DEBUG)
@@ -1086,6 +1099,7 @@ def _pack_fp(input_fp, output_fp, in_file_size,
         else:
             meta_size = len(metadata)
             meta_comp_size = meta_size
+        # TODO handle preallocation
         metadata_total += meta_comp_size
         # create metadata header
         raw_metadata_header = create_metadata_header(
@@ -1096,33 +1110,14 @@ def _pack_fp(input_fp, output_fp, in_file_size,
                 meta_size=meta_size,
                 max_meta_size=meta_comp_size,
                 meta_comp_size=meta_comp_size)
-        # TODO handle the checksum
-    if offsets:
-        offsets_storage = list(itertools.repeat(0, nchunks))
-    # set the checksum impl
-    checksum_impl = CHECKSUMS_LOOKUP[checksum]
-    raw_bloscpack_header = create_bloscpack_header(
-            options=options,
-            checksum=CHECKSUMS_AVAIL.index(checksum),
-            typesize=blosc_args['typesize'],
-            chunk_size=chunk_size,
-            last_chunk=last_chunk_size,
-            nchunks=nchunks,
-            )
-    print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
-            level=DEBUG)
-    # write the chunks to the file
-    output_fp.write(raw_bloscpack_header)
-    # write the metadata to the file
-    if metadata is not None:
         output_fp.write(raw_metadata_header)
         output_fp.write(metadata)
-        # TODO checksum
         print_verbose("Wrote %s metadata of size '%s': %s" %
                 ('compressed' if metadata_opts['codec'] != 'None' else
                     'uncompressed', meta_comp_size, repr(metadata)))
     # preallocate space for the offsets
     if offsets:
+        offsets_storage = list(itertools.repeat(0, nchunks))
         output_fp.write(encode_int64(-1) * nchunks)
     # if nchunks == 1 the last_chunk_size is the size of the single chunk
     for i, bytes_to_read in enumerate((

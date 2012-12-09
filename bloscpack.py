@@ -1080,6 +1080,9 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     metadata_total = 0
     # deal with metadata
     if metadata is not None:
+        print_verbose('metadata args are:', level=DEBUG)
+        for arg, value in metadata_opts.iteritems():
+            print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
         metadata_total += METADATA_HEADER_LENGTH
         if metadata_opts['codec'] != CODECS_AVAIL[0]:
             codec = CODECS_LOOKUP[metadata_opts['codec']]
@@ -1099,6 +1102,9 @@ def _pack_fp(input_fp, output_fp, in_file_size,
         else:
             meta_size = len(metadata)
             meta_comp_size = meta_size
+        print_verbose("Raw %s metadata of size '%s': %s" %
+                ('compressed' if metadata_opts['codec'] != 'None' else
+                    'uncompressed', meta_comp_size, repr(metadata)))
         # TODO handle preallocation
         metadata_total += meta_comp_size
         # create metadata header
@@ -1110,16 +1116,15 @@ def _pack_fp(input_fp, output_fp, in_file_size,
                 meta_size=meta_size,
                 max_meta_size=meta_comp_size,
                 meta_comp_size=meta_comp_size)
+        print_verbose('raw_metadata_header: %s' % repr(raw_metadata_header),
+                level=DEBUG)
+        output_fp.write(raw_metadata_header)
+        output_fp.write(metadata)
         if metadata_opts['checksum'] != CHECKSUMS_AVAIL[0]:
             metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_opts['checksum']]
             metadata_digest = metadata_checksum_impl(metadata)
             metadata_total += metadata_checksum_impl.size
-        output_fp.write(raw_metadata_header)
-        output_fp.write(metadata)
-        output_fp.write(metadata_digest)
-        print_verbose("Wrote %s metadata of size '%s': %s" %
-                ('compressed' if metadata_opts['codec'] != 'None' else
-                    'uncompressed', meta_comp_size, repr(metadata)))
+            output_fp.write(metadata_digest)
     # preallocate space for the offsets
     if offsets:
         offsets_storage = list(itertools.repeat(0, nchunks))

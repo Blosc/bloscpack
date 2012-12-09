@@ -1010,8 +1010,11 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     # calculate header
     options = create_options(offsets=offsets,
             metadata=True if metadata is not None else False)
+    # need to store how much space was used by metadata, for seeking later
+    metadata_total = 0
     # deal with metadata
     if metadata is not None:
+        metadata_total += METADATA_HEADER_LENGTH
         if metadata_opts['codec'] != CODECS_AVAIL[0]:
             codec = CODECS_LOOKUP[metadata_opts['codec']]
             codec_id = CODECS_AVAIL.index(metadata_opts['codec'])
@@ -1033,6 +1036,7 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             meta_size = len(metadata)
             meta_comp_size = meta_size
             codec_id = 0
+        metadata_total += meta_comp_size
         # create metadata header
         raw_metadata_header = create_metadata_header(
                 magic_format=metadata_opts['magic_format'],
@@ -1101,7 +1105,7 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             print_verbose(tail_mess, level=DEBUG)
     if offsets:
         # seek to 32 bits into the file
-        output_fp.seek(BLOSCPACK_HEADER_LENGTH+meta_size, 0)
+        output_fp.seek(BLOSCPACK_HEADER_LENGTH + metadata_total, 0)
         print_verbose("Writing '%d' offsets: '%s'" %
                 (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
         # write the offsets encoded into the reserved space in the file

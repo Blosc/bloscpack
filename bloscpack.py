@@ -1031,6 +1031,83 @@ def process_nthread_arg(args):
     print_verbose('using %d thread%s' %
             (args.nthreads, 's' if args.nthreads > 1 else ''))
 
+
+def _write_metadata(output_fp, metadata, metadata_args):
+    """ Write the metadata to a file pointer.
+
+    Parameters
+    ----------
+    output_fp : file like
+        the file pointer to write to
+    metadata : dict
+        the metadata to write
+    metadata_args : dict
+        the metadata args
+
+    Returns
+    -------
+    metadata_total : int
+        the total number of bytes occupied by metadata header, metadata plus
+        preallocation and checksum
+
+    Notes
+    -----
+    The 'output_fp' should point to the position in the file where the metadata
+    should be written.
+
+    """
+    metadata_total = 0
+    print_verbose('metadata args are:', level=DEBUG)
+    for arg, value in metadata_args.iteritems():
+        print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
+    metadata_total += METADATA_HEADER_LENGTH
+    if metadata_args['codec'] != CODECS_AVAIL[0]:
+        codec = CODECS_LOOKUP[metadata_args['codec']]
+        metadata_compressed = codec.compress(metadata,
+                metadata_args['level'])
+        meta_size = len(metadata)
+        meta_comp_size = len(metadata_compressed)
+        # be opportunistic, avoid compression if not beneficial
+        if meta_size < meta_comp_size:
+            metadata_args['codec'] = 'None'
+            meta_comp_size = meta_size
+            print_verbose('metadata compression requested, but it was not '
+                    'beneficial, deactivating',
+                    level=DEBUG)
+        else:
+            metadata = metadata_compressed
+    else:
+        meta_size = len(metadata)
+        meta_comp_size = meta_size
+    print_verbose("Raw %s metadata of size '%s': %s" %
+            ('compressed' if metadata_args['codec'] != 'None' else
+                'uncompressed', meta_comp_size, repr(metadata)),
+            level=DEBUG)
+    # TODO handle preallocation
+    metadata_total += meta_comp_size
+    # create metadata header
+    raw_metadata_header = create_metadata_header(
+            magic_format=metadata_args['magic_format'],
+            checksum=metadata_args['checksum'],
+            codec=metadata_args['codec'],
+            level=metadata_args['level'],
+            meta_size=meta_size,
+            max_meta_size=meta_comp_size,
+            meta_comp_size=meta_comp_size)
+    print_verbose('raw_metadata_header: %s' % repr(raw_metadata_header),
+            level=DEBUG)
+    output_fp.write(raw_metadata_header)
+    output_fp.write(metadata)
+    if metadata_args['checksum'] != CHECKSUMS_AVAIL[0]:
+        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_args['checksum']]
+        metadata_digest = metadata_checksum_impl(metadata)
+        metadata_total += metadata_checksum_impl.size
+        output_fp.write(metadata_digest)
+    print_verbose("metadata section occupies a total of '%i' bytes" %
+            metadata_total, level=DEBUG)
+    return metadata_total
+
+
 def pack_file(in_file, out_file, blosc_args,
         metadata=None,
         nchunks=None, chunk_size=None,
@@ -1111,52 +1188,7 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     metadata_total = 0
     # deal with metadata
     if metadata is not None:
-        print_verbose('metadata args are:', level=DEBUG)
-        for arg, value in metadata_args.iteritems():
-            print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
-        metadata_total += METADATA_HEADER_LENGTH
-        if metadata_args['codec'] != CODECS_AVAIL[0]:
-            codec = CODECS_LOOKUP[metadata_args['codec']]
-            metadata_compressed = codec.compress(metadata,
-                    metadata_args['level'])
-            meta_size = len(metadata)
-            meta_comp_size = len(metadata_compressed)
-            # be opportunistic, avoid compression if not beneficial
-            if meta_size < meta_comp_size:
-                metadata_args['codec'] = 'None'
-                meta_comp_size = meta_size
-                print_verbose('metadata compression requested, but it was not '
-                        'beneficial, deactivating',
-                        level=DEBUG)
-            else:
-                metadata = metadata_compressed
-        else:
-            meta_size = len(metadata)
-            meta_comp_size = meta_size
-        print_verbose("Raw %s metadata of size '%s': %s" %
-                ('compressed' if metadata_args['codec'] != 'None' else
-                    'uncompressed', meta_comp_size, repr(metadata)),
-                level=DEBUG)
-        # TODO handle preallocation
-        metadata_total += meta_comp_size
-        # create metadata header
-        raw_metadata_header = create_metadata_header(
-                magic_format=metadata_args['magic_format'],
-                checksum=metadata_args['checksum'],
-                codec=metadata_args['codec'],
-                level=metadata_args['level'],
-                meta_size=meta_size,
-                max_meta_size=meta_comp_size,
-                meta_comp_size=meta_comp_size)
-        print_verbose('raw_metadata_header: %s' % repr(raw_metadata_header),
-                level=DEBUG)
-        output_fp.write(raw_metadata_header)
-        output_fp.write(metadata)
-        if metadata_args['checksum'] != CHECKSUMS_AVAIL[0]:
-            metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_args['checksum']]
-            metadata_digest = metadata_checksum_impl(metadata)
-            metadata_total += metadata_checksum_impl.size
-            output_fp.write(metadata_digest)
+        metadata_total += _write_metadata(output_fp, metadata, metadata_args)
     # preallocate space for the offsets
     if offsets:
         offsets_storage = list(itertools.repeat(0, nchunks))

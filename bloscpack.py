@@ -1240,12 +1240,19 @@ def _read_metadata(input_fp):
     ----------
     input_fp : file like
         a file pointer to read from
+
     Returns
     -------
     metadata : dict
         the metadata
     metadata_header : dict
         the metadata contents as dict
+
+    Notes
+    -----
+    The 'input_fp' should point to the position where the metadata starts. The
+    number of bytes to read will be determined from the metadata header.
+
     """
     raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
     print_verbose("raw metadata header: '%s'" % repr(raw_metadata_header),

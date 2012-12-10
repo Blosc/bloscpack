@@ -97,6 +97,14 @@ def test_check_files():
     nt.assert_equal(check_files('test_bloscpack.py',
         'test_bloscpack.py', args), None)
 
+def test_check_metadata_arguments():
+    missing = DEFAULT_METADATA_ARGS.copy()
+    missing.pop('magic_format')
+    nt.assert_raises(ValueError, bloscpack._check_metadata_arguments, missing)
+    extra = DEFAULT_METADATA_ARGS.copy()
+    extra['wtf'] = 'wtf'
+    nt.assert_raises(ValueError, bloscpack._check_metadata_arguments, extra)
+
 def test_calculate_nchunks():
     # tests for nchunks given
     # odd with no remainder

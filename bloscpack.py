@@ -56,6 +56,7 @@ DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
 
 # metadata args
 METADATA_ARGS = ['magic_format', 'checksum', 'codec', 'level']
+_METADATA_ARGS_SET = set(METADATA_ARGS)  # cached
 DEFAULT_MAGIC_FORMAT = 'JSON'
 DEFAULT_METADATA_CHECKSUM = 'adler32'
 DEFAULT_CODEC = 'zlib'
@@ -694,6 +695,36 @@ def _check_options_zero(options, indices):
         if options[i] != '0':
             raise ValueError(
                 'Element %i was non-zero when attempting to decode options')
+
+
+def _check_metadata_arguments(metadata_args):
+    """ Check the integrity of the metadata arguments dict.
+
+    Parameters
+    ----------
+    metadata_args : dict
+        metadata args dictionary
+
+    Raises
+    ------
+    ValueError
+        if there are missing or unexpected keys present
+
+    Notes
+    -----
+
+    Check the value of the 'METADATA_ARGS' constant for the details of what
+    keys should be contained in the dictionary.
+
+    """
+
+    received = set(metadata_args.keys())
+    missing = _METADATA_ARGS_SET.difference(received)
+    if len(missing) != 0:
+        raise ValueError("metadata args was missing: '%s'" % repr(missing))
+    extra = received.difference(_METADATA_ARGS_SET)
+    if len(extra) != 0:
+        raise ValueError("metadata args had some extras: '%s'" % repr(extra))
 
 
 def create_options(offsets=DEFAULT_OFFSETS, metadata=False):

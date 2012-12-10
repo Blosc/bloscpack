@@ -745,7 +745,7 @@ def test_metadata_opportunisitic_compression():
             None,
             DEFAULT_OFFSETS,
             DEFAULT_CHECKSUM,
-            DEFAULT_METADATA_ARGS.copy())
+            DEFAULT_METADATA_ARGS)
     out_fp.seek(0)
     raw_header = out_fp.read(32)
     header = decode_bloscpack_header(raw_header)
@@ -766,7 +766,7 @@ def test_metadata_opportunisitic_compression():
             None,
             DEFAULT_OFFSETS,
             DEFAULT_CHECKSUM,
-            DEFAULT_METADATA_ARGS.copy())
+            DEFAULT_METADATA_ARGS)
     out_fp.seek(0)
     raw_header = out_fp.read(32)
     header = decode_bloscpack_header(raw_header)
@@ -847,7 +847,7 @@ def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
     bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
             blosc_args, metadata,
             nchunks, chunk_size, offsets, checksum,
-            DEFAULT_METADATA_ARGS.copy())
+            DEFAULT_METADATA_ARGS)
     out_fp.seek(0)
     if progress:
         print("Decompressing")

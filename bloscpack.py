@@ -1232,6 +1232,53 @@ def _pack_fp(input_fp, output_fp, in_file_size,
                 level=DEBUG)
         output_fp.write(encoded_offsets)
 
+
+def _read_metadata(input_fp):
+    """ Read the metadata and header from a file pointer.
+
+    Parameters
+    ----------
+    input_fp : file like
+        a file pointer to read from
+    Returns
+    -------
+    metadata : dict
+        the metadata
+    metadata_header : dict
+        the metadata contents as dict
+    """
+    raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
+    print_verbose("raw metadata header: '%s'" % repr(raw_metadata_header),
+            level=DEBUG)
+    metadata_header = decode_metadata_header(raw_metadata_header)
+    print_verbose("metadata header: ", level=DEBUG)
+    for arg, value in metadata_header.iteritems():
+        print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
+    metadata = input_fp.read(metadata_header['meta_comp_size'])
+    if metadata_header['checksum'] != 'None':
+        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header['checksum']]
+        metadata_expected_digest = input_fp.read(metadata_checksum_impl.size)
+        metadata_received_digest = metadata_checksum_impl(metadata)
+        if metadata_received_digest != metadata_expected_digest:
+            raise ChecksumMismatch(
+                    "Checksum mismatch detected in metadata "
+                    "expected: '%s', received: '%s'" %
+                    (repr(metadata_expected_digest),
+                        repr(metadata_received_digest)))
+        else:
+            print_verbose('metadata checksum OK (%s): %s ' %
+                    (metadata_checksum_impl.name,
+                        repr(metadata_received_digest)),
+                    level=DEBUG)
+    if metadata_header['codec'] != 'None':
+        metadata_codec_impl = CODECS_LOOKUP[metadata_header['codec']]
+        metadata = metadata_codec_impl.decompress(metadata)
+    print_verbose("read %s metadata of size: '%s'" %
+            ('compressed' if metadata_header['codec'] != 0 else
+                'uncompressed', metadata_header['meta_comp_size']))
+    return metadata, metadata_header
+
+
 def unpack_file(in_file, out_file):
 
     """ Main function for decompressing a file.
@@ -1285,38 +1332,9 @@ def _unpack_fp(input_fp, output_fp):
     # read the offsets
     options = decode_options(bloscpack_header['options'])
     # read the metadata
-    if options['metadata']:
-        raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
-        print_verbose("raw metadata header: '%s'" % repr(raw_metadata_header),
-                level=DEBUG)
-        metadata_header = decode_metadata_header(raw_metadata_header)
-        print_verbose("metadata header: ", level=DEBUG)
-        for arg, value in metadata_header.iteritems():
-            print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
-        metadata = input_fp.read(metadata_header['meta_comp_size'])
-        if metadata_header['checksum'] != 'None':
-            metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header['checksum']]
-            metadata_expected_digest = input_fp.read(metadata_checksum_impl.size)
-            metadata_received_digest = metadata_checksum_impl(metadata)
-            if metadata_received_digest != metadata_expected_digest:
-                raise ChecksumMismatch(
-                        "Checksum mismatch detected in metadata "
-                        "expected: '%s', received: '%s'" %
-                        (repr(metadata_expected_digest),
-                         repr(metadata_received_digest)))
-            else:
-                print_verbose('metadata checksum OK (%s): %s ' %
-                        (metadata_checksum_impl.name,
-                            repr(metadata_received_digest)),
-                        level=DEBUG)
-        if metadata_header['codec'] != 'None':
-            metadata_codec_impl = CODECS_LOOKUP[metadata_header['codec']]
-            metadata = metadata_codec_impl.decompress(metadata)
-        print_verbose("read %s metadata of size: '%s'" %
-                ('compressed' if metadata_header['codec'] != 0 else
-                    'uncompressed', metadata_header['meta_comp_size']))
-    else:
-        metadata = None
+    metadata, metadata_header = _read_metadata(input_fp) \
+            if options['metadata'] \
+            else (None, None)
     if options['offsets']:
         offsets_raw = input_fp.read(8 * nchunks)
         print_verbose('Read raw offsets: %s' % repr(offsets_raw),

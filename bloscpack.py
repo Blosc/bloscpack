@@ -9,6 +9,7 @@ from __future__ import division
 import argparse
 import contextlib
 import hashlib
+import json
 import itertools
 import os.path as path
 import struct
@@ -992,7 +993,7 @@ def process_metadata_args(args):
     if args.metadata is not None:
         try:
             with open(args.metadata, 'r') as metadata_file:
-                return metadata_file.read().strip()
+                return json.loads(metadata_file.read().strip())
         except IOError as ioe:
             error(ioe.message)
 
@@ -1061,6 +1062,8 @@ def _write_metadata(output_fp, metadata, metadata_args):
     for arg, value in metadata_args.iteritems():
         print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
     metadata_total += METADATA_HEADER_LENGTH
+    # jsonize metadata for the time being
+    metadata = json.dumps(metadata)
     if metadata_args['codec'] != CODECS_AVAIL[0]:
         codec = CODECS_LOOKUP[metadata_args['codec']]
         metadata_compressed = codec.compress(metadata,
@@ -1286,6 +1289,7 @@ def _read_metadata(input_fp):
     print_verbose("read %s metadata of size: '%s'" %
             ('compressed' if metadata_header['codec'] != 0 else
                 'uncompressed', metadata_header['meta_comp_size']))
+    metadata = json.loads(metadata)
     return metadata, metadata_header
 
 

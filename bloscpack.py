@@ -223,6 +223,36 @@ def _check_valid_codec(codec):
         raise NoSuchCodec("codec '%s' does not exist" % codec)
 
 
+class Serializer(object):
+    """ Uniform serializer object.
+
+    Parameters
+    ----------
+    name : str
+        the name of the serializer
+    compress : callable
+        a compression function taking a dict as arg
+    decompress : callable
+        a decompression function taking serialized data as arg
+
+    """
+    def __init__(self, name, dumps, loads):
+        self.name = name
+        self._loads = loads
+        self._dumps = dumps
+
+    def dumps(self, dict_):
+        return self._dumps(dict_)
+
+    def loads(self, data):
+        return self._loads(data)
+
+SERIZLIALIZERS = [Serializer('JSON',
+            lambda x: json.dumps(x, separators=(',', ':')),
+            lambda x: json.loads(x))]
+SERIZLIALIZERS_AVAIL = [s.name for s in SERIZLIALIZERS]
+SERIZLIALIZERS_LOOKUP = dict(((s.name, s) for s in SERIZLIALIZERS))
+
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
     if level not in VERBOSITY_LEVELS:

@@ -1072,11 +1072,13 @@ def _write_metadata(output_fp, metadata, metadata_args):
         meta_comp_size = len(metadata_compressed)
         # be opportunistic, avoid compression if not beneficial
         if meta_size < meta_comp_size:
+            print_verbose('metadata compression requested, but it was not '
+                    'beneficial, deactivating '
+                    "(raw: '%s' vs. compressed: '%s') " %
+                    (meta_size, meta_comp_size),
+                    level=DEBUG)
             metadata_args['codec'] = 'None'
             meta_comp_size = meta_size
-            print_verbose('metadata compression requested, but it was not '
-                    'beneficial, deactivating',
-                    level=DEBUG)
         else:
             metadata = metadata_compressed
     else:

@@ -479,7 +479,7 @@ def create_parser():
                 metavar='<metadata>',
                 type=str,
                 dest='metadata',
-                help="file containing the metadata")
+                help="file containing the metadata, must contain valid JSON")
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,

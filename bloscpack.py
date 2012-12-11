@@ -1063,7 +1063,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
         print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
     metadata_total += METADATA_HEADER_LENGTH
     # jsonize metadata for the time being
-    metadata = json.dumps(metadata)
+    metadata = json.dumps(metadata, separators=(',',':'))
     if metadata_args['codec'] != CODECS_AVAIL[0]:
         codec = CODECS_LOOKUP[metadata_args['codec']]
         metadata_compressed = codec.compress(metadata,

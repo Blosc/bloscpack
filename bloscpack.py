@@ -9,6 +9,7 @@ from __future__ import division
 import argparse
 import contextlib
 import hashlib
+import json
 import itertools
 import os.path as path
 import struct
@@ -221,6 +222,36 @@ def _check_valid_codec(codec):
     if codec not in CODECS_AVAIL:
         raise NoSuchCodec("codec '%s' does not exist" % codec)
 
+
+class Serializer(object):
+    """ Uniform serializer object.
+
+    Parameters
+    ----------
+    name : str
+        the name of the serializer
+    compress : callable
+        a compression function taking a dict as arg
+    decompress : callable
+        a decompression function taking serialized data as arg
+
+    """
+    def __init__(self, name, dumps, loads):
+        self.name = name
+        self._loads = loads
+        self._dumps = dumps
+
+    def dumps(self, dict_):
+        return self._dumps(dict_)
+
+    def loads(self, data):
+        return self._loads(data)
+
+SERIZLIALIZERS = [Serializer('JSON',
+            lambda x: json.dumps(x, separators=(',', ':')),
+            lambda x: json.loads(x))]
+SERIZLIALIZERS_AVAIL = [s.name for s in SERIZLIALIZERS]
+SERIZLIALIZERS_LOOKUP = dict(((s.name, s) for s in SERIZLIALIZERS))
 
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
@@ -448,7 +479,7 @@ def create_parser():
                 metavar='<metadata>',
                 type=str,
                 dest='metadata',
-                help="file containing the metadata")
+                help="file containing the metadata, must contain valid JSON")
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,
@@ -992,7 +1023,7 @@ def process_metadata_args(args):
     if args.metadata is not None:
         try:
             with open(args.metadata, 'r') as metadata_file:
-                return metadata_file.read().strip()
+                return json.loads(metadata_file.read().strip())
         except IOError as ioe:
             error(ioe.message)
 
@@ -1061,6 +1092,8 @@ def _write_metadata(output_fp, metadata, metadata_args):
     for arg, value in metadata_args.iteritems():
         print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
     metadata_total += METADATA_HEADER_LENGTH
+    serializer_impl = SERIZLIALIZERS_LOOKUP[metadata_args['magic_format']]
+    metadata = serializer_impl.dumps(metadata)
     if metadata_args['codec'] != CODECS_AVAIL[0]:
         codec = CODECS_LOOKUP[metadata_args['codec']]
         metadata_compressed = codec.compress(metadata,
@@ -1069,11 +1102,13 @@ def _write_metadata(output_fp, metadata, metadata_args):
         meta_comp_size = len(metadata_compressed)
         # be opportunistic, avoid compression if not beneficial
         if meta_size < meta_comp_size:
+            print_verbose('metadata compression requested, but it was not '
+                    'beneficial, deactivating '
+                    "(raw: '%s' vs. compressed: '%s') " %
+                    (meta_size, meta_comp_size),
+                    level=DEBUG)
             metadata_args['codec'] = 'None'
             meta_comp_size = meta_size
-            print_verbose('metadata compression requested, but it was not '
-                    'beneficial, deactivating',
-                    level=DEBUG)
         else:
             metadata = metadata_compressed
     else:
@@ -1103,6 +1138,9 @@ def _write_metadata(output_fp, metadata, metadata_args):
         metadata_digest = metadata_checksum_impl(metadata)
         metadata_total += metadata_checksum_impl.size
         output_fp.write(metadata_digest)
+        print_verbose("metadata checksum (%s): %s" %
+                (metadata_args['checksum'], repr(metadata_digest)),
+                level=DEBUG)
     print_verbose("metadata section occupies a total of '%i' bytes" %
             metadata_total, level=DEBUG)
     return metadata_total
@@ -1283,6 +1321,8 @@ def _read_metadata(input_fp):
     print_verbose("read %s metadata of size: '%s'" %
             ('compressed' if metadata_header['codec'] != 0 else
                 'uncompressed', metadata_header['meta_comp_size']))
+    serializer_impl = SERIZLIALIZERS_LOOKUP[metadata_header['magic_format']]
+    metadata = serializer_impl.loads(metadata)
     return metadata, metadata_header
 
 

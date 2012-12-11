@@ -714,7 +714,10 @@ def test_offsets():
             nt.assert_equal(expected, blosc_header)
 
 def test_metadata():
-    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
+    test_metadata = {'dtype': 'float64',
+                     'shape': [1024],
+                     'others': [],
+                     }
     received_metadata = pack_unpack_fp(1, nchunks=20, metadata=test_metadata)
     nt.assert_equal(test_metadata, received_metadata)
 

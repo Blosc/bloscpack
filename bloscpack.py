@@ -47,7 +47,7 @@ DEFAULT_CHECKSUM = 'adler32'
 DEFAULT_OPTIONS = None  # created programatically later on
 
 # Blosc args
-BLOSC_ARGS = ['typesize', 'clevel', 'shuffle']
+BLOSC_ARGS = ('typesize', 'clevel', 'shuffle')
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
 MAX_CLEVEL = 9
@@ -56,7 +56,7 @@ DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
     (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE)))
 
 # metadata args
-METADATA_ARGS = ['magic_format', 'checksum', 'codec', 'level']
+METADATA_ARGS = ('magic_format', 'checksum', 'codec', 'level')
 _METADATA_ARGS_SET = set(METADATA_ARGS)  # cached
 DEFAULT_MAGIC_FORMAT = 'JSON'
 DEFAULT_METADATA_CHECKSUM = 'adler32'

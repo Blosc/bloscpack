@@ -1103,6 +1103,9 @@ def _write_metadata(output_fp, metadata, metadata_args):
         metadata_digest = metadata_checksum_impl(metadata)
         metadata_total += metadata_checksum_impl.size
         output_fp.write(metadata_digest)
+        print_verbose("metadata checksum (%s): %s" %
+                (metadata_args['checksum'], repr(metadata_digest)),
+                level=DEBUG)
     print_verbose("metadata section occupies a total of '%i' bytes" %
             metadata_total, level=DEBUG)
     return metadata_total

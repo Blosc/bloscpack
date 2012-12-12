@@ -94,6 +94,10 @@ class NoSuchCodec(ValueError):
     pass
 
 
+class NoSuchSerializer(ValueError):
+    pass
+
+
 class FormatVersionMismatch(RuntimeError):
     pass
 
@@ -247,11 +251,30 @@ class Serializer(object):
     def loads(self, data):
         return self._loads(data)
 
+
 SERIZLIALIZERS = [Serializer('JSON',
             lambda x: json.dumps(x, separators=(',', ':')),
             lambda x: json.loads(x))]
 SERIZLIALIZERS_AVAIL = [s.name for s in SERIZLIALIZERS]
 SERIZLIALIZERS_LOOKUP = dict(((s.name, s) for s in SERIZLIALIZERS))
+
+
+def _check_valid_serializer(serializer):
+    """ Check the validity of a serializer.
+
+    Parameters
+    ----------
+    serializer : str
+        the magic format of the serializer
+
+    Raises
+    ------
+    NoSuchSerializer
+        if no such serializer exists.
+    """
+    if serializer not in SERIZLIALIZERS_AVAIL:
+        raise NoSuchSerializer("serializer '%s' does not exist" % serializer)
+
 
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """

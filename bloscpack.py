@@ -1369,19 +1369,18 @@ def _unpack_fp(input_fp, output_fp):
     bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
     print_verbose("bloscpack header: ", level=DEBUG)
     for arg, value in bloscpack_header.iteritems():
-        # hack the values of the bloscpack header into the namespace
-        globals()[arg] = value
         print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
-    checksum_impl = CHECKSUMS[checksum]
-    if FORMAT_VERSION != format_version:
+    checksum_impl = CHECKSUMS[bloscpack_header['checksum']]
+    if FORMAT_VERSION != bloscpack_header['format_version']:
         raise FormatVersionMismatch("format version of file was not '%s' as expected, but '%d'" %
-                (FORMAT_VERSION, format_version))
+                (FORMAT_VERSION, bloscpack_header['format_version']))
     # read the offsets
     options = decode_options(bloscpack_header['options'])
     # read the metadata
     metadata, metadata_header = _read_metadata(input_fp) \
             if options['metadata'] \
             else (None, None)
+    nchunks = bloscpack_header['nchunks']
     if options['offsets']:
         offsets_raw = input_fp.read(8 * nchunks)
         print_verbose('Read raw offsets: %s' % repr(offsets_raw),

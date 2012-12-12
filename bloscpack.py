@@ -56,15 +56,16 @@ DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
     (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE)))
 
 # metadata args
-METADATA_ARGS = ('magic_format', 'checksum', 'codec', 'level')
+METADATA_ARGS = ('magic_format', 'checksum', 'codec', 'level', 'max_meta_size')
 _METADATA_ARGS_SET = set(METADATA_ARGS)  # cached
 DEFAULT_MAGIC_FORMAT = 'JSON'
 DEFAULT_METADATA_CHECKSUM = 'adler32'
 DEFAULT_CODEC = 'zlib'
 DEFAULT_LEVEL = 6
+DEFAULT_MAX_META_SIZE = lambda x: 10 * x
 DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
     (DEFAULT_MAGIC_FORMAT, DEFAULT_METADATA_CHECKSUM,
-    DEFAULT_CODEC, DEFAULT_LEVEL)))
+    DEFAULT_CODEC, DEFAULT_LEVEL, DEFAULT_MAX_META_SIZE)))
 
 # verbosity levels
 NORMAL  = 'NORMAL'
@@ -1141,7 +1142,18 @@ def _write_metadata(output_fp, metadata, metadata_args):
             ('compressed' if metadata_args['codec'] != 'None' else
                 'uncompressed', meta_comp_size, repr(metadata)),
             level=DEBUG)
-    # TODO handle preallocation
+    if hasattr(metadata_args['max_meta_size'], '__call__'):
+        max_meta_size = metadata_args['max_meta_size'](meta_size)
+    elif isinstance(metadata_args['max_meta_size'], int):
+        max_meta_size = metadata_args['max_meta_size']
+    print_verbose('max meta size is deemed to be: %d' %
+            max_meta_size,
+            level=DEBUG)
+    if meta_comp_size > max_meta_size:
+        raise RuntimeError(
+                'metadata section is too small contain the metadata '
+                'required: %d allocated: %d' %
+                (meta_comp_size, max_meta_size))
     metadata_total += meta_comp_size
     # create metadata header
     raw_metadata_header = create_metadata_header(
@@ -1150,12 +1162,18 @@ def _write_metadata(output_fp, metadata, metadata_args):
             codec=metadata_args['codec'],
             level=metadata_args['level'],
             meta_size=meta_size,
-            max_meta_size=meta_comp_size,
+            max_meta_size=max_meta_size,
             meta_comp_size=meta_comp_size)
     print_verbose('raw_metadata_header: %s' % repr(raw_metadata_header),
             level=DEBUG)
     output_fp.write(raw_metadata_header)
     output_fp.write(metadata)
+    prealloc = max_meta_size - meta_comp_size
+    for i in xrange(prealloc):
+        output_fp.write('\x00')
+    metadata_total += prealloc
+    print_verbose("metadata has %d preallocated empty bytes" %
+            prealloc, level=DEBUG)
     if metadata_args['checksum'] != CHECKSUMS_AVAIL[0]:
         metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_args['checksum']]
         metadata_digest = metadata_checksum_impl(metadata)
@@ -1358,6 +1376,8 @@ def _read_metadata(input_fp):
     for arg, value in metadata_header.iteritems():
         print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
     metadata = input_fp.read(metadata_header['meta_comp_size'])
+    prealloc = metadata_header['max_meta_size'] - metadata_header['meta_comp_size']
+    input_fp.seek(prealloc, 1)
     if metadata_header['checksum'] != 'None':
         metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header['checksum']]
         metadata_expected_digest = input_fp.read(metadata_checksum_impl.size)

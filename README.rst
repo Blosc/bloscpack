@@ -284,13 +284,13 @@ for housekeeping:
 :offsets:
     a variable length section containing chunk offsets
 :chunk:
-    the blosc chunk
+    the blosc chunk(s)
 :checksum:
-    a checksum following the chunk, if desired
+    a checksum following each chunk, if desired
 
 The layout of the file is then::
 
-    |-header-|-meta-|-offsets-|-chunk-|-check-|-chunk-|-check-|...|
+    |-header-|-meta-|-offsets-|-chunk-|-checksum-|-chunk-|-checksum-|...|
 
 Description of the header
 ~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1357,8 +1357,9 @@ def unpack_file(in_file, out_file):
         metadata = _unpack_fp(input_fp, output_fp)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
-    print_verbose('decompression ratio: %f' % (out_file_size/in_file_size))
+    print_verbose('decompression ratio: %f' % (out_file_size / in_file_size))
     return metadata
+
 
 def _unpack_fp(input_fp, output_fp):
     # read the bloscpack header
@@ -1372,7 +1373,8 @@ def _unpack_fp(input_fp, output_fp):
         print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
     checksum_impl = CHECKSUMS[bloscpack_header['checksum']]
     if FORMAT_VERSION != bloscpack_header['format_version']:
-        raise FormatVersionMismatch("format version of file was not '%s' as expected, but '%d'" %
+        raise FormatVersionMismatch(
+                "format version of file was not '%s' as expected, but '%d'" %
                 (FORMAT_VERSION, bloscpack_header['format_version']))
     # read the offsets
     options = decode_options(bloscpack_header['options'])
@@ -1385,13 +1387,13 @@ def _unpack_fp(input_fp, output_fp):
         offsets_raw = input_fp.read(8 * nchunks)
         print_verbose('Read raw offsets: %s' % repr(offsets_raw),
                 level=DEBUG)
-        offset_storage = [decode_int64(offsets_raw[j-8:j]) for j in
-                xrange(8, nchunks*8+1, 8)]
+        offset_storage = [decode_int64(offsets_raw[j - 8:j]) for j in
+                xrange(8, nchunks * 8 + 1, 8)]
         print_verbose('Offsets: %s' % offset_storage, level=DEBUG)
     # decompress
     for i in range(nchunks):
         print_verbose("decompressing chunk '%d'%s" %
-                (i, ' (last)' if i == nchunks-1 else ''), level=DEBUG)
+                (i, ' (last)' if i == nchunks - 1 else ''), level=DEBUG)
         # read blosc header
         blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
         blosc_header = decode_blosc_header(blosc_header_raw)

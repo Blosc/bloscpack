@@ -645,8 +645,9 @@ Changelog
 Thanks
 ------
 
-* Fracesc Alted for writing Blosc in the first place and for providing
-  code-review and feedback on Bloscpack
+* Fracesc Alted for writing Blosc in the first place, for providing continual
+  code-review and feedback on Bloscpack and for co-authoring the Bloscpack
+  file-format specification.
 
 Author, Copyright and License
 -----------------------------

@@ -390,9 +390,9 @@ All entries are little-endian.
     couple of years. Again, ``-1`` denotes that the number of is unknown.
 :max-app-chunks:
     (``int64``)
-     The maximum number of chunks that can be appended to this file, excluding
-     ``nchunks``. This is only useful if there is an offsets section in the
-     file and should be set to ``-1`` if there is no such section.
+    The maximum number of chunks that can be appended to this file, excluding
+    ``nchunks``. This is only useful if there is an offsets section in the
+    file and should be set to ``-1`` if there is no such section.
 
 The overall file-size can be computed as ``chunk-size * (nchunks - 1) +
 last-chunk-size``. In a streaming scenario ``-1`` can be used as a placeholder.

@@ -168,7 +168,7 @@ def _check_valid_checksum(checksum):
 
     Raises
     ------
-    ValueError
+    NoSuchChecksum
         if no such checksum exists.
     """
     if checksum not in CHECKSUMS_AVAIL:
@@ -216,7 +216,7 @@ def _check_valid_codec(codec):
 
     Raises
     ------
-    ValueError
+    NoSuchCodec
         if no such checksum exists.
     """
     if codec not in CODECS_AVAIL:

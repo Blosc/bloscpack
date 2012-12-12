@@ -1283,6 +1283,13 @@ def _read_bloscpack_header(input_fp):
     -------
     bloscpack_header : dict
         the decoded bloscpack header
+
+    Raises
+    ------
+    FormatVersionMismatch
+        if the received format version is not equal to the one this module can
+        decode
+
     """
     print_verbose('reading bloscpack header', level=DEBUG)
     bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
@@ -1292,6 +1299,10 @@ def _read_bloscpack_header(input_fp):
     print_verbose("bloscpack header: ", level=DEBUG)
     for arg, value in bloscpack_header.iteritems():
         print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
+    if FORMAT_VERSION != bloscpack_header['format_version']:
+        raise FormatVersionMismatch(
+                "format version of file was not '%s' as expected, but '%d'" %
+                (FORMAT_VERSION, bloscpack_header['format_version']))
     return bloscpack_header
 
 
@@ -1388,10 +1399,6 @@ def unpack_file(in_file, out_file):
 def _unpack_fp(input_fp, output_fp):
     bloscpack_header = _read_bloscpack_header(input_fp)
     checksum_impl = CHECKSUMS[bloscpack_header['checksum']]
-    if FORMAT_VERSION != bloscpack_header['format_version']:
-        raise FormatVersionMismatch(
-                "format version of file was not '%s' as expected, but '%d'" %
-                (FORMAT_VERSION, bloscpack_header['format_version']))
     # read the offsets
     options = decode_options(bloscpack_header['options'])
     # read the metadata

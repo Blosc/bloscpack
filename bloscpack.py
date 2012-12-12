@@ -1271,6 +1271,30 @@ def _pack_fp(input_fp, output_fp, in_file_size,
         output_fp.write(encoded_offsets)
 
 
+def _read_bloscpack_header(input_fp):
+    """ Read the bloscpack header.
+
+    Parameters
+    ----------
+    input_fp : file like
+        a file pointer to read from
+
+    Returns
+    -------
+    bloscpack_header : dict
+        the decoded bloscpack header
+    """
+    print_verbose('reading bloscpack header', level=DEBUG)
+    bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
+    print_verbose('bloscpack_header_raw: %s' %
+            repr(bloscpack_header_raw), level=DEBUG)
+    bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
+    print_verbose("bloscpack header: ", level=DEBUG)
+    for arg, value in bloscpack_header.iteritems():
+        print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
+    return bloscpack_header
+
+
 def _read_metadata(input_fp):
     """ Read the metadata and header from a file pointer.
 
@@ -1362,15 +1386,7 @@ def unpack_file(in_file, out_file):
 
 
 def _unpack_fp(input_fp, output_fp):
-    # read the bloscpack header
-    print_verbose('reading bloscpack header', level=DEBUG)
-    bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
-    print_verbose('bloscpack_header_raw: %s' %
-            repr(bloscpack_header_raw), level=DEBUG)
-    bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
-    print_verbose("bloscpack header: ", level=DEBUG)
-    for arg, value in bloscpack_header.iteritems():
-        print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
+    bloscpack_header = _read_bloscpack_header(input_fp)
     checksum_impl = CHECKSUMS[bloscpack_header['checksum']]
     if FORMAT_VERSION != bloscpack_header['format_version']:
         raise FormatVersionMismatch(

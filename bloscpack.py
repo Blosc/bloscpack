@@ -1362,7 +1362,6 @@ def _read_metadata(input_fp):
 
 
 def unpack_file(in_file, out_file):
-
     """ Main function for decompressing a file.
 
     Parameters

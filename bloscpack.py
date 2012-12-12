@@ -107,6 +107,18 @@ class ChecksumMismatch(RuntimeError):
     pass
 
 
+class ChecksumLengthMismatch(RuntimeError):
+    pass
+
+
+class NoMetadataFound(RuntimeError):
+    pass
+
+
+class NoChangeInMetadata(RuntimeError):
+    pass
+
+
 class FileNotFound(IOError):
     pass
 
@@ -1491,6 +1503,72 @@ def _unpack_fp(input_fp, output_fp):
                 (pretty_size(len(compressed)),
                     pretty_size(len(decompressed))), level=DEBUG)
     return metadata
+
+def update_metadata_fp(target_fp, metadata,
+            magic_format=None, checksum=None,
+            codec=DEFAULT_CODEC, level=DEFAULT_LEVEL):
+    """ Update the metadata section.
+
+    Parameters
+    ----------
+    target_fp : file_like
+        the file pointer to read from and write into
+    metadata : dict
+        the new metadata to save
+
+    See the notes below for a description of the keyword arguments.
+
+    Raises
+    ------
+
+    Notes
+    -----
+
+    This updated the metadata section in a given bloscpack file. Since the
+    space has already been allocated, only certain metadata arguments can be
+    overridden. The keyword arguments specify which ones these are. If a
+    keyword argument value is 'None' the existing arguement is used. Otherwise
+    the value from the keyword argument takes precedence. Due to a policy of
+    opportunisitic compression, the defaults for the 'codec' and 'level'
+    arguments are overriden by default, to ensure that previously uncompressed
+    metadata, which might be compressible as a result of the enlargement
+    process, will actually be compressed. As for the 'checksum' only a checksum
+    with the same digest size can be used.
+
+    """
+    _check_valid_serializer(magic_format)
+    _check_valid_checksum(checksum)
+    _check_valid_codec(codec)
+    check_range('meta-level',      level,         0, MAX_CLEVEL)
+    bloscpack_header = _read_bloscpack_header(target_fp)
+    options = decode_options(bloscpack_header['options'])
+    # read the metadata
+    if not options['metadata']:
+        raise NoMetadataFound(
+                'target file_pointer does not have any metadata section')
+    old_metadata, metadata_header = _read_metadata(target_fp)
+    if metadata == old_metadata:
+        raise NoChangeInMetadata(
+                'you requested to update metadata, but this has not changed')
+    # get the settings from the metadata header
+    metadata_args = dict((k, metadata_header[k]) for k in METADATA_ARGS)
+    # handle and check validity of overrides
+    if magic_format is not None:
+        metadata_args['magic_format'] = magic_format
+    if checksum is not None:
+        old_impl = CHECKSUMS[metadata_header['checksum']]
+        new_impl = CHECKSUMS_LOOKUP[checksum]
+        if old_impl.size != new_impl.size:
+            raise ChecksumLengthMismatch(
+                    'checksums have a size mismatch')
+        metadata_args['checksum'] = checksum
+    if codec is not None:
+        metadata_args['codec'] = codec
+    if level is not None:
+        metadata_args[level] = level
+    # seek back to where the metadata begins and re-write it
+    target_fp.seek(BLOSCPACK_HEADER_LENGTH, 0)
+    _write_metadata(target_fp, metadata, metadata_args)
 
 if __name__ == '__main__':
     parser = create_parser()

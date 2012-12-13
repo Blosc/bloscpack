@@ -314,6 +314,22 @@ def test_decode_metadata_options():
     nt.assert_raises(ValueError, decode_metadata_options, '11111111')
 
 
+def test_check_options():
+    # check for non-string
+    nt.assert_raises(TypeError, bloscpack._check_options, 0)
+    nt.assert_raises(TypeError, bloscpack._check_options, 1)
+    # check for lengths too small and too large
+    nt.assert_raises(ValueError, bloscpack._check_options, '0')
+    nt.assert_raises(ValueError, bloscpack._check_options, '1')
+    nt.assert_raises(ValueError, bloscpack._check_options, '0000000')
+    nt.assert_raises(ValueError, bloscpack._check_options, '000000000')
+    nt.assert_raises(ValueError, bloscpack._check_options, '1111111')
+    nt.assert_raises(ValueError, bloscpack._check_options, '111111111')
+    # check for non zeros and ones
+    nt.assert_raises(ValueError, bloscpack._check_options, '0000000a')
+    nt.assert_raises(ValueError, bloscpack._check_options, 'aaaaaaaa')
+
+
 def test_create_bloscpack_header_arguments():
     # check format_version
     nt.assert_raises(ValueError, create_bloscpack_header, format_version=-1)
@@ -324,21 +340,7 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(ValueError, create_bloscpack_header, checksum=-1)
     nt.assert_raises(ValueError, create_bloscpack_header,
             checksum=len(CHECKSUMS)+1)
-    nt.assert_raises(TypeError, create_bloscpack_header, checksum='foo')
-    # check options argument
-    # check for non-string
-    nt.assert_raises(TypeError, create_bloscpack_header, options=0)
-    nt.assert_raises(TypeError, create_bloscpack_header, options=1)
-    # check for lengths too small and too large
-    nt.assert_raises(ValueError, create_bloscpack_header, options='0')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='1')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='0000000')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='000000000')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='1111111')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='111111111')
-    # check for non zeros and ones
-    nt.assert_raises(ValueError, create_bloscpack_header, options='0000000a')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='aaaaaaaa')
+    nt.assert_raises(NoSuchChecksum, create_bloscpack_header, checksum='foo')
     # check the typesize
     nt.assert_raises(ValueError, create_bloscpack_header, typesize=-1)
     nt.assert_raises(ValueError, create_bloscpack_header,
@@ -374,24 +376,25 @@ def test_create_bloscpack_header():
     expected = MAGIC + format_version + \
         '\x01\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(options='00000001'))
+    nt.assert_equal(expected, create_bloscpack_header(offsets=True))
     expected = MAGIC + format_version + \
         '\x02\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(options='00000010'))
+    nt.assert_equal(expected, create_bloscpack_header(metadata=True))
     expected = MAGIC + format_version + \
-        '\xff\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\x03\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(options='11111111'))
+    nt.assert_equal(expected,
+            create_bloscpack_header(offsets=True, metadata=True))
     # test with checksum
     expected = MAGIC + format_version + \
         '\x00\x01\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(checksum=1))
+    nt.assert_equal(expected, create_bloscpack_header(checksum='adler32'))
     expected = MAGIC + format_version + \
         '\x00\x08\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(checksum=8))
+    nt.assert_equal(expected, create_bloscpack_header(checksum='sha512'))
     # test with typesize
     expected = MAGIC + format_version + \
         '\x00\x00\x01\xff\xff\xff\xff\xff\xff\xff\xff'+ \
@@ -460,8 +463,9 @@ def test_create_bloscpack_header():
 def test_decode_bloscpack_header():
     no_arg_return  = {
             'format_version': FORMAT_VERSION,
-            'options':       '00000000',
-            'checksum':      0,
+            'offsets':       False,
+            'metadata':      False,
+            'checksum':      'None',
             'typesize':      0,
             'chunk_size':    -1,
             'last_chunk':    -1,
@@ -488,14 +492,18 @@ def test_decode_bloscpack_header():
     nt.assert_equal(format_version_set_return,
             decode_bloscpack_header(format_version_set))
     # check with options
-    nt.assert_equal(copy_and_set_return('options', '00000001'),
+    nt.assert_equal(copy_and_set_return('offsets', True),
             decode_bloscpack_header(copy_and_set_input(5, '\x01')))
-    nt.assert_equal(copy_and_set_return('options', '11111111'),
-            decode_bloscpack_header(copy_and_set_input(5, '\xff')))
+    nt.assert_equal(copy_and_set_return('metadata', True),
+            decode_bloscpack_header(copy_and_set_input(5, '\x02')))
+    expected = copy_and_set_return('metadata', True)
+    expected['offsets'] = True
+    nt.assert_equal(expected,
+            decode_bloscpack_header(copy_and_set_input(5, '\x03')))
     # check with checksum
-    nt.assert_equal(copy_and_set_return('checksum', 1),
+    nt.assert_equal(copy_and_set_return('checksum', 'adler32'),
             decode_bloscpack_header(copy_and_set_input(6, '\x01')))
-    nt.assert_equal(copy_and_set_return('checksum', 7),
+    nt.assert_equal(copy_and_set_return('checksum', 'sha384'),
             decode_bloscpack_header(copy_and_set_input(6, '\x07')))
     # check with typesize
     nt.assert_equal(copy_and_set_return('typesize', 1),
@@ -769,73 +777,26 @@ def test_rewrite_metadata():
             codec=None, level=None, checksum='sha512')
 
 
-#def test_metadata_mismatch():
-#    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
-#    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
-#    create_array_fp(1, in_fp)
-#    in_fp_size = in_fp.tell()
-#    in_fp.seek(0)
-#    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-#            DEFAULT_BLOSC_ARGS,
-#            test_metadata,
-#            1,
-#            None,
-#            DEFAULT_OFFSETS,
-#            DEFAULT_CHECKSUM,
-#            DEFAULT_METADATA_ARGS.copy())
-#    # remove the metadata bit
-#    options = create_options(metadata=False)
-#    options_binary = encode_uint8(int(options, 2))
-#    out_fp.seek(5)
-#    out_fp.write(options_binary)
-#    out_fp.seek(0)
-#    nt.assert_raises(MetaDataMismatch, bloscpack._unpack_fp, out_fp, dcmp_fp)
-
 def test_metadata_opportunisitic_compression():
     # make up some metadata that can be compressed with benefit
     test_metadata = ("{'dtype': 'float64', 'shape': [1024], 'others': [],"
             "'original_container': 'carray'}")
-    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
-    create_array_fp(1, in_fp)
-    in_fp_size = in_fp.tell()
-    in_fp.seek(0)
-    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            DEFAULT_BLOSC_ARGS,
-            test_metadata,
-            1,
-            None,
-            DEFAULT_OFFSETS,
-            DEFAULT_CHECKSUM,
-            DEFAULT_METADATA_ARGS)
-    out_fp.seek(0)
-    raw_header = out_fp.read(32)
-    header = decode_bloscpack_header(raw_header)
-    raw_options = header['options']
-    options = decode_options(raw_options)
-    #nt.assert_true(options['compress_meta'])
+    target_fp = StringIO()
+    bloscpack._write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
+    target_fp.seek(0, 0)
+    metadata, header = bloscpack._read_metadata(target_fp)
+    nt.assert_equal('zlib', header['codec'])
 
     # now do the same thing, but use badly compressible metadata
     test_metadata = "abc"
-    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
-    create_array_fp(1, in_fp)
-    in_fp_size = in_fp.tell()
-    in_fp.seek(0)
-    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            DEFAULT_BLOSC_ARGS,
-            test_metadata,
-            1,
-            None,
-            DEFAULT_OFFSETS,
-            DEFAULT_CHECKSUM,
-            DEFAULT_METADATA_ARGS)
-    out_fp.seek(0)
-    raw_header = out_fp.read(32)
-    header = decode_bloscpack_header(raw_header)
-    raw_options = header['options']
-    options = decode_options(raw_options)
-    # bloscpack should have decided that there is no benefit to compressing the
-    # metadata and thus deactivated it
-    #nt.assert_false(options['compress_meta'])
+    target_fp = StringIO()
+    # default args say: do compression...
+    bloscpack._write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
+    target_fp.seek(0, 0)
+    metadata, header = bloscpack._read_metadata(target_fp)
+    # but it wasn't of any use
+    nt.assert_equal('None', header['codec'])
+
 
 def test_invalid_format():
     # this will cause a bug if we ever reach 255 format versions

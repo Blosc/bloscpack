@@ -1520,29 +1520,39 @@ def _rewrite_metadata_fp(target_fp, metadata,
 
     Raises
     ------
+    ChecksumLengthMismatch
+        if the new checksum has a different length than the old one
+    NoChangeInMetadata
+        if the metadata has not changed
 
     Notes
     -----
 
-    This updated the metadata section in a given bloscpack file. Since the
-    space has already been allocated, only certain metadata arguments can be
-    overridden. The keyword arguments specify which ones these are. If a
-    keyword argument value is 'None' the existing arguement is used. Otherwise
-    the value from the keyword argument takes precedence. Due to a policy of
-    opportunisitic compression, the defaults for the 'codec' and 'level'
-    arguments are overriden by default, to ensure that previously uncompressed
-    metadata, which might be compressible as a result of the enlargement
+    The target_fp should point to the beginning of the metadata section.
+
+    This rewrites the metadata section. Since the space has already been
+    allocated, only certain metadata arguments can be overridden. The keyword
+    arguments specify which ones these are. If a keyword argument value is
+    'None' the existing argument which is obtained from the header is used.
+    Otherwise the value from the keyword argument takes precedence. Due to a
+    policy of opportunistic compression, the 'codec' and 'level' arguments are
+    not 'None' by default, to ensure that previously uncompressed metadata,
+    which might be favourably compressible as a result of the enlargement
     process, will actually be compressed. As for the 'checksum' only a checksum
     with the same digest size can be used.
 
     """
+    # cache the current position
     current_pos = target_fp.tell()
+
     #bloscpack_header = _read_bloscpack_header(target_fp)
     #options = decode_options(bloscpack_header['options'])
     ## read the metadata
     #if not options['metadata']:
     #    raise NoMetadataFound(
     #            'target file_pointer does not have any metadata section')
+
+    # read the metadata section
     old_metadata, metadata_header = _read_metadata(target_fp)
     if metadata == old_metadata:
         raise NoChangeInMetadata(
@@ -1567,8 +1577,9 @@ def _rewrite_metadata_fp(target_fp, metadata,
     if level is not None:
         check_range('meta-level',      level,         0, MAX_CLEVEL)
         metadata_args[level] = level
-    # seek back to where the metadata begins and re-write it
+    # seek back to where the metadata begins...
     target_fp.seek(current_pos, 0)
+    # and re-write it
     _write_metadata(target_fp, metadata, metadata_args)
 
 if __name__ == '__main__':

@@ -1575,7 +1575,7 @@ def _rewrite_metadata_fp(target_fp, metadata,
         _check_valid_codec(codec)
         metadata_args['codec'] = codec
     if level is not None:
-        check_range('meta-level',      level,         0, MAX_CLEVEL)
+        check_range('meta-level', level, 0, MAX_CLEVEL)
         metadata_args[level] = level
     # seek back to where the metadata begins...
     target_fp.seek(current_pos, 0)

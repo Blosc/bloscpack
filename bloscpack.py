@@ -1139,9 +1139,10 @@ def _write_metadata(output_fp, metadata, metadata_args):
     metadata_total += METADATA_HEADER_LENGTH
     serializer_impl = SERIZLIALIZERS_LOOKUP[metadata_args['magic_format']]
     metadata = serializer_impl.dumps(metadata)
+    codec = 'None'
     if metadata_args['codec'] != CODECS_AVAIL[0]:
-        codec = CODECS_LOOKUP[metadata_args['codec']]
-        metadata_compressed = codec.compress(metadata,
+        codec_impl = CODECS_LOOKUP[metadata_args['codec']]
+        metadata_compressed = codec_impl.compress(metadata,
                 metadata_args['level'])
         meta_size = len(metadata)
         meta_comp_size = len(metadata_compressed)
@@ -1152,9 +1153,9 @@ def _write_metadata(output_fp, metadata, metadata_args):
                     "(raw: '%s' vs. compressed: '%s') " %
                     (meta_size, meta_comp_size),
                     level=DEBUG)
-            metadata_args['codec'] = 'None'
             meta_comp_size = meta_size
         else:
+            codec = codec_impl.name
             metadata = metadata_compressed
     else:
         meta_size = len(metadata)
@@ -1180,7 +1181,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
     raw_metadata_header = create_metadata_header(
             magic_format=metadata_args['magic_format'],
             checksum=metadata_args['checksum'],
-            codec=metadata_args['codec'],
+            codec=codec,
             level=metadata_args['level'],
             meta_size=meta_size,
             max_meta_size=max_meta_size,

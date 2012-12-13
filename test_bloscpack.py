@@ -803,40 +803,20 @@ def test_metadata_opportunisitic_compression():
     # make up some metadata that can be compressed with benefit
     test_metadata = ("{'dtype': 'float64', 'shape': [1024], 'others': [],"
             "'original_container': 'carray'}")
-    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
-    create_array_fp(1, in_fp)
-    in_fp_size = in_fp.tell()
-    in_fp.seek(0)
-    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            DEFAULT_BLOSC_ARGS,
-            test_metadata,
-            1,
-            None,
-            DEFAULT_OFFSETS,
-            DEFAULT_CHECKSUM,
-            DEFAULT_METADATA_ARGS)
-    out_fp.seek(0)
-    raw_header = out_fp.read(BLOSCPACK_HEADER_LENGTH)
-    metadata, header = bloscpack._read_metadata(out_fp)
+    target_fp = StringIO()
+    bloscpack._write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
+    target_fp.seek(0, 0)
+    metadata, header = bloscpack._read_metadata(target_fp)
     nt.assert_equal('zlib', header['codec'])
 
     # now do the same thing, but use badly compressible metadata
     test_metadata = "abc"
-    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
-    create_array_fp(1, in_fp)
-    in_fp_size = in_fp.tell()
-    in_fp.seek(0)
-    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            DEFAULT_BLOSC_ARGS,
-            test_metadata,
-            1,
-            None,
-            DEFAULT_OFFSETS,
-            DEFAULT_CHECKSUM,
-            DEFAULT_METADATA_ARGS)
-    out_fp.seek(0)
-    raw_header = out_fp.read(BLOSCPACK_HEADER_LENGTH)
-    metadata, header = bloscpack._read_metadata(out_fp)
+    target_fp = StringIO()
+    # default args say: do compression...
+    bloscpack._write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
+    target_fp.seek(0, 0)
+    metadata, header = bloscpack._read_metadata(target_fp)
+    # but it wasn't of any use
     nt.assert_equal('None', header['codec'])
 
 def test_invalid_format():

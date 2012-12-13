@@ -1536,16 +1536,13 @@ def update_metadata_fp(target_fp, metadata,
     with the same digest size can be used.
 
     """
-    _check_valid_serializer(magic_format)
-    _check_valid_checksum(checksum)
-    _check_valid_codec(codec)
-    check_range('meta-level',      level,         0, MAX_CLEVEL)
-    bloscpack_header = _read_bloscpack_header(target_fp)
-    options = decode_options(bloscpack_header['options'])
-    # read the metadata
-    if not options['metadata']:
-        raise NoMetadataFound(
-                'target file_pointer does not have any metadata section')
+    current_pos = target_fp.tell()
+    #bloscpack_header = _read_bloscpack_header(target_fp)
+    #options = decode_options(bloscpack_header['options'])
+    ## read the metadata
+    #if not options['metadata']:
+    #    raise NoMetadataFound(
+    #            'target file_pointer does not have any metadata section')
     old_metadata, metadata_header = _read_metadata(target_fp)
     if metadata == old_metadata:
         raise NoChangeInMetadata(
@@ -1554,8 +1551,10 @@ def update_metadata_fp(target_fp, metadata,
     metadata_args = dict((k, metadata_header[k]) for k in METADATA_ARGS)
     # handle and check validity of overrides
     if magic_format is not None:
+        _check_valid_serializer(magic_format)
         metadata_args['magic_format'] = magic_format
     if checksum is not None:
+        _check_valid_checksum(checksum)
         old_impl = CHECKSUMS[metadata_header['checksum']]
         new_impl = CHECKSUMS_LOOKUP[checksum]
         if old_impl.size != new_impl.size:
@@ -1563,11 +1562,13 @@ def update_metadata_fp(target_fp, metadata,
                     'checksums have a size mismatch')
         metadata_args['checksum'] = checksum
     if codec is not None:
+        _check_valid_codec(codec)
         metadata_args['codec'] = codec
     if level is not None:
+        check_range('meta-level',      level,         0, MAX_CLEVEL)
         metadata_args[level] = level
     # seek back to where the metadata begins and re-write it
-    target_fp.seek(BLOSCPACK_HEADER_LENGTH, 0)
+    target_fp.seek(current_pos, 0)
     _write_metadata(target_fp, metadata, metadata_args)
 
 if __name__ == '__main__':

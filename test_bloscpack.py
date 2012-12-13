@@ -721,6 +721,40 @@ def test_metadata():
     received_metadata = pack_unpack_fp(1, nchunks=20, metadata=test_metadata)
     nt.assert_equal(test_metadata, received_metadata)
 
+def test_rewrite_metadata():
+    test_metadata = {'dtype': 'float64',
+                     'shape': [1024],
+                     'others': [],
+                     }
+    # assemble the metadata args from the default
+    metadata_args = DEFAULT_METADATA_ARGS.copy()
+    # avoid checksum and codec
+    metadata_args['checksum'] = 'None'
+    metadata_args['codec'] = 'None'
+    # preallocate a fixed size
+    metadata_args['max_meta_size'] = 1000 # fixed preallocation
+    target_fp = StringIO()
+    # write the metadata section
+    bloscpack._write_metadata(target_fp, test_metadata, metadata_args)
+    # check that the length is correct
+    nt.assert_equal(METADATA_HEADER_LENGTH + metadata_args['max_meta_size'],
+            len(target_fp.getvalue()))
+
+    # now add stuff to the metadata
+    test_metadata['container'] = 'numpy'
+    test_metadata['data_origin'] = 'LHC'
+    # compute the new length
+    new_metadata_length = len(SERIZLIALIZERS[0].dumps(test_metadata))
+    # jam the new metadata into the cStringIO
+    target_fp.seek(0, 0)
+    bloscpack._rewrite_metadata_fp(target_fp, test_metadata, codec=None, level=None)
+    # now seek back, read the metadata and make sure it has been updated
+    # correctly
+    target_fp.seek(0, 0)
+    result_metadata, result_metadata_header = bloscpack._read_metadata(target_fp)
+    nt.assert_equal(test_metadata, result_metadata)
+    nt.assert_equal(new_metadata_length, result_metadata_header['meta_comp_size'])
+
 #def test_metadata_mismatch():
 #    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
 #    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()

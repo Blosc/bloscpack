@@ -732,7 +732,7 @@ def test_rewrite_metadata():
     metadata_args['checksum'] = 'None'
     metadata_args['codec'] = 'None'
     # preallocate a fixed size
-    metadata_args['max_meta_size'] = 1000 # fixed preallocation
+    metadata_args['max_meta_size'] = 1000  # fixed preallocation
     target_fp = StringIO()
     # write the metadata section
     bloscpack._write_metadata(target_fp, test_metadata, metadata_args)
@@ -747,13 +747,27 @@ def test_rewrite_metadata():
     new_metadata_length = len(SERIZLIALIZERS[0].dumps(test_metadata))
     # jam the new metadata into the cStringIO
     target_fp.seek(0, 0)
-    bloscpack._rewrite_metadata_fp(target_fp, test_metadata, codec=None, level=None)
+    bloscpack._rewrite_metadata_fp(target_fp, test_metadata,
+            codec=None, level=None)
     # now seek back, read the metadata and make sure it has been updated
     # correctly
     target_fp.seek(0, 0)
-    result_metadata, result_metadata_header = bloscpack._read_metadata(target_fp)
+    result_metadata, result_header = bloscpack._read_metadata(target_fp)
     nt.assert_equal(test_metadata, result_metadata)
-    nt.assert_equal(new_metadata_length, result_metadata_header['meta_comp_size'])
+    nt.assert_equal(new_metadata_length, result_header['meta_comp_size'])
+
+    # make sure that NoChangeInMetadata is raised
+    target_fp.seek(0, 0)
+    nt.assert_raises(NoChangeInMetadata, bloscpack._rewrite_metadata_fp,
+            target_fp, test_metadata, codec=None, level=None)
+
+    # make sure that ChecksumLengthMismatch is raised, needs modified metadata
+    target_fp.seek(0, 0)
+    test_metadata['fluxcompensator'] = 'back to the future'
+    nt.assert_raises(ChecksumLengthMismatch, bloscpack._rewrite_metadata_fp,
+            target_fp, test_metadata,
+            codec=None, level=None, checksum='sha512')
+
 
 #def test_metadata_mismatch():
 #    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"

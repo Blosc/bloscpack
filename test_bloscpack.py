@@ -797,6 +797,7 @@ def test_metadata_opportunisitic_compression():
     # but it wasn't of any use
     nt.assert_equal('None', header['codec'])
 
+
 def test_invalid_format():
     # this will cause a bug if we ever reach 255 format versions
     bloscpack.FORMAT_VERSION = MAX_FORMAT_VERSION

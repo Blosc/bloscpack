@@ -314,6 +314,22 @@ def test_decode_metadata_options():
     nt.assert_raises(ValueError, decode_metadata_options, '11111111')
 
 
+def test_check_options():
+    # check for non-string
+    nt.assert_raises(TypeError, bloscpack._check_options, 0)
+    nt.assert_raises(TypeError, bloscpack._check_options, 1)
+    # check for lengths too small and too large
+    nt.assert_raises(ValueError, bloscpack._check_options, '0')
+    nt.assert_raises(ValueError, bloscpack._check_options, '1')
+    nt.assert_raises(ValueError, bloscpack._check_options, '0000000')
+    nt.assert_raises(ValueError, bloscpack._check_options, '000000000')
+    nt.assert_raises(ValueError, bloscpack._check_options, '1111111')
+    nt.assert_raises(ValueError, bloscpack._check_options, '111111111')
+    # check for non zeros and ones
+    nt.assert_raises(ValueError, bloscpack._check_options, '0000000a')
+    nt.assert_raises(ValueError, bloscpack._check_options, 'aaaaaaaa')
+
+
 def test_create_bloscpack_header_arguments():
     # check format_version
     nt.assert_raises(ValueError, create_bloscpack_header, format_version=-1)
@@ -325,20 +341,6 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(ValueError, create_bloscpack_header,
             checksum=len(CHECKSUMS)+1)
     nt.assert_raises(TypeError, create_bloscpack_header, checksum='foo')
-    # check options argument
-    # check for non-string
-    nt.assert_raises(TypeError, create_bloscpack_header, options=0)
-    nt.assert_raises(TypeError, create_bloscpack_header, options=1)
-    # check for lengths too small and too large
-    nt.assert_raises(ValueError, create_bloscpack_header, options='0')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='1')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='0000000')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='000000000')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='1111111')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='111111111')
-    # check for non zeros and ones
-    nt.assert_raises(ValueError, create_bloscpack_header, options='0000000a')
-    nt.assert_raises(ValueError, create_bloscpack_header, options='aaaaaaaa')
     # check the typesize
     nt.assert_raises(ValueError, create_bloscpack_header, typesize=-1)
     nt.assert_raises(ValueError, create_bloscpack_header,

@@ -816,11 +816,9 @@ def test_metadata_opportunisitic_compression():
             DEFAULT_CHECKSUM,
             DEFAULT_METADATA_ARGS)
     out_fp.seek(0)
-    raw_header = out_fp.read(32)
-    header = decode_bloscpack_header(raw_header)
-    raw_options = header['options']
-    options = decode_options(raw_options)
-    #nt.assert_true(options['compress_meta'])
+    raw_header = out_fp.read(BLOSCPACK_HEADER_LENGTH)
+    metadata, header = bloscpack._read_metadata(out_fp)
+    nt.assert_equal('zlib', header['codec'])
 
     # now do the same thing, but use badly compressible metadata
     test_metadata = "abc"
@@ -837,13 +835,9 @@ def test_metadata_opportunisitic_compression():
             DEFAULT_CHECKSUM,
             DEFAULT_METADATA_ARGS)
     out_fp.seek(0)
-    raw_header = out_fp.read(32)
-    header = decode_bloscpack_header(raw_header)
-    raw_options = header['options']
-    options = decode_options(raw_options)
-    # bloscpack should have decided that there is no benefit to compressing the
-    # metadata and thus deactivated it
-    #nt.assert_false(options['compress_meta'])
+    raw_header = out_fp.read(BLOSCPACK_HEADER_LENGTH)
+    metadata, header = bloscpack._read_metadata(out_fp)
+    nt.assert_equal('None', header['codec'])
 
 def test_invalid_format():
     # this will cause a bug if we ever reach 255 format versions

@@ -1504,7 +1504,7 @@ def _unpack_fp(input_fp, output_fp):
                     pretty_size(len(decompressed))), level=DEBUG)
     return metadata
 
-def update_metadata_fp(target_fp, metadata,
+def _rewrite_metadata_fp(target_fp, metadata,
             magic_format=None, checksum=None,
             codec=DEFAULT_CODEC, level=DEFAULT_LEVEL):
     """ Update the metadata section.

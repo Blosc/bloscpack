@@ -833,10 +833,6 @@ def decode_metadata_options(options):
     _check_options_zero(options, range(8))
     return {}
 
-# default options created here programatically
-DEFAULT_OPTIONS = create_options()
-DEFAULT_METADATA_OPTIONS = create_metadata_options()
-
 
 def create_bloscpack_header(format_version=FORMAT_VERSION,
         offsets=False,

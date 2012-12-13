@@ -841,7 +841,7 @@ DEFAULT_METADATA_OPTIONS = create_metadata_options()
 def create_bloscpack_header(format_version=FORMAT_VERSION,
         offsets=False,
         metadata=False,
-        checksum=0,
+        checksum='None',
         typesize=0,
         chunk_size=-1,
         last_chunk=-1,
@@ -887,7 +887,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     """
     check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
     #_check_options(options)
-    check_range('checksum',   checksum, 0, len(CHECKSUMS))
+    _check_valid_checksum(checksum)
     check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
@@ -897,7 +897,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     options = encode_uint8(int(
         create_options(offsets=offsets, metadata=metadata),
         2))
-    checksum = encode_uint8(checksum)
+    checksum = encode_uint8(CHECKSUMS_AVAIL.index(checksum))
     typesize = encode_uint8(typesize)
     chunk_size = encode_int32(chunk_size)
     last_chunk = encode_int32(last_chunk)
@@ -951,7 +951,7 @@ def decode_bloscpack_header(buffer_):
     return {'format_version': decode_uint8(buffer_[4]),
             'offsets':        options['offsets'],
             'metadata':       options['metadata'],
-            'checksum':       decode_uint8(buffer_[6]),
+            'checksum':       CHECKSUMS_AVAIL[decode_uint8(buffer_[6])],
             'typesize':       decode_uint8(buffer_[7]),
             'chunk_size':     decode_int32(buffer_[8:12]),
             'last_chunk':     decode_int32(buffer_[12:16]),
@@ -1274,7 +1274,7 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     raw_bloscpack_header = create_bloscpack_header(
             offsets=offsets,
             metadata=True if metadata is not None else False,
-            checksum=CHECKSUMS_AVAIL.index(checksum),
+            checksum=checksum,
             typesize=blosc_args['typesize'],
             chunk_size=chunk_size,
             last_chunk=last_chunk_size,
@@ -1461,7 +1461,7 @@ def unpack_file(in_file, out_file):
 
 def _unpack_fp(input_fp, output_fp):
     bloscpack_header = _read_bloscpack_header(input_fp)
-    checksum_impl = CHECKSUMS[bloscpack_header['checksum']]
+    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
     # read the metadata
     metadata, metadata_header = _read_metadata(input_fp) \
             if bloscpack_header['metadata'] \

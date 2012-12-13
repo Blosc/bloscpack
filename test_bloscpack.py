@@ -340,7 +340,7 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(ValueError, create_bloscpack_header, checksum=-1)
     nt.assert_raises(ValueError, create_bloscpack_header,
             checksum=len(CHECKSUMS)+1)
-    nt.assert_raises(TypeError, create_bloscpack_header, checksum='foo')
+    nt.assert_raises(NoSuchChecksum, create_bloscpack_header, checksum='foo')
     # check the typesize
     nt.assert_raises(ValueError, create_bloscpack_header, typesize=-1)
     nt.assert_raises(ValueError, create_bloscpack_header,
@@ -390,11 +390,11 @@ def test_create_bloscpack_header():
     expected = MAGIC + format_version + \
         '\x00\x01\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(checksum=1))
+    nt.assert_equal(expected, create_bloscpack_header(checksum='adler32'))
     expected = MAGIC + format_version + \
         '\x00\x08\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(expected, create_bloscpack_header(checksum=8))
+    nt.assert_equal(expected, create_bloscpack_header(checksum='sha512'))
     # test with typesize
     expected = MAGIC + format_version + \
         '\x00\x00\x01\xff\xff\xff\xff\xff\xff\xff\xff'+ \
@@ -465,7 +465,7 @@ def test_decode_bloscpack_header():
             'format_version': FORMAT_VERSION,
             'offsets':       False,
             'metadata':      False,
-            'checksum':      0,
+            'checksum':      'None',
             'typesize':      0,
             'chunk_size':    -1,
             'last_chunk':    -1,
@@ -501,9 +501,9 @@ def test_decode_bloscpack_header():
     nt.assert_equal(expected,
             decode_bloscpack_header(copy_and_set_input(5, '\x03')))
     # check with checksum
-    nt.assert_equal(copy_and_set_return('checksum', 1),
+    nt.assert_equal(copy_and_set_return('checksum', 'adler32'),
             decode_bloscpack_header(copy_and_set_input(6, '\x01')))
-    nt.assert_equal(copy_and_set_return('checksum', 7),
+    nt.assert_equal(copy_and_set_return('checksum', 'sha384'),
             decode_bloscpack_header(copy_and_set_input(6, '\x07')))
     # check with typesize
     nt.assert_equal(copy_and_set_return('typesize', 1),

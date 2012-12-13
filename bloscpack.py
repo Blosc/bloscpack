@@ -839,7 +839,8 @@ DEFAULT_METADATA_OPTIONS = create_metadata_options()
 
 
 def create_bloscpack_header(format_version=FORMAT_VERSION,
-        options='00000000',
+        offsets=False,
+        metadata=False,
         checksum=0,
         typesize=0,
         chunk_size=-1,
@@ -851,8 +852,10 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     ----------
     format_version : int
         the version format for the compressed file
-    options : bitfield (string of 0s and 1s)
-        the options for this file
+    offsets: bool
+        if the offsets to the chunks are present
+    metadata: bool
+        if the metadata is present
     checksum : int
         the checksum to be used
     typesize : int
@@ -883,7 +886,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
 
     """
     check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
-    _check_options(options)
+    #_check_options(options)
     check_range('checksum',   checksum, 0, len(CHECKSUMS))
     check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
@@ -891,7 +894,9 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
 
     format_version = encode_uint8(format_version)
-    options = encode_uint8(int(options, 2))
+    options = encode_uint8(int(
+        create_options(offsets=offsets, metadata=metadata),
+        2))
     checksum = encode_uint8(checksum)
     typesize = encode_uint8(typesize)
     chunk_size = encode_int32(chunk_size)
@@ -915,8 +920,10 @@ def decode_bloscpack_header(buffer_):
     -------
     format_version : int
         the version format for the compressed file
-    options : dict
-        the options for this file, decoded from the bitfield
+    offsets: bool
+        if the offsets to the chunks are present
+    metadata: bool
+        if the metadata is present
     checksum : int
         the checksum to be used
     typesize : int
@@ -940,8 +947,10 @@ def decode_bloscpack_header(buffer_):
             "the magic marker '%s' is missing from the bloscpack " % MAGIC +
             "header, instead we found: '%s'" % buffer_[0:4])
 
+    options = decode_options(decode_bitfield(buffer_[5]))
     return {'format_version': decode_uint8(buffer_[4]),
-            'options':        decode_bitfield(buffer_[5]),
+            'offsets':        options['offsets'],
+            'metadata':       options['metadata'],
             'checksum':       decode_uint8(buffer_[6]),
             'typesize':       decode_uint8(buffer_[7]),
             'chunk_size':     decode_int32(buffer_[8:12]),
@@ -1258,13 +1267,12 @@ def _pack_fp(input_fp, output_fp, in_file_size,
     # calculate chunk sizes
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, nchunks, chunk_size)
-    # calculate header
-    options = create_options(offsets=offsets,
-            metadata=True if metadata is not None else False)
     # set the checksum impl
     checksum_impl = CHECKSUMS_LOOKUP[checksum]
+    # create the bloscpack header
     raw_bloscpack_header = create_bloscpack_header(
-            options=options,
+            offsets=offsets,
+            metadata=True if metadata is not None else False,
             checksum=CHECKSUMS_AVAIL.index(checksum),
             typesize=blosc_args['typesize'],
             chunk_size=chunk_size,
@@ -1453,14 +1461,12 @@ def unpack_file(in_file, out_file):
 def _unpack_fp(input_fp, output_fp):
     bloscpack_header = _read_bloscpack_header(input_fp)
     checksum_impl = CHECKSUMS[bloscpack_header['checksum']]
-    # read the offsets
-    options = decode_options(bloscpack_header['options'])
     # read the metadata
     metadata, metadata_header = _read_metadata(input_fp) \
-            if options['metadata'] \
+            if bloscpack_header['metadata'] \
             else (None, None)
     nchunks = bloscpack_header['nchunks']
-    if options['offsets']:
+    if bloscpack_header['offsets']:
         offsets_raw = input_fp.read(8 * nchunks)
         print_verbose('Read raw offsets: %s' % repr(offsets_raw),
                 level=DEBUG)
@@ -1546,9 +1552,8 @@ def _rewrite_metadata_fp(target_fp, metadata,
     current_pos = target_fp.tell()
 
     #bloscpack_header = _read_bloscpack_header(target_fp)
-    #options = decode_options(bloscpack_header['options'])
     ## read the metadata
-    #if not options['metadata']:
+    #if not bloscpack_header['metadata']:
     #    raise NoMetadataFound(
     #            'target file_pointer does not have any metadata section')
 

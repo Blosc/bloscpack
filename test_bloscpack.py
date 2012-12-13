@@ -777,28 +777,6 @@ def test_rewrite_metadata():
             codec=None, level=None, checksum='sha512')
 
 
-#def test_metadata_mismatch():
-#    test_metadata = "{'dtype': 'float64', 'shape': [1024], 'others': []}"
-#    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
-#    create_array_fp(1, in_fp)
-#    in_fp_size = in_fp.tell()
-#    in_fp.seek(0)
-#    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-#            DEFAULT_BLOSC_ARGS,
-#            test_metadata,
-#            1,
-#            None,
-#            DEFAULT_OFFSETS,
-#            DEFAULT_CHECKSUM,
-#            DEFAULT_METADATA_ARGS.copy())
-#    # remove the metadata bit
-#    options = create_options(metadata=False)
-#    options_binary = encode_uint8(int(options, 2))
-#    out_fp.seek(5)
-#    out_fp.write(options_binary)
-#    out_fp.seek(0)
-#    nt.assert_raises(MetaDataMismatch, bloscpack._unpack_fp, out_fp, dcmp_fp)
-
 def test_metadata_opportunisitic_compression():
     # make up some metadata that can be compressed with benefit
     test_metadata = ("{'dtype': 'float64', 'shape': [1024], 'others': [],"

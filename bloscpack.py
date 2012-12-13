@@ -1565,7 +1565,7 @@ def _rewrite_metadata_fp(target_fp, metadata,
         metadata_args['magic_format'] = magic_format
     if checksum is not None:
         _check_valid_checksum(checksum)
-        old_impl = CHECKSUMS[metadata_header['checksum']]
+        old_impl = CHECKSUMS_LOOKUP[metadata_header['checksum']]
         new_impl = CHECKSUMS_LOOKUP[checksum]
         if old_impl.size != new_impl.size:
             raise ChecksumLengthMismatch(

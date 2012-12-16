@@ -62,16 +62,16 @@ DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
     (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE)))
 
 # metadata args
-METADATA_ARGS = ('magic_format', 'checksum', 'codec', 'level', 'max_meta_size')
+METADATA_ARGS = ('magic_format', 'meta_checksum', 'meta_codec', 'meta_level', 'max_meta_size')
 _METADATA_ARGS_SET = set(METADATA_ARGS)  # cached
 DEFAULT_MAGIC_FORMAT = 'JSON'
-DEFAULT_METADATA_CHECKSUM = 'adler32'
-DEFAULT_CODEC = 'zlib'
-DEFAULT_LEVEL = 6
+DEFAULT_META_CHECKSUM = 'adler32'
+DEFAULT_META_CODEC = 'zlib'
+DEFAULT_META_LEVEL = 6
 DEFAULT_MAX_META_SIZE = lambda x: 10 * x
 DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
-    (DEFAULT_MAGIC_FORMAT, DEFAULT_METADATA_CHECKSUM,
-    DEFAULT_CODEC, DEFAULT_LEVEL, DEFAULT_MAX_META_SIZE)))
+    (DEFAULT_MAGIC_FORMAT, DEFAULT_META_CHECKSUM,
+    DEFAULT_META_CODEC, DEFAULT_META_LEVEL, DEFAULT_MAX_META_SIZE)))
 
 # verbosity levels
 NORMAL  = 'NORMAL'
@@ -1121,9 +1121,9 @@ def decode_bloscpack_header(buffer_):
 
 def create_metadata_header(magic_format='',
        options="00000000",
-       checksum='None',
-       codec='None',
-       level=0,
+       meta_checksum='None',
+       meta_codec='None',
+       meta_level=0,
        meta_size=0,
        max_meta_size=0,
        meta_comp_size=0,
@@ -1131,25 +1131,25 @@ def create_metadata_header(magic_format='',
        ):
     _check_str('magic-format',     magic_format,  8)
     _check_options(options)
-    _check_valid_checksum(checksum)
-    _check_valid_codec(codec)
-    check_range('meta-level',      level,          0, MAX_CLEVEL)
-    check_range('meta-size',       meta_size,      0, MAX_META_SIZE)
-    check_range('max-meta-size',   max_meta_size,  0, MAX_META_SIZE)
-    check_range('meta-comp-size',  meta_comp_size, 0, MAX_META_SIZE)
-    _check_str('user-codec',       user_codec,     8)
+    _check_valid_checksum(meta_checksum)
+    _check_valid_codec(meta_codec)
+    check_range('meta_level',      meta_level,     0, MAX_CLEVEL)
+    check_range('meta_size',       meta_size,      0, MAX_META_SIZE)
+    check_range('max_meta_size',   max_meta_size,  0, MAX_META_SIZE)
+    check_range('meta_comp_size',  meta_comp_size, 0, MAX_META_SIZE)
+    _check_str('user_codec',       user_codec,     8)
 
     magic_format        = _pad_with_nulls(magic_format, 8)
     options             = encode_uint8(int(options, 2))
-    checksum            = encode_uint8(CHECKSUMS_AVAIL.index(checksum))
-    codec               = encode_uint8(CODECS_AVAIL.index(codec))
-    level               = encode_uint8(level)
+    meta_checksum       = encode_uint8(CHECKSUMS_AVAIL.index(meta_checksum))
+    meta_codec          = encode_uint8(CODECS_AVAIL.index(meta_codec))
+    meta_level          = encode_uint8(meta_level)
     meta_size           = encode_uint32(meta_size)
     max_meta_size       = encode_uint32(max_meta_size)
     meta_comp_size      = encode_uint32(meta_comp_size)
     user_codec          = _pad_with_nulls(user_codec, 8)
 
-    return magic_format + options + checksum + codec + level + \
+    return magic_format + options + meta_checksum + meta_codec + meta_level + \
             meta_size + max_meta_size + meta_comp_size + user_codec
 
 
@@ -1159,10 +1159,10 @@ def decode_metadata_header(buffer_):
             "attempting to decode a bloscpack metadata header of length '%d', not '32'"
             % len(buffer_))
     return {'magic_format':        decode_magic_string(buffer_[:8]),
-            'options':             decode_bitfield(buffer_[8]),
-            'checksum':            CHECKSUMS_AVAIL[decode_uint8(buffer_[9])],
-            'codec':               CODECS_AVAIL[decode_uint8(buffer_[10])],
-            'level':               decode_uint8(buffer_[11]),
+            'meta_options':        decode_bitfield(buffer_[8]),
+            'meta_checksum':       CHECKSUMS_AVAIL[decode_uint8(buffer_[9])],
+            'meta_codec':          CODECS_AVAIL[decode_uint8(buffer_[10])],
+            'meta_level':          decode_uint8(buffer_[11]),
             'meta_size':           decode_uint32(buffer_[12:16]),
             'max_meta_size':       decode_uint32(buffer_[16:20]),
             'meta_comp_size':      decode_uint32(buffer_[20:24]),
@@ -1297,6 +1297,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
     should be written.
 
     """
+    _check_metadata_arguments(metadata_args)
     metadata_total = 0
     print_verbose('metadata args are:', level=DEBUG)
     for arg, value in metadata_args.iteritems():
@@ -1305,10 +1306,10 @@ def _write_metadata(output_fp, metadata, metadata_args):
     serializer_impl = SERIZLIALIZERS_LOOKUP[metadata_args['magic_format']]
     metadata = serializer_impl.dumps(metadata)
     codec = 'None'
-    if metadata_args['codec'] != CODECS_AVAIL[0]:
-        codec_impl = CODECS_LOOKUP[metadata_args['codec']]
+    if metadata_args['meta_codec'] != CODECS_AVAIL[0]:
+        codec_impl = CODECS_LOOKUP[metadata_args['meta_codec']]
         metadata_compressed = codec_impl.compress(metadata,
-                metadata_args['level'])
+                metadata_args['meta_level'])
         meta_size = len(metadata)
         meta_comp_size = len(metadata_compressed)
         # be opportunistic, avoid compression if not beneficial
@@ -1326,7 +1327,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
         meta_size = len(metadata)
         meta_comp_size = meta_size
     print_verbose("Raw %s metadata of size '%s': %s" %
-            ('compressed' if metadata_args['codec'] != 'None' else
+            ('compressed' if metadata_args['meta_codec'] != 'None' else
                 'uncompressed', meta_comp_size, repr(metadata)),
             level=DEBUG)
     if hasattr(metadata_args['max_meta_size'], '__call__'):
@@ -1345,9 +1346,9 @@ def _write_metadata(output_fp, metadata, metadata_args):
     # create metadata header
     raw_metadata_header = create_metadata_header(
             magic_format=metadata_args['magic_format'],
-            checksum=metadata_args['checksum'],
-            codec=codec,
-            level=metadata_args['level'],
+            meta_checksum=metadata_args['meta_checksum'],
+            meta_codec=codec,
+            meta_level=metadata_args['meta_level'],
             meta_size=meta_size,
             max_meta_size=max_meta_size,
             meta_comp_size=meta_comp_size)
@@ -1361,13 +1362,13 @@ def _write_metadata(output_fp, metadata, metadata_args):
     metadata_total += prealloc
     print_verbose("metadata has %d preallocated empty bytes" %
             prealloc, level=DEBUG)
-    if metadata_args['checksum'] != CHECKSUMS_AVAIL[0]:
-        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_args['checksum']]
+    if metadata_args['meta_checksum'] != CHECKSUMS_AVAIL[0]:
+        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_args['meta_checksum']]
         metadata_digest = metadata_checksum_impl(metadata)
         metadata_total += metadata_checksum_impl.size
         output_fp.write(metadata_digest)
         print_verbose("metadata checksum (%s): %s" %
-                (metadata_args['checksum'], repr(metadata_digest)),
+                (metadata_args['meta_checksum'], repr(metadata_digest)),
                 level=DEBUG)
     print_verbose("metadata section occupies a total of '%i' bytes" %
             metadata_total, level=DEBUG)
@@ -1584,8 +1585,8 @@ def _read_metadata(input_fp):
     metadata = input_fp.read(metadata_header['meta_comp_size'])
     prealloc = metadata_header['max_meta_size'] - metadata_header['meta_comp_size']
     input_fp.seek(prealloc, 1)
-    if metadata_header['checksum'] != 'None':
-        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header['checksum']]
+    if metadata_header['meta_checksum'] != 'None':
+        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header['meta_checksum']]
         metadata_expected_digest = input_fp.read(metadata_checksum_impl.size)
         metadata_received_digest = metadata_checksum_impl(metadata)
         if metadata_received_digest != metadata_expected_digest:
@@ -1599,11 +1600,12 @@ def _read_metadata(input_fp):
                     (metadata_checksum_impl.name,
                         repr(metadata_received_digest)),
                     level=DEBUG)
-    if metadata_header['codec'] != 'None':
-        metadata_codec_impl = CODECS_LOOKUP[metadata_header['codec']]
+    if metadata_header['meta_codec'] != 'None':
+        metadata_codec_impl = CODECS_LOOKUP[metadata_header['meta_codec']]
         metadata = metadata_codec_impl.decompress(metadata)
     print_verbose("read %s metadata of size: '%s'" %
-            ('compressed' if metadata_header['codec'] != 0 else
+            # FIXME meta_codec?
+            ('compressed' if metadata_header['meta_codec'] != 'None' else
                 'uncompressed', metadata_header['meta_comp_size']))
     serializer_impl = SERIZLIALIZERS_LOOKUP[metadata_header['magic_format']]
     metadata = serializer_impl.loads(metadata)
@@ -1726,7 +1728,7 @@ def _unpack_fp(input_fp, output_fp):
 
 def _rewrite_metadata_fp(target_fp, metadata,
             magic_format=None, checksum=None,
-            codec=DEFAULT_CODEC, level=DEFAULT_LEVEL):
+            codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
     """ Update the metadata section.
 
     Parameters
@@ -1784,17 +1786,17 @@ def _rewrite_metadata_fp(target_fp, metadata,
         metadata_args['magic_format'] = magic_format
     if checksum is not None:
         _check_valid_checksum(checksum)
-        old_impl = CHECKSUMS_LOOKUP[metadata_header['checksum']]
+        old_impl = CHECKSUMS_LOOKUP[metadata_header['meta_checksum']]
         new_impl = CHECKSUMS_LOOKUP[checksum]
         if old_impl.size != new_impl.size:
             raise ChecksumLengthMismatch(
                     'checksums have a size mismatch')
-        metadata_args['checksum'] = checksum
+        metadata_args['meta_checksum'] = checksum
     if codec is not None:
         _check_valid_codec(codec)
-        metadata_args['codec'] = codec
+        metadata_args['meta_codec'] = codec
     if level is not None:
-        check_range('meta-level', level, 0, MAX_CLEVEL)
+        check_range('meta_level', level, 0, MAX_CLEVEL)
         metadata_args[level] = level
     # seek back to where the metadata begins...
     target_fp.seek(current_pos, 0)

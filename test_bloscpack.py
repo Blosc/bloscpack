@@ -46,7 +46,7 @@ def test_codecs():
     random_str = "4KzGCl7SxTsYLaerommsMWyZg1TXbV6wsR9Xk"
     for i,c in enumerate(CODECS):
         nt.assert_equal(random_str, c.decompress(
-            c.compress(random_str, DEFAULT_LEVEL)))
+            c.compress(random_str, DEFAULT_META_LEVEL)))
 
 def test_serializers():
     nt.assert_equal(SERIZLIALIZERS_AVAIL, ['JSON'])
@@ -578,13 +578,13 @@ def test_create_metadata_header():
             create_metadata_header(magic_format='JSON'))
 
     nt.assert_equal(mod_raw(9, '\x01'),
-            create_metadata_header(checksum='adler32'))
+            create_metadata_header(meta_checksum='adler32'))
 
     nt.assert_equal(mod_raw(10, '\x01'),
-            create_metadata_header(codec='zlib'))
+            create_metadata_header(meta_codec='zlib'))
 
     nt.assert_equal(mod_raw(11, '\x01'),
-            create_metadata_header(level=1))
+            create_metadata_header(meta_level=1))
 
     nt.assert_equal(mod_raw(12, '\x01'),
             create_metadata_header(meta_size=1))
@@ -607,10 +607,10 @@ def test_create_metadata_header():
 def test_decode_metadata_header():
     no_arg_return  = {
             'magic_format':        '',
-            'options':             '00000000',
-            'checksum':            'None',
-            'codec':               'None',
-            'level':               0,
+            'meta_options':        '00000000',
+            'meta_checksum':       'None',
+            'meta_codec':          'None',
+            'meta_level':          0,
             'meta_size':           0,
             'max_meta_size':       0,
             'meta_comp_size':      0,
@@ -634,13 +634,13 @@ def test_decode_metadata_header():
     nt.assert_equal(copy_and_set_return('magic_format', 'JSON'),
             decode_metadata_header(copy_and_set_input(0, 'JSON')))
 
-    nt.assert_equal(copy_and_set_return('checksum', 'adler32'),
+    nt.assert_equal(copy_and_set_return('meta_checksum', 'adler32'),
             decode_metadata_header(copy_and_set_input(9, '\x01')))
 
-    nt.assert_equal(copy_and_set_return('codec', 'zlib'),
+    nt.assert_equal(copy_and_set_return('meta_codec', 'zlib'),
             decode_metadata_header(copy_and_set_input(10, '\x01')))
 
-    nt.assert_equal(copy_and_set_return('level', 1),
+    nt.assert_equal(copy_and_set_return('meta_level', 1),
             decode_metadata_header(copy_and_set_input(11, '\x01')))
 
     nt.assert_equal(copy_and_set_return('meta_size', 1),
@@ -771,8 +771,8 @@ def test_rewrite_metadata():
     # assemble the metadata args from the default
     metadata_args = DEFAULT_METADATA_ARGS.copy()
     # avoid checksum and codec
-    metadata_args['checksum'] = 'None'
-    metadata_args['codec'] = 'None'
+    metadata_args['meta_checksum'] = 'None'
+    metadata_args['meta_codec'] = 'None'
     # preallocate a fixed size
     metadata_args['max_meta_size'] = 1000  # fixed preallocation
     target_fp = StringIO()
@@ -819,7 +819,7 @@ def test_metadata_opportunisitic_compression():
     bloscpack._write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
     target_fp.seek(0, 0)
     metadata, header = bloscpack._read_metadata(target_fp)
-    nt.assert_equal('zlib', header['codec'])
+    nt.assert_equal('zlib', header['meta_codec'])
 
     # now do the same thing, but use badly compressible metadata
     test_metadata = "abc"
@@ -829,7 +829,7 @@ def test_metadata_opportunisitic_compression():
     target_fp.seek(0, 0)
     metadata, header = bloscpack._read_metadata(target_fp)
     # but it wasn't of any use
-    nt.assert_equal('None', header['codec'])
+    nt.assert_equal('None', header['meta_codec'])
 
 
 def test_invalid_format():

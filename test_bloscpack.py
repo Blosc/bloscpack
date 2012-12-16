@@ -396,6 +396,8 @@ def test_create_bloscpack_header():
     nt.assert_equal(mod_raw(7, '\xff'), create_bloscpack_header(typesize=255))
 
     # test with chunksize
+    nt.assert_equal(mod_raw(8, '\xff\xff\xff\xff'),
+            create_bloscpack_header(chunk_size=-1))
     nt.assert_equal(mod_raw(8, '\x01\x00\x00\x00'),
             create_bloscpack_header(chunk_size=1))
     nt.assert_equal(mod_raw(8, '\x00\x00\x10\x00'),
@@ -404,6 +406,8 @@ def test_create_bloscpack_header():
             create_bloscpack_header(chunk_size=blosc.BLOSC_MAX_BUFFERSIZE))
 
     # test with last_chunk
+    nt.assert_equal(mod_raw(12, '\xff\xff\xff\xff'),
+            create_bloscpack_header(last_chunk=-1))
     nt.assert_equal(mod_raw(12, '\x01\x00\x00\x00'),
             create_bloscpack_header(last_chunk=1))
     nt.assert_equal(mod_raw(12, '\x00\x00\x10\x00'),
@@ -412,6 +416,8 @@ def test_create_bloscpack_header():
             create_bloscpack_header(last_chunk=blosc.BLOSC_MAX_BUFFERSIZE))
 
     # test nchunks
+    nt.assert_equal(mod_raw(16, '\xff\xff\xff\xff\xff\xff\xff\xff'),
+            create_bloscpack_header(nchunks=-1))
     nt.assert_equal(mod_raw(16, '\x00\x00\x00\x00\x00\x00\x00\x00'),
             create_bloscpack_header(nchunks=0))
     nt.assert_equal(mod_raw(16, '\x01\x00\x00\x00\x00\x00\x00\x00'),

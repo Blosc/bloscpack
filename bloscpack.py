@@ -788,14 +788,28 @@ def _check_metadata_arguments(metadata_args):
     keys should be contained in the dictionary.
 
     """
+    __check_args('metadata', metadata_args, _METADATA_ARGS_SET)
 
-    received = set(metadata_args.keys())
-    missing = _METADATA_ARGS_SET.difference(received)
+def __check_args(name, received, expected):
+    """ Check an arg dict.
+
+    Parameters
+    ----------
+    name : str
+        the name of the arg dict
+    received : dict
+        the arg dict received
+    expected : set of str
+        the keys that should have been contained
+    """
+
+    received = set(received.keys())
+    missing = expected.difference(received)
     if len(missing) != 0:
-        raise ValueError("metadata args was missing: '%s'" % repr(missing))
-    extra = received.difference(_METADATA_ARGS_SET)
+        raise ValueError("%s args was missing: '%s'" % (name, repr(missing)))
+    extra = received.difference(expected)
     if len(extra) != 0:
-        raise ValueError("metadata args had some extras: '%s'" % repr(extra))
+        raise ValueError("%s args had some extras: '%s'" % (name, repr(extra)))
 
 
 def create_options(offsets=DEFAULT_OFFSETS, metadata=False):

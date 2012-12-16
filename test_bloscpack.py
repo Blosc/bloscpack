@@ -135,6 +135,12 @@ def test_check_metadata_arguments():
     nt.assert_raises(ValueError, bloscpack._check_metadata_arguments, extra)
 
 
+def test_check_range():
+    nt.assert_raises(TypeError,  check_range, 'test', 'a', 0, 1 )
+    nt.assert_raises(ValueError, check_range, 'test', -1, 0, 1 )
+    nt.assert_raises(ValueError, check_range, 'test', 2, 0, 1 )
+
+
 def test_calculate_nchunks():
     # tests for nchunks given
     # odd with no remainder

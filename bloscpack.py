@@ -899,6 +899,66 @@ def decode_metadata_options(options):
     _check_options_zero(options, range(8))
     return {}
 
+def _handle_max_apps(offsets, nchunks, max_app_chunks):
+    """ Process and handle the 'max_app_chunks' argument
+
+    Parameters
+    ----------
+    offsets: bool
+        if the offsets to the chunks are present
+    nchunks : int
+        the number of chunks
+    max_app_chunks : callable or int
+        the total number of possible append chunks
+
+    Returns
+    -------
+    max_app_chunks : int
+        the int value
+
+    The 'max_app_chunks' parameter can either be a function of 'nchunks'
+    (callable that takes a single int as argument and returns a single int) or
+    an int.  The sum of the resulting value and 'nchunks' can not be larger
+    than MAX_CHUNKS.  The value of 'max_app_chunks' must be '0' if there is not
+    offsets section or if nchunks is unknown (has the value '-1'.
+
+    The function performs some silent optimisations. First, if there are no
+    offsets or 'nchunks' is unknown any value for 'max_app_chunks' will be
+    silently ignored. Secondly, if the resulting value of max_app_chunks would
+    be too large (i.e. the sum of 'nchunks' and 'max_app_chunks' is larger than
+    'MAX_CHUNKS', then 'max_app_chunks' is automatically set to the maximum
+    permissable value.
+
+    """
+    # first check that the args are actually valid
+    check_range('nchunks',        nchunks,       -1, MAX_CHUNKS)
+    # then check that we actually need to evaluate it
+    if offsets and nchunks != -1:
+        if hasattr(max_app_chunks, '__call__'):
+            # it's a callable allright
+            max_app_chunks = max_app_chunks(nchunks)
+            # check that the result is still positive, might be quite large
+            if max_app_chunks < 0:
+                raise ValueError(
+                        'max_app_chunks callable returnd a negative integer')
+        elif isinstance(max_app_chunks, int):
+            # it's a plain int, check it's range
+            check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
+        else:
+            raise ValueError('max_app_chunks was neither a callable or an int')
+        # we managed to get a reasonable value, make sure it's not too large
+        if nchunks + max_app_chunks > MAX_CHUNKS:
+            max_app_chunks = MAX_CHUNKS - nchunks
+            print_verbose(
+                    "'max_app_chunks' was too large, setting to max value: %d"
+                    % max_app_chunks,
+                    level=DEBUG)
+    else:
+        if max_app_chunks is not None:
+            print_verbose('max_app_chunks will be silently ignored',
+                    level=DEBUG)
+        max_app_chunks = 0
+    return max_app_chunks
 
 def create_bloscpack_header(format_version=FORMAT_VERSION,
         offsets=False,
@@ -929,7 +989,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         the size of the last chunk
     nchunks : int
         the number of chunks
-    max_app_chunks : callable or int
+    max_app_chunks : int
         the total number of possible append chunks
 
     Returns
@@ -957,6 +1017,11 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
     check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
+    if nchunks != -1:
+        check_range('nchunks + max_app_chunks',
+            nchunks + max_app_chunks, 0, MAX_CHUNKS)
+    elif max_app_chunks != 0:
+        raise ValueError("'max_app_chunks' can not be non '0' if 'nchunks' is '-1'")
 
     format_version = encode_uint8(format_version)
     options = encode_uint8(int(
@@ -1346,17 +1411,9 @@ def _pack_fp(input_fp, output_fp,
     """
     _check_blosc_args(blosc_args)
     _check_bloscpack_args(bloscpack_args)
-    if bloscpack_args['offsets']:
-        if hasattr(bloscpack_args['max_app_chunks'], '__call__'):
-            max_app_chunks = bloscpack_args['max_app_chunks'](nchunks)
-        elif isinstance(bloscpack_args['max_app_chunks'], int):
-            max_app_chunks = bloscpack_args['max_app_chunks']
-    else:
-        if bloscpack_args['max_app_chunks'] is not None:
-            print_verbose('max_app_chunks will be silently ignored',
-                    level=DEBUG)
-        max_app_chunks = 0
-    # TODO check coherence of arguments
+    max_app_chunks = _handle_max_apps(bloscpack_args['offsets'],
+            nchunks,
+            bloscpack_args['max_app_chunks'])
     # create the bloscpack header
     raw_bloscpack_header = create_bloscpack_header(
             offsets=bloscpack_args['offsets'],

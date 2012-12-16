@@ -391,8 +391,9 @@ All entries are little-endian.
 :max-app-chunks:
     (``int64``)
     The maximum number of chunks that can be appended to this file, excluding
-    ``nchunks``. This is only useful if there is an offsets section in the
-    file and should be set to ``0`` if there is no such section.
+    ``nchunks``. This is only useful if there is an offsets section and if
+    nchunks is known (not ``-1``), if either of these conditions do not apply
+    this should be ``0``.
 
 The overall file-size can be computed as ``chunk-size * (nchunks - 1) +
 last-chunk-size``. In a streaming scenario ``-1`` can be used as a placeholder.
@@ -529,6 +530,14 @@ used, both the checksum and the offsets will add overhead to the file. The
 offsets add 8 bytes per chunk and the checksum adds a fixed constant value
 which depends on the checksum to each chunk. For example, 32 bytes for the
 ``adler32`` checksum.
+
+Coding Conventions
+------------------
+
+* Numpy rst style docstrings
+* testing: expected before received ``nt.assert_equal(expected, received)``
+* Debug messages: as close to where the data was generated
+* Execptions instead of exit
 
 TODO
 ----

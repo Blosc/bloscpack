@@ -679,25 +679,24 @@ def create_tmp_files():
     shutil.rmtree(tdir)
 
 def test_offsets():
-    blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        bloscpack.pack_file(in_file, out_file, blosc_args, nchunks=6)
+        bloscpack.pack_file(in_file, out_file, nchunks=6)
         with open(out_file, 'r+b') as input_fp:
-            bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
-            bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
+            bloscpack_header = bloscpack._read_bloscpack_header(input_fp)
             nchunks = bloscpack_header['nchunks']
-            offsets_raw = input_fp.read(8 * nchunks)
+            total_entries = nchunks + bloscpack_header['max_app_chunks']
+            offsets_raw = input_fp.read(8 * total_entries)
             offsets = [decode_int64(offsets_raw[j - 8: j])
                     for j in xrange(8, nchunks * 8 + 1, 8)]
             # First chunks should start after header and offsets
-            first = BLOSCPACK_HEADER_LENGTH + 8 * nchunks
+            first = BLOSCPACK_HEADER_LENGTH + 8 * total_entries
             # We assume that the others are correct
             nt.assert_equal(offsets[0], first)
-            nt.assert_equal([80, 585990, 1071780, 1546083, 2003986, 2460350],
+            nt.assert_equal([560, 586470, 1072260, 1546563, 2004466, 2460830],
                     offsets)
             # try to read the second header
-            input_fp.seek(585990, 0)
+            input_fp.seek(586470, 0)
             blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
             expected = {'versionlz': 1,
                         'blocksize': 131072,

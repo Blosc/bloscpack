@@ -360,6 +360,11 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(ValueError, create_bloscpack_header, nchunks=-2)
     nt.assert_raises(TypeError, create_bloscpack_header, nchunks='foo')
 
+    # check value of max_app_chunks
+    nt.assert_raises(ValueError, create_bloscpack_header, max_app_chunks=MAX_CHUNKS+1)
+    nt.assert_raises(ValueError, create_bloscpack_header, max_app_chunks=-1)
+    nt.assert_raises(TypeError, create_bloscpack_header, max_app_chunks='foo')
+
 def test_create_bloscpack_header():
     # test with no arguments
     raw = MAGIC + struct.pack('<B', FORMAT_VERSION) + \

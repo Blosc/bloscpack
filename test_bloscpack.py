@@ -447,7 +447,7 @@ def test_decode_bloscpack_header():
             'chunk_size':    -1,
             'last_chunk':    -1,
             'nchunks':       -1,
-            'RESERVED':      0,
+            'max_app_chunks': 0,
             }
     def copy_and_set_return(key, value):
         copy_ = no_arg_return.copy()
@@ -520,7 +520,18 @@ def test_decode_bloscpack_header():
             copy_and_set_return('nchunks', MAX_CHUNKS),
             decode_bloscpack_header(copy_and_set_input(16,
                 '\xff\xff\xff\xff\xff\xff\xff\x7f')))
-
+    # check with max_app_chunks
+    nt.assert_equal(copy_and_set_return('max_app_chunks', 1),
+            decode_bloscpack_header(copy_and_set_input(24,
+                '\x01\x00\x00\x00\x00\x00\x00\x00')))
+    nt.assert_equal(copy_and_set_return('max_app_chunks',
+        reverse_pretty('1M')),
+            decode_bloscpack_header(copy_and_set_input(24,
+                '\x00\x00\x10\x00\x00\x00\x00\x00')))
+    nt.assert_equal(
+            copy_and_set_return('max_app_chunks', MAX_CHUNKS),
+            decode_bloscpack_header(copy_and_set_input(24,
+                '\xff\xff\xff\xff\xff\xff\xff\x7f')))
 
 def test_create_metadata_header():
     raw = '\x00\x00\x00\x00\x00\x00\x00\x00'\

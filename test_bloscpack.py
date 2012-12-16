@@ -421,6 +421,16 @@ def test_create_bloscpack_header():
     nt.assert_equal(mod_raw(16, '\xff\xff\xff\xff\xff\xff\xff\x7f'),
             create_bloscpack_header(nchunks=MAX_CHUNKS))
 
+    # test max_app_chunks
+    nt.assert_equal(mod_raw(24, '\x00\x00\x00\x00\x00\x00\x00\x00'),
+            create_bloscpack_header(max_app_chunks=0))
+    nt.assert_equal(mod_raw(24, '\x01\x00\x00\x00\x00\x00\x00\x00'),
+            create_bloscpack_header(max_app_chunks=1))
+    nt.assert_equal(mod_raw(24, '\x7f\x00\x00\x00\x00\x00\x00\x00'),
+            create_bloscpack_header(max_app_chunks=127))
+    nt.assert_equal(mod_raw(24, '\xff\xff\xff\xff\xff\xff\xff\x7f'),
+            create_bloscpack_header(max_app_chunks=MAX_CHUNKS))
+
 def test_decode_bloscpack_header():
     no_arg_return  = {
             'format_version': FORMAT_VERSION,

@@ -818,11 +818,8 @@ def test_file_corruption():
         pack_file(in_file, out_file, nchunks=1)
         # now go in and modify a byte in the file
         with open(out_file, 'r+b') as input_fp:
-            # read the header
-            bloscpack_header = bloscpack._read_bloscpack_header(input_fp)
-            # read the offsets
-            input_fp.read(8 * (bloscpack_header['nchunks'] +
-                bloscpack_header['max_app_chunks']))
+            bloscpack._read_bloscpack_header(input_fp)
+            bloscpack._read_offsets(input_fp)
             # read the blosc header of the first chunk
             input_fp.read(BLOSC_HEADER_LENGTH)
             # read four bytes

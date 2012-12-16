@@ -1454,6 +1454,39 @@ def _read_metadata(input_fp):
     return metadata, metadata_header
 
 
+def _read_offsets(input_fp, bloscpack_header):
+    """ Read the offsets from a file pointer.
+
+    Parameters
+    ----------
+    input_fp : file like
+        a file pointer to read from
+
+    Returns
+    -------
+    offsets : list of int
+        the offsets
+
+    Notes
+    -----
+    The 'input_fp' should point to the position where the offsets start. Any
+    unused offsets will not be returned.
+
+    """
+    if bloscpack_header['offsets']:
+        total_entries = bloscpack_header['nchunks'] + \
+                bloscpack_header['max_app_chunks']
+        offsets_raw = input_fp.read(8 * total_entries)
+        print_verbose('Read raw offsets: %s' % repr(offsets_raw),
+                level=DEBUG)
+        offsets = [decode_int64(offsets_raw[j - 8:j]) for j in
+                xrange(8, bloscpack_header['nchunks'] * 8 + 1, 8)]
+        print_verbose('Offsets: %s' % offsets, level=DEBUG)
+        return offsets
+    else:
+        return []
+
+
 def unpack_file(in_file, out_file):
     """ Main function for decompressing a file.
 
@@ -1496,14 +1529,7 @@ def _unpack_fp(input_fp, output_fp):
             if bloscpack_header['metadata'] \
             else (None, None)
     nchunks = bloscpack_header['nchunks']
-    if bloscpack_header['offsets']:
-        offsets_raw = input_fp.read(8 * (nchunks +
-                bloscpack_header['max_app_chunks']))
-        print_verbose('Read raw offsets: %s' % repr(offsets_raw),
-                level=DEBUG)
-        offset_storage = [decode_int64(offsets_raw[j - 8:j]) for j in
-                xrange(8, nchunks * 8 + 1, 8)]
-        print_verbose('Offsets: %s' % offset_storage, level=DEBUG)
+    offsets = _read_offsets(input_fp, bloscpack_header)
     # decompress
     for i in range(nchunks):
         print_verbose("decompressing chunk '%d'%s" %

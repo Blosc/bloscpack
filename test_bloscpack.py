@@ -684,11 +684,9 @@ def test_offsets():
         bloscpack.pack_file(in_file, out_file, nchunks=6)
         with open(out_file, 'r+b') as input_fp:
             bloscpack_header = bloscpack._read_bloscpack_header(input_fp)
-            nchunks = bloscpack_header['nchunks']
-            total_entries = nchunks + bloscpack_header['max_app_chunks']
-            offsets_raw = input_fp.read(8 * total_entries)
-            offsets = [decode_int64(offsets_raw[j - 8: j])
-                    for j in xrange(8, nchunks * 8 + 1, 8)]
+            total_entries = bloscpack_header['nchunks'] + \
+                    bloscpack_header['max_app_chunks']
+            offsets = bloscpack._read_offsets(input_fp, bloscpack_header)
             # First chunks should start after header and offsets
             first = BLOSCPACK_HEADER_LENGTH + 8 * total_entries
             # We assume that the others are correct

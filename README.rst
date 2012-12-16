@@ -542,7 +542,6 @@ Coding Conventions
 TODO
 ----
 
-* Introduce an appendix as discussed per mailinglist
 * quiet verbosity level
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage

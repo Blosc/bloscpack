@@ -1498,7 +1498,7 @@ def _unpack_fp(input_fp, output_fp):
     nchunks = bloscpack_header['nchunks']
     if bloscpack_header['offsets']:
         offsets_raw = input_fp.read(8 * (nchunks +
-                bloscpack_args['max_app_chunks']))
+                bloscpack_header['max_app_chunks']))
         print_verbose('Read raw offsets: %s' % repr(offsets_raw),
                 level=DEBUG)
         offset_storage = [decode_int64(offsets_raw[j - 8:j]) for j in

@@ -1257,7 +1257,6 @@ def pack_file(in_file, out_file, metadata=None,
     """
     in_file_size = path.getsize(in_file)
     print_verbose('input file size: %s' % double_pretty_size(in_file_size))
-    out_file_size = path.getsize(out_file)
     # calculate chunk sizes
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, nchunks, chunk_size)
@@ -1269,6 +1268,7 @@ def pack_file(in_file, out_file, metadata=None,
                 blosc_args=blosc_args,
                 bloscpack_args=bloscpack_args,
                 metadata_args=metadata_args)
+    out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 

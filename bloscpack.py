@@ -895,7 +895,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
-    check_range('max_app_chunks', nchunks, 0, MAX_CHUNKS)
+    check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
 
     format_version = encode_uint8(format_version)
     options = encode_uint8(int(

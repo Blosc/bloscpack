@@ -549,9 +549,6 @@ TODO
 * subcommand v or verify to verify the integrity of the data
 * subcommand i or info to print information of the file, e.g. decoded header
   and offsets
-* Defaults everywhere. To improve the semantics of future library usage,
-  whenever we see a keyword argument that has a defined default, that default
-  should be used. Should make the whole thing more coherent.
 * partial decompression?
 * add --raw-input and --raw-output switches to allow stuff like:
   cat file | blpk --raw-input --raw-output compress > file.blp

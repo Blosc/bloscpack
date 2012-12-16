@@ -951,7 +951,6 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
 
     """
     check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
-    #_check_options(options)
     _check_valid_checksum(checksum)
     check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)

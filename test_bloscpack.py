@@ -107,6 +107,25 @@ def test_check_files():
     nt.assert_equal(check_files('test_bloscpack.py',
         'test_bloscpack.py', args), None)
 
+
+def test_check_blosc_arguments():
+    missing = DEFAULT_BLOSC_ARGS.copy()
+    missing.pop('typesize')
+    nt.assert_raises(ValueError, bloscpack._check_blosc_args, missing)
+    extra = DEFAULT_BLOSC_ARGS.copy()
+    extra['wtf'] = 'wtf'
+    nt.assert_raises(ValueError, bloscpack._check_blosc_args, extra)
+
+
+def test_check_bloscpack_arguments():
+    missing = DEFAULT_BLOSCPACK_ARGS.copy()
+    missing.pop('offsets')
+    nt.assert_raises(ValueError, bloscpack._check_bloscpack_args, missing)
+    extra = DEFAULT_BLOSCPACK_ARGS.copy()
+    extra['wtf'] = 'wtf'
+    nt.assert_raises(ValueError, bloscpack._check_bloscpack_args, extra)
+
+
 def test_check_metadata_arguments():
     missing = DEFAULT_METADATA_ARGS.copy()
     missing.pop('magic_format')
@@ -114,6 +133,7 @@ def test_check_metadata_arguments():
     extra = DEFAULT_METADATA_ARGS.copy()
     extra['wtf'] = 'wtf'
     nt.assert_raises(ValueError, bloscpack._check_metadata_arguments, extra)
+
 
 def test_calculate_nchunks():
     # tests for nchunks given

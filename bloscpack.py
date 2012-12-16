@@ -42,6 +42,7 @@ MAX_META_SIZE = (2**32-1) # uint32 max val
 
 # Bloscpack args
 BLOSCPACK_ARGS = ('offsets', 'checksum', 'max_app_chunks')
+_BLOSCPACK_ARGS_SET = set(BLOSCPACK_ARGS)  # cached
 DEFAULT_OFFSETS = True
 DEFAULT_CHECKSUM = 'adler32'
 DEFAULT_MAX_APP_CHUNKS = lambda x: 10 * x
@@ -52,6 +53,7 @@ DEFAULT_CHUNK_SIZE = '1M'
 
 # Blosc args
 BLOSC_ARGS = ('typesize', 'clevel', 'shuffle')
+_BLOSC_ARGS_SET = set(BLOSC_ARGS) # cached
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
 MAX_CLEVEL = 9
@@ -766,6 +768,52 @@ def _check_options_zero(options, indices):
         if options[i] != '0':
             raise ValueError(
                 'Element %i was non-zero when attempting to decode options')
+
+
+def _check_blosc_args(blosc_args):
+    """ Check the integrity of the blosc arguments dict.
+
+    Parameters
+    ----------
+    blosc_args : dict
+        blosc args dictionary
+
+    Raises
+    ------
+    ValueError
+        if there are missing or unexpected keys present
+
+    Notes
+    -----
+
+    Check the value of the 'BLOSC_ARGS' constant for the details of what
+    keys should be contained in the dictionary.
+
+    """
+    __check_args('blosc', blosc_args, _BLOSC_ARGS_SET)
+
+
+def _check_bloscpack_args(bloscpack_args):
+    """ Check the integrity of the bloscpack arguments dict.
+
+    Parameters
+    ----------
+    bloscpack_args : dict
+        blosc args dictionary
+
+    Raises
+    ------
+    ValueError
+        if there are missing or unexpected keys present
+
+    Notes
+    -----
+
+    Check the value of the 'BLOSCPACK_ARGS' constant for the details of what
+    keys should be contained in the dictionary.
+
+    """
+    __check_args('bloscpack', bloscpack_args, _BLOSCPACK_ARGS_SET)
 
 
 def _check_metadata_arguments(metadata_args):

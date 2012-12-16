@@ -954,7 +954,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     silently ignored. Secondly, if the resulting value of max_app_chunks would
     be too large (i.e. the sum of 'nchunks' and 'max_app_chunks' is larger than
     'MAX_CHUNKS', then 'max_app_chunks' is automatically set to the maximum
-    permissable value.
+    permissible value.
 
     """
     # first check that the args are actually valid
@@ -962,12 +962,12 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     # then check that we actually need to evaluate it
     if offsets and nchunks != -1:
         if hasattr(max_app_chunks, '__call__'):
-            # it's a callable allright
+            # it's a callable all right
             max_app_chunks = max_app_chunks(nchunks)
             # check that the result is still positive, might be quite large
             if max_app_chunks < 0:
                 raise ValueError(
-                        'max_app_chunks callable returnd a negative integer')
+                        'max_app_chunks callable returned a negative integer')
         elif isinstance(max_app_chunks, int):
             # it's a plain int, check it's range
             check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)

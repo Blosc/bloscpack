@@ -1345,6 +1345,8 @@ def _pack_fp(input_fp, output_fp,
     Use file_pointers, which could potentially be cStringIO objects.
 
     """
+    _check_blosc_args(blosc_args)
+    _check_bloscpack_args(bloscpack_args)
     if bloscpack_args['offsets']:
         if hasattr(bloscpack_args['max_app_chunks'], '__call__'):
             max_app_chunks = bloscpack_args['max_app_chunks'](nchunks)

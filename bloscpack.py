@@ -41,10 +41,14 @@ MAX_CHUNKS = (2**63)-1
 MAX_META_SIZE = (2**32-1) # uint32 max val
 
 # Bloscpack args
-DEFAULT_CHUNK_SIZE = '1M'
+BLOSCPACK_ARGS = ('offsets', 'checksum', 'max_app_chunks')
 DEFAULT_OFFSETS = True
 DEFAULT_CHECKSUM = 'adler32'
-DEFAULT_OPTIONS = None  # created programatically later on
+DEFAULT_MAX_APP_CHUNKS = lambda x: 10 * x
+DEFAULT_BLOSCPACK_ARGS = dict(zip(BLOSCPACK_ARGS,
+    (DEFAULT_OFFSETS, DEFAULT_CHECKSUM, DEFAULT_MAX_APP_CHUNKS)))
+
+DEFAULT_CHUNK_SIZE = '1M'
 
 # Blosc args
 BLOSC_ARGS = ('typesize', 'clevel', 'shuffle')
@@ -833,10 +837,6 @@ def decode_metadata_options(options):
     _check_options_zero(options, range(8))
     return {}
 
-# default options created here programatically
-DEFAULT_OPTIONS = create_options()
-DEFAULT_METADATA_OPTIONS = create_metadata_options()
-
 
 def create_bloscpack_header(format_version=FORMAT_VERSION,
         offsets=False,
@@ -845,7 +845,8 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         typesize=0,
         chunk_size=-1,
         last_chunk=-1,
-        nchunks=-1):
+        nchunks=-1,
+        max_app_chunks=0):
     """ Create the bloscpack header string.
 
     Parameters
@@ -866,6 +867,8 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         the size of the last chunk
     nchunks : int
         the number of chunks
+    max_app_chunks : callable or int
+        the total number of possible append chunks
 
     Returns
     -------
@@ -892,6 +895,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
     check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
+    check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
 
     format_version = encode_uint8(format_version)
     options = encode_uint8(int(
@@ -902,11 +906,11 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     chunk_size = encode_int32(chunk_size)
     last_chunk = encode_int32(last_chunk)
     nchunks = encode_int64(nchunks)
-    RESERVED = encode_int64(0)
+    max_app_chunks = encode_int64(max_app_chunks)
 
     return (MAGIC + format_version + options + checksum + typesize +
             chunk_size + last_chunk +
-            nchunks + RESERVED)
+            nchunks + max_app_chunks)
 
 def decode_bloscpack_header(buffer_):
     """ Check that the magic marker exists and return number of chunks.
@@ -934,8 +938,8 @@ def decode_bloscpack_header(buffer_):
         the size of the last chunk
     nchunks : int
         the number of chunks
-    RESERVED : int
-        the RESERVED field from the header, should be zero
+    max_app_chunks : int
+        the maximum number of chunks that can be appended
 
     """
     if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
@@ -956,7 +960,7 @@ def decode_bloscpack_header(buffer_):
             'chunk_size':     decode_int32(buffer_[8:12]),
             'last_chunk':     decode_int32(buffer_[12:16]),
             'nchunks':        decode_int64(buffer_[16:24]),
-            'RESERVED':       decode_int64(buffer_[24:32]),
+            'max_app_chunks': decode_int64(buffer_[24:32]),
             }
 
 def create_metadata_header(magic_format='',
@@ -973,11 +977,11 @@ def create_metadata_header(magic_format='',
     _check_options(options)
     _check_valid_checksum(checksum)
     _check_valid_codec(codec)
-    check_range('meta-level',      level,         0, MAX_CLEVEL)
-    check_range('meta-size',       meta_size,     0, MAX_META_SIZE)
-    check_range('max-meta-size',   max_meta_size, 0, MAX_META_SIZE)
-    check_range('meta-comp-size',  max_meta_size, 0, MAX_META_SIZE)
-    _check_str('user-codec',       user_codec,    8)
+    check_range('meta-level',      level,          0, MAX_CLEVEL)
+    check_range('meta-size',       meta_size,      0, MAX_META_SIZE)
+    check_range('max-meta-size',   max_meta_size,  0, MAX_META_SIZE)
+    check_range('meta-comp-size',  meta_comp_size, 0, MAX_META_SIZE)
+    _check_str('user-codec',       user_codec,     8)
 
     magic_format        = _pad_with_nulls(magic_format, 8)
     options             = encode_uint8(int(options, 2))
@@ -1209,10 +1213,10 @@ def _write_metadata(output_fp, metadata, metadata_args):
     return metadata_total
 
 
-def pack_file(in_file, out_file, blosc_args,
-        metadata=None,
+def pack_file(in_file, out_file, metadata=None,
         nchunks=None, chunk_size=None,
-        offsets=DEFAULT_OFFSETS, checksum=DEFAULT_CHECKSUM,
+        blosc_args=DEFAULT_BLOSC_ARGS,
+        bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
         metadata_args=DEFAULT_METADATA_ARGS):
     """ Main function for compressing a file.
 
@@ -1222,20 +1226,25 @@ def pack_file(in_file, out_file, blosc_args,
         the name of the input file
     out_file : str
         the name of the output file
-    blosc_args : dict
-        dictionary of blosc keyword args
-    metadata : str
-        the metadata string
+    metadata : dict
+        the metadata dict
     nchunks : int, default: None
         The desired number of chunks.
     chunk_size : int, default: None
         The desired chunk size in bytes.
-    offsets : bool
-        Wheather to include offsets.
-    checksum : str
-        Which checksum to use.
+    blosc_args : dict
+        blosc keyword args
+    bloscpack_args : dict
+        bloscpack keyword args
     metadata_args : dict
-        The metadata options
+        metadata keyword args
+
+    Notes
+    -----
+    To decide on the chunking policy, you may either supply 'chunk_size' or
+    'nchunks' but not both. If you select neither, the 'DEFAULT_CHUNK_SIZE'
+    will be used. If the file is smaller than this, a single chunk with the
+    given file size will be created.
 
     Raises
     ------
@@ -1243,61 +1252,80 @@ def pack_file(in_file, out_file, blosc_args,
     ChunkingException
         if there was a problem caculating the chunks
 
+    # TODO document which arguments are silently ignored
+
     """
     in_file_size = path.getsize(in_file)
     print_verbose('input file size: %s' % double_pretty_size(in_file_size))
+    # calculate chunk sizes
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(in_file_size, nchunks, chunk_size)
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
-        _pack_fp(input_fp, output_fp, in_file_size,
-                blosc_args, metadata,
-                nchunks, chunk_size,
-                offsets, checksum, metadata_args)
+        _pack_fp(input_fp, output_fp,
+                nchunks, chunk_size, last_chunk_size,
+                metadata=metadata,
+                blosc_args=blosc_args,
+                bloscpack_args=bloscpack_args,
+                metadata_args=metadata_args)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
-def _pack_fp(input_fp, output_fp, in_file_size,
-        blosc_args, metadata,
-        nchunks, chunk_size,
-        offsets, checksum, metadata_args):
+def _pack_fp(input_fp, output_fp,
+        nchunks, chunk_size, last_chunk_size,
+        metadata=None,
+        blosc_args=DEFAULT_BLOSC_ARGS,
+        bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+        metadata_args=DEFAULT_METADATA_ARGS):
     """ Helper function for pack_file.
 
-    Use file_points, which could potentially be cStringIO objects.
+    Use file_pointers, which could potentially be cStringIO objects.
 
     """
-    # calculate chunk sizes
-    nchunks, chunk_size, last_chunk_size = \
-            calculate_nchunks(in_file_size, nchunks, chunk_size)
-    # set the checksum impl
-    checksum_impl = CHECKSUMS_LOOKUP[checksum]
+    if bloscpack_args['offsets']:
+        if hasattr(bloscpack_args['max_app_chunks'], '__call__'):
+            max_app_chunks = bloscpack_args['max_app_chunks'](nchunks)
+        elif isinstance(bloscpack_args['max_app_chunks'], int):
+            max_app_chunks = bloscpack_args['max_app_chunks']
+    else:
+        if bloscpack_args['max_app_chunks'] is not None:
+            print_verbose('max_app_chunks will be silently ignored',
+                    level=DEBUG)
+        max_app_chunks = 0
+    # TODO check coherence of arguments
     # create the bloscpack header
     raw_bloscpack_header = create_bloscpack_header(
-            offsets=offsets,
+            offsets=bloscpack_args['offsets'],
             metadata=True if metadata is not None else False,
-            checksum=checksum,
+            checksum=bloscpack_args['checksum'],
             typesize=blosc_args['typesize'],
             chunk_size=chunk_size,
             last_chunk=last_chunk_size,
             nchunks=nchunks,
+            max_app_chunks=max_app_chunks
             )
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)
-    # write the chunks to the file
+    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_args['checksum']]
     output_fp.write(raw_bloscpack_header)
     # need to store how much space was used by metadata, for seeking later
     metadata_total = 0
     # deal with metadata
     if metadata is not None:
         metadata_total += _write_metadata(output_fp, metadata, metadata_args)
-    # preallocate space for the offsets
-    if offsets:
-        offsets_storage = list(itertools.repeat(0, nchunks))
-        output_fp.write(encode_int64(-1) * nchunks)
+    elif metadata_args is not None:
+        print_verbose('metadata_args will be silently ignored', level=DEBUG)
+    # preallocate space for the offsets, including extra space for growing
+    if bloscpack_args['offsets']:
+        total_entries = nchunks + max_app_chunks
+        offsets_storage = list(itertools.repeat(-1, total_entries))
+        output_fp.write(encode_int64(-1) * total_entries)
     # if nchunks == 1 the last_chunk_size is the size of the single chunk
     for i, bytes_to_read in enumerate((
             [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
         # store the current position in the file
-        if offsets:
+        if bloscpack_args['offsets']:
             offsets_storage[i] = output_fp.tell()
         current_chunk = input_fp.read(bytes_to_read)
         # do compression
@@ -1317,12 +1345,13 @@ def _pack_fp(input_fp, output_fp, in_file_size,
             digest = checksum_impl(compressed)
             # write digest
             output_fp.write(digest)
-            tail_mess += ('checksum (%s): %s ' % (checksum, repr(digest)))
-        if offsets:
+            tail_mess += ('checksum (%s): %s ' %
+                    (bloscpack_args['checksum'], repr(digest)))
+        if bloscpack_args['offsets']:
             tail_mess += ("offset: '%d'" % offsets_storage[i])
         if len(tail_mess) > 0:
             print_verbose(tail_mess, level=DEBUG)
-    if offsets:
+    if bloscpack_args['offsets']:
         output_fp.seek(BLOSCPACK_HEADER_LENGTH + metadata_total, 0)
         print_verbose("Writing '%d' offsets: '%s'" %
                 (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
@@ -1425,6 +1454,39 @@ def _read_metadata(input_fp):
     return metadata, metadata_header
 
 
+def _read_offsets(input_fp, bloscpack_header):
+    """ Read the offsets from a file pointer.
+
+    Parameters
+    ----------
+    input_fp : file like
+        a file pointer to read from
+
+    Returns
+    -------
+    offsets : list of int
+        the offsets
+
+    Notes
+    -----
+    The 'input_fp' should point to the position where the offsets start. Any
+    unused offsets will not be returned.
+
+    """
+    if bloscpack_header['offsets']:
+        total_entries = bloscpack_header['nchunks'] + \
+                bloscpack_header['max_app_chunks']
+        offsets_raw = input_fp.read(8 * total_entries)
+        print_verbose('Read raw offsets: %s' % repr(offsets_raw),
+                level=DEBUG)
+        offsets = [decode_int64(offsets_raw[j - 8:j]) for j in
+                xrange(8, bloscpack_header['nchunks'] * 8 + 1, 8)]
+        print_verbose('Offsets: %s' % offsets, level=DEBUG)
+        return offsets
+    else:
+        return []
+
+
 def unpack_file(in_file, out_file):
     """ Main function for decompressing a file.
 
@@ -1467,13 +1529,7 @@ def _unpack_fp(input_fp, output_fp):
             if bloscpack_header['metadata'] \
             else (None, None)
     nchunks = bloscpack_header['nchunks']
-    if bloscpack_header['offsets']:
-        offsets_raw = input_fp.read(8 * nchunks)
-        print_verbose('Read raw offsets: %s' % repr(offsets_raw),
-                level=DEBUG)
-        offset_storage = [decode_int64(offsets_raw[j - 8:j]) for j in
-                xrange(8, nchunks * 8 + 1, 8)]
-        print_verbose('Offsets: %s' % offset_storage, level=DEBUG)
+    offsets = _read_offsets(input_fp, bloscpack_header)
     # decompress
     for i in range(nchunks):
         print_verbose("decompressing chunk '%d'%s" %
@@ -1631,15 +1687,14 @@ if __name__ == '__main__':
                 print_verbose("File was smaller than the default " +
                         "chunk-size, using a single chunk")
         metadata = process_metadata_args(args)
+        bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
+        bloscpack_args['offsets'] = args.offsets
+        bloscpack_args['checksum'] = args.checksum
         try:
-            pack_file(in_file, out_file,
-                    blosc_args,
-                    # TODO handle the checksum
-                    metadata,
-                    nchunks=args.nchunks,
-                    chunk_size=args.chunk_size,
-                    offsets=args.offsets,
-                    checksum=args.checksum,
+            pack_file(in_file, out_file, metadata,
+                    nchunks=args.nchunks, chunk_size=args.chunk_size,
+                    blosc_args=blosc_args,
+                    bloscpack_args=bloscpack_args,
                     metadata_args=DEFAULT_METADATA_ARGS)
         except ChunkingException as e:
             error(e.message)

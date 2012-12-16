@@ -392,7 +392,7 @@ All entries are little-endian.
     (``int64``)
     The maximum number of chunks that can be appended to this file, excluding
     ``nchunks``. This is only useful if there is an offsets section in the
-    file and should be set to ``-1`` if there is no such section.
+    file and should be set to ``0`` if there is no such section.
 
 The overall file-size can be computed as ``chunk-size * (nchunks - 1) +
 last-chunk-size``. In a streaming scenario ``-1`` can be used as a placeholder.
@@ -492,10 +492,12 @@ seeking. The offsets (if activated) follow the header. Each offset is a 64 bit
 signed little-endian integer (``int64``). A value of ``-1`` denotes an unknown
 offset. Initially, all offsets should be initialized to ``-1`` and filled in
 after writing all chunks. Thus, If the compression of the file fails
-prematurely or is aborted, all offsets should have the value ``-1``.  Each
-offset denotes the exact position of the chunk in the file such that seeking to
-the offset, will position the file pointer such that, reading the next 16 bytes
-gives the Blosc header, which is at the start of the desired chunk.
+prematurely or is aborted, all offsets should have the value ``-1``.  Also, any
+unused offset entries preallocated to allow the file to grow should be set to
+``-1``. Each offset denotes the exact position of the chunk in the file such
+that seeking to the offset, will position the file pointer such that, reading
+the next 16 bytes gives the Blosc header, which is at the start of the desired
+chunk.
 
 Description of the chunk format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

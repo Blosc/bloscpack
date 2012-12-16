@@ -706,6 +706,25 @@ def test_offsets():
             blosc_header = decode_blosc_header(blosc_header_raw)
             nt.assert_equal(expected, blosc_header)
 
+    # now check the same thing again, but w/o any max_app_chunks
+    input_fp, output_fp = StringIO(), StringIO()
+    create_array_fp(1, input_fp)
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(input_fp.tell(), nchunks=6)
+    input_fp.seek(0, 0)
+    bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
+    bloscpack_args['max_app_chunks'] = 0
+    bloscpack._pack_fp(input_fp, output_fp,
+            nchunks, chunk_size, last_chunk_size,
+            bloscpack_args=bloscpack_args
+            )
+    output_fp.seek(0, 0)
+    bloscpack_header = bloscpack._read_bloscpack_header(output_fp)
+    nt.assert_equal(0, bloscpack_header['max_app_chunks'])
+    offsets = bloscpack._read_offsets(output_fp, bloscpack_header)
+    nt.assert_equal([80, 585990, 1071780, 1546083, 2003986, 2460350],
+            offsets)
+
 def test_metadata():
     test_metadata = {'dtype': 'float64',
                      'shape': [1024],

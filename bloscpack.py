@@ -713,7 +713,7 @@ def check_range(name, value, min_, max_):
     elif not min_ <= value <= max_:
         raise ValueError(
                 "'%s' must be in the range %s <= n <= %s, not '%s'" %
-                tuple(map(str, (name, min, max_, value))))
+                tuple(map(str, (name, min_, max_, value))))
 
 
 def _check_str(name, value, max_len):

@@ -153,6 +153,7 @@ class Hash(object):
     def __call__(self, data):
         return self._function(data)
 
+
 def zlib_hash(func):
     """ Wrapper for zlib hashes. """
     def hash_(data):
@@ -161,11 +162,13 @@ def zlib_hash(func):
         return struct.pack('<I', func(data) & 0xffffffff)
     return 4, hash_
 
+
 def hashlib_hash(func):
     """ Wrapper for hashlib hashes. """
     def hash_(data):
         return func(data).digest()
     return func().digest_size, hash_
+
 
 CHECKSUMS = [Hash('None', 0, lambda data: ''),
      Hash('adler32', *zlib_hash(zlib.adler32)),
@@ -303,11 +306,13 @@ def print_verbose(message, level=VERBOSE):
     if VERBOSITY_LEVELS.index(level) <= VERBOSITY_LEVELS.index(LEVEL):
         print('%s: %s' % (PREFIX, message))
 
+
 def error(message, exit_code=1):
     """ Print message and exit with desired code. """
     for line in [l for l in message.split('\n') if l != '']:
         print('%s: error: %s' % (PREFIX, line))
     sys.exit(exit_code)
+
 
 def pretty_size(size_in_bytes):
     """ Pretty print filesize.  """
@@ -319,9 +324,11 @@ def pretty_size(size_in_bytes):
         else:
             return str(round(size_in_bytes/lim, 2))+suf
 
+
 def double_pretty_size(size_in_bytes):
     """ Pretty print filesize including size in bytes. """
     return ("%s (%dB)" %(pretty_size(size_in_bytes), size_in_bytes))
+
 
 def reverse_pretty(readable):
     """ Reverse pretty printed file size. """
@@ -334,35 +341,46 @@ def reverse_pretty(readable):
     else:
         return int(float(readable[:-1]) * SUFFIXES[suffix])
 
+
 def decode_uint8(byte):
     return struct.unpack('<B', byte)[0]
+
 
 def decode_uint32(fourbyte):
     return struct.unpack('<I', fourbyte)[0]
 
+
 def decode_int32(fourbyte):
     return struct.unpack('<i', fourbyte)[0]
+
 
 def decode_int64(eightbyte):
     return struct.unpack('<q', eightbyte)[0]
 
+
 def decode_bitfield(byte):
     return bin(decode_uint8(byte))[2:].rjust(8,'0')
+
 
 def decode_magic_string(str_):
     return str_.strip('\x00')
 
+
 def encode_uint8(byte):
     return struct.pack('<B', byte)
+
 
 def encode_uint32(byte):
     return struct.pack('<I', byte)
 
+
 def encode_int32(fourbyte):
     return struct.pack('<i', fourbyte)
 
+
 def encode_int64(eightbyte):
     return struct.pack('<q', eightbyte)
+
 
 @contextlib.contextmanager
 def open_two_file(input_fp, output_fp):
@@ -370,6 +388,7 @@ def open_two_file(input_fp, output_fp):
     yield input_fp, output_fp
     input_fp.close()
     output_fp.close()
+
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
@@ -392,6 +411,7 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
 
     def _split_lines(self, text, width):
         return text.splitlines()
+
 
 def create_parser():
     """ Create and return the parser. """
@@ -562,6 +582,7 @@ def create_parser():
 
     return parser
 
+
 def decode_blosc_header(buffer_):
     """ Read and decode header from compressed Blosc buffer.
 
@@ -706,6 +727,7 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
             level=DEBUG)
     return nchunks, chunk_size, last_chunk_size
 
+
 def check_range(name, value, min_, max_):
     """ Check that a variable is in range. """
     if not isinstance(value, (int, long)):
@@ -838,6 +860,7 @@ def _check_metadata_arguments(metadata_args):
     """
     __check_args('metadata', metadata_args, _METADATA_ARGS_SET)
 
+
 def __check_args(name, received, expected):
     """ Check an arg dict.
 
@@ -869,7 +892,8 @@ def create_options(offsets=DEFAULT_OFFSETS, metadata=False):
     metadata : bool
     """
     return "".join([str(int(i)) for i in
-        [False, False, False, False, False, False, metadata, offsets]])
+            [False, False, False, False, False, False, metadata, offsets]])
+
 
 def decode_options(options):
     """ Parse the options bitfield.
@@ -890,14 +914,17 @@ def decode_options(options):
             'metadata': bool(int(options[6])),
             }
 
+
 def create_metadata_options():
     """ Create the metadata options bitfield. """
     return "00000000"
+
 
 def decode_metadata_options(options):
     _check_options(options)
     _check_options_zero(options, range(8))
     return {}
+
 
 def _handle_max_apps(offsets, nchunks, max_app_chunks):
     """ Process and handle the 'max_app_chunks' argument
@@ -959,6 +986,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
                     level=DEBUG)
         max_app_chunks = 0
     return max_app_chunks
+
 
 def create_bloscpack_header(format_version=FORMAT_VERSION,
         offsets=False,
@@ -1038,6 +1066,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
             chunk_size + last_chunk +
             nchunks + max_app_chunks)
 
+
 def decode_bloscpack_header(buffer_):
     """ Check that the magic marker exists and return number of chunks.
 
@@ -1089,6 +1118,7 @@ def decode_bloscpack_header(buffer_):
             'max_app_chunks': decode_int64(buffer_[24:32]),
             }
 
+
 def create_metadata_header(magic_format='',
        options="00000000",
        checksum='None',
@@ -1121,6 +1151,7 @@ def create_metadata_header(magic_format='',
 
     return magic_format + options + checksum + codec + level + \
             meta_size + max_meta_size + meta_comp_size + user_codec
+
 
 def decode_metadata_header(buffer_):
     if len(buffer_) != 32:
@@ -1162,6 +1193,7 @@ def process_compression_args(args):
     blosc_args = dict((arg, args.__getattribute__(arg)) for arg in BLOSC_ARGS)
     return in_file, out_file, blosc_args
 
+
 def process_decompression_args(args):
     """ Extract and check the decompression args after parsing by argparse.
 
@@ -1194,6 +1226,7 @@ def process_decompression_args(args):
                     (in_file, EXTENSION))
     return in_file, out_file
 
+
 def process_metadata_args(args):
     if args.metadata is not None:
         try:
@@ -1201,6 +1234,7 @@ def process_metadata_args(args):
                 return json.loads(metadata_file.read().strip())
         except IOError as ioe:
             error(ioe.message)
+
 
 def check_files(in_file, out_file, args):
     """ Check files exist/don't exist.
@@ -1229,6 +1263,7 @@ def check_files(in_file, out_file, args):
             print_verbose("overwriting existing file: %s" % out_file)
     print_verbose('input file is: %s' % in_file)
     print_verbose('output file is: %s' % out_file)
+
 
 def process_nthread_arg(args):
     """ Extract and set nthreads. """
@@ -1397,6 +1432,7 @@ def pack_file(in_file, out_file, metadata=None,
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
+
 
 def _pack_fp(input_fp, output_fp,
         nchunks, chunk_size, last_chunk_size,
@@ -1686,6 +1722,7 @@ def _unpack_fp(input_fp, output_fp):
                 (pretty_size(len(compressed)),
                     pretty_size(len(decompressed))), level=DEBUG)
     return metadata
+
 
 def _rewrite_metadata_fp(target_fp, metadata,
             magic_format=None, checksum=None,

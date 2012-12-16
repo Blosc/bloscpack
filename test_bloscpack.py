@@ -798,14 +798,13 @@ def test_file_corruption():
         nt.assert_raises(ChecksumMismatch, unpack_file, out_file, dcmp_file)
 
 def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
-    blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         if progress:
             print("Creating test array")
         create_array(repeats, in_file, progress=progress)
         if progress:
             print("Compressing")
-        pack_file(in_file, out_file, blosc_args,
+        pack_file(in_file, out_file,
                 nchunks=nchunks, chunk_size=chunk_size)
         if progress:
             print("Decompressing")
@@ -816,9 +815,6 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
 
 def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
         progress=False, metadata=None):
-    blosc_args = DEFAULT_BLOSC_ARGS
-    offsets = DEFAULT_OFFSETS
-    checksum = DEFAULT_CHECKSUM
     in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
     if progress:
         print("Creating test array")
@@ -827,10 +823,11 @@ def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
     if progress:
         print("Compressing")
     in_fp.seek(0)
-    bloscpack._pack_fp(in_fp, out_fp, in_fp_size,
-            blosc_args, metadata,
-            nchunks, chunk_size, offsets, checksum,
-            DEFAULT_METADATA_ARGS)
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(in_fp_size, nchunks, chunk_size)
+    bloscpack._pack_fp(in_fp, out_fp,
+            nchunks, chunk_size, last_chunk_size,
+            metadata=metadata)
     out_fp.seek(0)
     if progress:
         print("Decompressing")

@@ -417,10 +417,10 @@ The header has the following layout::
    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
    |         magic-format          | ^ | ^ | ^ | ^ |   meta-size   |
                                      |   |   |   |
-                 options  -----------+   |   |   |
-                 checksum ---------------+   |   |
-                 codec    -------------------+   |
-                 level    -----------------------+
+                 meta-options -------+   |   |   |
+                 meta-checksum ----------+   |   |
+                 meta-codec -----------------+   |
+                 meta-level ---------------------+
 
    |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
    | max-meta-size |meta-comp-size |            user-codec         |
@@ -430,14 +430,14 @@ The header has the following layout::
     The data will usually be some kind of binary serialized string data, for
     example ``JSON``, ``BSON``, ``YAML`` or Protocol-Buffers. The format
     identifier is to be placed in this field.
-:options:
+:meta-options:
     (``bitfield``)
     A bitfield which allows for setting certain options in this metadata
     section. Currently unused
-:checksum:
+:meta-checksum:
     The checksum used for the metadata. The same checksums as for the data are
     available.
-:codec:
+:meta-codec:
     (``unit8``)
     The codec used for compressing the metadata. As of Bloscpack version
     ``0.3.0`` the following codecs are supported.
@@ -447,7 +447,7 @@ The header has the following layout::
     :``1``:
         ``zlib`` (DEFLATE)
 
-:level:
+:meta-level:
     (``unit8``)
     The compression level used for the codec. If ``codec`` is ``0`` i.e. the
     metadata is not compressed, this must be ``0`` too.

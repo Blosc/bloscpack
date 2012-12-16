@@ -796,18 +796,16 @@ def test_invalid_format():
     bloscpack.FORMAT_VERSION = FORMAT_VERSION
 
 def test_file_corruption():
-    blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        pack_file(in_file, out_file, blosc_args,
-                nchunks=1)
+        pack_file(in_file, out_file, nchunks=1)
         # now go in and modify a byte in the file
         with open(out_file, 'r+b') as input_fp:
             # read the header
-            bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
-            bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
+            bloscpack_header = bloscpack._read_bloscpack_header(input_fp)
             # read the offsets
-            input_fp.read(8 * bloscpack_header['nchunks'])
+            input_fp.read(8 * (bloscpack_header['nchunks'] +
+                bloscpack_header['max_app_chunks']))
             # read the blosc header of the first chunk
             input_fp.read(BLOSC_HEADER_LENGTH)
             # read four bytes

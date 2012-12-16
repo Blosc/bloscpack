@@ -694,7 +694,7 @@ def test_offsets():
             nt.assert_equal([560, 586470, 1072260, 1546563, 2004466, 2460830],
                     offsets)
             # try to read the second header
-            input_fp.seek(586470, 0)
+            input_fp.seek(offsets[1], 0)
             blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
             expected = {'versionlz': 1,
                         'blocksize': 131072,

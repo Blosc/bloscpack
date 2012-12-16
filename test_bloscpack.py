@@ -812,7 +812,7 @@ def test_file_corruption():
             input_fp.read(4)
             # read the fifth byte
             fifth = input_fp.read(1)
-            # figure out what to replcae it by
+            # figure out what to replace it by
             replace = '\x00' if fifth == '\xff' else '\xff'
             # seek one byte back relative to current position
             input_fp.seek(-1, 1)

@@ -1447,7 +1447,13 @@ def _pack_fp(input_fp, output_fp,
 
     """
     _check_blosc_args(blosc_args)
+    print_verbose('blosc args are:', level=DEBUG)
+    for arg, value in blosc_args.iteritems():
+        print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
     _check_bloscpack_args(bloscpack_args)
+    print_verbose('bloscpack args are:', level=DEBUG)
+    for arg, value in bloscpack_args.iteritems():
+        print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
     max_app_chunks = _handle_max_apps(bloscpack_args['offsets'],
             nchunks,
             bloscpack_args['max_app_chunks'])
@@ -1824,9 +1830,6 @@ if __name__ == '__main__':
     if args.subcommand in ['compress', 'c']:
         print_verbose('getting ready for compression')
         in_file, out_file, blosc_args = process_compression_args(args)
-        print_verbose('blosc args are:', level=DEBUG)
-        for arg, value in blosc_args.iteritems():
-            print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
         try:
             check_files(in_file, out_file, args)
         except FileNotFound as fnf:

@@ -1650,6 +1650,50 @@ def _read_offsets(input_fp, bloscpack_header):
     else:
         return []
 
+def _unpack_chunk_fp(input_fp, checksum_impl):
+    """ Unpack a chunk.
+
+    Parameters
+    ----------
+    input_fp : file like
+        the file pointer to unpack the chunk from
+    checksum_impl : Checksum
+        the checksum that has been used
+
+    Returns
+    -------
+    compressed : str
+        the compressed data
+    decompressed : str
+        the decompressed data
+    """
+    # read blosc header
+    blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
+    blosc_header = decode_blosc_header(blosc_header_raw)
+    print_verbose('blosc_header: %s' % repr(blosc_header), level=DEBUG)
+    ctbytes = blosc_header['ctbytes']
+    # Seek back BLOSC_HEADER_LENGTH bytes in file relative to current
+    # position. Blosc needs the header too and presumably this is
+    # better than to read the whole buffer and then concatenate it...
+    input_fp.seek(-BLOSC_HEADER_LENGTH, 1)
+    # read chunk
+    compressed = input_fp.read(ctbytes)
+    if checksum_impl.size > 0:
+        # do checksum
+        expected_digest = input_fp.read(checksum_impl.size)
+        received_digest = checksum_impl(compressed)
+        if received_digest != expected_digest:
+            raise ChecksumMismatch(
+                    "Checksum mismatch detected in chunk, "
+                    "expected: '%s', received: '%s'" %
+                    (repr(expected_digest), repr(received_digest)))
+        else:
+            print_verbose('checksum OK (%s): %s ' %
+                    (checksum_impl.name, repr(received_digest)),
+                    level=DEBUG)
+    # if checksum OK, decompress buffer
+    decompressed = blosc.decompress(compressed)
+    return compressed, decompressed
 
 def unpack_file(in_file, out_file):
     """ Main function for decompressing a file.
@@ -1698,32 +1742,7 @@ def _unpack_fp(input_fp, output_fp):
     for i in range(nchunks):
         print_verbose("decompressing chunk '%d'%s" %
                 (i, ' (last)' if i == nchunks - 1 else ''), level=DEBUG)
-        # read blosc header
-        blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
-        blosc_header = decode_blosc_header(blosc_header_raw)
-        print_verbose('blosc_header: %s' % repr(blosc_header), level=DEBUG)
-        ctbytes = blosc_header['ctbytes']
-        # Seek back BLOSC_HEADER_LENGTH bytes in file relative to current
-        # position. Blosc needs the header too and presumably this is
-        # better than to read the whole buffer and then concatenate it...
-        input_fp.seek(-BLOSC_HEADER_LENGTH, 1)
-        # read chunk
-        compressed = input_fp.read(ctbytes)
-        if checksum_impl.size > 0:
-            # do checksum
-            expected_digest = input_fp.read(checksum_impl.size)
-            received_digest = checksum_impl(compressed)
-            if received_digest != expected_digest:
-                raise ChecksumMismatch(
-                        "Checksum mismatch detected in chunk '%d' " % i +
-                        "expected: '%s', received: '%s'" %
-                        (repr(expected_digest), repr(received_digest)))
-            else:
-                print_verbose('checksum OK (%s): %s ' %
-                        (checksum_impl.name, repr(received_digest)),
-                        level=DEBUG)
-        # if checksum OK, decompress buffer
-        decompressed = blosc.decompress(compressed)
+        compressed, decompressed = _unpack_chunk_fp(input_fp, checksum_impl)
         # write decompressed chunk
         output_fp.write(decompressed)
         print_verbose("chunk written, in: %s out: %s" %

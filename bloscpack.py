@@ -1769,11 +1769,7 @@ if __name__ == '__main__':
     print_verbose('command line argument parsing complete', level=DEBUG)
     print_verbose('command line arguments are: ', level=DEBUG)
     for arg, val in vars(args).iteritems():
-        if arg == 'chunk_size' and val is not None:
-            print_verbose('\t%s: %s' % (arg, double_pretty_size(val)),
-                    level=DEBUG)
-        else:
-            print_verbose('\t%s: %s' % (arg, str(val)), level=DEBUG)
+        print_verbose('\t%s: %s' % (arg, str(val)), level=DEBUG)
 
     # compression and decompression handled via subparsers
     if args.subcommand in ['compress', 'c']:

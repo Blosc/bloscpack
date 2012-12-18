@@ -1319,6 +1319,8 @@ def _write_metadata(output_fp, metadata, metadata_args):
             double_pretty_size(metadata_total), level=DEBUG)
     return metadata_total
 
+def _pack_chunk_fp(input_fp, , blosc_args, bloscpack_args):
+
 
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
         blosc_args=DEFAULT_BLOSC_ARGS,
@@ -1762,6 +1764,41 @@ def _rewrite_metadata_fp(target_fp, metadata,
     target_fp.seek(current_pos, 0)
     # and re-write it
     _write_metadata(target_fp, metadata, metadata_args)
+
+
+def append_fp(original_fp, new_content_fp, new_size):
+    """ Append a file to a file.
+
+    Parameters
+    ----------
+    original : str
+        the name of the file to append to
+    new_content : str
+        the name of the file to append from
+
+    """
+    bloscpack_header = _read_bloscpack_header(original_fp)
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(new_size, nchunks=None,
+                    chunk_size=bloscpack_header['chunk_size'])
+    if nchunks > bloscpack_header['max_app_chunks']:
+        raise NotEnoughSpace('not enough space')
+    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
+    if bloscpack_header['metadata']:
+        # TODO since we don't need the metadata here, we could seek past it
+        _read_metadata(original_fp)
+    offsets = _read_offsets(original_fp)
+    # TODO what if there are no offsets?
+    original_fp.seek(offsets[-1], 0)
+    # decompress the last chunk
+    compressed, decompressed = _unpack_chunk_fp(original_fp, checksum_impl)
+    # figure out how many bytes we need to read to rebuild the last chunk
+    ultimo_length = len(decompressed)
+    bytes_to_read = bloscpack_header['chunk_size'] - ultimo_length
+    # read those bytes
+    fill_up = new_content_fp.read(bytes_to_read)
+    # rebuild the existing last buffer
+    # rewrite the header
 
 if __name__ == '__main__':
     parser = create_parser()

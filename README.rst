@@ -121,17 +121,13 @@ directly to Blosc:
   Deactivate shuffle:
   ``zsh» ./blpk c -s data.dat``
 
-In addition, there are two mutually exclusive options for Bloscpack itself,
-that govern how the file is split into chunks:
+In addition, the desired size of the chunks may be specified.
 
 * ``[-z | --chunk-size]``
   Desired approximate size of the chunks, where you can use human readable
   strings like ``8M`` or ``128K`` or ``max`` to use the maximum chunk size of
   apprx. ``2GB`` (default: ``1MB``):
   ``zsh» ./blpk -d c -z 128K data.dat``
-* ``[-c | --nchunks]``
-  Desired number of chunks:
-  ``zsh» ./blpk -d c -c 2 data.dat``
 
 There are two options that influence how the data is stored:
 
@@ -229,7 +225,7 @@ of memory and loads of disk-space (10G). Use ``-s`` to print progress::
     zsh» nosetests -s test_bloscpack.py:pack_unpack_extreme
     [...]
 
-Note that, all compression/decompression tests create temporary files (on
+Note that, some compression/decompression tests create temporary files (on
 UNIXoid systems this is under ``/tmp/blpk*``) which are deleted upon completion
 of the respective test, both successful and unsuccessful, or when the test is
 aborted with e.g. ``ctrl-c`` (using ``atexit`` magic).
@@ -268,11 +264,7 @@ Bloscpack Format
 The input is split into chunks since a) we wish to put less stress on main
 memory and b) because Blosc has a buffer limit of 2GB (Version ``1.0.0`` and
 above). By default the chunk-size is a moderate ``1MB`` which should be fine,
-even for less powerful machines. When specifying the desired chunk-size, the
-last chunk always contains the remainder and has thus size either equal too or
-less than the rest of the chunks. When specifying a desired nchunks you may end
-up with a final chunks that is either larger than or smaller than the other
-chunks and may even be zero.
+even for less powerful machines.
 
 In addition to the chunks some additional information must be added to the file
 for housekeeping:
@@ -313,11 +305,11 @@ The following ASCII representation shows the layout of the header::
     |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
     |            nchunks            |        max-app-chunks         |
 
-The first 4 bytes are the magic string ``blpk``. Then there are 4 bytes, the
-first three are described below and the last one is reserved. This is followed
-by 4 bytes for the ``chunk-size``, another 4 bytes for the ``last-chunk-size``
-and 8 bytes for the number of chunks. The last 8 bytes are reserved for use in
-future versions of the format.
+The first 4 bytes are the magic string ``blpk``. Then there are 4 bytes which
+hold information about the activated features in this file.  This is followed
+by 4 bytes for the ``chunk-size``, another 4 bytes for the ``last-chunk-size``,
+8 bytes for the number of chunks, ``nchunks`` and lastly 8 bytes for the total
+number of chunks that can be appended to this file, ``max-app-chunks``.
 
 Effectively, storing the number of chunks as a signed 8 byte integer, limits
 the number of chunks to ``2**63-1 = 9223372036854775807``, but this should not
@@ -399,6 +391,12 @@ The overall file-size can be computed as ``chunk-size * (nchunks - 1) +
 last-chunk-size``. In a streaming scenario ``-1`` can be used as a placeholder.
 For example if the total number of chunks, or the size of the last chunk is not
 known at the time the header is created.
+
+The following constraints exist on the header entries:
+
+* ``last-chunk`` must be less than or equal to ``chunk-size``.
+* ``nchunks + max_app_chunks`` must be less than or equal to the maximum value
+  of an ``int64``.
 
 
 Description of the metadata section

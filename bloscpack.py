@@ -1784,19 +1784,6 @@ if __name__ == '__main__':
         except FileNotFound as fnf:
             error(str(fnf))
         process_nthread_arg(args)
-        # mutually exclusivity in parser protects us from both having a value
-        if args.nchunks is None and args.chunk_size is None:
-            # file is larger than the default size... use it
-            in_file_size = path.getsize(in_file)
-            if in_file_size > reverse_pretty(DEFAULT_CHUNK_SIZE):
-                args.chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
-                print_verbose("Using default chunk-size: '%s'" %
-                        DEFAULT_CHUNK_SIZE, level=DEBUG)
-            # file is smaller than the default size, make a single chunk
-            else:
-                args.nchunks = 1
-                print_verbose("File was smaller than the default " +
-                        "chunk-size, using a single chunk")
         metadata = process_metadata_args(args)
         bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
         bloscpack_args['offsets'] = args.offsets

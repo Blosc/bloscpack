@@ -142,69 +142,10 @@ def test_check_range():
 
 
 def test_calculate_nchunks():
-    # tests for nchunks given
-    # odd with no remainder
-    nt.assert_equal((3, 3, 3), calculate_nchunks(9, nchunks=3))
-    # even with no remaider
-    nt.assert_equal((4, 2, 2), calculate_nchunks(8, nchunks=4))
-    # odd with nchunks 2
-    nt.assert_equal((2, 3, 4), calculate_nchunks(7, nchunks=2))
-    # even with nchunks 2
-    nt.assert_equal((2, 4, 4), calculate_nchunks(8, nchunks=2))
-    # odd with nchunks 1
-    nt.assert_equal((1, 0, 9), calculate_nchunks(9, nchunks=1))
-    # even with nchunks 1
-    nt.assert_equal((1, 0, 8), calculate_nchunks(8, nchunks=1))
-
-    # once, from beginning to end
-    nt.assert_equal((1,  0,  23), calculate_nchunks(23, nchunks=1))
-    nt.assert_equal((2,  11, 12), calculate_nchunks(23, nchunks=2))
-    nt.assert_equal((3,  11, 1),  calculate_nchunks(23, nchunks=3))
-    nt.assert_equal((4,  7,  2),  calculate_nchunks(23, nchunks=4))
-    nt.assert_equal((5,  5,  3),  calculate_nchunks(23, nchunks=5))
-    nt.assert_equal((6,  4,  3),  calculate_nchunks(23, nchunks=6))
-    nt.assert_equal((7,  3,  5),  calculate_nchunks(23, nchunks=7))
-    nt.assert_equal((8,  3,  2),  calculate_nchunks(23, nchunks=8))
-    nt.assert_equal((9,  2,  7),  calculate_nchunks(23, nchunks=9))
-    nt.assert_equal((10, 2,  5),  calculate_nchunks(23, nchunks=10))
-    nt.assert_equal((11, 2,  3),  calculate_nchunks(23, nchunks=11))
-    nt.assert_equal((12, 2,  1),  calculate_nchunks(23, nchunks=12))
-    nt.assert_equal((13, 1,  11), calculate_nchunks(23, nchunks=13))
-    nt.assert_equal((14, 1,  10), calculate_nchunks(23, nchunks=14))
-    nt.assert_equal((15, 1,  9),  calculate_nchunks(23, nchunks=15))
-    nt.assert_equal((16, 1,  8),  calculate_nchunks(23, nchunks=16))
-    nt.assert_equal((17, 1,  7),  calculate_nchunks(23, nchunks=17))
-    nt.assert_equal((18, 1,  6),  calculate_nchunks(23, nchunks=18))
-    nt.assert_equal((19, 1,  5),  calculate_nchunks(23, nchunks=19))
-    nt.assert_equal((20, 1,  4),  calculate_nchunks(23, nchunks=20))
-    nt.assert_equal((21, 1,  3),  calculate_nchunks(23, nchunks=21))
-    nt.assert_equal((22, 1,  2),  calculate_nchunks(23, nchunks=22))
-    nt.assert_equal((23, 1,  1),  calculate_nchunks(23, nchunks=23))
-
-    # some more random spot tests
-    nt.assert_equal((2, 8, 9), calculate_nchunks(17, nchunks=2))
-    nt.assert_equal((4, 2, 2), calculate_nchunks(8, nchunks=4))
-    nt.assert_equal((7, 3, 2), calculate_nchunks(20, nchunks=7))
-
-    # the special case of no remainder and an empty last chunk
-    nt.assert_equal((5, 4, 0), calculate_nchunks(16, nchunks=5))
-
-    # check for nchunks bigger than in_file_size
-    nt.assert_raises(ChunkingException, calculate_nchunks,
-            23, nchunks=24)
-    # check for zero or negative nchunks
-    nt.assert_raises(ChunkingException, calculate_nchunks,
-            23, nchunks=0)
-    nt.assert_raises(ChunkingException, calculate_nchunks,
-            23, nchunks=-1)
-
-    # check for chunk_size bigger than in_file_size
-    nt.assert_raises(ChunkingException, calculate_nchunks,
-            23, chunk_size=24)
     # check for zero or negative chunk_size
-    nt.assert_raises(ChunkingException, calculate_nchunks,
+    nt.assert_raises(ValueError, calculate_nchunks,
             23, chunk_size=0)
-    nt.assert_raises(ChunkingException, calculate_nchunks,
+    nt.assert_raises(ValueError, calculate_nchunks,
             23, chunk_size=-1)
 
     nt.assert_equal((9, 1, 1), calculate_nchunks(9, chunk_size=1))
@@ -217,34 +158,22 @@ def test_calculate_nchunks():
     nt.assert_equal((2, 8, 1), calculate_nchunks(9, chunk_size=8))
     nt.assert_equal((1, 0, 9), calculate_nchunks(9, chunk_size=9))
 
+    # check downgrade
+    nt.assert_equal((1, 0, 23), calculate_nchunks(23, chunk_size=24))
+
     # single byte file
     nt.assert_equal((1, 0,  1),
-            calculate_nchunks(1, nchunks=1))
+            calculate_nchunks(1, chunk_size=1))
 
-    # check that giving both arguments raises an error
-    nt.assert_raises(ValueError, calculate_nchunks,
-            128, nchunks=23, chunk_size=23)
-
-    # check that giving neither argument raises an error
-    nt.assert_raises(ValueError, calculate_nchunks, 128)
-
-    # check that a zero length file raises and error
+    # check that a zero length file raises an error
     nt.assert_raises(ValueError, calculate_nchunks, 0)
+    # in_file_size must be strictly positive
+    nt.assert_raises(ValueError, calculate_nchunks, -1)
 
     # check overflow of nchunks due to chunk_size being too small
     # and thus stuff not fitting into the header
     nt.assert_raises(ChunkingException, calculate_nchunks,
             MAX_CHUNKS+1, chunk_size=1)
-    # check overflow of chunk-size due to nchunks being too small
-    nt.assert_raises(ChunkingException,
-            calculate_nchunks, blosc.BLOSC_MAX_BUFFERSIZE*2+1, nchunks=2)
-
-    # check underflow due to nchunks being too large
-    nt.assert_raises(ChunkingException, calculate_nchunks,
-            128, nchunks=129)
-    # check underflow due to chunk_size being too large
-    nt.assert_raises(ChunkingException, calculate_nchunks,
-            128, chunk_size=129)
 
 def test_decode_blosc_header():
     array_ = numpy.linspace(0, 100, 2e4).tostring()
@@ -711,7 +640,7 @@ def create_tmp_files():
 def test_offsets():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        bloscpack.pack_file(in_file, out_file, nchunks=6)
+        bloscpack.pack_file(in_file, out_file, chunk_size='2M')
         with open(out_file, 'r+b') as input_fp:
             bloscpack_header = bloscpack._read_bloscpack_header(input_fp)
             total_entries = bloscpack_header['nchunks'] + \
@@ -721,17 +650,18 @@ def test_offsets():
             first = BLOSCPACK_HEADER_LENGTH + 8 * total_entries
             # We assume that the others are correct
             nt.assert_equal(offsets[0], first)
-            nt.assert_equal([560, 586470, 1072260, 1546563, 2004466, 2460830],
+            nt.assert_equal([736, 418578, 736870, 1050327,
+                1363364, 1660766, 1959218, 2257703],
                     offsets)
             # try to read the second header
             input_fp.seek(offsets[1], 0)
             blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
             expected = {'versionlz': 1,
                         'blocksize': 131072,
-                        'ctbytes':   485786,
+                        'ctbytes':   318288,
                         'version':   2,
                         'flags':     1,
-                        'nbytes':    3200000,
+                        'nbytes':    2097152,
                         'typesize':  8}
             blosc_header = decode_blosc_header(blosc_header_raw)
             nt.assert_equal(expected, blosc_header)
@@ -740,7 +670,7 @@ def test_offsets():
     input_fp, output_fp = StringIO(), StringIO()
     create_array_fp(1, input_fp)
     nchunks, chunk_size, last_chunk_size = \
-            calculate_nchunks(input_fp.tell(), nchunks=6)
+            calculate_nchunks(input_fp.tell(), chunk_size='2M')
     input_fp.seek(0, 0)
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
     bloscpack_args['max_app_chunks'] = 0
@@ -752,7 +682,8 @@ def test_offsets():
     bloscpack_header = bloscpack._read_bloscpack_header(output_fp)
     nt.assert_equal(0, bloscpack_header['max_app_chunks'])
     offsets = bloscpack._read_offsets(output_fp, bloscpack_header)
-    nt.assert_equal([80, 585990, 1071780, 1546083, 2003986, 2460350],
+    nt.assert_equal([96, 417938, 736230, 1049687,
+        1362724, 1660126, 1958578, 2257063],
             offsets)
 
 def test_metadata():
@@ -760,7 +691,7 @@ def test_metadata():
                      'shape': [1024],
                      'others': [],
                      }
-    received_metadata = pack_unpack_fp(1, nchunks=20, metadata=test_metadata)
+    received_metadata = pack_unpack_fp(1, metadata=test_metadata)
     nt.assert_equal(test_metadata, received_metadata)
 
 def test_rewrite_metadata():
@@ -838,14 +769,14 @@ def test_invalid_format():
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        bloscpack.pack_file(in_file, out_file, blosc_args, nchunks=1)
+        bloscpack.pack_file(in_file, out_file, blosc_args)
         nt.assert_raises(FormatVersionMismatch, unpack_file, out_file, dcmp_file)
     bloscpack.FORMAT_VERSION = FORMAT_VERSION
 
 def test_file_corruption():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        pack_file(in_file, out_file, nchunks=1)
+        pack_file(in_file, out_file)
         # now go in and modify a byte in the file
         with open(out_file, 'r+b') as input_fp:
             # read offsets and header
@@ -866,15 +797,14 @@ def test_file_corruption():
         # now attempt to unpack it
         nt.assert_raises(ChecksumMismatch, unpack_file, out_file, dcmp_file)
 
-def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
+def pack_unpack(repeats, chunk_size=None, progress=False):
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         if progress:
             print("Creating test array")
         create_array(repeats, in_file, progress=progress)
         if progress:
             print("Compressing")
-        pack_file(in_file, out_file,
-                nchunks=nchunks, chunk_size=chunk_size)
+        pack_file(in_file, out_file, chunk_size=chunk_size)
         if progress:
             print("Decompressing")
         unpack_file(out_file, dcmp_file)
@@ -882,7 +812,7 @@ def pack_unpack(repeats, nchunks=None, chunk_size=None, progress=False):
             print("Verifying")
         cmp(in_file, dcmp_file)
 
-def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
+def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
         progress=False, metadata=None):
     in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
     if progress:
@@ -893,7 +823,7 @@ def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
         print("Compressing")
     in_fp.seek(0)
     nchunks, chunk_size, last_chunk_size = \
-            calculate_nchunks(in_fp_size, nchunks, chunk_size)
+            calculate_nchunks(in_fp_size, chunk_size)
     bloscpack._pack_fp(in_fp, out_fp,
             nchunks, chunk_size, last_chunk_size,
             metadata=metadata)
@@ -908,18 +838,12 @@ def pack_unpack_fp(repeats, nchunks=None, chunk_size=None,
         return metadata
 
 def test_pack_unpack():
-    pack_unpack(1, nchunks=20)
-    pack_unpack(1, nchunks=1)
-    pack_unpack(1, nchunks=100)
     pack_unpack(1, chunk_size=reverse_pretty('1M'))
     pack_unpack(1, chunk_size=reverse_pretty('2M'))
     pack_unpack(1, chunk_size=reverse_pretty('4M'))
     pack_unpack(1, chunk_size=reverse_pretty('8M'))
 
 def test_pack_unpack_fp():
-    pack_unpack_fp(1, nchunks=20)
-    pack_unpack_fp(1, nchunks=1)
-    pack_unpack_fp(1, nchunks=100)
     pack_unpack_fp(1, chunk_size=reverse_pretty('1M'))
     pack_unpack_fp(1, chunk_size=reverse_pretty('2M'))
     pack_unpack_fp(1, chunk_size=reverse_pretty('4M'))

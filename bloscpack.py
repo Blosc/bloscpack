@@ -465,12 +465,6 @@ def create_parser():
             formatter_class=BloscPackCustomFormatter,
             help="alias for 'compress'")
 
-    class CheckNchunksOption(argparse.Action):
-        def __call__(self, parser, namespace, value, option_string=None):
-            if not 1 <= value <= MAX_CHUNKS:
-                error('%s must be 1 <= n <= %d'
-                        % (option_string, MAX_CHUNKS))
-            setattr(namespace, self.dest, value)
     class CheckChunkSizeOption(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
             if value == 'max':
@@ -504,20 +498,13 @@ def create_parser():
                 dest='shuffle',
                 help='deactivate shuffle')
         bloscpack_chunking_group = p.add_mutually_exclusive_group()
-        bloscpack_chunking_group.add_argument('-c', '--nchunks',
-                metavar='[1, 2**32-1]',
-                action=CheckNchunksOption,
-                type=int,
-                default=None,
-                help='set desired number of chunks')
         bloscpack_chunking_group.add_argument('-z', '--chunk-size',
                 metavar='<size>',
                 action=CheckChunkSizeOption,
                 type=str,
-                default=None,
+                default=DEFAULT_CHUNK_SIZE,
                 dest='chunk_size',
-                help="set desired chunk size or 'max' (default: %s)" %
-                DEFAULT_CHUNK_SIZE)
+                help="set desired chunk size or 'max'")
         bloscpack_group = p.add_argument_group(title='bloscpack settings')
         def join_with_eol(items):
             return ', '.join(items) + '\n'
@@ -612,16 +599,14 @@ def decode_blosc_header(buffer_):
             'ctbytes':   decode_uint32(buffer_[12:16])}
 
 
-def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
+def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
     """ Determine chunking for an input file.
 
     Parameters
     ----------
     in_file_size : int
         the size of the input file
-    nchunks : int, default: None
-        the number of chunks desired by the user
-    chunk_size : int, default: None
+    chunk_size : int or str
         the desired chunk size
 
     Returns
@@ -638,85 +623,36 @@ def calculate_nchunks(in_file_size, nchunks=None, chunk_size=None):
     Raises
     ------
     ChunkingException
-        under various error conditions
-
-    Notes
-    -----
-    You must specify either 'nchunks' or 'chunk_size' but not neither or both.
+        if the resulting nchunks is larger than MAX_CHUNKS
 
     """
-    if nchunks is not None and chunk_size is not None:
-        raise ValueError(
-                "either specify 'nchunks' or 'chunk_size', but not both")
-    elif nchunks is None and chunk_size is None:
-        raise ValueError(
-                "you must specify either 'nchunks' or 'chunk_size'")
-    elif in_file_size <= 0:
-        raise ValueError(
-                "'in_file_size' must be greater than zero")
-    elif nchunks is not None and chunk_size is None:
-        print_verbose("'nchunks' proposed", level=DEBUG)
-        if nchunks > in_file_size:
-            raise ChunkingException(
-                    "Your value of 'nchunks': %d is " % nchunks +
-                    "greater than the 'in_file size': %d" % in_file_size)
-        elif nchunks <= 0:
-            raise ChunkingException(
-                    "'nchunks' must be greater than zero, not '%d' " % nchunks)
-        quotient, remainder = divmod(in_file_size, nchunks)
-        # WARNING: this is the most horrible piece of code in bloscpack
-        # if you can do better, please, please send me patches
-        # user wants a single chunk
-        if nchunks == 1:
-            chunk_size = 0
-            last_chunk_size = in_file_size
-        # perfect fit
-        elif remainder == 0:
-            chunk_size = quotient
-            last_chunk_size = chunk_size
-        # user wants two chunks
-        elif nchunks == 2:
-            chunk_size = quotient
-            last_chunk_size = in_file_size - chunk_size
-        # multiple chunks, if the nchunks is quite small, we may have a tiny
-        # remainder and hence tiny last chunk
-        else:
-            chunk_size = in_file_size//(nchunks-1)
-            last_chunk_size = in_file_size - chunk_size * (nchunks-1)
-    elif nchunks is None and chunk_size is not None:
-        print_verbose("'chunk_size' proposed", level=DEBUG)
-        if chunk_size > in_file_size:
-            raise ChunkingException(
-                    "Your value of 'chunk_size': %d is " % chunk_size +
-                    "greater than the 'in_file size': %d" % in_file_size)
-        elif chunk_size <= 0:
-            raise ChunkingException(
-                    "'chunk_size' must be greater than zero, not '%d' " %
-                    chunk_size)
-        quotient, remainder = divmod(in_file_size, chunk_size)
-        # the user wants a single chunk
-        if chunk_size == in_file_size:
-            nchunks = 1
-            chunk_size = 0
-            last_chunk_size = in_file_size
-        # no remainder, perfect fit
-        elif remainder == 0:
-            nchunks = quotient
-            last_chunk_size = chunk_size
-        # with a remainder
-        else:
-            nchunks = quotient + 1
-            last_chunk_size = remainder
-    if chunk_size > blosc.BLOSC_MAX_BUFFERSIZE \
-            or last_chunk_size > blosc.BLOSC_MAX_BUFFERSIZE:
-        raise ChunkingException(
-            "Your value of 'nchunks' would lead to chunk sizes bigger than " +
-            "'BLOSC_MAX_BUFFERSIZE', please use something smaller.\n" +
-            "nchunks : %d\n" % nchunks +
-            "chunk_size : %d\n" % chunk_size +
-            "last_chunk_size : %d\n" % last_chunk_size +
-            "BLOSC_MAX_BUFFERSIZE : %d\n" % blosc.BLOSC_MAX_BUFFERSIZE)
-    elif nchunks > MAX_CHUNKS:
+    # convert a human readable description to an int
+    if in_file_size <= 0:
+            raise ValueError("'in_file_size' must be strictly positive, not %d"
+                    % in_file_size)
+    if isinstance(chunk_size, basestring):
+        chunk_size = reverse_pretty(chunk_size)
+    check_range('chunk_size', chunk_size, 1, blosc.BLOSC_MAX_BUFFERSIZE)
+    if chunk_size > in_file_size:
+        print_verbose(
+            "Input was smaller than the given chunk_size '%s' using size '%s'"
+            % (chunk_size, in_file_size))
+        chunk_size = in_file_size
+    quotient, remainder = divmod(in_file_size, chunk_size)
+    # the user wants a single chunk
+    if chunk_size == in_file_size:
+        nchunks = 1
+        chunk_size = 0
+        last_chunk_size = in_file_size
+    # no remainder, perfect fit
+    elif remainder == 0:
+        nchunks = quotient
+        last_chunk_size = chunk_size
+    # with a remainder
+    else:
+        nchunks = quotient + 1
+        last_chunk_size = remainder
+    if nchunks > MAX_CHUNKS:
         raise ChunkingException(
                 "nchunks: '%d' is greater than the MAX_CHUNKS: '%d'" %
                 (nchunks, MAX_CHUNKS))
@@ -1050,6 +986,9 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
             nchunks + max_app_chunks, 0, MAX_CHUNKS)
     elif max_app_chunks != 0:
         raise ValueError("'max_app_chunks' can not be non '0' if 'nchunks' is '-1'")
+    if chunk_size != -1 and last_chunk != -1 and last_chunk > chunk_size:
+        raise ValueError("'last_chunk' (%d) is larger than 'chunk_size' (%d)"
+                % (last_chunk, chunk_size))
 
     format_version = encode_uint8(format_version)
     options = encode_uint8(int(
@@ -1375,8 +1314,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
     return metadata_total
 
 
-def pack_file(in_file, out_file, metadata=None,
-        nchunks=None, chunk_size=None,
+def pack_file(in_file, out_file, metadata=None, chunk_size=DEFAULT_CHUNK_SIZE,
         blosc_args=DEFAULT_BLOSC_ARGS,
         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
         metadata_args=DEFAULT_METADATA_ARGS):
@@ -1390,9 +1328,7 @@ def pack_file(in_file, out_file, metadata=None,
         the name of the output file
     metadata : dict
         the metadata dict
-    nchunks : int, default: None
-        The desired number of chunks.
-    chunk_size : int, default: None
+    chunk_size : int
         The desired chunk size in bytes.
     blosc_args : dict
         blosc keyword args
@@ -1400,13 +1336,6 @@ def pack_file(in_file, out_file, metadata=None,
         bloscpack keyword args
     metadata_args : dict
         metadata keyword args
-
-    Notes
-    -----
-    To decide on the chunking policy, you may either supply 'chunk_size' or
-    'nchunks' but not both. If you select neither, the 'DEFAULT_CHUNK_SIZE'
-    will be used. If the file is smaller than this, a single chunk with the
-    given file size will be created.
 
     Raises
     ------
@@ -1421,7 +1350,7 @@ def pack_file(in_file, out_file, metadata=None,
     print_verbose('input file size: %s' % double_pretty_size(in_file_size))
     # calculate chunk sizes
     nchunks, chunk_size, last_chunk_size = \
-            calculate_nchunks(in_file_size, nchunks, chunk_size)
+            calculate_nchunks(in_file_size, chunk_size)
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
         _pack_fp(input_fp, output_fp,
@@ -1873,7 +1802,7 @@ if __name__ == '__main__':
         bloscpack_args['checksum'] = args.checksum
         try:
             pack_file(in_file, out_file, metadata,
-                    nchunks=args.nchunks, chunk_size=args.chunk_size,
+                    chunk_size=args.chunk_size,
                     blosc_args=blosc_args,
                     bloscpack_args=bloscpack_args,
                     metadata_args=DEFAULT_METADATA_ARGS)

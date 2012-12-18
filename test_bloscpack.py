@@ -156,13 +156,13 @@ def test_calculate_nchunks():
     nt.assert_equal((2, 6, 3), calculate_nchunks(9, chunk_size=6))
     nt.assert_equal((2, 7, 2), calculate_nchunks(9, chunk_size=7))
     nt.assert_equal((2, 8, 1), calculate_nchunks(9, chunk_size=8))
-    nt.assert_equal((1, 0, 9), calculate_nchunks(9, chunk_size=9))
+    nt.assert_equal((1, 9, 9), calculate_nchunks(9, chunk_size=9))
 
     # check downgrade
-    nt.assert_equal((1, 0, 23), calculate_nchunks(23, chunk_size=24))
+    nt.assert_equal((1, 23, 23), calculate_nchunks(23, chunk_size=24))
 
     # single byte file
-    nt.assert_equal((1, 0,  1),
+    nt.assert_equal((1, 1,  1),
             calculate_nchunks(1, chunk_size=1))
 
     # check that a zero length file raises an error

@@ -643,7 +643,7 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
     # the user wants a single chunk
     if chunk_size == in_file_size:
         nchunks = 1
-        chunk_size = 0
+        chunk_size = in_file_size
         last_chunk_size = in_file_size
     # no remainder, perfect fit
     elif remainder == 0:

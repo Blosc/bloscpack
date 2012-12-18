@@ -472,7 +472,11 @@ def create_parser():
             else:
                 try:
                     # try to get the value as bytes
-                    value = reverse_pretty(value)
+                    if value[-1] in SUFFIXES.keys():
+                        value = reverse_pretty(value)
+                    # seems to be intended to be a naked int
+                    else:
+                        value = int(value)
                 except ValueError as ve:
                     error('%s error: %s' % (option_string, ve.message +
                         " or 'max'"))

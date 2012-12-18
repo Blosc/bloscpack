@@ -268,11 +268,7 @@ Bloscpack Format
 The input is split into chunks since a) we wish to put less stress on main
 memory and b) because Blosc has a buffer limit of 2GB (Version ``1.0.0`` and
 above). By default the chunk-size is a moderate ``1MB`` which should be fine,
-even for less powerful machines. When specifying the desired chunk-size, the
-last chunk always contains the remainder and has thus size either equal too or
-less than the rest of the chunks. When specifying a desired nchunks you may end
-up with a final chunks that is either larger than or smaller than the other
-chunks and may even be zero.
+even for less powerful machines.
 
 In addition to the chunks some additional information must be added to the file
 for housekeeping:
@@ -399,6 +395,12 @@ The overall file-size can be computed as ``chunk-size * (nchunks - 1) +
 last-chunk-size``. In a streaming scenario ``-1`` can be used as a placeholder.
 For example if the total number of chunks, or the size of the last chunk is not
 known at the time the header is created.
+
+The following constraints exist on the header entries:
+
+* ``last-chunk`` must be less than or equal to ``chunk-size``.
+* ``nchunks + max_app_chunks`` must be less than or equal to the maximum value
+  of an ``int64``.
 
 
 Description of the metadata section

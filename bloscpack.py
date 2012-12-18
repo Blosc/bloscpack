@@ -626,13 +626,14 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
         if the resulting nchunks is larger than MAX_CHUNKS
 
     """
-    # convert a human readable description to an int
     if in_file_size <= 0:
             raise ValueError("'in_file_size' must be strictly positive, not %d"
                     % in_file_size)
+    # convert a human readable description to an int
     if isinstance(chunk_size, basestring):
         chunk_size = reverse_pretty(chunk_size)
     check_range('chunk_size', chunk_size, 1, blosc.BLOSC_MAX_BUFFERSIZE)
+    # downcast
     if chunk_size > in_file_size:
         print_verbose(
             "Input was smaller than the given chunk_size '%s' using size '%s'"

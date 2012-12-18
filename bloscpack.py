@@ -1424,12 +1424,12 @@ def _pack_fp(input_fp, output_fp,
     # if nchunks == 1 the last_chunk_size is the size of the single chunk
     for i, bytes_to_read in enumerate((
             [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
-        # store the current position in the file
-        if bloscpack_args['offsets']:
-            offsets_storage[i] = output_fp.tell()
         current_chunk = input_fp.read(bytes_to_read)
         # do compression
         compressed = blosc.compress(current_chunk, **blosc_args)
+        # store the current position in the file
+        if bloscpack_args['offsets']:
+            offsets_storage[i] = output_fp.tell()
         # write compressed data
         output_fp.write(compressed)
         print_verbose("chunk '%d'%s written, in: %s out: %s ratio: %s" %

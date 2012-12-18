@@ -175,6 +175,13 @@ def test_calculate_nchunks():
     nt.assert_raises(ChunkingException, calculate_nchunks,
             MAX_CHUNKS+1, chunk_size=1)
 
+    # check that strings are converted correctly
+    nt.assert_equal((6, 1048576, 209715),
+            calculate_nchunks(reverse_pretty('5.2M')))
+    nt.assert_equal((3, 2097152, 1258291),
+            calculate_nchunks(reverse_pretty('5.2M'),
+                chunk_size='2M'))
+
 def test_decode_blosc_header():
     array_ = numpy.linspace(0, 100, 2e4).tostring()
     # basic test case

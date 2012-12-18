@@ -225,7 +225,7 @@ of memory and loads of disk-space (10G). Use ``-s`` to print progress::
     zsh» nosetests -s test_bloscpack.py:pack_unpack_extreme
     [...]
 
-Note that, all compression/decompression tests create temporary files (on
+Note that, some compression/decompression tests create temporary files (on
 UNIXoid systems this is under ``/tmp/blpk*``) which are deleted upon completion
 of the respective test, both successful and unsuccessful, or when the test is
 aborted with e.g. ``ctrl-c`` (using ``atexit`` magic).

@@ -640,8 +640,9 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
     # downcast
     if chunk_size > in_file_size:
         print_verbose(
-            "Input was smaller than the given chunk_size '%s' using size '%s'"
-            % (chunk_size, in_file_size))
+                "Input was smaller than the given 'chunk_size': %s using: %s"
+                % (double_pretty_size(chunk_size),
+                double_pretty_size(in_file_size)))
         chunk_size = in_file_size
     quotient, remainder = divmod(in_file_size, chunk_size)
     # the user wants a single chunk
@@ -1314,8 +1315,8 @@ def _write_metadata(output_fp, metadata, metadata_args):
         print_verbose("metadata checksum (%s): %s" %
                 (metadata_args['meta_checksum'], repr(metadata_digest)),
                 level=DEBUG)
-    print_verbose("metadata section occupies a total of '%i' bytes" %
-            metadata_total, level=DEBUG)
+    print_verbose("metadata section occupies a total of %s" %
+            double_pretty_size(metadata_total), level=DEBUG)
     return metadata_total
 
 

@@ -121,17 +121,13 @@ directly to Blosc:
   Deactivate shuffle:
   ``zsh» ./blpk c -s data.dat``
 
-In addition, there are two mutually exclusive options for Bloscpack itself,
-that govern how the file is split into chunks:
+In addition, the desired size of the chunks may be specified.
 
 * ``[-z | --chunk-size]``
   Desired approximate size of the chunks, where you can use human readable
   strings like ``8M`` or ``128K`` or ``max`` to use the maximum chunk size of
   apprx. ``2GB`` (default: ``1MB``):
   ``zsh» ./blpk -d c -z 128K data.dat``
-* ``[-c | --nchunks]``
-  Desired number of chunks:
-  ``zsh» ./blpk -d c -c 2 data.dat``
 
 There are two options that influence how the data is stored:
 

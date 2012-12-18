@@ -787,7 +787,7 @@ def test_invalid_format():
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        bloscpack.pack_file(in_file, out_file, blosc_args)
+        bloscpack.pack_file(in_file, out_file, blosc_args=blosc_args)
         nt.assert_raises(FormatVersionMismatch, unpack_file, out_file, dcmp_file)
     bloscpack.FORMAT_VERSION = FORMAT_VERSION
 

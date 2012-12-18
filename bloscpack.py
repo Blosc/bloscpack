@@ -1320,7 +1320,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
     return metadata_total
 
 
-def pack_file(in_file, out_file, metadata=None, chunk_size=DEFAULT_CHUNK_SIZE,
+def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
         blosc_args=DEFAULT_BLOSC_ARGS,
         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
         metadata_args=DEFAULT_METADATA_ARGS):
@@ -1332,10 +1332,10 @@ def pack_file(in_file, out_file, metadata=None, chunk_size=DEFAULT_CHUNK_SIZE,
         the name of the input file
     out_file : str
         the name of the output file
-    metadata : dict
-        the metadata dict
     chunk_size : int
         The desired chunk size in bytes.
+    metadata : dict
+        the metadata dict
     blosc_args : dict
         blosc keyword args
     bloscpack_args : dict

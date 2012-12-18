@@ -1832,8 +1832,8 @@ if __name__ == '__main__':
                     blosc_args=blosc_args,
                     bloscpack_args=bloscpack_args,
                     metadata_args=DEFAULT_METADATA_ARGS)
-        except ChunkingException as e:
-            error(e.message)
+        except ChunkingException as ce:
+            error(str(ce))
     elif args.subcommand in ['decompress', 'd']:
         print_verbose('getting ready for decompression')
         in_file, out_file = process_decompression_args(args)

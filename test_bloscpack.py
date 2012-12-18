@@ -320,6 +320,17 @@ def test_create_bloscpack_header_arguments():
     nt.assert_raises(ValueError, create_bloscpack_header, max_app_chunks=-1)
     nt.assert_raises(TypeError, create_bloscpack_header, max_app_chunks='foo')
 
+    # check sum
+    nt.assert_raises(ValueError, create_bloscpack_header,
+            nchunks=MAX_CHUNKS/2+1,
+            max_app_chunks=MAX_CHUNKS/2+1)
+
+    # check constrain on last_chunk
+    nt.assert_raises(ValueError, create_bloscpack_header,
+            chunk_size=1,
+            last_chunk=2)
+
+
 def test_create_bloscpack_header():
     # test with no arguments
     raw = MAGIC + struct.pack('<B', FORMAT_VERSION) + \

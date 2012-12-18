@@ -309,11 +309,11 @@ The following ASCII representation shows the layout of the header::
     |-0-|-1-|-2-|-3-|-4-|-5-|-6-|-7-|-8-|-9-|-A-|-B-|-C-|-D-|-E-|-F-|
     |            nchunks            |        max-app-chunks         |
 
-The first 4 bytes are the magic string ``blpk``. Then there are 4 bytes, the
-first three are described below and the last one is reserved. This is followed
-by 4 bytes for the ``chunk-size``, another 4 bytes for the ``last-chunk-size``
-and 8 bytes for the number of chunks. The last 8 bytes are reserved for use in
-future versions of the format.
+The first 4 bytes are the magic string ``blpk``. Then there are 4 bytes which
+hold information about the activated features in this file.  This is followed
+by 4 bytes for the ``chunk-size``, another 4 bytes for the ``last-chunk-size``,
+8 bytes for the number of chunks, ``nchunks`` and lastly 8 bytes for the total
+number of chunks that can be appended to this file, ``max-app-chunks``.
 
 Effectively, storing the number of chunks as a signed 8 byte integer, limits
 the number of chunks to ``2**63-1 = 9223372036854775807``, but this should not

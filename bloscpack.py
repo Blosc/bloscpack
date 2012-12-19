@@ -1778,17 +1778,15 @@ def append_fp(original_fp, new_content_fp, new_size):
 
     """
     bloscpack_header = _read_bloscpack_header(original_fp)
-    nchunks, chunk_size, last_chunk_size = \
-            calculate_nchunks(new_size, nchunks=None,
-                    chunk_size=bloscpack_header['chunk_size'])
-    if nchunks > bloscpack_header['max_app_chunks']:
-        raise NotEnoughSpace('not enough space')
     checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
     if bloscpack_header['metadata']:
         # TODO since we don't need the metadata here, we could seek past it
         _read_metadata(original_fp)
+    if not bloscpack_header['offsets']:
+        raise RuntimeError(
+                'Appending to a file without offsets is not yet supported')
     offsets = _read_offsets(original_fp)
-    # TODO what if there are no offsets?
+    # seek to the final offset
     original_fp.seek(offsets[-1], 0)
     # decompress the last chunk
     compressed, decompressed = _unpack_chunk_fp(original_fp, checksum_impl)
@@ -1797,8 +1795,24 @@ def append_fp(original_fp, new_content_fp, new_size):
     bytes_to_read = bloscpack_header['chunk_size'] - ultimo_length
     # read those bytes
     fill_up = new_content_fp.read(bytes_to_read)
-    # rebuild the existing last buffer
+    # figure out what is left over
+    new_new_size = new_size - bytes_to_read
+    # figure out how many chunks we will need
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(new_new_size,
+                chunk_size=bloscpack_header['chunk_size'])
+    # make sure that we actually have that kind of space
+    if nchunks > bloscpack_header['max_app_chunks']:
+        raise NotEnoughSpace('not enough space')
+    # write the now filled last chunk
+    # allocate new offsets
+    # enter the read-compress-write loop somehow
+    # there may need to be an iterator that returns chunks
+    # which could also return already created buffers
+    # (there should be a function _pack_chunks() which takes this iterator as
+    # argument
     # rewrite the header
+    # write the new offsets, but only those that changed
 
 if __name__ == '__main__':
     parser = create_parser()

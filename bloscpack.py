@@ -1370,8 +1370,72 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
 
+class PlainSource(object):
+
+    def __iter__(self):
+        return self()
+
+
+class PlainFPSource(PlainSource):
+
+    def __init__(self, input_fp, chunk_size, last_chunk, nchunks):
+        self.input_fp = input_fp
+        self.chunk_size = chunk_size
+        self.last_chunk = last_chunk
+        self.nchunks = nchunks
+
+    def __call__(self):
+        # if nchunks == 1 the last_chunk_size is the size of the single chunk
+        for num_bytes in ([self.chunk_size] * (self.nchunks - 1) +
+                [self.last_chunk]):
+            yield self.input_fp.read(num_bytes)
+
+
+class CompressedFPSink(object):
+
+    def __init__(self, output_fp, nchunks, offsets=True,
+            checksum=DEFAULT_CHECKSUM,
+            blosc_args=DEFAULT_BLOSC_ARGS):
+        self.output_fp = output_fp
+        self.nchunks = nchunks
+        self.offsets = offsets
+        if self.offsets:
+            self.offset_storage = list(itertools.repeat(-1, nchunks))
+        self.checksum_impl = CHECKSUMS_LOOKUP[checksum]
+        self.blosc_args = blosc_args
+        self.index = 0
+
+    def put(self, chunk):
+        if self.index >= self.nchunks:
+            raise Exception()
+        if self.offsets:
+            self.offset_storage[self.index] = self.output_fp.tell()
+        compressed = blosc.compress(chunk, **self.blosc_args)
+        self.output_fp.write(compressed)
+        print_verbose("chunk '%d'%s written, in: %s out: %s ratio: %s" %
+                (self.index, ' (last)' if self.index == self.nchunks - 1 else '',
+                double_pretty_size(len(chunk)),
+                double_pretty_size(len(compressed)),
+                "%0.3f" % (len(compressed) / len(chunk))
+                if len(chunk) != 0 else "N/A"),
+                level=DEBUG)
+        tail_mess = ""
+        if self.checksum_impl.size > 0:
+            # compute the checksum on the compressed data
+            digest = self.checksum_impl(compressed)
+            # write digest
+            self.output_fp.write(digest)
+            tail_mess += ('checksum (%s): %s ' %
+                    (self.checksum_impl.name, repr(digest)))
+        if self.offsets:
+            tail_mess += ("offset: '%d'" % self.offset_storage[self.index])
+        if len(tail_mess) > 0:
+            print_verbose(tail_mess, level=DEBUG)
+        self.index += 1
+
+
 def _pack_fp(input_fp, output_fp,
-        nchunks, chunk_size, last_chunk_size,
+        nchunks, chunk_size, last_chunk,
         metadata=None,
         blosc_args=DEFAULT_BLOSC_ARGS,
         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
@@ -1399,13 +1463,12 @@ def _pack_fp(input_fp, output_fp,
             checksum=bloscpack_args['checksum'],
             typesize=blosc_args['typesize'],
             chunk_size=chunk_size,
-            last_chunk=last_chunk_size,
+            last_chunk=last_chunk,
             nchunks=nchunks,
             max_app_chunks=max_app_chunks
             )
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)
-    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_args['checksum']]
     output_fp.write(raw_bloscpack_header)
     # need to store how much space was used by metadata, for seeking later
     metadata_total = 0
@@ -1417,44 +1480,24 @@ def _pack_fp(input_fp, output_fp,
     # preallocate space for the offsets, including extra space for growing
     if bloscpack_args['offsets']:
         total_entries = nchunks + max_app_chunks
-        offsets_storage = list(itertools.repeat(-1, total_entries))
         output_fp.write(encode_int64(-1) * total_entries)
-    # if nchunks == 1 the last_chunk_size is the size of the single chunk
-    for i, bytes_to_read in enumerate((
-            [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
-        # store the current position in the file
-        if bloscpack_args['offsets']:
-            offsets_storage[i] = output_fp.tell()
-        current_chunk = input_fp.read(bytes_to_read)
-        # do compression
-        compressed = blosc.compress(current_chunk, **blosc_args)
-        # write compressed data
-        output_fp.write(compressed)
-        print_verbose("chunk '%d'%s written, in: %s out: %s ratio: %s" %
-                (i, ' (last)' if i == nchunks - 1 else '',
-                double_pretty_size(len(current_chunk)),
-                double_pretty_size(len(compressed)),
-                "%0.3f" % (len(compressed) / len(current_chunk))
-                if len(current_chunk) != 0 else "N/A"),
-                level=DEBUG)
-        tail_mess = ""
-        if checksum_impl.size > 0:
-            # compute the checksum on the compressed data
-            digest = checksum_impl(compressed)
-            # write digest
-            output_fp.write(digest)
-            tail_mess += ('checksum (%s): %s ' %
-                    (bloscpack_args['checksum'], repr(digest)))
-        if bloscpack_args['offsets']:
-            tail_mess += ("offset: '%d'" % offsets_storage[i])
-        if len(tail_mess) > 0:
-            print_verbose(tail_mess, level=DEBUG)
+    # define source and sink
+    source = PlainFPSource(input_fp, chunk_size, last_chunk, nchunks)
+    sink = CompressedFPSink(output_fp, nchunks,
+            offsets=bloscpack_args['offsets'],
+            checksum=bloscpack_args['checksum'],
+            blosc_args=blosc_args)
+
+    # read-compress-write loop
+    for chunk in source():
+        sink.put(chunk)
+
     if bloscpack_args['offsets']:
         output_fp.seek(BLOSCPACK_HEADER_LENGTH + metadata_total, 0)
         print_verbose("Writing '%d' offsets: '%s'" %
-                (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
+                (len(sink.offset_storage), repr(sink.offset_storage)), level=DEBUG)
         # write the offsets encoded into the reserved space in the file
-        encoded_offsets = "".join([encode_int64(i) for i in offsets_storage])
+        encoded_offsets = "".join([encode_int64(i) for i in sink.offset_storage])
         print_verbose("Raw offsets: %s" % repr(encoded_offsets),
                 level=DEBUG)
         output_fp.write(encoded_offsets)

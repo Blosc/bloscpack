@@ -1404,12 +1404,12 @@ class CompressedFPSink(object):
         offset = self.output_fp.tell()
         compressed = blosc.compress(chunk, **self.blosc_args)
         self.output_fp.write(compressed)
-        print_verbose("chunk written, in: %s out: %s ratio: %s" %
-                (double_pretty_size(len(chunk)),
-                 double_pretty_size(len(compressed)),
-                 "%0.3f" % (len(compressed) / len(chunk))
-                if len(chunk) != 0 else "N/A"),
-                level=DEBUG)
+        if LEVEL == DEBUG:
+            print_verbose("chunk compressed, in: %s out: %s ratio: %s" %
+                    (double_pretty_size(len(chunk)),
+                    double_pretty_size(len(compressed)),
+                    "%0.3f" % (len(compressed) / len(chunk))),
+                    level=DEBUG)
         if self.checksum_impl.size > 0:
             # compute the checksum on the compressed data
             digest = self.checksum_impl(compressed)
@@ -1477,6 +1477,8 @@ def _pack_fp(input_fp, output_fp,
 
     # read-compress-write loop
     for i, chunk in enumerate(source()):
+        print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
+            else ''), level=DEBUG)
         offset, compressed, digest = sink.put(chunk)
         offset_storage[i] = offset
 

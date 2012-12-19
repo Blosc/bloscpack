@@ -1790,8 +1790,8 @@ if __name__ == '__main__':
         bloscpack_args['offsets'] = args.offsets
         bloscpack_args['checksum'] = args.checksum
         try:
-            pack_file(in_file, out_file, metadata,
-                    chunk_size=args.chunk_size,
+            pack_file(in_file, out_file, chunk_size=args.chunk_size,
+                    metadata=None,
                     blosc_args=blosc_args,
                     bloscpack_args=bloscpack_args,
                     metadata_args=DEFAULT_METADATA_ARGS)

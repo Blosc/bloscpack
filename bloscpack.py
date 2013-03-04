@@ -1420,11 +1420,23 @@ class CompressedFPSource(CompressedSource):
                         pretty_size(len(decompressed))), level=DEBUG)
             yield decompressed
 
+class PlainSink(object):
+
+    def put(self, chunk):
+        pass
 
 class CompressedSink(object):
 
     def put(self, chunk):
         pass
+
+class PlainFPSink(PlainSink):
+
+    def __init__(self, output_fp):
+        self.output_fp = output_fp
+
+    def put(self, chunk):
+        self.output_fp.write(chunk)
 
 
 class CompressedFPSink(CompressedSink):
@@ -1735,9 +1747,10 @@ def unpack_file(in_file, out_file):
 
 def _unpack_fp(input_fp, output_fp):
     compressed_fp_source = CompressedFPSource(input_fp)
+    plain_fp_sink = PlainFPSink(output_fp)
     # decompress
     for decompressed_chunk in iter(compressed_fp_source):
-        output_fp.write(decompressed_chunk)
+        plain_fp_sink.put(decompressed_chunk)
     return compressed_fp_source.metadata
 
 

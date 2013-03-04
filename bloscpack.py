@@ -1320,6 +1320,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
     return metadata_total
 
 def _pack_chunk_fp(input_fp, blosc_args, bloscpack_args):
+    pass
 
 
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,

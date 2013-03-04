@@ -1748,7 +1748,7 @@ def unpack_file(in_file, out_file):
 def _unpack_fp(input_fp, output_fp):
     compressed_fp_source = CompressedFPSource(input_fp)
     plain_fp_sink = PlainFPSink(output_fp)
-    # decompress
+    # read, decompress, write loop
     for decompressed_chunk in iter(compressed_fp_source):
         plain_fp_sink.put(decompressed_chunk)
     return compressed_fp_source.metadata

@@ -1319,8 +1319,24 @@ def _write_metadata(output_fp, metadata, metadata_args):
             double_pretty_size(metadata_total), level=DEBUG)
     return metadata_total
 
-def _pack_chunk_fp(input_fp, blosc_args, bloscpack_args):
-    pass
+def _pack_chunk_fp(output_fp, chunk, blosc_args, checksum_impl):
+    compressed = blosc.compress(chunk, **blosc_args)
+    output_fp.write(compressed)
+    if LEVEL == DEBUG:
+        print_verbose("chunk compressed, in: %s out: %s ratio: %s" %
+                (double_pretty_size(len(chunk)),
+                double_pretty_size(len(compressed)),
+                "%0.3f" % (len(compressed) / len(chunk))),
+                level=DEBUG)
+    if checksum_impl.size > 0:
+        # compute the checksum on the compressed data
+        digest = checksum_impl(compressed)
+        # write digest
+        output_fp.write(digest)
+        print_verbose('checksum (%s): %s ' %
+                (checksum_impl.name, repr(digest)),
+                level=DEBUG)
+    return compressed, digest
 
 
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
@@ -1453,22 +1469,8 @@ class CompressedFPSink(CompressedSink):
 
     def put(self, chunk):
         offset = self.output_fp.tell()
-        compressed = blosc.compress(chunk, **self.blosc_args)
-        self.output_fp.write(compressed)
-        if LEVEL == DEBUG:
-            print_verbose("chunk compressed, in: %s out: %s ratio: %s" %
-                    (double_pretty_size(len(chunk)),
-                    double_pretty_size(len(compressed)),
-                    "%0.3f" % (len(compressed) / len(chunk))),
-                    level=DEBUG)
-        if self.checksum_impl.size > 0:
-            # compute the checksum on the compressed data
-            digest = self.checksum_impl(compressed)
-            # write digest
-            self.output_fp.write(digest)
-            print_verbose('checksum (%s): %s ' %
-                    (self.checksum_impl.name, repr(digest)),
-                    level=DEBUG)
+        compressed, digest = _pack_chunk_fp(self.output_fp, chunk, self.blosc_args,
+                self.checksum_impl)
         return offset, compressed, digest
 
 

@@ -1391,7 +1391,13 @@ class PlainFPSource(PlainSource):
             yield self.input_fp.read(num_bytes)
 
 
-class CompressedFPSink(object):
+class CompressedSink(object):
+
+    def put(self, chunk):
+        pass
+
+
+class CompressedFPSink(CompressedSink):
 
     def __init__(self, output_fp,
             checksum=DEFAULT_CHECKSUM,

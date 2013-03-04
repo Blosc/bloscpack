@@ -1319,7 +1319,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
             double_pretty_size(metadata_total), level=DEBUG)
     return metadata_total
 
-def _pack_chunk_fp(input_fp, , blosc_args, bloscpack_args):
+def _pack_chunk_fp(input_fp, blosc_args, bloscpack_args):
 
 
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,

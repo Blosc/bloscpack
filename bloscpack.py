@@ -1375,6 +1375,11 @@ class PlainSource(object):
     def __iter__(self):
         return self()
 
+class CompressedSource(object):
+
+    def __iter__(self):
+        return self()
+
 
 class PlainFPSource(PlainSource):
 
@@ -1389,6 +1394,31 @@ class PlainFPSource(PlainSource):
         for num_bytes in ([self.chunk_size] * (self.nchunks - 1) +
                 [self.last_chunk]):
             yield self.input_fp.read(num_bytes)
+
+
+class CompressedFPSource(CompressedSource):
+
+    def __init__(self, input_fp):
+
+        self.input_fp = input_fp
+        self.bloscpack_header = _read_bloscpack_header(self.input_fp)
+        self.checksum_impl = CHECKSUMS_LOOKUP[self.bloscpack_header['checksum']]
+        # read the metadata
+        self.metadata, self.metadata_header = _read_metadata(self.input_fp) \
+                if self.bloscpack_header['metadata'] \
+                else (None, None)
+        self.nchunks = self.bloscpack_header['nchunks']
+        self.offsets = _read_offsets(self.input_fp, self.bloscpack_header)
+
+    def __call__(self):
+        for i in xrange(self.nchunks):
+            print_verbose("decompressing chunk '%d'%s" %
+                    (i, ' (last)' if i == self.nchunks - 1 else ''), level=DEBUG)
+            compressed, decompressed = _unpack_chunk_fp(self.input_fp, self.checksum_impl)
+            print_verbose("chunk handled, in: %s out: %s" %
+                    (pretty_size(len(compressed)),
+                        pretty_size(len(decompressed))), level=DEBUG)
+            yield decompressed
 
 
 class CompressedSink(object):
@@ -1704,25 +1734,11 @@ def unpack_file(in_file, out_file):
 
 
 def _unpack_fp(input_fp, output_fp):
-    bloscpack_header = _read_bloscpack_header(input_fp)
-    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
-    # read the metadata
-    metadata, metadata_header = _read_metadata(input_fp) \
-            if bloscpack_header['metadata'] \
-            else (None, None)
-    nchunks = bloscpack_header['nchunks']
-    offsets = _read_offsets(input_fp, bloscpack_header)
+    compressed_fp_source = CompressedFPSource(input_fp)
     # decompress
-    for i in range(nchunks):
-        print_verbose("decompressing chunk '%d'%s" %
-                (i, ' (last)' if i == nchunks - 1 else ''), level=DEBUG)
-        compressed, decompressed = _unpack_chunk_fp(input_fp, checksum_impl)
-        # write decompressed chunk
-        output_fp.write(decompressed)
-        print_verbose("chunk written, in: %s out: %s" %
-                (pretty_size(len(compressed)),
-                    pretty_size(len(decompressed))), level=DEBUG)
-    return metadata
+    for decompressed_chunk in iter(compressed_fp_source):
+        output_fp.write(decompressed_chunk)
+    return compressed_fp_source.metadata
 
 
 def _rewrite_metadata_fp(target_fp, metadata,

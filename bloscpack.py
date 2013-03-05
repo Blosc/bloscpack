@@ -1540,13 +1540,7 @@ def _pack_fp(input_fp, output_fp,
 
     if bloscpack_args['offsets']:
         output_fp.seek(BLOSCPACK_HEADER_LENGTH + metadata_total, 0)
-        print_verbose("Writing '%d' offsets: '%s'" %
-                (len(offset_storage), repr(offset_storage)), level=DEBUG)
-        # write the offsets encoded into the reserved space in the file
-        encoded_offsets = "".join([encode_int64(i) for i in offset_storage])
-        print_verbose("Raw offsets: %s" % repr(encoded_offsets),
-                level=DEBUG)
-        output_fp.write(encoded_offsets)
+        _write_offsets(output_fp, offset_storage)
 
 
 def _read_bloscpack_header(input_fp):
@@ -1673,6 +1667,16 @@ def _read_offsets(input_fp, bloscpack_header):
         return offsets
     else:
         return []
+
+def _write_offsets(output_fp, offsets):
+    print_verbose("Writing '%d' offsets: '%s'" %
+            (len(offsets), repr(offsets)), level=DEBUG)
+    # write the offsets encoded into the reserved space in the file
+    encoded_offsets = "".join([encode_int64(i) for i in offsets])
+    print_verbose("Raw offsets: %s" % repr(encoded_offsets),
+            level=DEBUG)
+    output_fp.write(encoded_offsets)
+
 
 def _unpack_chunk_fp(input_fp, checksum_impl):
     """ Unpack a chunk.

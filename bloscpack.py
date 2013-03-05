@@ -1864,19 +1864,19 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     original_fp.seek(offsets[-1], 0)
     # decompress the last chunk
     compressed, decompressed, blosc_header = _unpack_chunk_fp(original_fp, checksum_impl)
-    if blosc_args = None:
+    if blosc_args is None:
         blosc_args = DEFAULT_BLOSC_ARGS
-    if blosc_args['typesize'] == None:
+    if blosc_args['typesize'] is None:
         if bloscpack_header['typesize'] == -1:
             raise NonUniformTypesize(
                     "Non uniform type size, can not append to file.")
         else:
             # use the typesize from the bloscpack header
             blosc_args['typesize'] == bloscpack_header['typesize']
-    if blosc_args['clevel'] == None:
+    if blosc_args['clevel'] is None:
         # use the default from the 
         blosc_args['clevel'] = DEFAULT_CLEVEL
-    if blosc_args['shuffle'] == None:
+    if blosc_args['shuffle'] is None:
         blosc_args['shuffle'] = blosc_header['shuffle']
     _check_blosc_args(blosc_args)
     # figure out how many bytes we need to read to rebuild the last chunk

@@ -1849,6 +1849,16 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         the name of the file to append to
     new_content : str
         the name of the file to append from
+    new_size : int
+        the size of the new_content
+    blosc_args : dict
+        the blosc_args
+
+    Notes
+    -----
+
+    The blosc_args argument can be supplied if different blosc arguments are
+    desired
 
     """
     bloscpack_header = _read_bloscpack_header(original_fp)

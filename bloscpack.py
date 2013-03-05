@@ -128,6 +128,9 @@ class NoChangeInMetadata(RuntimeError):
 class FileNotFound(IOError):
     pass
 
+class NonUniformTypesize(RuntimeError):
+    pass
+
 
 class Hash(object):
     """ Uniform hash object.
@@ -1837,7 +1840,7 @@ def _rewrite_metadata_fp(target_fp, metadata,
     _write_metadata(target_fp, metadata, metadata_args)
 
 
-def append_fp(original_fp, new_content_fp, new_size):
+def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     """ Append a file to a file.
 
     Parameters
@@ -1860,7 +1863,22 @@ def append_fp(original_fp, new_content_fp, new_size):
     # seek to the final offset
     original_fp.seek(offsets[-1], 0)
     # decompress the last chunk
-    compressed, decompressed = _unpack_chunk_fp(original_fp, checksum_impl)
+    compressed, decompressed, blosc_header = _unpack_chunk_fp(original_fp, checksum_impl)
+    if blosc_args = None:
+        blosc_args = DEFAULT_BLOSC_ARGS
+    if blosc_args['typesize'] == None:
+        if bloscpack_header['typesize'] == -1:
+            raise NonUniformTypesize(
+                    "Non uniform type size, can not append to file.")
+        else:
+            # use the typesize from the bloscpack header
+            blosc_args['typesize'] == bloscpack_header['typesize']
+    if blosc_args['clevel'] == None:
+        # use the default from the 
+        blosc_args['clevel'] = DEFAULT_CLEVEL
+    if blosc_args['shuffle'] == None:
+        blosc_args['shuffle'] = blosc_header['shuffle']
+    _check_blosc_args(blosc_args)
     # figure out how many bytes we need to read to rebuild the last chunk
     ultimo_length = len(decompressed)
     bytes_to_read = bloscpack_header['chunk_size'] - ultimo_length

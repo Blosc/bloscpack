@@ -952,7 +952,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         if the offsets to the chunks are present
     metadata: bool
         if the metadata is present
-    checksum : int
+    checksum : str
         the checksum to be used
     typesize : int
         the typesize used for blosc in the chunks
@@ -1031,7 +1031,7 @@ def decode_bloscpack_header(buffer_):
         if the offsets to the chunks are present
     metadata: bool
         if the metadata is present
-    checksum : int
+    checksum : str
         the checksum to be used
     typesize : int
         the typesize used for blosc in the chunks

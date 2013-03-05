@@ -1433,7 +1433,7 @@ class CompressedFPSource(CompressedSource):
         for i in xrange(self.nchunks):
             print_verbose("decompressing chunk '%d'%s" %
                     (i, ' (last)' if i == self.nchunks - 1 else ''), level=DEBUG)
-            compressed, decompressed = _unpack_chunk_fp(self.input_fp, self.checksum_impl)
+            compressed, decompressed, header= _unpack_chunk_fp(self.input_fp, self.checksum_impl)
             print_verbose("chunk handled, in: %s out: %s" %
                     (pretty_size(len(compressed)),
                         pretty_size(len(decompressed))), level=DEBUG)
@@ -1714,7 +1714,7 @@ def _unpack_chunk_fp(input_fp, checksum_impl):
                     level=DEBUG)
     # if checksum OK, decompress buffer
     decompressed = blosc.decompress(compressed)
-    return compressed, decompressed
+    return compressed, decompressed, blosc_header
 
 def unpack_file(in_file, out_file):
     """ Main function for decompressing a file.

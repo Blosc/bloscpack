@@ -1889,7 +1889,8 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     if not bloscpack_header['offsets']:
         raise RuntimeError(
                 'Appending to a file without offsets is not yet supported')
-    offsets = _read_offsets(original_fp)
+    offsets_pos = original_fp.tell()
+    offsets = _read_offsets(original_fp, bloscpack_header)
     # seek to the final offset
     original_fp.seek(offsets[-1], 0)
     # decompress the last chunk
@@ -1930,8 +1931,19 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         offset, compressed, digest = sink.put(chunk)
         offset_storage[i] = offset
 
-    # rewrite the header
+    # build the new header
+    bloscpack_header['last_chunk'] = last_chunk_size
+    bloscpack_header['nchunks'] += nchunks
+    bloscpack_header['max_app_chunks'] -= nchunks
+    # create the new header
+    raw_bloscpack_header = create_bloscpack_header(
+            **bloscpack_header)
+    original_fp.seek(0)
+    original_fp.write(raw_bloscpack_header)
     # write the new offsets, but only those that changed
+    original_fp.seek(offsets_pos)
+    # FIXME: write only those that changed
+    _write_offsets(original_fp, offsets.extend(offset_storage)
 
 if __name__ == '__main__':
     parser = create_parser()

@@ -1863,17 +1863,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     """
     bloscpack_header = _read_bloscpack_header(original_fp)
     checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
-    if bloscpack_header['metadata']:
-        # TODO since we don't need the metadata here, we could seek past it
-        _read_metadata(original_fp)
-    if not bloscpack_header['offsets']:
-        raise RuntimeError(
-                'Appending to a file without offsets is not yet supported')
-    offsets = _read_offsets(original_fp)
-    # seek to the final offset
-    original_fp.seek(offsets[-1], 0)
-    # decompress the last chunk
-    compressed, decompressed, blosc_header = _unpack_chunk_fp(original_fp, checksum_impl)
+    # handle blosc_args
     if blosc_args is None:
         blosc_args = DEFAULT_BLOSC_ARGS
     if blosc_args['typesize'] is None:
@@ -1889,6 +1879,17 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     if blosc_args['shuffle'] is None:
         blosc_args['shuffle'] = blosc_header['shuffle']
     _check_blosc_args(blosc_args)
+    if bloscpack_header['metadata']:
+        # TODO since we don't need the metadata here, we could seek past it
+        _read_metadata(original_fp)
+    if not bloscpack_header['offsets']:
+        raise RuntimeError(
+                'Appending to a file without offsets is not yet supported')
+    offsets = _read_offsets(original_fp)
+    # seek to the final offset
+    original_fp.seek(offsets[-1], 0)
+    # decompress the last chunk
+    compressed, decompressed, blosc_header = _unpack_chunk_fp(original_fp, checksum_impl)
     # figure out how many bytes we need to read to rebuild the last chunk
     ultimo_length = len(decompressed)
     bytes_to_read = bloscpack_header['chunk_size'] - ultimo_length

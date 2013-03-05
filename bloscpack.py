@@ -1893,13 +1893,28 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # make sure that we actually have that kind of space
     if nchunks > bloscpack_header['max_app_chunks']:
         raise NotEnoughSpace('not enough space')
-    # write the now filled last chunk
+    # seek back to the position of the original last chunk
+    original_fp.seek(offsets[-1], 0)
+    # write the chunk that has been filled up
+    offset, compressed, digest = _pack_chunk_fp(original_fp, fill_up,
+            blosc_args, checksum_impl)
     # allocate new offsets
-    # enter the read-compress-write loop somehow
-    # there may need to be an iterator that returns chunks
-    # which could also return already created buffers
-    # (there should be a function _pack_chunks() which takes this iterator as
-    # argument
+    offset_storage = list(itertools.repeat(-1, nchunks))
+    # read from the new input file, new_content_fp should be adequately
+    # positioned
+    source = PlainFPSource(new_content_fp, chunk_size, last_chunk, nchunks)
+    # append to the original file, again original_fp should be adequately
+    # positioned
+    sink = CompressedFPSink(original_fp,
+            checksum=bloscpack_args['checksum'],
+            blosc_args=blosc_args)
+    # read, compress, write loop
+    for i, chunk in enumerate(source()):
+        print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
+            else ''), level=DEBUG)
+        offset, compressed, digest = sink.put(chunk)
+        offset_storage[i] = offset
+
     # rewrite the header
     # write the new offsets, but only those that changed
 

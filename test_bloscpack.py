@@ -896,7 +896,9 @@ def test_append_fp():
     dcmp.reset()
     new.reset()
     new_str = new.read()
-    nt.assert_equal(len(dcmp.read()), len(new_str * 2))
+    dcmp_str = dcmp.read()
+    nt.assert_equal(len(dcmp_str), len(new_str * 2))
+    nt.assert_equal(dcmp_str, new_str * 2)
 
 
 def cmp(file1, file2):

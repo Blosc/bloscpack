@@ -881,6 +881,19 @@ def pack_unpack_extreme():
     # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
     pack_unpack(300, chunk_size=blosc.BLOSC_MAX_BUFFERSIZE, progress=True)
 
+def test_append_fp():
+    orig, new = StringIO(), StringIO()
+    create_array_fp(1, new)
+    new_size = new.tell()
+    new.reset()
+    chunking = calculate_nchunks(new_size)
+    bloscpack._pack_fp(new, orig, *chunking)
+    orig.reset()
+    new.reset()
+    print(orig.tell())
+    bloscpack.append_fp(orig, new, new_size)
+
+
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """
     with open_two_file(open(file1, 'rb'), open(file2, 'rb')) as \

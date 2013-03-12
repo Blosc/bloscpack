@@ -1918,11 +1918,11 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     offset_storage = list(itertools.repeat(-1, nchunks))
     # read from the new input file, new_content_fp should be adequately
     # positioned
-    source = PlainFPSource(new_content_fp, chunk_size, last_chunk, nchunks)
+    source = PlainFPSource(new_content_fp, chunk_size, last_chunk_size, nchunks)
     # append to the original file, again original_fp should be adequately
     # positioned
     sink = CompressedFPSink(original_fp,
-            checksum=bloscpack_args['checksum'],
+            checksum=bloscpack_header['checksum'],
             blosc_args=blosc_args)
     # read, compress, write loop
     for i, chunk in enumerate(source()):
@@ -1943,7 +1943,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # write the new offsets, but only those that changed
     original_fp.seek(offsets_pos)
     # FIXME: write only those that changed
-    _write_offsets(original_fp, offsets.extend(offset_storage))
+    _write_offsets(original_fp, offsets + offset_storage)
 
 def append(orig_file, new_file, blosc_args=None):
 

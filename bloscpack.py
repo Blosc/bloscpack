@@ -1945,6 +1945,23 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # FIXME: write only those that changed
     _write_offsets(original_fp, offsets.extend(offset_storage)
 
+def append(orig_file, new_file, blosc_args=None):
+
+    orig_size = path.getsize(orig_file)
+    new_size = path.getsize(new_size)
+    print_verbose('orig file size: %s' % double_pretty_size(orig_size))
+    print_verbose('new file size: %s' % double_pretty_size(new_size))
+
+    # calculate chunk sizes
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(in_file_size, chunk_size)
+    with open_two_file(open(orig_file, 'r+b'), open(out_file, 'rb')) as \
+            (orig_fp, new_fp):
+        append_fp(orig_fp, new_fp, new_size, blosc_args)
+            #out_file_size = path.getsize(out_file)
+            #print_verbose('output file size: %s' % double_pretty_size(out_file_size))
+            #print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
+
 if __name__ == '__main__':
     parser = create_parser()
     PREFIX = parser.prog

@@ -1912,7 +1912,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # seek back to the position of the original last chunk
     original_fp.seek(offsets[-1], 0)
     # write the chunk that has been filled up
-    offset, compressed, digest = _pack_chunk_fp(original_fp, fill_up,
+    compressed, digest = _pack_chunk_fp(original_fp, fill_up,
             blosc_args, checksum_impl)
     # allocate new offsets
     offset_storage = list(itertools.repeat(-1, nchunks))

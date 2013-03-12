@@ -1943,7 +1943,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # write the new offsets, but only those that changed
     original_fp.seek(offsets_pos)
     # FIXME: write only those that changed
-    _write_offsets(original_fp, offsets.extend(offset_storage)
+    _write_offsets(original_fp, offsets.extend(offset_storage))
 
 def append(orig_file, new_file, blosc_args=None):
 

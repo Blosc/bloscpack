@@ -882,7 +882,7 @@ def pack_unpack_extreme():
     pack_unpack(300, chunk_size=blosc.BLOSC_MAX_BUFFERSIZE, progress=True)
 
 def test_append_fp():
-    orig, new = StringIO(), StringIO()
+    orig, new, dcmp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, new)
     new_size = new.tell()
     new.reset()
@@ -890,8 +890,13 @@ def test_append_fp():
     bloscpack._pack_fp(new, orig, *chunking)
     orig.reset()
     new.reset()
-    print(orig.tell())
     bloscpack.append_fp(orig, new, new_size)
+    orig.reset()
+    bloscpack._unpack_fp(orig, dcmp)
+    dcmp.reset()
+    new.reset()
+    new_str = new.read()
+    nt.assert_equal(len(dcmp.read()), len(new_str * 2))
 
 
 def cmp(file1, file2):

@@ -1423,14 +1423,10 @@ class CompressedFPSource(CompressedSource):
     def __init__(self, input_fp):
 
         self.input_fp = input_fp
-        self.bloscpack_header = _read_bloscpack_header(self.input_fp)
+        self.bloscpack_header, self.metadata, self.metadata_header, \
+                self.offsets = _read_beginning(input_fp)
         self.checksum_impl = CHECKSUMS_LOOKUP[self.bloscpack_header['checksum']]
-        # read the metadata
-        self.metadata, self.metadata_header = _read_metadata(self.input_fp) \
-                if self.bloscpack_header['metadata'] \
-                else (None, None)
         self.nchunks = self.bloscpack_header['nchunks']
-        self.offsets = _read_offsets(self.input_fp, self.bloscpack_header)
 
     def __call__(self):
         for i in xrange(self.nchunks):
@@ -1636,6 +1632,7 @@ def _read_metadata(input_fp):
     return metadata, metadata_header
 
 
+
 def _read_offsets(input_fp, bloscpack_header):
     """ Read the offsets from a file pointer.
 
@@ -1667,6 +1664,15 @@ def _read_offsets(input_fp, bloscpack_header):
         return offsets
     else:
         return []
+
+def _read_beginning(input_fp):
+    """ Read the bloscpack_header, metadata, metadata_header and offsets. """
+    bloscpack_header = _read_bloscpack_header(input_fp)
+    metadata, metadata_header = _read_metadata(input_fp) \
+            if bloscpack_header['metadata'] \
+            else (None, None)
+    offsets = _read_offsets(input_fp, bloscpack_header)
+    return bloscpack_header, metadata, metadata_header, offsets
 
 def _write_offsets(output_fp, offsets):
     print_verbose("Writing '%d' offsets: '%s'" %

@@ -535,7 +535,7 @@ Coding Conventions
 * Numpy rst style docstrings
 * testing: expected before received ``nt.assert_equal(expected, received)``
 * Debug messages: as close to where the data was generated
-* Execptions instead of exit
+* Exceptions instead of exit
 
 TODO
 ----

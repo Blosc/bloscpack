@@ -1871,8 +1871,12 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     desired
 
     """
-    bloscpack_header = _read_bloscpack_header(original_fp)
+    bloscpack_header, metadata, metadata_header, offsets = \
+        _read_beginning(original_fp)
     checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
+    if not offsets:
+        raise RuntimeError(
+                'Appending to a file without offsets is not yet supported')
     # handle blosc_args
     if blosc_args is None:
         blosc_args = DEFAULT_BLOSC_ARGS
@@ -1889,14 +1893,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     if blosc_args['shuffle'] is None:
         blosc_args['shuffle'] = blosc_header['shuffle']
     _check_blosc_args(blosc_args)
-    if bloscpack_header['metadata']:
-        # TODO since we don't need the metadata here, we could seek past it
-        _read_metadata(original_fp)
-    if not bloscpack_header['offsets']:
-        raise RuntimeError(
-                'Appending to a file without offsets is not yet supported')
-    offsets_pos = original_fp.tell()
-    offsets = _read_offsets(original_fp, bloscpack_header)
+    offsets_pos = (BLOSCPACK_HEADER_LENGTH +
+                  (METADATA_HEADER_LENGTH + metadata_header['max_meta_size']
+                   if metadata is not None else 0))
     # seek to the final offset
     original_fp.seek(offsets[-1], 0)
     # decompress the last chunk

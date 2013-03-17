@@ -899,6 +899,17 @@ def test_append_fp():
     nt.assert_equal(len(dcmp_str), len(new_str * 2))
     nt.assert_equal(dcmp_str, new_str * 2)
 
+    ## TODO
+    # * check blosc args
+    #   * using file with different compression settings
+    #   * mixing shuffle
+    # * check error conditions
+    #   * file w/o offsets
+    #   * file w/o enough additional offsets
+    # * check additional aspects of file integrity
+    #   * offsets OK
+    #   * metadata OK
+
 
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """

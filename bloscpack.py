@@ -579,6 +579,26 @@ def create_parser():
                 default=None,
                 help=help_out)
 
+    append_parser = subparsers.add_parser('append',
+            formatter_class=BloscPackCustomFormatter,
+            help='append data to a compressed file')
+
+    a_parser = subparsers.add_parser('a',
+            formatter_class=BloscPackCustomFormatter,
+            help="alias for 'append'")
+
+    for p in (append_parser, a_parser):
+        p.add_argument('original_file',
+                metavar='<original_file>',
+                type=str,
+                help="file to append to")
+        p.add_argument('new_file',
+                metavar='<new_file>',
+                type=str,
+                help="file to append from")
+
+
+
     return parser
 
 

@@ -310,6 +310,11 @@ def print_verbose(message, level=VERBOSE):
         print('%s: %s' % (PREFIX, message))
 
 
+def print_debug(message):
+    """ Print message with verbosity level ``DEBUG``. """
+    print_verbose(message, level=DEBUG)
+
+
 def error(message, exit_code=1):
     """ Print message and exit with desired code. """
     for line in [l for l in message.split('\n') if l != '']:

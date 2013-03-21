@@ -125,6 +125,9 @@ class NoChangeInMetadata(RuntimeError):
     pass
 
 
+class MetadataSectionTooSmall(RuntimeError):
+    pass
+
 class FileNotFound(IOError):
     pass
 
@@ -1311,8 +1314,8 @@ def _write_metadata(output_fp, metadata, metadata_args):
             max_meta_size,
             level=DEBUG)
     if meta_comp_size > max_meta_size:
-        raise RuntimeError(
-                'metadata section is too small contain the metadata '
+        raise MetadataSectionTooSmall(
+                'metadata section is too small to contain the metadata '
                 'required: %d allocated: %d' %
                 (meta_comp_size, max_meta_size))
     metadata_total += meta_comp_size
@@ -1796,20 +1799,57 @@ def _unpack_fp(input_fp, output_fp):
         plain_fp_sink.put(decompressed_chunk)
     return compressed_fp_source.metadata
 
+def _rewrite_metadata_fp(target_fp, new_metadata,
+            magic_format=None, checksum=None,
+            codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
+    """ Rewrite the metadata section in a file pointer.
 
-def _rewrite_metadata_fp(target_fp, metadata,
+    Parameters
+    ----------
+    target_fp : file like
+        the target file pointer to rewrite in
+    new_metadata: dict
+        the new metadata to save
+
+    See the notes in ``_recreate_metadata`` for a description of the keyword
+    arguments.
+
+    """
+    # cache the current position
+    current_pos = target_fp.tell()
+    # read the metadata section
+    old_metadata, old_metadata_header = _read_metadata(target_fp)
+    if old_metadata == new_metadata:
+        raise NoChangeInMetadata(
+                'you requested to update metadata, but this has not changed')
+    new_metadata_args = _recreate_metadata(old_metadata_header, new_metadata,
+            magic_format=magic_format, checksum=checksum,
+            codec=codec, level=level)
+    # seek back to where the metadata begins...
+    target_fp.seek(current_pos, 0)
+    # and re-write it
+    _write_metadata(target_fp, new_metadata, new_metadata_args)
+
+def _recreate_metadata(old_metadata_header, new_metadata,
             magic_format=None, checksum=None,
             codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
     """ Update the metadata section.
 
     Parameters
     ----------
-    target_fp : file_like
-        the file pointer to read from and write into
-    metadata : dict
+    old_metadata_header: dict
+        the header of the old metadata
+    new_metadata: dict
         the new metadata to save
 
     See the notes below for a description of the keyword arguments.
+
+    Returns
+    -------
+
+    new_metadata_args: dict
+        the new arguments for ``_write_metadata``
+
 
     Raises
     ------
@@ -1821,43 +1861,30 @@ def _rewrite_metadata_fp(target_fp, metadata,
     Notes
     -----
 
-    The target_fp should point to the beginning of the metadata section.
+    This create new ``metadata_args`` based on an old metadata_header, Since
+    the space has already been allocated, only certain metadata arguments can
+    be overridden. The keyword arguments specify which ones these are. If a
+    keyword argument value is 'None' the existing argument which is obtained
+    from the header is used.  Otherwise the value from the keyword argument
+    takes precedence. Due to a policy of opportunistic compression, the 'codec'
+    and 'level' arguments are not 'None' by default, to ensure that previously
+    uncompressed metadata, which might be favourably compressible as a result
+    of the enlargement process, will actually be compressed. As for the
+    'checksum' only a checksum with the same digest size can be used.
 
-    This rewrites the metadata section. Since the space has already been
-    allocated, only certain metadata arguments can be overridden. The keyword
-    arguments specify which ones these are. If a keyword argument value is
-    'None' the existing argument which is obtained from the header is used.
-    Otherwise the value from the keyword argument takes precedence. Due to a
-    policy of opportunistic compression, the 'codec' and 'level' arguments are
-    not 'None' by default, to ensure that previously uncompressed metadata,
-    which might be favourably compressible as a result of the enlargement
-    process, will actually be compressed. As for the 'checksum' only a checksum
-    with the same digest size can be used.
+    The ``metadata_args`` returned by this function are suitable to be passed
+    on to ``_write_metadata``.
 
     """
-    # cache the current position
-    current_pos = target_fp.tell()
-
-    #bloscpack_header = _read_bloscpack_header(target_fp)
-    ## read the metadata
-    #if not bloscpack_header['metadata']:
-    #    raise NoMetadataFound(
-    #            'target file_pointer does not have any metadata section')
-
-    # read the metadata section
-    old_metadata, metadata_header = _read_metadata(target_fp)
-    if metadata == old_metadata:
-        raise NoChangeInMetadata(
-                'you requested to update metadata, but this has not changed')
     # get the settings from the metadata header
-    metadata_args = dict((k, metadata_header[k]) for k in METADATA_ARGS)
+    metadata_args = dict((k, old_metadata_header[k]) for k in METADATA_ARGS)
     # handle and check validity of overrides
     if magic_format is not None:
         _check_valid_serializer(magic_format)
         metadata_args['magic_format'] = magic_format
     if checksum is not None:
         _check_valid_checksum(checksum)
-        old_impl = CHECKSUMS_LOOKUP[metadata_header['meta_checksum']]
+        old_impl = CHECKSUMS_LOOKUP[old_metadata_header['meta_checksum']]
         new_impl = CHECKSUMS_LOOKUP[checksum]
         if old_impl.size != new_impl.size:
             raise ChecksumLengthMismatch(
@@ -1869,10 +1896,7 @@ def _rewrite_metadata_fp(target_fp, metadata,
     if level is not None:
         check_range('meta_level', level, 0, MAX_CLEVEL)
         metadata_args[level] = level
-    # seek back to where the metadata begins...
-    target_fp.seek(current_pos, 0)
-    # and re-write it
-    _write_metadata(target_fp, metadata, metadata_args)
+    return metadata_args
 
 
 def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):

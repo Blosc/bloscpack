@@ -757,6 +757,12 @@ def test_rewrite_metadata():
     nt.assert_raises(ChecksumLengthMismatch, bloscpack._rewrite_metadata_fp,
             target_fp, test_metadata,
             codec=None, level=None, checksum='sha512')
+    # len of metadata when dumped to json should be around 1105
+    for i in range(100):
+        test_metadata[str(i)] = str(i)
+    target_fp.seek(0, 0)
+    nt.assert_raises(MetadataSectionTooSmall, bloscpack._rewrite_metadata_fp,
+            target_fp, test_metadata, codec=None, level=None)
 
 
 def test_metadata_opportunisitic_compression():

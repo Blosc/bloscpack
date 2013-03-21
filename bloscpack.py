@@ -1818,11 +1818,11 @@ def _rewrite_metadata_fp(target_fp, new_metadata,
     # cache the current position
     current_pos = target_fp.tell()
     # read the metadata section
-    old_metadata, metadata_header = _read_metadata(target_fp)
+    old_metadata, old_metadata_header = _read_metadata(target_fp)
     if old_metadata == new_metadata:
         raise NoChangeInMetadata(
                 'you requested to update metadata, but this has not changed')
-    new_metadata_args = _recreate_metadata(metadata_header, new_metadata,
+    new_metadata_args = _recreate_metadata(old_metadata_header, new_metadata,
             magic_format=magic_format, checksum=checksum,
             codec=codec, level=level)
     # seek back to where the metadata begins...

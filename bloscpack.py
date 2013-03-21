@@ -125,6 +125,9 @@ class NoChangeInMetadata(RuntimeError):
     pass
 
 
+class MetadataSectionTooSmall(RuntimeError):
+    pass
+
 class FileNotFound(IOError):
     pass
 
@@ -1311,8 +1314,8 @@ def _write_metadata(output_fp, metadata, metadata_args):
             max_meta_size,
             level=DEBUG)
     if meta_comp_size > max_meta_size:
-        raise RuntimeError(
-                'metadata section is too small contain the metadata '
+        raise MetadataSectionTooSmall(
+                'metadata section is too small to contain the metadata '
                 'required: %d allocated: %d' %
                 (meta_comp_size, max_meta_size))
     metadata_total += meta_comp_size

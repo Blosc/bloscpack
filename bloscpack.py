@@ -1799,6 +1799,19 @@ def _unpack_fp(input_fp, output_fp):
 def _rewrite_metadata_fp(target_fp, new_metadata,
             magic_format=None, checksum=None,
             codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
+    """ Rewrite the metadata section in a file pointer.
+
+    Parameters
+    ----------
+    target_fp : file like
+        the target file pointer to rewrite in
+    new_metadata: dict
+        the new metadata to save
+
+    See the notes in ``_recreate_metadata`` for a description of the keyword
+    arguments.
+
+    """
     # cache the current position
     current_pos = target_fp.tell()
     # read the metadata section
@@ -1832,7 +1845,7 @@ def _recreate_metadata(old_metadata_header, new_metadata,
     -------
 
     new_metadata_args: dict
-        the new arguments to ``_write_metadata``
+        the new arguments for ``_write_metadata``
 
 
     Raises

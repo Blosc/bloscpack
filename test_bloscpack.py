@@ -915,6 +915,7 @@ def test_append_fp():
     # * check additional aspects of file integrity
     #   * offsets OK
     #   * metadata OK
+    # * check files with a single chunk
 
 
 def cmp(file1, file2):

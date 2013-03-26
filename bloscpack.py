@@ -620,7 +620,6 @@ def decode_blosc_header(buffer_):
 
     Notes
     -----
-
     Please see the readme for a precise descripttion of the blosc header
     format.
 
@@ -780,7 +779,6 @@ def _check_blosc_args(blosc_args):
 
     Notes
     -----
-
     Check the value of the 'BLOSC_ARGS' constant for the details of what
     keys should be contained in the dictionary.
 
@@ -803,7 +801,6 @@ def _check_bloscpack_args(bloscpack_args):
 
     Notes
     -----
-
     Check the value of the 'BLOSCPACK_ARGS' constant for the details of what
     keys should be contained in the dictionary.
 
@@ -826,7 +823,6 @@ def _check_metadata_arguments(metadata_args):
 
     Notes
     -----
-
     Check the value of the 'METADATA_ARGS' constant for the details of what
     keys should be contained in the dictionary.
 
@@ -920,7 +916,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     (callable that takes a single int as argument and returns a single int) or
     an int.  The sum of the resulting value and 'nchunks' can not be larger
     than MAX_CHUNKS.  The value of 'max_app_chunks' must be '0' if there is not
-    offsets section or if nchunks is unknown (has the value '-1'.
+    offsets section or if nchunks is unknown (has the value '-1').
 
     The function performs some silent optimisations. First, if there are no
     offsets or 'nchunks' is unknown any value for 'max_app_chunks' will be
@@ -1000,7 +996,6 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
 
     Notes
     -----
-
     See the README distributed for details on the header format.
 
     Raises
@@ -1383,7 +1378,7 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
     out_file : str
         the name of the output file
     chunk_size : int
-        The desired chunk size in bytes.
+        the desired chunk size in bytes
     metadata : dict
         the metadata dict
     blosc_args : dict
@@ -1846,10 +1841,8 @@ def _recreate_metadata(old_metadata_header, new_metadata,
 
     Returns
     -------
-
     new_metadata_args: dict
         the new arguments for ``_write_metadata``
-
 
     Raises
     ------
@@ -1860,7 +1853,6 @@ def _recreate_metadata(old_metadata_header, new_metadata,
 
     Notes
     -----
-
     This create new ``metadata_args`` based on an old metadata_header, Since
     the space has already been allocated, only certain metadata arguments can
     be overridden. The keyword arguments specify which ones these are. If a
@@ -1915,9 +1907,8 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
 
     Notes
     -----
-
     The blosc_args argument can be supplied if different blosc arguments are
-    desired
+    desired.
 
     """
     bloscpack_header, metadata, metadata_header, offsets = \

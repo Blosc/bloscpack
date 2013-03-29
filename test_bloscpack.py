@@ -902,15 +902,19 @@ def pack_unpack_extreme():
     # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
     pack_unpack(300, chunk_size=blosc.BLOSC_MAX_BUFFERSIZE, progress=True)
 
-def test_append_fp():
+def prep_array_for_append(bloscpack_args=DEFAULT_BLOSCPACK_ARGS):
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, new)
     new_size = new.tell()
     new.reset()
     chunking = calculate_nchunks(new_size)
-    bloscpack._pack_fp(new, orig, *chunking)
+    bloscpack._pack_fp(new, orig, *chunking, bloscpack_args=bloscpack_args)
     orig.reset()
     new.reset()
+    return orig, new, new_size, dcmp
+
+def test_append_fp():
+    orig, new, new_size, dcmp = prep_array_for_append()
     bloscpack.append_fp(orig, new, new_size)
     orig.reset()
     bloscpack._unpack_fp(orig, dcmp)
@@ -931,29 +935,15 @@ def test_append_fp():
     # * check files with a single chunk
 
 def test_append_fp_no_offsets():
-    orig, new, dcmp = StringIO(), StringIO(), StringIO()
-    create_array_fp(1, new)
-    new_size = new.tell()
-    new.reset()
-    chunking = calculate_nchunks(new_size)
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
     bloscpack_args['offsets'] = False
-    bloscpack._pack_fp(new, orig, *chunking, bloscpack_args=bloscpack_args)
-    orig.reset()
-    new.reset()
+    orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
     nt.assert_raises(RuntimeError, bloscpack.append_fp, orig, new, new_size)
 
 def test_append_fp_not_enough_space():
-    orig, new, dcmp = StringIO(), StringIO(), StringIO()
-    create_array_fp(1, new)
-    new_size = new.tell()
-    new.reset()
-    chunking = calculate_nchunks(new_size)
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
     bloscpack_args['max_app_chunks'] = 0
-    bloscpack._pack_fp(new, orig, *chunking, bloscpack_args=bloscpack_args)
-    orig.reset()
-    new.reset()
+    orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
     nt.assert_raises(NotEnoughSpace, bloscpack.append_fp, orig, new, new_size)
 
 def cmp(file1, file2):

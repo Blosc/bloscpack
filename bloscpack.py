@@ -1926,6 +1926,11 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     blosc_args : dict
         the blosc_args
 
+    Returns
+    -------
+    nchunks_written : int
+        the total number of new chunks written to the file
+
     Notes
     -----
     The blosc_args argument can be supplied if different blosc arguments are
@@ -2010,6 +2015,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     original_fp.seek(offsets_pos)
     # FIXME: write only those that changed
     _write_offsets(original_fp, offsets + offset_storage)
+    return nchunks
 
 def append(orig_file, new_file, blosc_args=None):
 

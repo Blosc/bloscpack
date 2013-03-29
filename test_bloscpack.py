@@ -926,12 +926,24 @@ def test_append_fp():
     #   * using file with different compression settings
     #   * mixing shuffle
     # * check error conditions
-    #   * file w/o offsets
     #   * file w/o enough additional offsets
     # * check additional aspects of file integrity
     #   * offsets OK
     #   * metadata OK
     # * check files with a single chunk
+
+def test_append_fp_no_offsets():
+    orig, new, dcmp = StringIO(), StringIO(), StringIO()
+    create_array_fp(1, new)
+    new_size = new.tell()
+    new.reset()
+    chunking = calculate_nchunks(new_size)
+    bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
+    bloscpack_args['offsets'] = False
+    bloscpack._pack_fp(new, orig, *chunking, bloscpack_args=bloscpack_args)
+    orig.reset()
+    new.reset()
+    nt.assert_raises(RuntimeError, bloscpack.append_fp, orig, new, new_size)
 
 
 def cmp(file1, file2):

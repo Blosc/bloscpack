@@ -1555,7 +1555,8 @@ def _pack_fp(input_fp, output_fp,
         print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
             else ''), level=DEBUG)
         offset, compressed, digest = sink.put(chunk)
-        offset_storage[i] = offset
+        if bloscpack_args['offsets']:
+            offset_storage[i] = offset
 
     if bloscpack_args['offsets']:
         output_fp.seek(BLOSCPACK_HEADER_LENGTH + metadata_total, 0)

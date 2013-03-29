@@ -948,6 +948,56 @@ def test_append_fp_not_enough_space():
     orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
     nt.assert_raises(NotEnoughSpace, bloscpack.append_fp, orig, new, new_size)
 
+
+def test_mixing_clevel():
+    # the first set of chunks has max compression
+    blosc_args = DEFAULT_BLOSC_ARGS.copy()
+    blosc_args['clevel'] = 9
+    orig, new, new_size, dcmp = prep_array_for_append()
+    # get the original size
+    orig.seek(0, 2)
+    orig_size = orig.tell()
+    orig.reset()
+    # get a backup of the settings
+    bloscpack_header, metadata, metadata_header, offsets = \
+            bloscpack._read_beginning(orig)
+    orig.reset()
+    # compressed size of the last chunk, including checksum
+    last_chunk_compressed_size = orig_size - offsets[-1]
+
+    # do append
+    blosc_args = DEFAULT_BLOSC_ARGS.copy()
+    # use the typesize from the file
+    blosc_args['typesize'] = None
+    # make the second set of chunks have no compression
+    blosc_args['clevel'] = 0
+    nchunks = bloscpack.append_fp(orig, new, new_size, blosc_args=blosc_args)
+
+    # get the final size
+    orig.seek(0, 2)
+    final_size = orig.tell()
+    orig.reset()
+
+    # the original file minus the compressed size of the last chunk
+    discounted_orig_size = orig_size - last_chunk_compressed_size
+    # size of the appended data
+    #  * raw new size, since we have no compression
+    #  * uncompressed size of the last chunk
+    #  * nchunks + 1 times the blosc and checksum overhead
+    appended_size = new_size + bloscpack_header['last_chunk'] + (nchunks+1) * (16 + 4)
+    # final size should be original plus appended data
+    nt.assert_equal(final_size, appended_size + discounted_orig_size)
+
+    # check by unpacking
+    bloscpack._unpack_fp(orig, dcmp)
+    dcmp.reset()
+    new.reset()
+    new_str = new.read()
+    dcmp_str = dcmp.read()
+    nt.assert_equal(len(dcmp_str), len(new_str * 2))
+    nt.assert_equal(dcmp_str, new_str * 2)
+
+
 def test_append_mix_shuffle():
     orig, new, new_size, dcmp = prep_array_for_append()
     blosc_args = DEFAULT_BLOSC_ARGS.copy()

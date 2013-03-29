@@ -135,6 +135,10 @@ class NonUniformTypesize(RuntimeError):
     pass
 
 
+class NotEnoughSpace(RuntimeError):
+    pass
+
+
 class Hash(object):
     """ Uniform hash object.
 

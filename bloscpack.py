@@ -1949,7 +1949,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
             # use the typesize from the bloscpack header
             blosc_args['typesize'] = bloscpack_header['typesize']
     if blosc_args['clevel'] is None:
-        # use the default from the 
+        # use the default
         blosc_args['clevel'] = DEFAULT_CLEVEL
     if blosc_args['shuffle'] is None:
         blosc_args['shuffle'] = blosc_header['shuffle']

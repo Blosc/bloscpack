@@ -931,7 +931,6 @@ def test_append_fp():
     ## TODO
     # * check blosc args
     #   * using file with different compression settings
-    #   * mixing shuffle
     # * check additional aspects of file integrity
     #   * offsets OK
     #   * metadata OK
@@ -948,6 +947,43 @@ def test_append_fp_not_enough_space():
     bloscpack_args['max_app_chunks'] = 0
     orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
     nt.assert_raises(NotEnoughSpace, bloscpack.append_fp, orig, new, new_size)
+
+def test_append_mix_shuffle():
+    orig, new, new_size, dcmp = prep_array_for_append()
+    blosc_args = DEFAULT_BLOSC_ARGS.copy()
+    # use the typesize from the file
+    blosc_args['typesize'] = None
+    # deactivate shuffle
+    blosc_args['shuffle'] = False
+    # crank up the clevel to ensure compression happens, otherwise the flags
+    # will be screwed later on
+    blosc_args['clevel'] = 9
+    bloscpack.append_fp(orig, new, new_size, blosc_args=blosc_args)
+    orig.reset()
+    bloscpack._unpack_fp(orig, dcmp)
+    dcmp.reset()
+    new.reset()
+    new_str = new.read()
+    dcmp_str = dcmp.read()
+    nt.assert_equal(len(dcmp_str), len(new_str * 2))
+    nt.assert_equal(dcmp_str, new_str * 2)
+
+    # now get the first and the last chunk and check that the shuffle doesn't
+    # match
+    orig.reset()
+    bloscpack_header, metadata, metadata_header, offsets = \
+            bloscpack._read_beginning(orig)
+    orig.seek(offsets[0])
+    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
+    compressed_zero, decompressed_zero, blosc_header_zero = \
+        bloscpack._unpack_chunk_fp(orig, checksum_impl)
+    orig.seek(offsets[-1])
+    compressed_last, decompressed_last, blosc_header_last = \
+        bloscpack._unpack_chunk_fp(orig, checksum_impl)
+    # first chunk has shuffle active
+    nt.assert_equal(blosc_header_zero['flags'], 1)
+    # last chunk doesn't
+    nt.assert_equal(blosc_header_last['flags'], 0)
 
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """

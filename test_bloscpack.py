@@ -902,13 +902,16 @@ def pack_unpack_extreme():
     # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
     pack_unpack(300, chunk_size=blosc.BLOSC_MAX_BUFFERSIZE, progress=True)
 
-def prep_array_for_append(bloscpack_args=DEFAULT_BLOSCPACK_ARGS):
+def prep_array_for_append(blosc_args=DEFAULT_BLOSC_ARGS,
+        bloscpack_args=DEFAULT_BLOSCPACK_ARGS):
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, new)
     new_size = new.tell()
     new.reset()
     chunking = calculate_nchunks(new_size)
-    bloscpack._pack_fp(new, orig, *chunking, bloscpack_args=bloscpack_args)
+    bloscpack._pack_fp(new, orig, *chunking,
+            blosc_args=blosc_args,
+            bloscpack_args=bloscpack_args)
     orig.reset()
     new.reset()
     return orig, new, new_size, dcmp

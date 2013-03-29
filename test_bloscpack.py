@@ -925,8 +925,6 @@ def test_append_fp():
     # * check blosc args
     #   * using file with different compression settings
     #   * mixing shuffle
-    # * check error conditions
-    #   * file w/o enough additional offsets
     # * check additional aspects of file integrity
     #   * offsets OK
     #   * metadata OK
@@ -945,6 +943,18 @@ def test_append_fp_no_offsets():
     new.reset()
     nt.assert_raises(RuntimeError, bloscpack.append_fp, orig, new, new_size)
 
+def test_append_fp_not_enough_space():
+    orig, new, dcmp = StringIO(), StringIO(), StringIO()
+    create_array_fp(1, new)
+    new_size = new.tell()
+    new.reset()
+    chunking = calculate_nchunks(new_size)
+    bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
+    bloscpack_args['max_app_chunks'] = 0
+    bloscpack._pack_fp(new, orig, *chunking, bloscpack_args=bloscpack_args)
+    orig.reset()
+    new.reset()
+    nt.assert_raises(NotEnoughSpace, bloscpack.append_fp, orig, new, new_size)
 
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """

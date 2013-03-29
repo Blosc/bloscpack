@@ -1690,7 +1690,21 @@ def _read_offsets(input_fp, bloscpack_header):
         return []
 
 def _read_beginning(input_fp):
-    """ Read the bloscpack_header, metadata, metadata_header and offsets. """
+    """ Read the bloscpack_header, metadata, metadata_header and offsets.
+
+    Parameters
+    ----------
+    input_fp : file like
+        input file pointer
+
+    Returns
+    -------
+    bloscpack_header : dict
+    metadata : object
+    metadata_header : dict
+    offsets : list of ints
+
+    """
     bloscpack_header = _read_bloscpack_header(input_fp)
     metadata, metadata_header = _read_metadata(input_fp) \
             if bloscpack_header['metadata'] \

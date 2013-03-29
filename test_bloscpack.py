@@ -918,8 +918,61 @@ def prep_array_for_append(blosc_args=DEFAULT_BLOSC_ARGS,
 
 def test_append_fp():
     orig, new, new_size, dcmp = prep_array_for_append()
+
+    # check that the header and offsets are as we expected them to be
+    orig_bloscpack_header, orig_metadata, orig_metadata_header, orig_offsets = \
+            bloscpack._read_beginning(orig)
+    orig.reset()
+    expected_orig_bloscpack_header = {
+            'chunk_size': 1048576,
+            'nchunks': 16,
+            'last_chunk': 271360,
+            'max_app_chunks': 160,
+            'format_version': 3,
+            'offsets': True,
+            'checksum': 'adler32',
+            'typesize': 8,
+            'metadata': False,
+    }
+    expected_orig_offsets = [1440, 221122, 419302, 576717, 737614,
+                             894182, 1051091, 1208872, 1364148,
+                             1512476, 1661570, 1811035, 1960042,
+                             2109263, 2258547, 2407759]
+    nt.assert_equal(expected_orig_bloscpack_header, orig_bloscpack_header)
+    nt.assert_equal(expected_orig_offsets, orig_offsets)
+
+    # perform the append
     bloscpack.append_fp(orig, new, new_size)
     orig.reset()
+
+    # check that the header and offsets are as we expected them to be after
+    # appending
+    app_bloscpack_header, app_metadata, app_metadata_header, app_offsets = \
+            bloscpack._read_beginning(orig)
+    orig.reset()
+    expected_app_bloscpack_header = {
+            'chunk_size': 1048576,
+            'nchunks': 31,
+            'last_chunk': 542720,
+            'max_app_chunks': 145,
+            'format_version': 3,
+            'offsets': True,
+            'checksum': 'adler32',
+            'typesize': 8,
+            'metadata': False
+    }
+    expected_app_offsets = [1440, 221122, 419302, 576717, 737614,
+                            894182, 1051091, 1208872, 1364148,
+                            1512476, 1661570, 1811035, 1960042,
+                            2109263, 2258547, 2407759, 2613561,
+                            2815435, 2984307, 3141891, 3302879,
+                            3459460, 3617126, 3775757, 3925209,
+                            4073901, 4223131, 4372322, 4521936,
+                            4671276, 4819767]
+    nt.assert_equal(expected_app_bloscpack_header, app_bloscpack_header)
+    nt.assert_equal(expected_app_offsets, app_offsets)
+
+    # now check by unpacking
     bloscpack._unpack_fp(orig, dcmp)
     dcmp.reset()
     new.reset()

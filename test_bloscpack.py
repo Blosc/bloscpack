@@ -934,6 +934,23 @@ def test_append_fp():
     #   * metadata OK
     # * check files with a single chunk
 
+
+def test_double_append():
+    orig, new, new_size, dcmp = prep_array_for_append()
+    bloscpack.append_fp(orig, new, new_size)
+    orig.reset()
+    new.reset()
+    bloscpack.append_fp(orig, new, new_size)
+    orig.reset()
+    new.reset()
+    new_str = new.read()
+    bloscpack._unpack_fp(orig, dcmp)
+    dcmp.reset()
+    dcmp_str = dcmp.read()
+    nt.assert_equal(len(dcmp_str), len(new_str) * 3)
+    nt.assert_equal(dcmp_str, new_str * 3)
+
+
 def test_append_fp_no_offsets():
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
     bloscpack_args['offsets'] = False

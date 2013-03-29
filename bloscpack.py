@@ -1947,7 +1947,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
                     "Non uniform type size, can not append to file.")
         else:
             # use the typesize from the bloscpack header
-            blosc_args['typesize'] == bloscpack_header['typesize']
+            blosc_args['typesize'] = bloscpack_header['typesize']
     if blosc_args['clevel'] is None:
         # use the default from the 
         blosc_args['clevel'] = DEFAULT_CLEVEL

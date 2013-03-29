@@ -929,8 +929,6 @@ def test_append_fp():
     nt.assert_equal(dcmp_str, new_str * 2)
 
     ## TODO
-    # * check blosc args
-    #   * using file with different compression settings
     # * check additional aspects of file integrity
     #   * offsets OK
     #   * metadata OK

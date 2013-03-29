@@ -796,6 +796,10 @@ def test_disable_offsets():
     bloscpack._pack_fp(in_fp, out_fp,
             *calculate_nchunks(in_fp_size),
             bloscpack_args=bloscpack_args)
+    out_fp.seek(0)
+    bloscpack_header, metadata, metadata_header, offsets = \
+            bloscpack._read_beginning(out_fp)
+    nt.assert_true(len(offsets) == 0)
 
 
 def test_invalid_format():

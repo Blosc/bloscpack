@@ -2020,14 +2020,11 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
 def append(orig_file, new_file, blosc_args=None):
 
     orig_size = path.getsize(orig_file)
-    new_size = path.getsize(new_size)
+    new_size = path.getsize(new_file)
     print_verbose('orig file size: %s' % double_pretty_size(orig_size))
     print_verbose('new file size: %s' % double_pretty_size(new_size))
 
-    # calculate chunk sizes
-    nchunks, chunk_size, last_chunk_size = \
-            calculate_nchunks(in_file_size, chunk_size)
-    with open_two_file(open(orig_file, 'r+b'), open(out_file, 'rb')) as \
+    with open_two_file(open(orig_file, 'r+b'), open(new_file, 'rb')) as \
             (orig_fp, new_fp):
         append_fp(orig_fp, new_fp, new_size, blosc_args)
             #out_file_size = path.getsize(out_file)

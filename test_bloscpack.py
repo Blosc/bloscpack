@@ -988,6 +988,18 @@ def test_append_fp():
     # * check files with a single chunk
 
 
+def test_append():
+    with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
+        create_array(1, in_file)
+        pack_file(in_file, out_file)
+        append(out_file, in_file)
+        unpack_file(out_file, dcmp_file)
+        in_content = open(in_file, 'rb').read()
+        dcmp_content = open(dcmp_file, 'rb').read()
+        nt.assert_equal(len(dcmp_content), len(in_content) * 2)
+        nt.assert_equal(dcmp_content, in_content * 2)
+
+
 def test_double_append():
     orig, new, new_size, dcmp = prep_array_for_append()
     bloscpack.append_fp(orig, new, new_size)

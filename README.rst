@@ -562,6 +562,7 @@ TODO
 * Debian packages (for python-blosc and bloscpack)
 * Use cram to test the command-line user interface
 * Establish and document proper exit codes
+* Use Travis CI for testing
 
 
 Changelog

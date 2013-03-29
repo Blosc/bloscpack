@@ -786,6 +786,18 @@ def test_metadata_opportunisitic_compression():
     nt.assert_equal('None', header['meta_codec'])
 
 
+def test_disable_offsets():
+    in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
+    create_array_fp(1, in_fp)
+    in_fp_size = in_fp.tell()
+    in_fp.seek(0)
+    bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
+    bloscpack_args['offsets'] = False
+    bloscpack._pack_fp(in_fp, out_fp,
+            *calculate_nchunks(in_fp_size),
+            bloscpack_args=bloscpack_args)
+
+
 def test_invalid_format():
     # this will cause a bug if we ever reach 255 format versions
     bloscpack.FORMAT_VERSION = MAX_FORMAT_VERSION

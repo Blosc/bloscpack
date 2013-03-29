@@ -1943,9 +1943,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     if not offsets:
         raise RuntimeError(
                 'Appending to a file without offsets is not yet supported')
-    # handle blosc_args
     if blosc_args is None:
-        blosc_args = DEFAULT_BLOSC_ARGS
+        blosc_args = dict(zip(BLOSC_ARGS, [None] * len(BLOSC_ARGS)))
+    # handle blosc_args
     if blosc_args['typesize'] is None:
         if bloscpack_header['typesize'] == -1:
             raise NonUniformTypesize(
@@ -1957,7 +1957,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         # use the default
         blosc_args['clevel'] = DEFAULT_CLEVEL
     if blosc_args['shuffle'] is None:
-        blosc_args['shuffle'] = blosc_header['shuffle']
+        blosc_args['shuffle'] = DEFAULT_SHUFFLE
     _check_blosc_args(blosc_args)
     offsets_pos = (BLOSCPACK_HEADER_LENGTH +
                   (METADATA_HEADER_LENGTH + metadata_header['max_meta_size']

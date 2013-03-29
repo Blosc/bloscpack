@@ -1742,6 +1742,8 @@ def _unpack_chunk_fp(input_fp, checksum_impl):
         the compressed data
     decompressed : str
         the decompressed data
+    blosc_header : dict
+        the blosc header from the chunk
     """
     # read blosc header
     blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)

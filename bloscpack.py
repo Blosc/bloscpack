@@ -2001,6 +2001,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
                 decompressed + fill_up,
                 blosc_args, checksum_impl)
         # return 0 to indicate that no new chunks have been written
+        # FIXME this does not correctly update the header
         return 0
 
     # figure out what is left over

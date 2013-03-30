@@ -916,13 +916,26 @@ def prep_array_for_append(blosc_args=DEFAULT_BLOSC_ARGS,
     new.reset()
     return orig, new, new_size, dcmp
 
+def reset_append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
+    nchunks = append_fp(original_fp, new_content_fp, new_size,
+                        blosc_args=blosc_args)
+    original_fp.reset()
+    new_content_fp.reset()
+    return nchunks
+
+
+def reset_read_beginning(input_fp):
+    ans = bloscpack._read_beginning(input_fp)
+    input_fp.reset()
+    print(ans)
+    return ans
+
+
 def test_append_fp():
     orig, new, new_size, dcmp = prep_array_for_append()
 
     # check that the header and offsets are as we expected them to be
-    orig_bloscpack_header, orig_metadata, orig_metadata_header, orig_offsets = \
-            bloscpack._read_beginning(orig)
-    orig.reset()
+    orig_bloscpack_header, orig_offsets = reset_read_beginning(orig)[0:4:3]
     expected_orig_bloscpack_header = {
             'chunk_size': 1048576,
             'nchunks': 16,
@@ -942,14 +955,11 @@ def test_append_fp():
     nt.assert_equal(expected_orig_offsets, orig_offsets)
 
     # perform the append
-    bloscpack.append_fp(orig, new, new_size)
-    orig.reset()
+    reset_append_fp(orig, new, new_size)
 
     # check that the header and offsets are as we expected them to be after
     # appending
-    app_bloscpack_header, app_metadata, app_metadata_header, app_offsets = \
-            bloscpack._read_beginning(orig)
-    orig.reset()
+    app_bloscpack_header, app_offsets = reset_read_beginning(orig)[0:4:3]
     expected_app_bloscpack_header = {
             'chunk_size': 1048576,
             'nchunks': 31,

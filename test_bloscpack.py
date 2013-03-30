@@ -999,6 +999,7 @@ def test_append():
         nt.assert_equal(dcmp_content, in_content * 2)
 
 def test_append_into_last_chunk():
+    # first create an array with a single chunk
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, new)
     new_size = new.tell()
@@ -1007,16 +1008,21 @@ def test_append_into_last_chunk():
     bloscpack._pack_fp(new, orig, *chunking)
     orig.reset()
     new.reset()
-    # append a few bytes
+    # append a few bytes, creating a new, smaller, last_chunk
     new_content = new.read()
     new.reset()
-    bloscpack.append_fp(orig, StringIO(new_content[:1023]), 1023)
-    orig.reset()
-    bloscpack.append_fp(orig, StringIO(new_content[:1023]), 1023)
+    nchunks  = bloscpack.append_fp(orig, StringIO(new_content[:1023]), 1023)
     orig.reset()
     bloscpack_header = bloscpack._read_beginning(orig)[0]
     orig.reset()
-
+    nt.assert_equal(nchunks, 1)
+    nt.assert_equal(bloscpack_header['last_chunk'], 1023)
+    # now append into that last chunk
+    nchunks = bloscpack.append_fp(orig, StringIO(new_content[:1023]), 1023)
+    orig.reset()
+    bloscpack_header = bloscpack._read_beginning(orig)[0]
+    orig.reset()
+    nt.assert_equal(nchunks, 0)
     nt.assert_equal(bloscpack_header['last_chunk'], 2046)
 
     # now check by unpacking

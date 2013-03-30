@@ -2101,9 +2101,17 @@ if __name__ == '__main__':
     elif args.subcommand in ['append', 'a']:
         print_verbose('getting ready for append')
         original_file, new_file = process_append_args(args)
-        # check files exist
-        # process_nthread_arg(args)
-        # catch exceptions
+        try:
+            if not path.exists(original_file):
+                raise FileNotFound("original file file '%s' does not exist!" %
+                        original_file)
+            if not path.exists(new_file):
+                raise FileNotFound("new file '%s' does not exist!" %
+                        new_file)
+        except FileNotFound as fnf:
+            error(str(fnf))
+        print_verbose('original file is: %s' % original_file)
+        print_verbose('new file is: %s' % new_file)
         # additional arguments
         append(original_file, new_file)
     else:

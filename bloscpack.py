@@ -1993,7 +1993,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     if new_size <= bytes_to_read:
         # special case
         # must squeeze data into last chunk
-        fill_up = new_content_fp.read(bytes_to_read)
+        fill_up = new_content_fp.read(new_size)
         # seek back to the position of the original last chunk
         original_fp.seek(offsets[-1], 0)
         # write the chunk that has been filled up
@@ -2001,7 +2001,13 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
                 decompressed + fill_up,
                 blosc_args, checksum_impl)
         # return 0 to indicate that no new chunks have been written
-        # FIXME this does not correctly update the header
+        # build the new header
+        bloscpack_header['last_chunk'] += new_size
+        # create the new header
+        raw_bloscpack_header = create_bloscpack_header(
+                **bloscpack_header)
+        original_fp.seek(0)
+        original_fp.write(raw_bloscpack_header)
         return 0
 
     # figure out what is left over

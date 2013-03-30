@@ -998,6 +998,35 @@ def test_append():
         nt.assert_equal(len(dcmp_content), len(in_content) * 2)
         nt.assert_equal(dcmp_content, in_content * 2)
 
+def test_append_into_last_chunk():
+    orig, new, dcmp = StringIO(), StringIO(), StringIO()
+    create_array_fp(1, new)
+    new_size = new.tell()
+    new.reset()
+    chunking = calculate_nchunks(new_size, chunk_size=new_size)
+    bloscpack._pack_fp(new, orig, *chunking)
+    orig.reset()
+    new.reset()
+    # append a few bytes
+    new_content = new.read()
+    new.reset()
+    bloscpack.append_fp(orig, StringIO(new_content[:1023]), 1023)
+    orig.reset()
+    bloscpack.append_fp(orig, StringIO(new_content[:1023]), 1023)
+    orig.reset()
+    bloscpack_header = bloscpack._read_beginning(orig)[0]
+    orig.reset()
+
+    nt.assert_equal(bloscpack_header['last_chunk'], 2046)
+
+    # now check by unpacking
+    bloscpack._unpack_fp(orig, dcmp)
+    dcmp.reset()
+    new.reset()
+    new_str = new.read()
+    dcmp_str = dcmp.read()
+    nt.assert_equal(len(dcmp_str), len(new_str) + 2046)
+    nt.assert_equal(dcmp_str, new_str + new_str[:1023] * 2)
 
 def test_append_single_chunk():
     orig, new, dcmp = StringIO(), StringIO(), StringIO()

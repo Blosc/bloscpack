@@ -2099,7 +2099,7 @@ if __name__ == '__main__':
         except ChecksumMismatch as csm:
             error(csm.message)
     elif args.subcommand in ['append', 'a']:
-        print_verbose('getting ready for decompression')
+        print_verbose('getting ready for append')
         original_file, new_file = process_append_args(args)
         # check files exist
         # process_nthread_arg(args)

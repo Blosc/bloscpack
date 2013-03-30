@@ -2118,8 +2118,8 @@ if __name__ == '__main__':
             error(str(fnf))
         print_verbose('original file is: %s' % original_file)
         print_verbose('new file is: %s' % new_file)
-        # additional arguments
-        append(original_file, new_file)
+        blosc_args = _blosc_args_from_args(args)
+        append(original_file, new_file, blosc_args=blosc_args)
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

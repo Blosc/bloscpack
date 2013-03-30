@@ -1078,12 +1078,8 @@ def test_append_single_chunk():
 
 def test_double_append():
     orig, new, new_size, dcmp = prep_array_for_append()
-    bloscpack.append_fp(orig, new, new_size)
-    orig.reset()
-    new.reset()
-    bloscpack.append_fp(orig, new, new_size)
-    orig.reset()
-    new.reset()
+    reset_append_fp(orig, new, new_size)
+    reset_append_fp(orig, new, new_size)
     new_str = new.read()
     bloscpack._unpack_fp(orig, dcmp)
     dcmp.reset()
@@ -1116,8 +1112,7 @@ def test_mixing_clevel():
     orig.reset()
     # get a backup of the settings
     bloscpack_header, metadata, metadata_header, offsets = \
-            bloscpack._read_beginning(orig)
-    orig.reset()
+            reset_read_beginning(orig)
     # compressed size of the last chunk, including checksum
     last_chunk_compressed_size = orig_size - offsets[-1]
 
@@ -1164,9 +1159,9 @@ def test_append_mix_shuffle():
     # crank up the clevel to ensure compression happens, otherwise the flags
     # will be screwed later on
     blosc_args['clevel'] = 9
-    bloscpack.append_fp(orig, new, new_size, blosc_args=blosc_args)
-    orig.reset()
+    reset_append_fp(orig, new, new_size, blosc_args=blosc_args)
     bloscpack._unpack_fp(orig, dcmp)
+    orig.reset()
     dcmp.reset()
     new.reset()
     new_str = new.read()
@@ -1176,9 +1171,7 @@ def test_append_mix_shuffle():
 
     # now get the first and the last chunk and check that the shuffle doesn't
     # match
-    orig.reset()
-    bloscpack_header, metadata, metadata_header, offsets = \
-            bloscpack._read_beginning(orig)
+    bloscpack_header, offsets = reset_read_beginning(orig)[0:4:3]
     orig.seek(offsets[0])
     checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
     compressed_zero, decompressed_zero, blosc_header_zero = \

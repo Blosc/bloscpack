@@ -1202,6 +1202,12 @@ def process_decompression_args(args):
     return in_file, out_file
 
 
+def process_append_args(args):
+    original_file = args.original_file
+    new_file = args.new_file
+    return original_file, new_file
+
+
 def process_metadata_args(args):
     if args.metadata is not None:
         try:
@@ -2019,17 +2025,20 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
 
 def append(orig_file, new_file, blosc_args=None):
 
-    orig_size = path.getsize(orig_file)
+    orig_size_before = path.getsize(orig_file)
     new_size = path.getsize(new_file)
-    print_verbose('orig file size: %s' % double_pretty_size(orig_size))
+    print_verbose('orig file size before append: %s' %
+            double_pretty_size(orig_size_before))
     print_verbose('new file size: %s' % double_pretty_size(new_size))
 
     with open_two_file(open(orig_file, 'r+b'), open(new_file, 'rb')) as \
             (orig_fp, new_fp):
         append_fp(orig_fp, new_fp, new_size, blosc_args)
-            #out_file_size = path.getsize(out_file)
-            #print_verbose('output file size: %s' % double_pretty_size(out_file_size))
-            #print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
+    orig_size_after = path.getsize(orig_file)
+    print_verbose('orig file size after append: %s' %
+            double_pretty_size(orig_size_after))
+    print_verbose('Approximate compression ratio: %f' %
+            ((orig_size_after-orig_size_before)/new_size))
 
 if __name__ == '__main__':
     parser = create_parser()
@@ -2081,6 +2090,15 @@ if __name__ == '__main__':
             error(fvm.message)
         except ChecksumMismatch as csm:
             error(csm.message)
+    elif args.subcommand in ['append', 'a']:
+        print_verbose('getting ready for decompression')
+        original_file, new_file = process_append_args(args)
+        # check that file has correct extension
+        # check files exist
+        # process_nthread_arg(args)
+        # catch exceptions
+        # additional arguments
+        append(original_file, new_file)
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

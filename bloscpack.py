@@ -603,6 +603,11 @@ def create_parser():
                 metavar='<new_file>',
                 type=str,
                 help="file to append from")
+        p.add_argument('-e', '--no-check-extension',
+                action='store_true',
+                default=False,
+                dest='no_check_extension',
+                help='disable checking original file for extension (*.blp)\n')
 
 
 
@@ -1205,6 +1210,10 @@ def process_decompression_args(args):
 def process_append_args(args):
     original_file = args.original_file
     new_file = args.new_file
+    if not args.no_check_extension and not original_file.endswith(EXTENSION):
+        error("original file '%s' does not end with '%s'" %
+                    (original_file, EXTENSION))
+
     return original_file, new_file
 
 
@@ -2092,7 +2101,6 @@ if __name__ == '__main__':
     elif args.subcommand in ['append', 'a']:
         print_verbose('getting ready for decompression')
         original_file, new_file = process_append_args(args)
-        # check that file has correct extension
         # check files exist
         # process_nthread_arg(args)
         # catch exceptions

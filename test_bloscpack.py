@@ -1094,6 +1094,7 @@ def test_append_fp_no_offsets():
     orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
     nt.assert_raises(RuntimeError, bloscpack.append_fp, orig, new, new_size)
 
+
 def test_append_fp_not_enough_space():
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
     bloscpack_args['max_app_chunks'] = 0

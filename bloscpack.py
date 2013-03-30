@@ -2052,6 +2052,7 @@ if __name__ == '__main__':
     print_verbose('command line arguments are: ', level=DEBUG)
     for arg, val in vars(args).iteritems():
         print_verbose('\t%s: %s' % (arg, str(val)), level=DEBUG)
+    process_nthread_arg(args)
 
     # compression and decompression handled via subparsers
     if args.subcommand in ['compress', 'c']:
@@ -2061,7 +2062,6 @@ if __name__ == '__main__':
             check_files(in_file, out_file, args)
         except FileNotFound as fnf:
             error(str(fnf))
-        process_nthread_arg(args)
         metadata = process_metadata_args(args)
         bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
         bloscpack_args['offsets'] = args.offsets
@@ -2081,7 +2081,6 @@ if __name__ == '__main__':
             check_files(in_file, out_file, args)
         except FileNotFound as fnf:
             error(str(fnf))
-        process_nthread_arg(args)
         try:
             metadata = unpack_file(in_file, out_file)
             if metadata:

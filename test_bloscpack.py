@@ -917,6 +917,7 @@ def prep_array_for_append(blosc_args=DEFAULT_BLOSC_ARGS,
     return orig, new, new_size, dcmp
 
 def reset_append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
+    """ like ``append_fp`` but with ``reset()`` on the file pointers. """
     nchunks = append_fp(original_fp, new_content_fp, new_size,
                         blosc_args=blosc_args)
     original_fp.reset()
@@ -925,6 +926,7 @@ def reset_append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
 
 
 def reset_read_beginning(input_fp):
+    """ like ``_read_beginning`` but with ``reset()`` on the file pointer. """
     ans = bloscpack._read_beginning(input_fp)
     input_fp.reset()
     print(ans)

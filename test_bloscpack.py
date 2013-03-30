@@ -1008,6 +1008,8 @@ def test_append_single_chunk():
     bloscpack._pack_fp(new, orig, *chunking)
     orig.reset()
     new.reset()
+
+    # append a single chunk
     bloscpack.append_fp(orig, new, new_size)
     orig.reset()
     new.reset()
@@ -1016,13 +1018,33 @@ def test_append_single_chunk():
     orig.reset()
     nt.assert_equal(bloscpack_header['nchunks'], 2)
 
-    bloscpack.append_fp(orig, new, new_size)
-    orig.reset()
+    # append a large content, that amounts to two chunks
+    new_content = new.read()
     new.reset()
+    bloscpack.append_fp(orig, StringIO(new_content * 2), new_size * 2)
+    orig.reset()
     bloscpack_header, metadata, metadata_header, offsets = \
             bloscpack._read_beginning(orig)
     orig.reset()
-    nt.assert_equal(bloscpack_header['nchunks'], 3)
+    nt.assert_equal(bloscpack_header['nchunks'], 4)
+
+    # append half a chunk
+    bloscpack.append_fp(orig, StringIO(new_content[:len(new_content)]), new_size/2)
+    orig.reset()
+    bloscpack_header, metadata, metadata_header, offsets = \
+            bloscpack._read_beginning(orig)
+    orig.reset()
+    nt.assert_equal(bloscpack_header['nchunks'], 5)
+    print(bloscpack_header)
+
+    # append a few bytes
+    bloscpack.append_fp(orig, StringIO(new_content[:1023]), 1024)
+    orig.reset()
+    bloscpack_header, metadata, metadata_header, offsets = \
+            bloscpack._read_beginning(orig)
+    orig.reset()
+    # make sure it is squashed into the lat chunk
+    nt.assert_equal(bloscpack_header['nchunks'], 5)
 
 
 def test_double_append():

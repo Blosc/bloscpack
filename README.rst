@@ -535,6 +535,7 @@ Coding Conventions
 * Numpy rst style docstrings
 * testing: expected before received ``nt.assert_equal(expected, received)``
 * Debug messages: as close to where the data was generated
+* Single quotes around ambiguities in messages ``overwriting existing file: 'testfile'``
 * Exceptions instead of exit
 
 TODO

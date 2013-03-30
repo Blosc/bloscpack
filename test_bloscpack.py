@@ -1021,17 +1021,13 @@ def test_append_into_last_chunk():
     # append a few bytes, creating a new, smaller, last_chunk
     new_content = new.read()
     new.reset()
-    nchunks  = bloscpack.append_fp(orig, StringIO(new_content[:1023]), 1023)
-    orig.reset()
-    bloscpack_header = bloscpack._read_beginning(orig)[0]
-    orig.reset()
+    nchunks  = reset_append_fp(orig, StringIO(new_content[:1023]), 1023)
+    bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(nchunks, 1)
     nt.assert_equal(bloscpack_header['last_chunk'], 1023)
     # now append into that last chunk
-    nchunks = bloscpack.append_fp(orig, StringIO(new_content[:1023]), 1023)
-    orig.reset()
-    bloscpack_header = bloscpack._read_beginning(orig)[0]
-    orig.reset()
+    nchunks  = reset_append_fp(orig, StringIO(new_content[:1023]), 1023)
+    bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(nchunks, 0)
     nt.assert_equal(bloscpack_header['last_chunk'], 2046)
 
@@ -1055,40 +1051,26 @@ def test_append_single_chunk():
     new.reset()
 
     # append a single chunk
-    bloscpack.append_fp(orig, new, new_size)
-    orig.reset()
-    new.reset()
-    bloscpack_header, metadata, metadata_header, offsets = \
-            bloscpack._read_beginning(orig)
-    orig.reset()
+    reset_append_fp(orig, new, new_size)
+    bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(bloscpack_header['nchunks'], 2)
 
     # append a large content, that amounts to two chunks
     new_content = new.read()
     new.reset()
-    bloscpack.append_fp(orig, StringIO(new_content * 2), new_size * 2)
-    orig.reset()
-    bloscpack_header, metadata, metadata_header, offsets = \
-            bloscpack._read_beginning(orig)
-    orig.reset()
+    reset_append_fp(orig, StringIO(new_content * 2), new_size * 2)
+    bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(bloscpack_header['nchunks'], 4)
 
     # append half a chunk
-    bloscpack.append_fp(orig, StringIO(new_content[:len(new_content)]), new_size/2)
-    orig.reset()
-    bloscpack_header, metadata, metadata_header, offsets = \
-            bloscpack._read_beginning(orig)
-    orig.reset()
+    reset_append_fp(orig, StringIO(new_content[:len(new_content)]), new_size/2)
+    bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(bloscpack_header['nchunks'], 5)
-    print(bloscpack_header)
 
     # append a few bytes
-    bloscpack.append_fp(orig, StringIO(new_content[:1023]), 1024)
-    orig.reset()
-    bloscpack_header, metadata, metadata_header, offsets = \
-            bloscpack._read_beginning(orig)
-    orig.reset()
+    reset_append_fp(orig, StringIO(new_content[:1023]), 1024)
     # make sure it is squashed into the lat chunk
+    bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(bloscpack_header['nchunks'], 5)
 
 

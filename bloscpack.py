@@ -1153,6 +1153,10 @@ def decode_metadata_header(buffer_):
             }
 
 
+def _blosc_args_from_args(args):
+    return dict((arg, args.__getattribute__(arg)) for arg in BLOSC_ARGS)
+
+
 def process_compression_args(args):
     """ Extract and check the compression args after parsing by argparse.
 
@@ -1173,8 +1177,7 @@ def process_compression_args(args):
     in_file = args.in_file
     out_file = in_file + EXTENSION \
         if args.out_file is None else args.out_file
-    blosc_args = dict((arg, args.__getattribute__(arg)) for arg in BLOSC_ARGS)
-    return in_file, out_file, blosc_args
+    return in_file, out_file, _blosc_args_from_args(args)
 
 
 def process_decompression_args(args):

@@ -1257,8 +1257,8 @@ def check_files(in_file, out_file, args):
             raise FileNotFound("output file '%s' exists!" % out_file)
         else:
             print_verbose("overwriting existing file: %s" % out_file)
-    print_verbose('input file is: %s' % in_file)
-    print_verbose('output file is: %s' % out_file)
+    print_verbose("input file is: '%s'" % in_file)
+    print_verbose("output file is: '%s'" % out_file)
 
 
 def process_nthread_arg(args):
@@ -2116,8 +2116,8 @@ if __name__ == '__main__':
                         new_file)
         except FileNotFound as fnf:
             error(str(fnf))
-        print_verbose('original file is: %s' % original_file)
-        print_verbose('new file is: %s' % new_file)
+        print_verbose("original file is: '%s'" % original_file)
+        print_verbose("new file is: '%s'" % new_file)
         blosc_args = _blosc_args_from_args(args)
         append(original_file, new_file, blosc_args=blosc_args)
     else:

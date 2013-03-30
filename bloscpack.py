@@ -1990,10 +1990,23 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # figure out how many bytes we need to read to rebuild the last chunk
     ultimo_length = len(decompressed)
     bytes_to_read = bloscpack_header['chunk_size'] - ultimo_length
-    # read those bytes
-    fill_up = new_content_fp.read(bytes_to_read)
+    if new_size <= bytes_to_read:
+        # special case
+        # must squeeze data into last chunk
+        fill_up = new_content_fp.read(bytes_to_read)
+        # seek back to the position of the original last chunk
+        original_fp.seek(offsets[-1], 0)
+        # write the chunk that has been filled up
+        compressed, digest = _pack_chunk_fp(original_fp,
+                decompressed + fill_up,
+                blosc_args, checksum_impl)
+        # return 0 to indicate that no new chunks have been written
+        return 0
+
     # figure out what is left over
     new_new_size = new_size - bytes_to_read
+    # read those bytes
+    fill_up = new_content_fp.read(bytes_to_read)
     # figure out how many chunks we will need
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(new_new_size,

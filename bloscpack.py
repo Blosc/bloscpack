@@ -2052,7 +2052,7 @@ def append(orig_file, new_file, blosc_args=None):
     orig_size_after = path.getsize(orig_file)
     print_verbose('orig file size after append: %s' %
             double_pretty_size(orig_size_after))
-    print_verbose('Approximate compression ratio: %f' %
+    print_verbose('Approximate compression ratio of appended data: %f' %
             ((orig_size_after-orig_size_before)/new_size))
 
 if __name__ == '__main__':

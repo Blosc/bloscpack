@@ -597,6 +597,7 @@ def create_parser():
             help="alias for 'append'")
 
     for p in (append_parser, a_parser):
+        _inject_blosc_group(p)
         p.add_argument('original_file',
                 metavar='<original_file>',
                 type=str,

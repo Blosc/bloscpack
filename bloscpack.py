@@ -427,6 +427,24 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
         return text.splitlines()
 
+def _inject_blosc_group(parser):
+    blosc_group = parser.add_argument_group(title='blosc settings')
+    blosc_group.add_argument('-t', '--typesize',
+            metavar='<size>',
+            default=DEFAULT_TYPESIZE,
+            type=int,
+            help='typesize for blosc')
+    blosc_group.add_argument('-l', '--clevel',
+            default=DEFAULT_CLEVEL,
+            choices=range(10),
+            metavar='[0, 9]',
+            type=int,
+            help='compression level')
+    blosc_group.add_argument('-s', '--no-shuffle',
+            action='store_false',
+            default=DEFAULT_SHUFFLE,
+            dest='shuffle',
+            help='deactivate shuffle')
 
 def create_parser():
     """ Create and return the parser. """
@@ -499,23 +517,7 @@ def create_parser():
                     error('%s must be > 0 ' % option_string)
             setattr(namespace, self.dest, value)
     for p in [compress_parser, c_parser]:
-        blosc_group = p.add_argument_group(title='blosc settings')
-        blosc_group.add_argument('-t', '--typesize',
-                metavar='<size>',
-                default=DEFAULT_TYPESIZE,
-                type=int,
-                help='typesize for blosc')
-        blosc_group.add_argument('-l', '--clevel',
-                default=DEFAULT_CLEVEL,
-                choices=range(10),
-                metavar='[0, 9]',
-                type=int,
-                help='compression level')
-        blosc_group.add_argument('-s', '--no-shuffle',
-                action='store_false',
-                default=DEFAULT_SHUFFLE,
-                dest='shuffle',
-                help='deactivate shuffle')
+        _inject_blosc_group(p)
         bloscpack_chunking_group = p.add_mutually_exclusive_group()
         bloscpack_chunking_group.add_argument('-z', '--chunk-size',
                 metavar='<size>',

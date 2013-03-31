@@ -2042,7 +2042,8 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         blosc_args['shuffle'] = DEFAULT_SHUFFLE
     _check_blosc_args(blosc_args)
     offsets_pos = (BLOSCPACK_HEADER_LENGTH +
-                  (METADATA_HEADER_LENGTH + metadata_header['max_meta_size']
+                  (METADATA_HEADER_LENGTH + metadata_header['max_meta_size'] +
+                      CHECKSUMS_LOOKUP[metadata_header['meta_checksum']].size
                    if metadata is not None else 0))
     # seek to the final offset
     original_fp.seek(offsets[-1], 0)

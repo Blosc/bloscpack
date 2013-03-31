@@ -620,6 +620,12 @@ def create_parser():
                 default=False,
                 dest='no_check_extension',
                 help='disable checking original file for extension (*.blp)\n')
+        p.add_argument('-m', '--metadata',
+                metavar='<metadata>',
+                type=str,
+                dest='metadata',
+                help="file containing the metadata, must contain valid JSON")
+
 
     info_parser = subparsers.add_parser('info',
             formatter_class=BloscPackCustomFormatter,
@@ -2201,7 +2207,12 @@ if __name__ == '__main__':
         print_verbose("original file is: '%s'" % original_file)
         print_verbose("new file is: '%s'" % new_file)
         blosc_args = _blosc_args_from_args(args)
+        metadata = process_metadata_args(args)
         append(original_file, new_file, blosc_args=blosc_args)
+        if metadata is not None:
+            with open(original_file, 'r+b') as fp:
+                _seek_to_metadata(fp)
+                _rewrite_metadata_fp(fp, metadata)
     elif args.subcommand in ('info', 'i'):
         try:
             if not path.exists(args.file_):

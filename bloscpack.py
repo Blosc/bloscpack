@@ -317,7 +317,8 @@ def print_verbose(message, level=VERBOSE):
         raise TypeError("Desired level '%s' is not one of %s" % (level,
             str(VERBOSITY_LEVELS)))
     if VERBOSITY_LEVELS.index(level) <= VERBOSITY_LEVELS.index(LEVEL):
-        print('%s: %s' % (PREFIX, message))
+        for line in [l for l in message.split('\n') if l != '']:
+            print('%s: %s' % (PREFIX, line))
 
 
 def print_debug(message):

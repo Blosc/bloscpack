@@ -2218,6 +2218,9 @@ if __name__ == '__main__':
             print_normal(pprint.pformat(metadata, indent=4))
             print_normal("'metadata_header':")
             print_normal(pprint.pformat(metadata_header, indent=4))
+        if offsets:
+            print_normal("'offsets':")
+            print_normal("[%s,...]" % (",".join(str(o) for o in offsets[:5])))
 
     else:
         # we should never reach this

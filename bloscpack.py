@@ -2169,7 +2169,7 @@ if __name__ == '__main__':
         original_file, new_file = process_append_args(args)
         try:
             if not path.exists(original_file):
-                raise FileNotFound("original file file '%s' does not exist!" %
+                raise FileNotFound("original file '%s' does not exist!" %
                         original_file)
             if not path.exists(new_file):
                 raise FileNotFound("new file '%s' does not exist!" %

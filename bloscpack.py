@@ -1990,7 +1990,7 @@ def _recreate_metadata(old_metadata_header, new_metadata,
         metadata_args['meta_codec'] = codec
     if level is not None:
         check_range('meta_level', level, 0, MAX_CLEVEL)
-        metadata_args[level] = level
+        metadata_args['meta_level'] = level
     return metadata_args
 
 

@@ -125,7 +125,17 @@ class NoChangeInMetadata(RuntimeError):
     pass
 
 
+class MetadataSectionTooSmall(RuntimeError):
+    pass
+
 class FileNotFound(IOError):
+    pass
+
+class NonUniformTypesize(RuntimeError):
+    pass
+
+
+class NotEnoughSpace(RuntimeError):
     pass
 
 
@@ -307,6 +317,11 @@ def print_verbose(message, level=VERBOSE):
         print('%s: %s' % (PREFIX, message))
 
 
+def print_debug(message):
+    """ Print message with verbosity level ``DEBUG``. """
+    print_verbose(message, level=DEBUG)
+
+
 def error(message, exit_code=1):
     """ Print message and exit with desired code. """
     for line in [l for l in message.split('\n') if l != '']:
@@ -412,6 +427,24 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
         return text.splitlines()
 
+def _inject_blosc_group(parser):
+    blosc_group = parser.add_argument_group(title='blosc settings')
+    blosc_group.add_argument('-t', '--typesize',
+            metavar='<size>',
+            default=DEFAULT_TYPESIZE,
+            type=int,
+            help='typesize for blosc')
+    blosc_group.add_argument('-l', '--clevel',
+            default=DEFAULT_CLEVEL,
+            choices=range(10),
+            metavar='[0, 9]',
+            type=int,
+            help='compression level')
+    blosc_group.add_argument('-s', '--no-shuffle',
+            action='store_false',
+            default=DEFAULT_SHUFFLE,
+            dest='shuffle',
+            help='deactivate shuffle')
 
 def create_parser():
     """ Create and return the parser. """
@@ -484,23 +517,7 @@ def create_parser():
                     error('%s must be > 0 ' % option_string)
             setattr(namespace, self.dest, value)
     for p in [compress_parser, c_parser]:
-        blosc_group = p.add_argument_group(title='blosc settings')
-        blosc_group.add_argument('-t', '--typesize',
-                metavar='<size>',
-                default=DEFAULT_TYPESIZE,
-                type=int,
-                help='typesize for blosc')
-        blosc_group.add_argument('-l', '--clevel',
-                default=DEFAULT_CLEVEL,
-                choices=range(10),
-                metavar='[0, 9]',
-                type=int,
-                help='compression level')
-        blosc_group.add_argument('-s', '--no-shuffle',
-                action='store_false',
-                default=DEFAULT_SHUFFLE,
-                dest='shuffle',
-                help='deactivate shuffle')
+        _inject_blosc_group(p)
         bloscpack_chunking_group = p.add_mutually_exclusive_group()
         bloscpack_chunking_group.add_argument('-z', '--chunk-size',
                 metavar='<size>',
@@ -571,6 +588,32 @@ def create_parser():
                 default=None,
                 help=help_out)
 
+    append_parser = subparsers.add_parser('append',
+            formatter_class=BloscPackCustomFormatter,
+            help='append data to a compressed file')
+
+    a_parser = subparsers.add_parser('a',
+            formatter_class=BloscPackCustomFormatter,
+            help="alias for 'append'")
+
+    for p in (append_parser, a_parser):
+        _inject_blosc_group(p)
+        p.add_argument('original_file',
+                metavar='<original_file>',
+                type=str,
+                help="file to append to")
+        p.add_argument('new_file',
+                metavar='<new_file>',
+                type=str,
+                help="file to append from")
+        p.add_argument('-e', '--no-check-extension',
+                action='store_true',
+                default=False,
+                dest='no_check_extension',
+                help='disable checking original file for extension (*.blp)\n')
+
+
+
     return parser
 
 
@@ -589,7 +632,6 @@ def decode_blosc_header(buffer_):
 
     Notes
     -----
-
     Please see the readme for a precise descripttion of the blosc header
     format.
 
@@ -749,7 +791,6 @@ def _check_blosc_args(blosc_args):
 
     Notes
     -----
-
     Check the value of the 'BLOSC_ARGS' constant for the details of what
     keys should be contained in the dictionary.
 
@@ -772,7 +813,6 @@ def _check_bloscpack_args(bloscpack_args):
 
     Notes
     -----
-
     Check the value of the 'BLOSCPACK_ARGS' constant for the details of what
     keys should be contained in the dictionary.
 
@@ -795,7 +835,6 @@ def _check_metadata_arguments(metadata_args):
 
     Notes
     -----
-
     Check the value of the 'METADATA_ARGS' constant for the details of what
     keys should be contained in the dictionary.
 
@@ -889,7 +928,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     (callable that takes a single int as argument and returns a single int) or
     an int.  The sum of the resulting value and 'nchunks' can not be larger
     than MAX_CHUNKS.  The value of 'max_app_chunks' must be '0' if there is not
-    offsets section or if nchunks is unknown (has the value '-1'.
+    offsets section or if nchunks is unknown (has the value '-1').
 
     The function performs some silent optimisations. First, if there are no
     offsets or 'nchunks' is unknown any value for 'max_app_chunks' will be
@@ -949,7 +988,7 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         if the offsets to the chunks are present
     metadata: bool
         if the metadata is present
-    checksum : int
+    checksum : str
         the checksum to be used
     typesize : int
         the typesize used for blosc in the chunks
@@ -969,7 +1008,6 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
 
     Notes
     -----
-
     See the README distributed for details on the header format.
 
     Raises
@@ -1028,7 +1066,7 @@ def decode_bloscpack_header(buffer_):
         if the offsets to the chunks are present
     metadata: bool
         if the metadata is present
-    checksum : int
+    checksum : str
         the checksum to be used
     typesize : int
         the typesize used for blosc in the chunks
@@ -1115,6 +1153,10 @@ def decode_metadata_header(buffer_):
             }
 
 
+def _blosc_args_from_args(args):
+    return dict((arg, args.__getattribute__(arg)) for arg in BLOSC_ARGS)
+
+
 def process_compression_args(args):
     """ Extract and check the compression args after parsing by argparse.
 
@@ -1135,8 +1177,7 @@ def process_compression_args(args):
     in_file = args.in_file
     out_file = in_file + EXTENSION \
         if args.out_file is None else args.out_file
-    blosc_args = dict((arg, args.__getattribute__(arg)) for arg in BLOSC_ARGS)
-    return in_file, out_file, blosc_args
+    return in_file, out_file, _blosc_args_from_args(args)
 
 
 def process_decompression_args(args):
@@ -1172,6 +1213,16 @@ def process_decompression_args(args):
     return in_file, out_file
 
 
+def process_append_args(args):
+    original_file = args.original_file
+    new_file = args.new_file
+    if not args.no_check_extension and not original_file.endswith(EXTENSION):
+        error("original file '%s' does not end with '%s'" %
+                    (original_file, EXTENSION))
+
+    return original_file, new_file
+
+
 def process_metadata_args(args):
     if args.metadata is not None:
         try:
@@ -1205,9 +1256,9 @@ def check_files(in_file, out_file, args):
         if not args.force:
             raise FileNotFound("output file '%s' exists!" % out_file)
         else:
-            print_verbose("overwriting existing file: %s" % out_file)
-    print_verbose('input file is: %s' % in_file)
-    print_verbose('output file is: %s' % out_file)
+            print_verbose("overwriting existing file: '%s'" % out_file)
+    print_verbose("input file is: '%s'" % in_file)
+    print_verbose("output file is: '%s'" % out_file)
 
 
 def process_nthread_arg(args):
@@ -1283,8 +1334,8 @@ def _write_metadata(output_fp, metadata, metadata_args):
             max_meta_size,
             level=DEBUG)
     if meta_comp_size > max_meta_size:
-        raise RuntimeError(
-                'metadata section is too small contain the metadata '
+        raise MetadataSectionTooSmall(
+                'metadata section is too small to contain the metadata '
                 'required: %d allocated: %d' %
                 (meta_comp_size, max_meta_size))
     metadata_total += meta_comp_size
@@ -1319,6 +1370,25 @@ def _write_metadata(output_fp, metadata, metadata_args):
             double_pretty_size(metadata_total), level=DEBUG)
     return metadata_total
 
+def _pack_chunk_fp(output_fp, chunk, blosc_args, checksum_impl):
+    compressed = blosc.compress(chunk, **blosc_args)
+    output_fp.write(compressed)
+    if LEVEL == DEBUG:
+        print_verbose("chunk compressed, in: %s out: %s ratio: %s" %
+                (double_pretty_size(len(chunk)),
+                double_pretty_size(len(compressed)),
+                "%0.3f" % (len(compressed) / len(chunk))),
+                level=DEBUG)
+    if checksum_impl.size > 0:
+        # compute the checksum on the compressed data
+        digest = checksum_impl(compressed)
+        # write digest
+        output_fp.write(digest)
+        print_verbose('checksum (%s): %s ' %
+                (checksum_impl.name, repr(digest)),
+                level=DEBUG)
+    return compressed, digest
+
 
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
         blosc_args=DEFAULT_BLOSC_ARGS,
@@ -1333,7 +1403,7 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
     out_file : str
         the name of the output file
     chunk_size : int
-        The desired chunk size in bytes.
+        the desired chunk size in bytes
     metadata : dict
         the metadata dict
     blosc_args : dict
@@ -1370,8 +1440,89 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
     print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
 
+class PlainSource(object):
+
+    def __iter__(self):
+        return self()
+
+class CompressedSource(object):
+
+    def __iter__(self):
+        return self()
+
+
+class PlainFPSource(PlainSource):
+
+    def __init__(self, input_fp, chunk_size, last_chunk, nchunks):
+        self.input_fp = input_fp
+        self.chunk_size = chunk_size
+        self.last_chunk = last_chunk
+        self.nchunks = nchunks
+
+    def __call__(self):
+        # if nchunks == 1 the last_chunk_size is the size of the single chunk
+        for num_bytes in ([self.chunk_size] * (self.nchunks - 1) +
+                [self.last_chunk]):
+            yield self.input_fp.read(num_bytes)
+
+
+class CompressedFPSource(CompressedSource):
+
+    def __init__(self, input_fp):
+
+        self.input_fp = input_fp
+        self.bloscpack_header, self.metadata, self.metadata_header, \
+                self.offsets = _read_beginning(input_fp)
+        self.checksum_impl = CHECKSUMS_LOOKUP[self.bloscpack_header['checksum']]
+        self.nchunks = self.bloscpack_header['nchunks']
+
+    def __call__(self):
+        for i in xrange(self.nchunks):
+            print_verbose("decompressing chunk '%d'%s" %
+                    (i, ' (last)' if i == self.nchunks - 1 else ''), level=DEBUG)
+            compressed, decompressed, header= _unpack_chunk_fp(self.input_fp, self.checksum_impl)
+            print_verbose("chunk handled, in: %s out: %s" %
+                    (pretty_size(len(compressed)),
+                        pretty_size(len(decompressed))), level=DEBUG)
+            yield decompressed
+
+class PlainSink(object):
+
+    def put(self, chunk):
+        pass
+
+class CompressedSink(object):
+
+    def put(self, chunk):
+        pass
+
+class PlainFPSink(PlainSink):
+
+    def __init__(self, output_fp):
+        self.output_fp = output_fp
+
+    def put(self, chunk):
+        self.output_fp.write(chunk)
+
+
+class CompressedFPSink(CompressedSink):
+
+    def __init__(self, output_fp,
+            checksum=DEFAULT_CHECKSUM,
+            blosc_args=DEFAULT_BLOSC_ARGS):
+        self.output_fp = output_fp
+        self.checksum_impl = CHECKSUMS_LOOKUP[checksum]
+        self.blosc_args = blosc_args
+
+    def put(self, chunk):
+        offset = self.output_fp.tell()
+        compressed, digest = _pack_chunk_fp(self.output_fp, chunk, self.blosc_args,
+                self.checksum_impl)
+        return offset, compressed, digest
+
+
 def _pack_fp(input_fp, output_fp,
-        nchunks, chunk_size, last_chunk_size,
+        nchunks, chunk_size, last_chunk,
         metadata=None,
         blosc_args=DEFAULT_BLOSC_ARGS,
         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
@@ -1399,13 +1550,12 @@ def _pack_fp(input_fp, output_fp,
             checksum=bloscpack_args['checksum'],
             typesize=blosc_args['typesize'],
             chunk_size=chunk_size,
-            last_chunk=last_chunk_size,
+            last_chunk=last_chunk,
             nchunks=nchunks,
             max_app_chunks=max_app_chunks
             )
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)
-    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_args['checksum']]
     output_fp.write(raw_bloscpack_header)
     # need to store how much space was used by metadata, for seeking later
     metadata_total = 0
@@ -1417,47 +1567,25 @@ def _pack_fp(input_fp, output_fp,
     # preallocate space for the offsets, including extra space for growing
     if bloscpack_args['offsets']:
         total_entries = nchunks + max_app_chunks
-        offsets_storage = list(itertools.repeat(-1, total_entries))
+        offset_storage = list(itertools.repeat(-1, nchunks))
         output_fp.write(encode_int64(-1) * total_entries)
-    # if nchunks == 1 the last_chunk_size is the size of the single chunk
-    for i, bytes_to_read in enumerate((
-            [chunk_size] * (nchunks - 1)) + [last_chunk_size]):
-        # store the current position in the file
+    # define source and sink
+    source = PlainFPSource(input_fp, chunk_size, last_chunk, nchunks)
+    sink = CompressedFPSink(output_fp,
+            checksum=bloscpack_args['checksum'],
+            blosc_args=blosc_args)
+
+    # read-compress-write loop
+    for i, chunk in enumerate(source()):
+        print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
+            else ''), level=DEBUG)
+        offset, compressed, digest = sink.put(chunk)
         if bloscpack_args['offsets']:
-            offsets_storage[i] = output_fp.tell()
-        current_chunk = input_fp.read(bytes_to_read)
-        # do compression
-        compressed = blosc.compress(current_chunk, **blosc_args)
-        # write compressed data
-        output_fp.write(compressed)
-        print_verbose("chunk '%d'%s written, in: %s out: %s ratio: %s" %
-                (i, ' (last)' if i == nchunks - 1 else '',
-                double_pretty_size(len(current_chunk)),
-                double_pretty_size(len(compressed)),
-                "%0.3f" % (len(compressed) / len(current_chunk))
-                if len(current_chunk) != 0 else "N/A"),
-                level=DEBUG)
-        tail_mess = ""
-        if checksum_impl.size > 0:
-            # compute the checksum on the compressed data
-            digest = checksum_impl(compressed)
-            # write digest
-            output_fp.write(digest)
-            tail_mess += ('checksum (%s): %s ' %
-                    (bloscpack_args['checksum'], repr(digest)))
-        if bloscpack_args['offsets']:
-            tail_mess += ("offset: '%d'" % offsets_storage[i])
-        if len(tail_mess) > 0:
-            print_verbose(tail_mess, level=DEBUG)
+            offset_storage[i] = offset
+
     if bloscpack_args['offsets']:
         output_fp.seek(BLOSCPACK_HEADER_LENGTH + metadata_total, 0)
-        print_verbose("Writing '%d' offsets: '%s'" %
-                (len(offsets_storage), repr(offsets_storage)), level=DEBUG)
-        # write the offsets encoded into the reserved space in the file
-        encoded_offsets = "".join([encode_int64(i) for i in offsets_storage])
-        print_verbose("Raw offsets: %s" % repr(encoded_offsets),
-                level=DEBUG)
-        output_fp.write(encoded_offsets)
+        _write_offsets(output_fp, offset_storage)
 
 
 def _read_bloscpack_header(input_fp):
@@ -1553,6 +1681,7 @@ def _read_metadata(input_fp):
     return metadata, metadata_header
 
 
+
 def _read_offsets(input_fp, bloscpack_header):
     """ Read the offsets from a file pointer.
 
@@ -1585,6 +1714,39 @@ def _read_offsets(input_fp, bloscpack_header):
     else:
         return []
 
+def _read_beginning(input_fp):
+    """ Read the bloscpack_header, metadata, metadata_header and offsets.
+
+    Parameters
+    ----------
+    input_fp : file like
+        input file pointer
+
+    Returns
+    -------
+    bloscpack_header : dict
+    metadata : object
+    metadata_header : dict
+    offsets : list of ints
+
+    """
+    bloscpack_header = _read_bloscpack_header(input_fp)
+    metadata, metadata_header = _read_metadata(input_fp) \
+            if bloscpack_header['metadata'] \
+            else (None, None)
+    offsets = _read_offsets(input_fp, bloscpack_header)
+    return bloscpack_header, metadata, metadata_header, offsets
+
+def _write_offsets(output_fp, offsets):
+    print_verbose("Writing '%d' offsets: '%s'" %
+            (len(offsets), repr(offsets)), level=DEBUG)
+    # write the offsets encoded into the reserved space in the file
+    encoded_offsets = "".join([encode_int64(i) for i in offsets])
+    print_verbose("Raw offsets: %s" % repr(encoded_offsets),
+            level=DEBUG)
+    output_fp.write(encoded_offsets)
+
+
 def _unpack_chunk_fp(input_fp, checksum_impl):
     """ Unpack a chunk.
 
@@ -1601,6 +1763,8 @@ def _unpack_chunk_fp(input_fp, checksum_impl):
         the compressed data
     decompressed : str
         the decompressed data
+    blosc_header : dict
+        the blosc header from the chunk
     """
     # read blosc header
     blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
@@ -1628,7 +1792,7 @@ def _unpack_chunk_fp(input_fp, checksum_impl):
                     level=DEBUG)
     # if checksum OK, decompress buffer
     decompressed = blosc.decompress(compressed)
-    return compressed, decompressed
+    return compressed, decompressed, blosc_header
 
 def unpack_file(in_file, out_file):
     """ Main function for decompressing a file.
@@ -1665,40 +1829,87 @@ def unpack_file(in_file, out_file):
 
 
 def _unpack_fp(input_fp, output_fp):
-    bloscpack_header = _read_bloscpack_header(input_fp)
-    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
-    # read the metadata
-    metadata, metadata_header = _read_metadata(input_fp) \
-            if bloscpack_header['metadata'] \
-            else (None, None)
-    nchunks = bloscpack_header['nchunks']
-    offsets = _read_offsets(input_fp, bloscpack_header)
-    # decompress
-    for i in range(nchunks):
-        print_verbose("decompressing chunk '%d'%s" %
-                (i, ' (last)' if i == nchunks - 1 else ''), level=DEBUG)
-        compressed, decompressed = _unpack_chunk_fp(input_fp, checksum_impl)
-        # write decompressed chunk
-        output_fp.write(decompressed)
-        print_verbose("chunk written, in: %s out: %s" %
-                (pretty_size(len(compressed)),
-                    pretty_size(len(decompressed))), level=DEBUG)
-    return metadata
+    compressed_fp_source = CompressedFPSource(input_fp)
+    plain_fp_sink = PlainFPSink(output_fp)
+    # read, decompress, write loop
+    for decompressed_chunk in iter(compressed_fp_source):
+        plain_fp_sink.put(decompressed_chunk)
+    return compressed_fp_source.metadata
 
+def _seek_to_metadata(target_fp):
+    """ Given a target file pointer, seek to the metadata section.
 
-def _rewrite_metadata_fp(target_fp, metadata,
+    Parameters
+    ----------
+
+    target_fp : file like
+        the taregt file pointer
+
+    Returns
+    -------
+    metadata_position : int
+
+    Raises
+    ------
+    NoMetadataFound
+        if there is no metadata section in this file
+
+    """
+    bloscpack_header = _read_bloscpack_header(target_fp)
+    if not bloscpack_header['metadata']:
+        raise NoMetadataFound("unable to seek to metadata if it does not exist")
+    else:
+        return target_fp.tell()
+
+def _rewrite_metadata_fp(target_fp, new_metadata,
+            magic_format=None, checksum=None,
+            codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
+    """ Rewrite the metadata section in a file pointer.
+
+    Parameters
+    ----------
+    target_fp : file like
+        the target file pointer to rewrite in
+    new_metadata: dict
+        the new metadata to save
+
+    See the notes in ``_recreate_metadata`` for a description of the keyword
+    arguments.
+
+    """
+    # cache the current position
+    current_pos = target_fp.tell()
+    # read the metadata section
+    old_metadata, old_metadata_header = _read_metadata(target_fp)
+    if old_metadata == new_metadata:
+        raise NoChangeInMetadata(
+                'you requested to update metadata, but this has not changed')
+    new_metadata_args = _recreate_metadata(old_metadata_header, new_metadata,
+            magic_format=magic_format, checksum=checksum,
+            codec=codec, level=level)
+    # seek back to where the metadata begins...
+    target_fp.seek(current_pos, 0)
+    # and re-write it
+    _write_metadata(target_fp, new_metadata, new_metadata_args)
+
+def _recreate_metadata(old_metadata_header, new_metadata,
             magic_format=None, checksum=None,
             codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
     """ Update the metadata section.
 
     Parameters
     ----------
-    target_fp : file_like
-        the file pointer to read from and write into
-    metadata : dict
+    old_metadata_header: dict
+        the header of the old metadata
+    new_metadata: dict
         the new metadata to save
 
     See the notes below for a description of the keyword arguments.
+
+    Returns
+    -------
+    new_metadata_args: dict
+        the new arguments for ``_write_metadata``
 
     Raises
     ------
@@ -1709,44 +1920,30 @@ def _rewrite_metadata_fp(target_fp, metadata,
 
     Notes
     -----
+    This create new ``metadata_args`` based on an old metadata_header, Since
+    the space has already been allocated, only certain metadata arguments can
+    be overridden. The keyword arguments specify which ones these are. If a
+    keyword argument value is 'None' the existing argument which is obtained
+    from the header is used.  Otherwise the value from the keyword argument
+    takes precedence. Due to a policy of opportunistic compression, the 'codec'
+    and 'level' arguments are not 'None' by default, to ensure that previously
+    uncompressed metadata, which might be favourably compressible as a result
+    of the enlargement process, will actually be compressed. As for the
+    'checksum' only a checksum with the same digest size can be used.
 
-    The target_fp should point to the beginning of the metadata section.
-
-    This rewrites the metadata section. Since the space has already been
-    allocated, only certain metadata arguments can be overridden. The keyword
-    arguments specify which ones these are. If a keyword argument value is
-    'None' the existing argument which is obtained from the header is used.
-    Otherwise the value from the keyword argument takes precedence. Due to a
-    policy of opportunistic compression, the 'codec' and 'level' arguments are
-    not 'None' by default, to ensure that previously uncompressed metadata,
-    which might be favourably compressible as a result of the enlargement
-    process, will actually be compressed. As for the 'checksum' only a checksum
-    with the same digest size can be used.
+    The ``metadata_args`` returned by this function are suitable to be passed
+    on to ``_write_metadata``.
 
     """
-    # cache the current position
-    current_pos = target_fp.tell()
-
-    #bloscpack_header = _read_bloscpack_header(target_fp)
-    ## read the metadata
-    #if not bloscpack_header['metadata']:
-    #    raise NoMetadataFound(
-    #            'target file_pointer does not have any metadata section')
-
-    # read the metadata section
-    old_metadata, metadata_header = _read_metadata(target_fp)
-    if metadata == old_metadata:
-        raise NoChangeInMetadata(
-                'you requested to update metadata, but this has not changed')
     # get the settings from the metadata header
-    metadata_args = dict((k, metadata_header[k]) for k in METADATA_ARGS)
+    metadata_args = dict((k, old_metadata_header[k]) for k in METADATA_ARGS)
     # handle and check validity of overrides
     if magic_format is not None:
         _check_valid_serializer(magic_format)
         metadata_args['magic_format'] = magic_format
     if checksum is not None:
         _check_valid_checksum(checksum)
-        old_impl = CHECKSUMS_LOOKUP[metadata_header['meta_checksum']]
+        old_impl = CHECKSUMS_LOOKUP[old_metadata_header['meta_checksum']]
         new_impl = CHECKSUMS_LOOKUP[checksum]
         if old_impl.size != new_impl.size:
             raise ChecksumLengthMismatch(
@@ -1758,10 +1955,150 @@ def _rewrite_metadata_fp(target_fp, metadata,
     if level is not None:
         check_range('meta_level', level, 0, MAX_CLEVEL)
         metadata_args[level] = level
-    # seek back to where the metadata begins...
-    target_fp.seek(current_pos, 0)
-    # and re-write it
-    _write_metadata(target_fp, metadata, metadata_args)
+    return metadata_args
+
+
+def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
+    """ Append a file to a file.
+
+    Parameters
+    ----------
+    original : str
+        the name of the file to append to
+    new_content : str
+        the name of the file to append from
+    new_size : int
+        the size of the new_content
+    blosc_args : dict
+        the blosc_args
+
+    Returns
+    -------
+    nchunks_written : int
+        the total number of new chunks written to the file
+
+    Notes
+    -----
+    The blosc_args argument can be supplied if different blosc arguments are
+    desired.
+
+    """
+    bloscpack_header, metadata, metadata_header, offsets = \
+        _read_beginning(original_fp)
+    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
+    if not offsets:
+        raise RuntimeError(
+                'Appending to a file without offsets is not yet supported')
+    if blosc_args is None:
+        blosc_args = dict(zip(BLOSC_ARGS, [None] * len(BLOSC_ARGS)))
+    # handle blosc_args
+    if blosc_args['typesize'] is None:
+        if bloscpack_header['typesize'] == -1:
+            raise NonUniformTypesize(
+                    "Non uniform type size, can not append to file.")
+        else:
+            # use the typesize from the bloscpack header
+            blosc_args['typesize'] = bloscpack_header['typesize']
+    if blosc_args['clevel'] is None:
+        # use the default
+        blosc_args['clevel'] = DEFAULT_CLEVEL
+    if blosc_args['shuffle'] is None:
+        blosc_args['shuffle'] = DEFAULT_SHUFFLE
+    _check_blosc_args(blosc_args)
+    offsets_pos = (BLOSCPACK_HEADER_LENGTH +
+                  (METADATA_HEADER_LENGTH + metadata_header['max_meta_size']
+                   if metadata is not None else 0))
+    # seek to the final offset
+    original_fp.seek(offsets[-1], 0)
+    # decompress the last chunk
+    compressed, decompressed, blosc_header = _unpack_chunk_fp(original_fp, checksum_impl)
+    # figure out how many bytes we need to read to rebuild the last chunk
+    ultimo_length = len(decompressed)
+    bytes_to_read = bloscpack_header['chunk_size'] - ultimo_length
+    if new_size <= bytes_to_read:
+        # special case
+        # must squeeze data into last chunk
+        fill_up = new_content_fp.read(new_size)
+        # seek back to the position of the original last chunk
+        original_fp.seek(offsets[-1], 0)
+        # write the chunk that has been filled up
+        compressed, digest = _pack_chunk_fp(original_fp,
+                decompressed + fill_up,
+                blosc_args, checksum_impl)
+        # return 0 to indicate that no new chunks have been written
+        # build the new header
+        bloscpack_header['last_chunk'] += new_size
+        # create the new header
+        raw_bloscpack_header = create_bloscpack_header(
+                **bloscpack_header)
+        original_fp.seek(0)
+        original_fp.write(raw_bloscpack_header)
+        return 0
+
+    # figure out what is left over
+    new_new_size = new_size - bytes_to_read
+    # read those bytes
+    fill_up = new_content_fp.read(bytes_to_read)
+    # figure out how many chunks we will need
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(new_new_size,
+                chunk_size=bloscpack_header['chunk_size'])
+    # make sure that we actually have that kind of space
+    if nchunks > bloscpack_header['max_app_chunks']:
+        raise NotEnoughSpace('not enough space')
+    # seek back to the position of the original last chunk
+    original_fp.seek(offsets[-1], 0)
+    # write the chunk that has been filled up
+    compressed, digest = _pack_chunk_fp(original_fp, decompressed + fill_up,
+            blosc_args, checksum_impl)
+    # allocate new offsets
+    offset_storage = list(itertools.repeat(-1, nchunks))
+    # read from the new input file, new_content_fp should be adequately
+    # positioned
+    source = PlainFPSource(new_content_fp, chunk_size, last_chunk_size, nchunks)
+    # append to the original file, again original_fp should be adequately
+    # positioned
+    sink = CompressedFPSink(original_fp,
+            checksum=bloscpack_header['checksum'],
+            blosc_args=blosc_args)
+    # read, compress, write loop
+    for i, chunk in enumerate(source()):
+        print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
+            else ''), level=DEBUG)
+        offset, compressed, digest = sink.put(chunk)
+        offset_storage[i] = offset
+
+    # build the new header
+    bloscpack_header['last_chunk'] = last_chunk_size
+    bloscpack_header['nchunks'] += nchunks
+    bloscpack_header['max_app_chunks'] -= nchunks
+    # create the new header
+    raw_bloscpack_header = create_bloscpack_header(
+            **bloscpack_header)
+    original_fp.seek(0)
+    original_fp.write(raw_bloscpack_header)
+    # write the new offsets, but only those that changed
+    original_fp.seek(offsets_pos)
+    # FIXME: write only those that changed
+    _write_offsets(original_fp, offsets + offset_storage)
+    return nchunks
+
+def append(orig_file, new_file, blosc_args=None):
+
+    orig_size_before = path.getsize(orig_file)
+    new_size = path.getsize(new_file)
+    print_verbose('orig file size before append: %s' %
+            double_pretty_size(orig_size_before))
+    print_verbose('new file size: %s' % double_pretty_size(new_size))
+
+    with open_two_file(open(orig_file, 'r+b'), open(new_file, 'rb')) as \
+            (orig_fp, new_fp):
+        append_fp(orig_fp, new_fp, new_size, blosc_args)
+    orig_size_after = path.getsize(orig_file)
+    print_verbose('orig file size after append: %s' %
+            double_pretty_size(orig_size_after))
+    print_verbose('Approximate compression ratio of appended data: %f' %
+            ((orig_size_after-orig_size_before)/new_size))
 
 if __name__ == '__main__':
     parser = create_parser()
@@ -1775,6 +2112,7 @@ if __name__ == '__main__':
     print_verbose('command line arguments are: ', level=DEBUG)
     for arg, val in vars(args).iteritems():
         print_verbose('\t%s: %s' % (arg, str(val)), level=DEBUG)
+    process_nthread_arg(args)
 
     # compression and decompression handled via subparsers
     if args.subcommand in ['compress', 'c']:
@@ -1784,7 +2122,6 @@ if __name__ == '__main__':
             check_files(in_file, out_file, args)
         except FileNotFound as fnf:
             error(str(fnf))
-        process_nthread_arg(args)
         metadata = process_metadata_args(args)
         bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
         bloscpack_args['offsets'] = args.offsets
@@ -1795,8 +2132,8 @@ if __name__ == '__main__':
                     blosc_args=blosc_args,
                     bloscpack_args=bloscpack_args,
                     metadata_args=DEFAULT_METADATA_ARGS)
-        except ChunkingException as e:
-            error(e.message)
+        except ChunkingException as ce:
+            error(str(ce))
     elif args.subcommand in ['decompress', 'd']:
         print_verbose('getting ready for decompression')
         in_file, out_file = process_decompression_args(args)
@@ -1804,7 +2141,6 @@ if __name__ == '__main__':
             check_files(in_file, out_file, args)
         except FileNotFound as fnf:
             error(str(fnf))
-        process_nthread_arg(args)
         try:
             metadata = unpack_file(in_file, out_file)
             if metadata:
@@ -1813,6 +2149,22 @@ if __name__ == '__main__':
             error(fvm.message)
         except ChecksumMismatch as csm:
             error(csm.message)
+    elif args.subcommand in ['append', 'a']:
+        print_verbose('getting ready for append')
+        original_file, new_file = process_append_args(args)
+        try:
+            if not path.exists(original_file):
+                raise FileNotFound("original file file '%s' does not exist!" %
+                        original_file)
+            if not path.exists(new_file):
+                raise FileNotFound("new file '%s' does not exist!" %
+                        new_file)
+        except FileNotFound as fnf:
+            error(str(fnf))
+        print_verbose("original file is: '%s'" % original_file)
+        print_verbose("new file is: '%s'" % new_file)
+        blosc_args = _blosc_args_from_args(args)
+        append(original_file, new_file, blosc_args=blosc_args)
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

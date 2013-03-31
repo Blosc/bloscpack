@@ -535,7 +535,8 @@ Coding Conventions
 * Numpy rst style docstrings
 * testing: expected before received ``nt.assert_equal(expected, received)``
 * Debug messages: as close to where the data was generated
-* Execptions instead of exit
+* Single quotes around ambiguities in messages ``overwriting existing file: 'testfile'``
+* Exceptions instead of exit
 
 TODO
 ----
@@ -562,6 +563,7 @@ TODO
 * Debian packages (for python-blosc and bloscpack)
 * Use cram to test the command-line user interface
 * Establish and document proper exit codes
+* Use Travis CI for testing
 
 
 Changelog
@@ -574,6 +576,7 @@ Changelog
   * Sanitize calculation of nchunks and chunk-size a little
   * Introduce a metadata section with own header
   * Special keyword 'max' for use with chunk-size in the CLI
+  * Support appending to a file
   * Minor bugfixes and corrections as usual
 
 * v0.2.1     - Mon Nov 26 2012
@@ -657,7 +660,7 @@ Thanks
 Author, Copyright and License
 -----------------------------
 
-© 2012 Valentin Haenel <valentin.haenel@gmx.de>
+© 2012-2013 Valentin Haenel <valentin.haenel@gmx.de>
 
 Bloscpack is licensed under the terms of the MIT License.
 

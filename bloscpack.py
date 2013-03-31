@@ -946,6 +946,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     if offsets and nchunks != -1:
         if hasattr(max_app_chunks, '__call__'):
             # it's a callable all right
+            print_verbose("'max_app_chunks' is a callable")
             max_app_chunks = max_app_chunks(nchunks)
             # check that the result is still positive, might be quite large
             if max_app_chunks < 0:
@@ -953,6 +954,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
                         'max_app_chunks callable returned a negative integer')
         elif isinstance(max_app_chunks, int):
             # it's a plain int, check it's range
+            print_verbose("'max_app_chunks' is an int")
             check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
         else:
             raise ValueError('max_app_chunks was neither a callable or an int')
@@ -968,6 +970,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
             print_verbose('max_app_chunks will be silently ignored',
                     level=DEBUG)
         max_app_chunks = 0
+    print_verbose("'max_app_chunks' was set to: %d" % max_app_chunks)
     return max_app_chunks
 
 

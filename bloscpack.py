@@ -2211,7 +2211,7 @@ if __name__ == '__main__':
         with open(args.file_) as fp:
             bloscpack_header, metadata, metadata_header, offsets = \
                     _read_beginning(fp)
-        print_normal("'bloscpack_haeder':")
+        print_normal("'bloscpack_header':")
         print_normal(pprint.pformat(bloscpack_header, indent=4))
         if metadata is not None:
             print_normal(metadata)

@@ -924,6 +924,14 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     max_app_chunks : int
         the int value
 
+    Raises
+    ------
+    TypeError
+        if 'max_app_chunks' 
+    ValueError
+        if 'max_app_chunks' is a callable and returned either a non-int or a
+        negative int.
+
     Notes
     -----
     The 'max_app_chunks' parameter can either be a function of 'nchunks'

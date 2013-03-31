@@ -948,6 +948,10 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
             # it's a callable all right
             print_verbose("'max_app_chunks' is a callable")
             max_app_chunks = max_app_chunks(nchunks)
+            if not isinstance(max_app_chunks, (int, long)):
+                raise ValueError(
+                        "max_app_chunks callable returned a non integer "
+                        "of type '%s'" % type(max_app_chunks))
             # check that the result is still positive, might be quite large
             if max_app_chunks < 0:
                 raise ValueError(

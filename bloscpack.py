@@ -614,6 +614,14 @@ def create_parser():
                 dest='no_check_extension',
                 help='disable checking original file for extension (*.blp)\n')
 
+    append_parser = subparsers.add_parser('info',
+            formatter_class=BloscPackCustomFormatter,
+            help='print information about a compressed file')
+
+    a_parser = subparsers.add_parser('i',
+            formatter_class=BloscPackCustomFormatter,
+            help="alias for 'info'")
+
     return parser
 
 

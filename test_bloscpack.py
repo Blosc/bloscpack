@@ -616,6 +616,29 @@ def test_decode_metadata_header():
     nt.assert_equal(copy_and_set_return('user_codec', 'sesame'),
             decode_metadata_header(copy_and_set_input(24, 'sesame')))
 
+
+def test_handle_max_apps():
+    nt.assert_equals(bloscpack._handle_max_apps(True, 10, 10), 10)
+    nt.assert_equals(bloscpack._handle_max_apps(True, 10, lambda x: x*10), 100)
+    nt.assert_equals(
+            bloscpack._handle_max_apps(True, 1, lambda x: MAX_CHUNKS),
+            MAX_CHUNKS-1)
+    nt.assert_equals(
+            bloscpack._handle_max_apps(True, 1, lambda x: MAX_CHUNKS+10),
+            MAX_CHUNKS-1)
+    nt.assert_equals(
+            bloscpack._handle_max_apps(True, 1, MAX_CHUNKS),
+            MAX_CHUNKS-1)
+    nt.assert_equals(
+            bloscpack._handle_max_apps(True, 10, MAX_CHUNKS),
+            MAX_CHUNKS-10)
+    nt.assert_raises(TypeError, bloscpack._handle_max_apps, True, 10, 10.0)
+    nt.assert_raises(ValueError, bloscpack._handle_max_apps,
+            True, 10, lambda x: -1)
+    nt.assert_raises(ValueError, bloscpack._handle_max_apps,
+            True, 10, lambda x: 1.0)
+
+
 def create_array(repeats, in_file, progress=False):
     with open(in_file, 'w') as in_fp:
         create_array_fp(repeats, in_fp, progress=progress)

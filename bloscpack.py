@@ -924,6 +924,16 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     max_app_chunks : int
         the int value
 
+    Raises
+    ------
+    TypeError
+        if 'max_app_chunks' 
+    ValueError
+        if 'max_app_chunks' is a callable and returned either a non-int or a
+        negative int.
+
+    Notes
+    -----
     The 'max_app_chunks' parameter can either be a function of 'nchunks'
     (callable that takes a single int as argument and returns a single int) or
     an int.  The sum of the resulting value and 'nchunks' can not be larger
@@ -944,28 +954,33 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     if offsets and nchunks != -1:
         if hasattr(max_app_chunks, '__call__'):
             # it's a callable all right
+            print_debug("max_app_chunks is a callable")
             max_app_chunks = max_app_chunks(nchunks)
+            if not isinstance(max_app_chunks, (int, long)):
+                raise ValueError(
+                        "max_app_chunks callable returned a non integer "
+                        "of type '%s'" % type(max_app_chunks))
             # check that the result is still positive, might be quite large
             if max_app_chunks < 0:
                 raise ValueError(
                         'max_app_chunks callable returned a negative integer')
-        elif isinstance(max_app_chunks, int):
+        elif isinstance(max_app_chunks, (int, long)):
             # it's a plain int, check it's range
+            print_debug("max_app_chunks is an int")
             check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
         else:
-            raise ValueError('max_app_chunks was neither a callable or an int')
+            raise TypeError('max_app_chunks was neither a callable or an int')
         # we managed to get a reasonable value, make sure it's not too large
         if nchunks + max_app_chunks > MAX_CHUNKS:
             max_app_chunks = MAX_CHUNKS - nchunks
-            print_verbose(
-                    "'max_app_chunks' was too large, setting to max value: %d"
-                    % max_app_chunks,
-                    level=DEBUG)
+            print_debug(
+                    "max_app_chunks was too large, setting to max value: %d"
+                    % max_app_chunks)
     else:
         if max_app_chunks is not None:
-            print_verbose('max_app_chunks will be silently ignored',
-                    level=DEBUG)
+            print_debug('max_app_chunks will be silently ignored')
         max_app_chunks = 0
+    print_debug("max_app_chunks was set to: %d" % max_app_chunks)
     return max_app_chunks
 
 

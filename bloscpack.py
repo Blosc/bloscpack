@@ -128,8 +128,10 @@ class NoChangeInMetadata(RuntimeError):
 class MetadataSectionTooSmall(RuntimeError):
     pass
 
+
 class FileNotFound(IOError):
     pass
+
 
 class NonUniformTypesize(RuntimeError):
     pass
@@ -374,7 +376,7 @@ def decode_int64(eightbyte):
 
 
 def decode_bitfield(byte):
-    return bin(decode_uint8(byte))[2:].rjust(8,'0')
+    return bin(decode_uint8(byte))[2:].rjust(8, '0')
 
 
 def decode_magic_string(str_):
@@ -611,8 +613,6 @@ def create_parser():
                 default=False,
                 dest='no_check_extension',
                 help='disable checking original file for extension (*.blp)\n')
-
-
 
     return parser
 

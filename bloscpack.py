@@ -1836,6 +1836,31 @@ def _unpack_fp(input_fp, output_fp):
         plain_fp_sink.put(decompressed_chunk)
     return compressed_fp_source.metadata
 
+def _seek_to_metadata(target_fp):
+    """ Given a target file pointer, seek to the metadata section.
+
+    Parameters
+    ----------
+
+    target_fp : file like
+        the taregt file pointer
+
+    Returns
+    -------
+    metadata_position : int
+
+    Raises
+    ------
+    NoMetadataFound
+        if there is no metadata section in this file
+
+    """
+    bloscpack_header = _read_bloscpack_header(target_fp)
+    if not bloscpack_header['metadata']:
+        raise NoMetadataFound("unable to seek to metadata if it does not exist")
+    else:
+        return target_fp.tell()
+
 def _rewrite_metadata_fp(target_fp, new_metadata,
             magic_format=None, checksum=None,
             codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):

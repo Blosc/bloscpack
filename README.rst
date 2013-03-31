@@ -578,8 +578,6 @@ TODO
 * document library usage
 * subcommand e or estimate to estimate the size of the uncompressed data.
 * subcommand v or verify to verify the integrity of the data
-* subcommand i or info to print information of the file, e.g. decoded header
-  and offsets
 * partial decompression?
 * add --raw-input and --raw-output switches to allow stuff like:
   cat file | blpk --raw-input --raw-output compress > file.blp
@@ -609,6 +607,7 @@ Changelog
   * Introduce a metadata section with own header
   * Special keyword 'max' for use with chunk-size in the CLI
   * Support appending to a file
+  * Support rudimentary 'info' subcommand
   * Minor bugfixes and corrections as usual
 
 * v0.2.1     - Mon Nov 26 2012

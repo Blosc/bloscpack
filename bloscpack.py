@@ -961,7 +961,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
             print_verbose("'max_app_chunks' is an int")
             check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
         else:
-            raise ValueError('max_app_chunks was neither a callable or an int')
+            raise TypeError('max_app_chunks was neither a callable or an int')
         # we managed to get a reasonable value, make sure it's not too large
         if nchunks + max_app_chunks > MAX_CHUNKS:
             max_app_chunks = MAX_CHUNKS - nchunks

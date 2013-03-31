@@ -42,13 +42,17 @@ Installation
 ------------
 
 Add the ``blpk`` file to your ``$PATH`` somehow. For example by copying using
-dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``::
+dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``:
 
-    zsh» cp -L blpk ~/bin
+.. code-block:: console
 
-Or, of course, use the standard ``setup.py``::
+    $ cp -L blpk ~/bin
 
-    zsh» python setup.py install
+Or, of course, use the standard ``setup.py``:
+
+.. code-block:: console
+
+    $ python setup.py install
 
 ... which may require superuser privileges.
 
@@ -59,67 +63,83 @@ Bloscpack has a number of global options and two subcommands: ``[c |
 compress]`` and ``[d | decompress]`` which each have their own options.
 
 
-Help for global options and subcommands::
+Help for global options and subcommands:
 
-    zsh» ./blpk --help
+.. code-block:: console
+
+    $ ./blpk --help
     [...]
 
-Help for each one of the subcommands::
+Help for each one of the subcommands:
 
-    zsh» ./blpk compress --help
+.. code-block:: console
+
+    $ ./blpk compress --help
     [...]
-    zsh» ./blpk decompress --help
+    $ ./blpk decompress --help
     [...]
 
 Examples
 --------
 
-Basic compression::
+Basic compression:
 
-    zsh» ./blpk c data.dat
+.. code-block:: console
+
+    $ ./blpk c data.dat
 
 ... will compress the file ``data.dat`` to ``data.dat.blp``
 
-Basic decompression::
+Basic decompression:
 
-    zsh» ./blpk d data.dat.blp data.dcmp
+.. code-block:: console
+
+    $ ./blpk d data.dat.blp data.dcmp
 
 ... will decompress the file ``data.dat.blp`` to the file ``data.dcmp``. If you
 leave out the ``[<out_file>]`` argument, Bloscpack will complain that the file
-``data.dat`` exists already and refuse to overwrite it::
+``data.dat`` exists already and refuse to overwrite it:
 
-    zsh» ./blpk d data.dat.blp
+.. code-block:: console
+
+    $ ./blpk d data.dat.blp
     blpk: error: output file 'data.dat' exists!
 
 If you know what you are doing, you can use the global option ``[-f |
---force]`` to override the overwrite checks::
+--force]`` to override the overwrite checks:
 
-    zsh» ./blpk -f d data.dat.blp
+.. code-block:: console
 
-Incidentally this works for compression too::
+    $ ./blpk -f d data.dat.blp
 
-    zsh» ./blpk c data.dat
+Incidentally this works for compression too:
+
+.. code-block:: console
+
+    $ ./blpk c data.dat
     blpk: error: output file 'data.dat.blp' exists!
-    zsh» ./blpk -f c data.dat
+    $ ./blpk -f c data.dat
 
 By default, the number of threads that Blosc uses is determined by the number
 of cores detected on your system. You can change this using the ``[-n |
---nthreads]`` option::
+--nthreads]`` option:
 
-    zsh» ./blpk -n 1 c data.dat
+.. code-block:: console
+
+    $ ./blpk -n 1 c data.dat
 
 There are some useful additional options for compression, that are passed
 directly to Blosc:
 
 * ``[-t | --typesize]``
   Typesize used by Blosc (default: 8):
-  ``zsh» ./blpk c -t 8 data.dat``
+  ``$ ./blpk c -t 8 data.dat``
 * ``[-l | --level]``
   Compression level (default: 7):
-  ``zsh» ./blpk c -l 3 data.dat``
+  ``$ ./blpk c -l 3 data.dat``
 * ``[-s | --no-shuffle]``
   Deactivate shuffle:
-  ``zsh» ./blpk c -s data.dat``
+  ``$ ./blpk c -s data.dat``
 
 In addition, the desired size of the chunks may be specified.
 
@@ -127,7 +147,7 @@ In addition, the desired size of the chunks may be specified.
   Desired approximate size of the chunks, where you can use human readable
   strings like ``8M`` or ``128K`` or ``max`` to use the maximum chunk size of
   apprx. ``2GB`` (default: ``1MB``):
-  ``zsh» ./blpk -d c -z 128K data.dat``
+  ``$ ./blpk -d c -z 128K data.dat``
 
 There are two options that influence how the data is stored:
 
@@ -146,9 +166,11 @@ There are two options that influence how the data is stored:
 
 Lastly there are two options to control how much output is produced,
 
-The first causes basic info to be printed, ``[-v | --verbose]``::
+The first causes basic info to be printed, ``[-v | --verbose]``:
 
-    zsh» ./blpk --verbose compress --chunk-size 0.5G data.dat
+.. code-block:: console
+
+    $ ./blpk --verbose compress --chunk-size 0.5G data.dat
     blpk: getting ready for compression
     blpk: input file is: data.dat
     blpk: output file is: data.dat.blp
@@ -160,9 +182,11 @@ The first causes basic info to be printed, ``[-v | --verbose]``::
     blpk: compression ratio: 0.106100
     blpk: done
 
-... and ``[-d | --debug]`` prints a detailed account of what is going on::
+... and ``[-d | --debug]`` prints a detailed account of what is going on:
 
-    zsh» ./blpk --debug compress --chunk-size 0.5G data.dat
+.. code-block:: console
+
+    $ ./blpk --debug compress --chunk-size 0.5G data.dat
     blpk: command line argument parsing complete
     blpk: command line arguments are:
     blpk:   nchunks: None
@@ -208,21 +232,27 @@ The first causes basic info to be printed, ``[-v | --verbose]``::
 Testing
 -------
 
-Basic tests, runs quickly::
+Basic tests, runs quickly:
 
-    zsh» nosetests
+.. code-block:: console
+
+    $ nosetests
     [...]
 
 Extended tests using a larger file, may take some time, but will be nice to
-memory::
+memory:
 
-    zsh» nosetests test_bloscpack.py:pack_unpack_hard
+.. code-block:: console
+
+    $ nosetests test_bloscpack.py:pack_unpack_hard
     [...]
 
 Extended tests using a huge file. This one take forever and needs loads (5G-6G)
-of memory and loads of disk-space (10G). Use ``-s`` to print progress::
+of memory and loads of disk-space (10G). Use ``-s`` to print progress:
 
-    zsh» nosetests -s test_bloscpack.py:pack_unpack_extreme
+.. code-block:: console
+
+    $ nosetests -s test_bloscpack.py:pack_unpack_extreme
     [...]
 
 Note that, some compression/decompression tests create temporary files (on
@@ -240,9 +270,11 @@ Benchmark
 
 Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
 CPU 960  @ 3.20GHz`` CPU with 4 cores, 6GB of memory and active hyperthreading
-yields the following results::
+yields the following results:
 
-    zsh» PYTHONPATH=. ./bench/blpk_vs_gzip.py
+.. code-block:: console
+
+    $ PYTHONPATH=. ./bench/blpk_vs_gzip.py
     create the test data..........
     Input file size: 1.49G
     Will now run bloscpack...

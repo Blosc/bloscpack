@@ -547,7 +547,9 @@ header. The Blosc header (as of ``v1.0.0``) is 16 bytes as follows::
 The first four are simply bytes, the last three are are each unsigned ints
 (``uint32``) each occupying 4 bytes. The header is always little-endian.
 ``ctbytes`` is the length of the buffer including header and ``nbytes`` is the
-length of the data when uncompressed.
+length of the data when uncompressed. A more detailed description of the Blosc
+header can be found in the `README_HEADER.rst of the Blosc repository
+<https://github.com/FrancescAlted/blosc/blob/master/README_HEADER.rst>`_
 
 Overhead
 ~~~~~~~~

@@ -605,9 +605,9 @@ Changelog
     file name strings, allows using StringIO/cStringIO.
   * Sanitize calculation of nchunks and chunk-size a little
   * Introduce a metadata section with own header
-  * Special keyword 'max' for use with chunk-size in the CLI
+  * Special keyword ``max`` for use with chunk-size in the CLI
   * Support appending to a file
-  * Support rudimentary 'info' subcommand
+  * Support rudimentary ``info`` subcommand
   * Minor bugfixes and corrections as usual
 
 * v0.2.1     - Mon Nov 26 2012

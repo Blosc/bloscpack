@@ -1995,7 +1995,7 @@ def _recreate_metadata(old_metadata_header, new_metadata,
 
 
 def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
-    """ Append a file to a file.
+    """ Append from a file pointer to a file pointer.
 
     Parameters
     ----------

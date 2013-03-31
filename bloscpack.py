@@ -924,6 +924,8 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     max_app_chunks : int
         the int value
 
+    Notes
+    -----
     The 'max_app_chunks' parameter can either be a function of 'nchunks'
     (callable that takes a single int as argument and returns a single int) or
     an int.  The sum of the resulting value and 'nchunks' can not be larger

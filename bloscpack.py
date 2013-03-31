@@ -12,6 +12,7 @@ import hashlib
 import json
 import itertools
 import os.path as path
+import pprint
 import struct
 import sys
 import zlib
@@ -614,14 +615,20 @@ def create_parser():
                 dest='no_check_extension',
                 help='disable checking original file for extension (*.blp)\n')
 
-    append_parser = subparsers.add_parser('info',
+    info_parser = subparsers.add_parser('info',
             formatter_class=BloscPackCustomFormatter,
             help='print information about a compressed file')
 
-    a_parser = subparsers.add_parser('i',
+    i_parser = subparsers.add_parser('i',
             formatter_class=BloscPackCustomFormatter,
             help="alias for 'info'")
 
+    for p in (info_parser, i_parser):
+        p.add_argument('file_',
+                metavar='<file>',
+                type=str,
+                default=None,
+                help=help_out)
     return parser
 
 
@@ -2188,6 +2195,22 @@ if __name__ == '__main__':
         print_verbose("new file is: '%s'" % new_file)
         blosc_args = _blosc_args_from_args(args)
         append(original_file, new_file, blosc_args=blosc_args)
+    elif args.subcommand in ('info', 'i'):
+        try:
+            if not path.exists(args.file_):
+                raise FileNotFound("file '%s' does not exist!" %
+                        original_file)
+        except FileNotFound as fnf:
+            error(str(fnf))
+        with open(args.file_) as fp:
+            bloscpack_header, metadata, metadata_header, offsets = \
+                    _read_beginning(fp)
+        print("'bloscpack_haeder':")
+        pprint.pprint(bloscpack_header, indent=4)
+        if metadata is not None:
+            print(metadata)
+            print(metadata_header)
+
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

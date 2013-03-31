@@ -326,6 +326,11 @@ def print_debug(message):
     print_verbose(message, level=DEBUG)
 
 
+def print_normal(message):
+    """ Print message with verbosity level ``NORMAL``. """
+    print_verbose(message, level=NORMAL)
+
+
 def error(message, exit_code=1):
     """ Print message and exit with desired code. """
     for line in [l for l in message.split('\n') if l != '']:

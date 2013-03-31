@@ -2214,8 +2214,10 @@ if __name__ == '__main__':
         print_normal("'bloscpack_header':")
         print_normal(pprint.pformat(bloscpack_header, indent=4))
         if metadata is not None:
-            print_normal(metadata)
-            print_normal(metadata_header)
+            print_normal("'metadata':")
+            print_normal(pprint.pformat(metadata, indent=4))
+            print_normal("'metadata_header':")
+            print_normal(pprint.pformat(metadata_header, indent=4))
 
     else:
         # we should never reach this

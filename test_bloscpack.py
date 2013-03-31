@@ -1111,6 +1111,28 @@ def test_double_append():
     nt.assert_equal(dcmp_str, new_str * 3)
 
 
+def test_append_metadata():
+    orig, new, dcmp = StringIO(), StringIO(), StringIO()
+    create_array_fp(1, new)
+    new_size = new.tell()
+    new.reset()
+
+    metadata = {"dtype": "float64", "shape": [1024], "others": []}
+    chunking = calculate_nchunks(new_size, chunk_size=new_size)
+    bloscpack._pack_fp(new, orig, *chunking, metadata=metadata)
+    orig.reset()
+    new.reset()
+    reset_append_fp(orig, new, new_size)
+
+    ans = bloscpack._unpack_fp(orig, dcmp)
+    print(ans)
+    dcmp.reset()
+    new.reset()
+    new_str = new.read()
+    dcmp_str = dcmp.read()
+    nt.assert_equal(len(dcmp_str), len(new_str) * 2)
+    nt.assert_equal(dcmp_str, new_str * 2)
+
 def test_append_fp_no_offsets():
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
     bloscpack_args['offsets'] = False

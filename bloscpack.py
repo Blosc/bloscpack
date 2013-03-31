@@ -12,6 +12,7 @@ import hashlib
 import json
 import itertools
 import os.path as path
+import pprint
 import struct
 import sys
 import zlib
@@ -316,12 +317,18 @@ def print_verbose(message, level=VERBOSE):
         raise TypeError("Desired level '%s' is not one of %s" % (level,
             str(VERBOSITY_LEVELS)))
     if VERBOSITY_LEVELS.index(level) <= VERBOSITY_LEVELS.index(LEVEL):
-        print('%s: %s' % (PREFIX, message))
+        for line in [l for l in message.split('\n') if l != '']:
+            print('%s: %s' % (PREFIX, line))
 
 
 def print_debug(message):
     """ Print message with verbosity level ``DEBUG``. """
     print_verbose(message, level=DEBUG)
+
+
+def print_normal(message):
+    """ Print message with verbosity level ``NORMAL``. """
+    print_verbose(message, level=NORMAL)
 
 
 def error(message, exit_code=1):
@@ -614,6 +621,20 @@ def create_parser():
                 dest='no_check_extension',
                 help='disable checking original file for extension (*.blp)\n')
 
+    info_parser = subparsers.add_parser('info',
+            formatter_class=BloscPackCustomFormatter,
+            help='print information about a compressed file')
+
+    i_parser = subparsers.add_parser('i',
+            formatter_class=BloscPackCustomFormatter,
+            help="alias for 'info'")
+
+    for p in (info_parser, i_parser):
+        p.add_argument('file_',
+                metavar='<file>',
+                type=str,
+                default=None,
+                help=help_out)
     return parser
 
 
@@ -2180,6 +2201,22 @@ if __name__ == '__main__':
         print_verbose("new file is: '%s'" % new_file)
         blosc_args = _blosc_args_from_args(args)
         append(original_file, new_file, blosc_args=blosc_args)
+    elif args.subcommand in ('info', 'i'):
+        try:
+            if not path.exists(args.file_):
+                raise FileNotFound("file '%s' does not exist!" %
+                        original_file)
+        except FileNotFound as fnf:
+            error(str(fnf))
+        with open(args.file_) as fp:
+            bloscpack_header, metadata, metadata_header, offsets = \
+                    _read_beginning(fp)
+        print_normal("'bloscpack_header':")
+        print_normal(pprint.pformat(bloscpack_header, indent=4))
+        if metadata is not None:
+            print_normal(metadata)
+            print_normal(metadata_header)
+
     else:
         # we should never reach this
         error('You found the easter-egg, please contact the author')

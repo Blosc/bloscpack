@@ -734,6 +734,34 @@ def test_metadata():
     received_metadata = pack_unpack_fp(1, metadata=test_metadata)
     nt.assert_equal(test_metadata, received_metadata)
 
+def test_recreate_metadata():
+    old_meta_header = create_metadata_header(magic_format='',
+        options="00000000",
+        meta_checksum='None',
+        meta_codec='None',
+        meta_level=0,
+        meta_size=0,
+        max_meta_size=0,
+        meta_comp_size=0,
+        user_codec='',
+        )
+    header_dict = decode_metadata_header(old_meta_header)
+    nt.assert_raises(NoSuchSerializer,
+            bloscpack._recreate_metadata,
+            header_dict,
+            '',
+            magic_format='NOSUCHSERIALIZER')
+    nt.assert_raises(NoSuchCodec,
+            bloscpack._recreate_metadata,
+            header_dict,
+            '',
+            codec='NOSUCHCODEC')
+    nt.assert_raises(ChecksumLengthMismatch,
+            bloscpack._recreate_metadata,
+            header_dict,
+            '',
+            checksum='adler32')
+
 def test_rewrite_metadata():
     test_metadata = {'dtype': 'float64',
                      'shape': [1024],

@@ -2220,9 +2220,13 @@ if __name__ == '__main__':
                         args.file_)
         except FileNotFound as fnf:
             error(str(fnf))
-        with open(args.file_) as fp:
-            bloscpack_header, metadata, metadata_header, offsets = \
-                    _read_beginning(fp)
+        try:
+            with open(args.file_) as fp:
+                bloscpack_header, metadata, metadata_header, offsets = \
+                        _read_beginning(fp)
+        except ValueError as ve:
+            error(str(ve) + "\n" +
+            "This might not be a bloscpack compressed file.")
         print_normal("'bloscpack_header':")
         print_normal(pprint.pformat(bloscpack_header, indent=4))
         if metadata is not None:

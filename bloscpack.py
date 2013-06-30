@@ -640,7 +640,7 @@ def create_parser():
                 metavar='<file>',
                 type=str,
                 default=None,
-                help=help_out)
+                help="file to show info for")
     return parser
 
 

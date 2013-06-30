@@ -639,7 +639,7 @@ Changelog
   * Sanitize calculation of nchunks and chunk-size a little
   * Introduce a metadata section with own header
   * Special keyword ``max`` for use with chunk-size in the CLI
-  * Support appending to a file
+  * Support appending to a file and ``append`` subcommand
   * Support rudimentary ``info`` subcommand
   * Minor bugfixes and corrections as usual
 

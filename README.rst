@@ -59,9 +59,9 @@ Or, of course, use the standard ``setup.py``:
 Usage
 -----
 
-Bloscpack has a number of global options and two subcommands: ``[c |
-compress]`` and ``[d | decompress]`` which each have their own options.
-
+Bloscpack has a number of global options and four subcommands: ``[c |
+compress]``, ``[d | decompress]``, ``[a | append]`` and ``[i | info]`` most of
+which each have their own options.
 
 Help for global options and subcommands:
 

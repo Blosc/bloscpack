@@ -34,9 +34,9 @@ Stability of File Format
 
 The tool is considered alpha-stage, experimental, research software. It is not
 unlikely that **the internal storage format for the compressed files will
-change in future**. Please **do not depend critically on the files generated**
-by Bloscpack. See the warranty disclaimer in the licence at the end of this
-file.
+change in future**. Please **do not depend critically on the files generated
+(unless you know what you are doing)** by Bloscpack. See the warranty disclaimer
+in the licence at the end of this file.
 
 Installation
 ------------

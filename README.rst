@@ -578,6 +578,14 @@ TODO
 * quiet verbosity level
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage
+* The info subcommand should use human readable sizes when printing the header
+* Refactor certain collections of functions that operate on data into objects
+
+  * BloscpackHeader
+  * BloscHeader
+  * MetadataHeader
+  * Offsets (maybe)
+
 * subcommand e or estimate to estimate the size of the uncompressed data.
 * subcommand v or verify to verify the integrity of the data
 * partial decompression?

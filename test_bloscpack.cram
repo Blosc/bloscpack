@@ -1,0 +1,227 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+Cram (http://pypi.python.org/pypi/cram) tests for bloscpack
+
+In case of no arguments, show a usage message:
+
+  $ blpk
+  usage: blpk [-h] [--version] [-v | -d] [-f] [-n [1, 256]]  ...
+  blpk: error: too few arguments
+  [2]
+
+Help for global options and subcommands:
+
+  $ blpk --help
+  usage: blpk [-h] [--version] [-v | -d] [-f] [-n [1, 256]]  ...
+  
+  command line de/compression with blosc
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    --version             show program's version number and exit
+    -v, --verbose         be verbose about actions
+    -d, --debug           print debugging output too
+  
+  global options:
+    -f, --force           disable overwrite checks for existing files
+                          (use with caution)
+    -n [1, 256], --nthreads [1, 256]
+                          set number of threads, (default: 2 (ncores))
+  
+  subcommands:
+    
+      compress            perform compression on file
+      c                   alias for 'compress'
+      decompress          perform decompression on file
+      d                   alias for 'decompress'
+      append              append data to a compressed file
+      a                   alias for 'append'
+      info                print information about a compressed file
+      i                   alias for 'info'
+
+Help for the subcommands:
+
+  $ blpk compress --help
+  usage: blpk compress [-h] [-t <size>] [-l [0, 9]] [-s] [-z <size>]
+                       [-k <checksum>] [-o] [-m <metadata>]
+                       <in_file> [<out_file>]
+  
+  positional arguments:
+    <in_file>             file to be compressed
+    <out_file>            file to compress to
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    -z <size>, --chunk-size <size>
+                          set desired chunk size or 'max' (default: 1M)
+  
+  blosc settings:
+    -t <size>, --typesize <size>
+                          typesize for blosc (default: 8)
+    -l [0, 9], --clevel [0, 9]
+                          compression level (default: 7)
+    -s, --no-shuffle      deactivate shuffle
+  
+  bloscpack settings:
+    -k <checksum>, --checksum <checksum>
+                          set desired checksum:
+                          None, adler32, crc32
+                          md5, sha1, sha224
+                          sha256, sha384, sha512
+                           (default: adler32)
+    -o, --no-offsets      deactivate offsets
+    -m <metadata>, --metadata <metadata>
+                          file containing the metadata, must contain valid JSON
+  $ blpk decompress --help
+  usage: blpk decompress [-h] [-e] <in_file> [<out_file>]
+  
+  positional arguments:
+    <in_file>             file to be decompressed
+    <out_file>            file to decompress to
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    -e, --no-check-extension
+                          disable checking input file for extension (*.blp)
+                          (requires use of <out_file>)
+  $ blpk append --help
+  usage: blpk append [-h] [-t <size>] [-l [0, 9]] [-s] [-e] [-m <metadata>]
+                     <original_file> <new_file>
+  
+  positional arguments:
+    <original_file>       file to append to
+    <new_file>            file to append from
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    -e, --no-check-extension
+                          disable checking original file for extension (*.blp)
+    -m <metadata>, --metadata <metadata>
+                          file containing the metadata, must contain valid JSON
+  
+  blosc settings:
+    -t <size>, --typesize <size>
+                          typesize for blosc (default: 8)
+    -l [0, 9], --clevel [0, 9]
+                          compression level (default: 7)
+    -s, --no-shuffle      deactivate shuffle
+  $ blpk info --help
+  usage: blpk info [-h] <file>
+  
+  positional arguments:
+    <file>      file to show info for
+  
+  optional arguments:
+    -h, --help  show this help message and exit
+
+Create a test datafile.
+
+  $ python -c "import numpy; a = numpy.linspace(0, 100, 2e7); f = open('data.dat', 'w');  f.write(a.tostring()) "
+  $ ls data.dat
+  data.dat
+
+Basic compression:
+
+  $ blpk compress data.dat
+  $ ls data.dat.blp
+  data.dat.blp
+  $ rm data.dat.blp
+  $ blpk c data.dat
+  $ ls data.dat.blp
+  data.dat.blp
+  $ rm data.dat.blp
+
+Compression to a file:
+
+  $ blpk compress data.dat packed.blp
+  $ ls packed.blp
+  packed.blp
+  $ rm packed.blp
+
+Basic decompression:
+
+  $ blpk compress data.dat
+  $ rm data.dat
+  $ blpk decompress data.dat.blp
+  $ ls data.dat
+  data.dat
+  $ rm data.dat.blp
+  $ blpk compress data.dat
+  $ rm data.dat
+  $ blpk d data.dat.blp
+  $ rm data.dat.blp
+  $ ls data.dat
+  data.dat
+
+Decompression to a file:
+
+  $ blpk compress data.dat
+  $ blpk decompress data.dat.blp data.dat.dcmp
+  $ ls data.dat.dcmp
+  data.dat.dcmp
+  $ rm data.dat.dcmp
+
+Use the force, Luke:
+
+  $ blpk compress data.dat
+  blpk: error: output file 'data.dat.blp' exists!
+  [1]
+  $ blpk --force compress data.dat
+  $ blpk d data.dat.blp
+  blpk: error: output file 'data.dat' exists!
+  [1]
+  $ blpk --force decompress data.dat.blp
+
+Get some info on the file:
+
+  $ blpk info data.dat.blp
+  blpk: 'bloscpack_header':
+  blpk: {   'checksum': 'adler32',
+  blpk:     'chunk_size': 1048576,
+  blpk:     'format_version': 3,
+  blpk:     'last_chunk': 616448,
+  blpk:     'max_app_chunks': 1530,
+  blpk:     'metadata': False,
+  blpk:     'nchunks': 153,
+  blpk:     'offsets': True,
+  blpk:     'typesize': 8}
+  blpk: 'offsets':
+  blpk: [13496,168668,310991,471593,628230,...]
+  $ blpk i data.dat.blp
+  blpk: 'bloscpack_header':
+  blpk: {   'checksum': 'adler32',
+  blpk:     'chunk_size': 1048576,
+  blpk:     'format_version': 3,
+  blpk:     'last_chunk': 616448,
+  blpk:     'max_app_chunks': 1530,
+  blpk:     'metadata': False,
+  blpk:     'nchunks': 153,
+  blpk:     'offsets': True,
+  blpk:     'typesize': 8}
+  blpk: 'offsets':
+  blpk: [13496,168668,310991,471593,628230,...]
+  $ rm data.dat.blp
+  $ blpk info data.dat.blp
+  blpk: error: file 'data.dat.blp' does not exist!
+  [1]
+  $ blpk i data.dat
+  blpk: error: the magic marker 'blpk' is missing from the bloscpack header, instead we found: '\x00\x00\x00\x00' (esc)
+  blpk: error: This might not be a bloscpack compressed file.
+  [1]
+
+Get more information using --verbose:
+
+  $ blpk --verbose compress data.dat
+  blpk: using 2 threads
+  blpk: getting ready for compression
+  blpk: input file is: 'data.dat'
+  blpk: output file is: 'data.dat.blp'
+  blpk: input file size: 152.59M (160000000B)
+  blpk: nchunks: 153
+  blpk: chunk_size: 1.0M (1048576B)
+  blpk: output file size: 16.2M (16984384B)
+  blpk: compression ratio: 0.106152
+  blpk: done
+  $ rm data.dat.blp
+

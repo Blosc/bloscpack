@@ -152,6 +152,7 @@ In addition, the desired size of the chunks may be specified.
   strings like ``8M`` or ``128K`` or ``max`` to use the maximum chunk size of
   apprx. ``2GB`` (default: ``1MB``):
   ``$ ./blpk -d c -z 128K data.dat``
+  ``$ ./blpk -d c -z max data.dat``
 
 There are two options that influence how the data is stored:
 

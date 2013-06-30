@@ -27,7 +27,7 @@ Dependencies
 
 * Python 2.6 (requires ``ordereddict`` and ``argparse``) or Python 2.7
 * `python-blosc  <https://github.com/FrancescAlted/python-blosc>`_  `(at least v1.0.5) <https://github.com/FrancescAlted/python-blosc/tree/v1.0.5>`_ (provides Blosc)
-* ``numpy`` and ``nose`` for testing
+* The Python packages ``numpy``, ``nose`` and ``cram`` for testing
 
 Stability of File Format
 ------------------------
@@ -288,6 +288,12 @@ Under rare circumstances, for example when aborting the deletion which is
 triggered on abort you may be left with large files polluting your temporary
 space.  Depending on your partitioning scheme etc.. doing this repeatedly, may
 lead to you running out of space on the file-system.
+
+The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
+
+.. code-block:: console
+
+   $ ./test_bloscpack.cram
 
 Benchmark
 ---------

@@ -605,6 +605,7 @@ Coding Conventions
 TODO
 ----
 
+* list prior art
 * quiet verbosity level
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage

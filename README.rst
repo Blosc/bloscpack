@@ -168,6 +168,25 @@ There are two options that influence how the data is stored:
   to allow for partial decompression in the future. This option disables that
   feature.
 
+If you just need some info on how the file was compressed ``[i | info]``:
+
+.. code-block:: console
+
+   $ ./blpk info testfile.blp
+   blpk: 'bloscpack_header':
+   blpk: {   'checksum': 'adler32',
+   blpk:     'chunk_size': 1048576,
+   blpk:     'format_version': 3,
+   blpk:     'last_chunk': 921600,
+   blpk:     'max_app_chunks': 15260,
+   blpk:     'metadata': False,
+   blpk:     'nchunks': 1526,
+   blpk:     'offsets': True,
+   blpk:     'typesize': 8}
+   blpk: 'offsets':
+   blpk: [134320,289492,431815,592417,749054,...]
+
+
 Lastly there are two options to control how much output is produced,
 
 The first causes basic info to be printed, ``[-v | --verbose]``:

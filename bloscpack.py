@@ -2217,7 +2217,7 @@ if __name__ == '__main__':
         try:
             if not path.exists(args.file_):
                 raise FileNotFound("file '%s' does not exist!" %
-                        original_file)
+                        args.file_)
         except FileNotFound as fnf:
             error(str(fnf))
         with open(args.file_) as fp:

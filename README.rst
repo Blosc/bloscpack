@@ -78,6 +78,10 @@ Help for each one of the subcommands:
     [...]
     $ ./blpk decompress --help
     [...]
+    $ ./blpk info --help
+    [...]
+    $ ./blpk append --help
+    [...]
 
 Examples
 --------

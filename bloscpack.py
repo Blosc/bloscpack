@@ -970,7 +970,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     The function performs some silent optimisations. First, if there are no
     offsets or 'nchunks' is unknown any value for 'max_app_chunks' will be
     silently ignored. Secondly, if the resulting value of max_app_chunks would
-    be too large (i.e. the sum of 'nchunks' and 'max_app_chunks' is larger than
+    be too large, i.e. the sum of 'nchunks' and 'max_app_chunks' is larger than
     'MAX_CHUNKS', then 'max_app_chunks' is automatically set to the maximum
     permissible value.
 

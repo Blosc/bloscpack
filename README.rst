@@ -167,7 +167,8 @@ There are two options that influence how the data is stored:
 * ``[-o | --no-offsets]``
   By default, offsets to the individual chunks are stored. These are included
   to allow for partial decompression in the future. This option disables that
-  feature.
+  feature. Also, a certain number of offsets (default: 10 * 'nchunks') are
+  preallocated to allow for appending data to the file.
 
 If you just need some info on how the file was compressed ``[i | info]``:
 

@@ -624,6 +624,7 @@ TODO
 * quiet verbosity level
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage
+* Expose the ability to set 'max_app_chunks' from the command line
 * The info subcommand should use human readable sizes when printing the header
 * Refactor certain collections of functions that operate on data into objects
 

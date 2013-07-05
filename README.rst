@@ -188,6 +188,20 @@ If you just need some info on how the file was compressed ``[i | info]``:
    blpk: 'offsets':
    blpk: [134320,289492,431815,592417,749054,...]
 
+You can also append data to an existing bloscpack compressed file:
+
+.. code-block:: console
+
+   $ ./blpk append data.dat.blp data.dat
+
+However there are certain limitations on the amount of data can be appended.
+For example, there is an offsets section, there must be enough room to store
+the offsets for the appended chunks. If no offsets exists, you may append as
+much data as possible given the limitations goverend by the maximum number of
+chunks and the chunk-size. Additionally, there are limitations on the
+compression options. For example, one cannot change the checksum used. It is
+however possible to change the compression level, the typesize and the shuffle
+option for the appended chunks.
 
 Lastly there are two options to control how much output is produced,
 

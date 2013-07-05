@@ -664,6 +664,7 @@ Changelog
   * Introduce a metadata section with own header
   * Special keyword ``max`` for use with chunk-size in the CLI
   * Support appending to a file and ``append`` subcommand
+    (including the ability to preallocate offsets)
   * Support rudimentary ``info`` subcommand
   * Minor bugfixes and corrections as usual
 

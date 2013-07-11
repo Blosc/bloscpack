@@ -654,8 +654,10 @@ def create_array_fp(repeats, in_fp, progress=False):
         in_fp.write(array_.tostring())
         if progress:
             progress(i)
+    in_fp.flush()
     if progress:
         print('done')
+
 
 def atexit_tmpremover(dirname):
     try:

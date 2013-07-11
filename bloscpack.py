@@ -1129,7 +1129,7 @@ def decode_bloscpack_header(buffer_):
     elif buffer_[0:4] != MAGIC:
         raise ValueError(
             "the magic marker '%s' is missing from the bloscpack " % MAGIC +
-            "header, instead we found: '%s'" % buffer_[0:4])
+            "header, instead we found: %s" % repr(buffer_[0:4]))
 
     options = decode_options(decode_bitfield(buffer_[5]))
     return {'format_version': decode_uint8(buffer_[4]),

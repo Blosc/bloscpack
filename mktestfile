@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+import json
 import test_bloscpack as tb
 
 print('create the test data', end='')
@@ -10,3 +11,10 @@ def progress(i):
     sys.stdout.flush()
 tb.create_array(100, 'testfile', progress=progress)
 print('')
+print('create the test metadata')
+test_metadata = {'dtype': 'float64',
+                 'shape': [1024],
+                 'others': [],
+                }
+with open('testmetadata.json', 'w') as f:
+    json.dump(test_metadata, f)

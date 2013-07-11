@@ -653,6 +653,7 @@ Coding Conventions
 ------------------
 
 * Numpy rst style docstrings
+* README cli examples should use long options
 * testing: expected before received ``nt.assert_equal(expected, received)``
 * Debug messages: as close to where the data was generated
 * Single quotes around ambiguities in messages ``overwriting existing file: 'testfile'``

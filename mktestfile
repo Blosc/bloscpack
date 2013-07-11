@@ -9,12 +9,12 @@ def progress(i):
     if i % 10 == 0:
         print('.', end='')
     sys.stdout.flush()
-tb.create_array(100, 'testfile', progress=progress)
+tb.create_array(100, 'data.dat', progress=progress)
 print('')
 print('create the test metadata')
 test_metadata = {'dtype': 'float64',
                  'shape': (200000000,),
                  'container': 'numpy',
                 }
-with open('testmetadata.json', 'w') as f:
+with open('meta.json', 'w') as f:
     json.dump(test_metadata, f)

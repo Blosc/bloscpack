@@ -238,7 +238,7 @@ You can also append data to an existing bloscpack compressed file:
 However there are certain limitations on the amount of data can be appended.
 For example, if there is an offsets section, there must be enough room to store
 the offsets for the appended chunks. If no offsets exists, you may append as
-much data as possible given the limitations goverend by the maximum number of
+much data as possible given the limitations governed by the maximum number of
 chunks and the chunk-size. Additionally, there are limitations on the
 compression options. For example, one cannot change the checksum used. It is
 however possible to change the compression level, the typesize and the shuffle

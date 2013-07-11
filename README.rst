@@ -236,7 +236,7 @@ You can also append data to an existing bloscpack compressed file:
    $ ./blpk append data.dat.blp data.dat
 
 However there are certain limitations on the amount of data can be appended.
-For example, there is an offsets section, there must be enough room to store
+For example, if there is an offsets section, there must be enough room to store
 the offsets for the appended chunks. If no offsets exists, you may append as
 much data as possible given the limitations goverend by the maximum number of
 chunks and the chunk-size. Additionally, there are limitations on the

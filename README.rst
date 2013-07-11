@@ -188,6 +188,47 @@ If you just need some info on how the file was compressed ``[i | info]``:
    blpk: 'offsets':
    blpk: [134320,289492,431815,592417,749054,...]
 
+Using the ``[-m | --metadata]`` option you can include JSON from a file:
+
+.. code-block:: console
+
+   $ cat testmetadata.json
+   {"dtype": "float64", "shape": [200000000], "container": "numpy"}
+   $ ./blpk compress --metadata testmetadata.json testfile
+   $ ./blpk info testfile.blp
+   blpk: 'bloscpack_header':
+   blpk: {   'checksum': 'adler32',
+   blpk:     'chunk_size': 1048576,
+   blpk:     'format_version': 3,
+   blpk:     'last_chunk': 921600,
+   blpk:     'max_app_chunks': 15260,
+   blpk:     'metadata': True,
+   blpk:     'nchunks': 1526,
+   blpk:     'offsets': True,
+   blpk:     'typesize': 8}
+   blpk: 'metadata':
+   blpk: {   u'container': u'numpy', u'dtype': u'float64', u'shape': [200000000]}
+   blpk: 'metadata_header':
+   blpk: {   'magic_format': 'JSON',
+   blpk:     'max_meta_size': 590,
+   blpk:     'meta_checksum': 'adler32',
+   blpk:     'meta_codec': 'zlib',
+   blpk:     'meta_comp_size': 58,
+   blpk:     'meta_level': 6,
+   blpk:     'meta_options': '00000000',
+   blpk:     'meta_size': 59,
+   blpk:     'user_codec': ''}
+   blpk: 'offsets':
+   blpk: [134946,354628,552808,710223,871120,...]
+
+It will be printed when decompressing:
+
+.. code-block:: console
+
+    $ ./blpk -f d testfile.blp
+    blpk: Metadata is:
+    blpk: '{u'dtype': u'float64', u'shape': [200000000], u'container': u'numpy'}'
+
 You can also append data to an existing bloscpack compressed file:
 
 .. code-block:: console

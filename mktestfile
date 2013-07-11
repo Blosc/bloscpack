@@ -13,8 +13,8 @@ tb.create_array(100, 'testfile', progress=progress)
 print('')
 print('create the test metadata')
 test_metadata = {'dtype': 'float64',
-                 'shape': [1024],
-                 'others': [],
+                 'shape': (200000000,),
+                 'container': 'numpy',
                 }
 with open('testmetadata.json', 'w') as f:
     json.dump(test_metadata, f)

@@ -228,3 +228,35 @@ Get more information using --verbose:
   blpk: done
   $ rm data.dat.blp
 
+Add metadata to the file:
+
+  $ blpk compress --metadata meta.json data.dat
+  $ blpk info data.dat.blp
+  blpk: 'bloscpack_header':
+  blpk: {   'checksum': 'adler32',
+  blpk:     'chunk_size': 1048576,
+  blpk:     'format_version': 3,
+  blpk:     'last_chunk': 616448,
+  blpk:     'max_app_chunks': 1530,
+  blpk:     'metadata': True,
+  blpk:     'nchunks': 153,
+  blpk:     'offsets': True,
+  blpk:     'typesize': 8}
+  blpk: 'metadata':
+  blpk: {   u'container': u'numpy', u'dtype': u'float64', u'shape': [200000000]}
+  blpk: 'metadata_header':
+  blpk: {   'magic_format': 'JSON',
+  blpk:     'max_meta_size': 590,
+  blpk:     'meta_checksum': 'adler32',
+  blpk:     'meta_codec': 'zlib',
+  blpk:     'meta_comp_size': 58,
+  blpk:     'meta_level': 6,
+  blpk:     'meta_options': '00000000',
+  blpk:     'meta_size': 59,
+  blpk:     'user_codec': ''}
+  blpk: 'offsets':
+  blpk: [14122,169294,311617,472219,628856,...]
+  $ blpk decompress data.dat.blp data.dat.dcmp
+  blpk: Metadata is:
+  blpk: '{u'dtype': u'float64', u'shape': [200000000], u'container': u'numpy'}'
+

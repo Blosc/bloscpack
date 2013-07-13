@@ -120,7 +120,7 @@ Create a test datafile.
   $ python -c "import numpy; a = numpy.linspace(0, 100, 2e7); f = open('data.dat', 'w');  f.write(a.tostring()) "
   $ ls data.dat
   data.dat
-  $ echo '{"dtype": "float64", "shape": [200000000], "container": "numpy"}' > meta.json
+  $ echo '{"dtype": "float64", "shape": [20000000], "container": "numpy"}' > meta.json
   $ ls meta.json
   meta.json
 
@@ -243,20 +243,20 @@ Add metadata to the file:
   blpk:     'offsets': True,
   blpk:     'typesize': 8}
   blpk: 'metadata':
-  blpk: {   u'container': u'numpy', u'dtype': u'float64', u'shape': [200000000]}
+  blpk: {   u'container': u'numpy', u'dtype': u'float64', u'shape': [20000000]}
   blpk: 'metadata_header':
   blpk: {   'magic_format': 'JSON',
-  blpk:     'max_meta_size': 590,
+  blpk:     'max_meta_size': 580,
   blpk:     'meta_checksum': 'adler32',
   blpk:     'meta_codec': 'zlib',
   blpk:     'meta_comp_size': 58,
   blpk:     'meta_level': 6,
   blpk:     'meta_options': '00000000',
-  blpk:     'meta_size': 59,
+  blpk:     'meta_size': 58,
   blpk:     'user_codec': ''}
   blpk: 'offsets':
-  blpk: [14122,169294,311617,472219,628856,...]
+  blpk: [14112,169284,311607,472209,628846,...]
   $ blpk decompress data.dat.blp data.dat.dcmp
   blpk: Metadata is:
-  blpk: '{u'dtype': u'float64', u'shape': [200000000], u'container': u'numpy'}'
+  blpk: '{u'dtype': u'float64', u'shape': [20000000], u'container': u'numpy'}'
 

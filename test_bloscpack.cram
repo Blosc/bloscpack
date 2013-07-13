@@ -260,3 +260,11 @@ Add metadata to the file:
   blpk: Metadata is:
   blpk: '{u'dtype': u'float64', u'shape': [20000000], u'container': u'numpy'}'
 
+Test basic append:
+
+
+  $ ls -lah  data.dat.blp
+  -rw------- 1 esc esc 17M Jul 13 19:03 data.dat.blp
+  $ blpk append data.dat.blp data.dat
+  $ ls -lah  data.dat.blp
+  -rw------- 1 esc esc 33M Jul 13 19:03 data.dat.blp

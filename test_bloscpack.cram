@@ -206,7 +206,7 @@ Get some info on the file:
   blpk: error: file 'data.dat.blp' does not exist!
   [1]
   $ blpk i data.dat
-  blpk: error: the magic marker 'blpk' is missing from the bloscpack header, instead we found: '\x00\x00\x00\x00' (esc)
+  blpk: error: the magic marker 'blpk' is missing from the bloscpack header, instead we found: '\x00\x00\x00\x00'
   blpk: error: This might not be a bloscpack compressed file.
   [1]
 

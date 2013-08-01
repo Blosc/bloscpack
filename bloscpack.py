@@ -39,7 +39,7 @@ METADATA_HEADER_LENGTH = 32
 # maximum values
 MAX_FORMAT_VERSION = 255
 MAX_CHUNKS = (2**63)-1
-MAX_META_SIZE = (2**32-1) # uint32 max val
+MAX_META_SIZE = (2**32-1)  # uint32 max val
 
 # Bloscpack args
 BLOSCPACK_ARGS = ('offsets', 'checksum', 'max_app_chunks')
@@ -54,7 +54,7 @@ DEFAULT_CHUNK_SIZE = '1M'
 
 # Blosc args
 BLOSC_ARGS = ('typesize', 'clevel', 'shuffle')
-_BLOSC_ARGS_SET = set(BLOSC_ARGS) # cached
+_BLOSC_ARGS_SET = set(BLOSC_ARGS)  # cached
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
 MAX_CLEVEL = 9
@@ -72,7 +72,7 @@ DEFAULT_META_LEVEL = 6
 DEFAULT_MAX_META_SIZE = lambda x: 10 * x
 DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
     (DEFAULT_MAGIC_FORMAT, DEFAULT_META_CHECKSUM,
-    DEFAULT_META_CODEC, DEFAULT_META_LEVEL, DEFAULT_MAX_META_SIZE)))
+     DEFAULT_META_CODEC, DEFAULT_META_LEVEL, DEFAULT_MAX_META_SIZE)))
 
 # verbosity levels
 NORMAL  = 'NORMAL'
@@ -184,15 +184,15 @@ def hashlib_hash(func):
 
 
 CHECKSUMS = [Hash('None', 0, lambda data: ''),
-     Hash('adler32', *zlib_hash(zlib.adler32)),
-     Hash('crc32', *zlib_hash(zlib.crc32)),
-     Hash('md5', *hashlib_hash(hashlib.md5)),
-     Hash('sha1', *hashlib_hash(hashlib.sha1)),
-     Hash('sha224', *hashlib_hash(hashlib.sha224)),
-     Hash('sha256', *hashlib_hash(hashlib.sha256)),
-     Hash('sha384', *hashlib_hash(hashlib.sha384)),
-     Hash('sha512', *hashlib_hash(hashlib.sha512)),
-    ]
+             Hash('adler32', *zlib_hash(zlib.adler32)),
+             Hash('crc32', *zlib_hash(zlib.crc32)),
+             Hash('md5', *hashlib_hash(hashlib.md5)),
+             Hash('sha1', *hashlib_hash(hashlib.sha1)),
+             Hash('sha224', *hashlib_hash(hashlib.sha224)),
+             Hash('sha256', *hashlib_hash(hashlib.sha256)),
+             Hash('sha384', *hashlib_hash(hashlib.sha384)),
+             Hash('sha512', *hashlib_hash(hashlib.sha512)),
+             ]
 CHECKSUMS_AVAIL = [c.name for c in CHECKSUMS]
 CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
 
@@ -288,8 +288,8 @@ class Serializer(object):
 
 
 SERIZLIALIZERS = [Serializer('JSON',
-            lambda x: json.dumps(x, separators=(',', ':')),
-            lambda x: json.loads(x))]
+                  lambda x: json.dumps(x, separators=(',', ':')),
+                  lambda x: json.loads(x))]
 SERIZLIALIZERS_AVAIL = [s.name for s in SERIZLIALIZERS]
 SERIZLIALIZERS_LOOKUP = dict(((s.name, s) for s in SERIZLIALIZERS))
 
@@ -315,7 +315,7 @@ def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
     if level not in VERBOSITY_LEVELS:
         raise TypeError("Desired level '%s' is not one of %s" % (level,
-            str(VERBOSITY_LEVELS)))
+                        str(VERBOSITY_LEVELS)))
     if VERBOSITY_LEVELS.index(level) <= VERBOSITY_LEVELS.index(LEVEL):
         for line in [l for l in message.split('\n') if l != '']:
             print('%s: %s' % (PREFIX, line))
@@ -351,7 +351,7 @@ def pretty_size(size_in_bytes):
 
 def double_pretty_size(size_in_bytes):
     """ Pretty print filesize including size in bytes. """
-    return ("%s (%dB)" %(pretty_size(size_in_bytes), size_in_bytes))
+    return ("%s (%dB)" % (pretty_size(size_in_bytes), size_in_bytes))
 
 
 def reverse_pretty(readable):
@@ -436,6 +436,7 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
         return text.splitlines()
 
+
 def _inject_blosc_group(parser):
     blosc_group = parser.add_argument_group(title='blosc settings')
     blosc_group.add_argument('-t', '--typesize',
@@ -454,6 +455,7 @@ def _inject_blosc_group(parser):
             default=DEFAULT_SHUFFLE,
             dest='shuffle',
             help='deactivate shuffle')
+
 
 def create_parser():
     """ Create and return the parser. """
@@ -954,7 +956,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     Raises
     ------
     TypeError
-        if 'max_app_chunks' 
+        if 'max_app_chunks' is neither a callable or an int
     ValueError
         if 'max_app_chunks' is a callable and returned either a non-int or a
         negative int.
@@ -1723,7 +1725,6 @@ def _read_metadata(input_fp):
     return metadata, metadata_header
 
 
-
 def _read_offsets(input_fp, bloscpack_header):
     """ Read the offsets from a file pointer.
 
@@ -1756,6 +1757,7 @@ def _read_offsets(input_fp, bloscpack_header):
     else:
         return []
 
+
 def _read_beginning(input_fp):
     """ Read the bloscpack_header, metadata, metadata_header and offsets.
 
@@ -1778,6 +1780,7 @@ def _read_beginning(input_fp):
             else (None, None)
     offsets = _read_offsets(input_fp, bloscpack_header)
     return bloscpack_header, metadata, metadata_header, offsets
+
 
 def _write_offsets(output_fp, offsets):
     print_verbose("Writing '%d' offsets: '%s'" %
@@ -1836,6 +1839,7 @@ def _unpack_chunk_fp(input_fp, checksum_impl):
     decompressed = blosc.decompress(compressed)
     return compressed, decompressed, blosc_header
 
+
 def unpack_file(in_file, out_file):
     """ Main function for decompressing a file.
 
@@ -1878,6 +1882,7 @@ def _unpack_fp(input_fp, output_fp):
         plain_fp_sink.put(decompressed_chunk)
     return compressed_fp_source.metadata
 
+
 def _seek_to_metadata(target_fp):
     """ Given a target file pointer, seek to the metadata section.
 
@@ -1902,6 +1907,7 @@ def _seek_to_metadata(target_fp):
         raise NoMetadataFound("unable to seek to metadata if it does not exist")
     else:
         return target_fp.tell()
+
 
 def _rewrite_metadata_fp(target_fp, new_metadata,
             magic_format=None, checksum=None,
@@ -1933,6 +1939,7 @@ def _rewrite_metadata_fp(target_fp, new_metadata,
     target_fp.seek(current_pos, 0)
     # and re-write it
     _write_metadata(target_fp, new_metadata, new_metadata_args)
+
 
 def _recreate_metadata(old_metadata_header, new_metadata,
             magic_format=None, checksum=None,
@@ -2126,8 +2133,8 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     _write_offsets(original_fp, offsets + offset_storage)
     return nchunks
 
-def append(orig_file, new_file, blosc_args=None):
 
+def append(orig_file, new_file, blosc_args=None):
     orig_size_before = path.getsize(orig_file)
     new_size = path.getsize(new_file)
     print_verbose('orig file size before append: %s' %

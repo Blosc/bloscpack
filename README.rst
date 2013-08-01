@@ -87,6 +87,9 @@ Help for each one of the subcommands:
 Examples
 --------
 
+Basics
+......
+
 Basic compression:
 
 .. code-block:: console
@@ -124,6 +127,9 @@ Incidentally this works for compression too:
     $ ./blpk c data.dat
     blpk: error: output file 'data.dat.blp' exists!
     $ ./blpk -f c data.dat
+
+Settings
+........
 
 By default, the number of threads that Blosc uses is determined by the number
 of cores detected on your system. You can change this using the ``[-n |
@@ -171,6 +177,9 @@ There are two options that influence how the data is stored:
   feature. Also, a certain number of offsets (default: 10 * 'nchunks') are
   preallocated to allow for appending data to the file.
 
+Info Subcommand
+...............
+
 If you just need some info on how the file was compressed ``[i | info]``:
 
 .. code-block:: console
@@ -188,6 +197,9 @@ If you just need some info on how the file was compressed ``[i | info]``:
    blpk:     'typesize': 8}
    blpk: 'offsets':
    blpk: [134320,354002,552182,709597,870494,...]
+
+Adding Metdata
+..............
 
 Using the ``[-m | --metadata]`` option you can include JSON from a file:
 
@@ -230,6 +242,9 @@ It will be printed when decompressing:
     blpk: Metadata is:
     blpk: '{u'dtype': u'float64', u'shape': [200000000], u'container': u'numpy'}'
 
+Appending
+.........
+
 You can also append data to an existing bloscpack compressed file:
 
 .. code-block:: console
@@ -244,6 +259,9 @@ chunks and the chunk-size. Additionally, there are limitations on the
 compression options. For example, one cannot change the checksum used. It is
 however possible to change the compression level, the typesize and the shuffle
 option for the appended chunks.
+
+Verbose and Debug mode
+......................
 
 Lastly there are two options to control how much output is produced,
 

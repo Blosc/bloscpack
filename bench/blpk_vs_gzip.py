@@ -11,18 +11,20 @@ import subprocess
 import bloscpack
 import test_bloscpack as tb
 
+
 def get_fs(file_name):
     return bloscpack.pretty_size(path.getsize(file_name))
+
 
 def get_ratio(file1, file2):
     return path.getsize(file1)/path.getsize(file2)
 
-blosc_args = bloscpack.DEFAULT_BLOSC_ARGS
 
 with tb.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
     gz_out_file = path.join(tdir, 'file.gz')
 
     print('create the test data', end='')
+
     def progress(i):
         if i % 10 == 0:
             print('.', end='')
@@ -34,8 +36,7 @@ with tb.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
 
     print("Will now run bloscpack... ")
     tic = time.time()
-    bloscpack.pack_file(in_file, out_file, blosc_args,
-            chunk_size=bloscpack.reverse_pretty(bloscpack.DEFAULT_CHUNK_SIZE))
+    bloscpack.pack_file(in_file, out_file)
     toc = time.time()
     print("Time: %.2f seconds" % (toc - tic))
     print("Output file size: %s" % get_fs(out_file))

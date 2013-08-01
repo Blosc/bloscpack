@@ -728,7 +728,7 @@ TODO
 Changelog
 ---------
 
-* v0.3.0-rc1 - XXX XXX XX XXXX
+* v0.3.0-rc1 - Thu Jul 08 2013
 
   * Bloscpack format changes (format version 3)
 

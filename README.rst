@@ -8,7 +8,7 @@ Description
 
 This script provides a command line interface to
 `Blosc <http://blosc.pytables.org/trac>`_, a high performance, multi-threaded,
-blocking and shuffeling compressor. The interface is realized by using the
+blocking and shuffling compressor. The interface is realized by using the
 `argparse <http://docs.python.org/dev/library/argparse.html>`_ library
 and `python-blosc <https://github.com/FrancescAlted/python-blosc>`_ bindings.
 
@@ -26,7 +26,8 @@ Dependencies
 ------------
 
 * Python 2.6 (requires ``ordereddict`` and ``argparse``) or Python 2.7
-* `python-blosc  <https://github.com/FrancescAlted/python-blosc>`_  `(at least v1.0.5) <https://github.com/FrancescAlted/python-blosc/tree/v1.0.5>`_ (provides Blosc)
+* `python-blosc  <https://github.com/FrancescAlted/python-blosc>`_
+  `(at least v1.0.5) <https://github.com/FrancescAlted/python-blosc/tree/v1.0.5>`_ (provides Blosc)
 * The Python packages ``numpy``, ``nose`` and ``cram`` for testing
 
 Stability of File Format

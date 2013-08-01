@@ -2012,10 +2012,10 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
 
     Parameters
     ----------
-    original : str
-        the name of the file to append to
+    original : file_like
+        the original file_pointer
     new_content : str
-        the name of the file to append from
+        the file pointer for the data to be appended
     new_size : int
         the size of the new_content
     blosc_args : dict
@@ -2135,6 +2135,22 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
 
 
 def append(orig_file, new_file, blosc_args=None):
+    """ Append from a file pointer to a file pointer.
+
+    Parameters
+    ----------
+    orig_file : str
+        the name of the file to append to
+    new_file : str
+        the name of the file to append from
+    blosc_args : dict
+        the blosc_args
+
+    Notes
+    -----
+    The blosc_args argument can be supplied if different blosc arguments are
+    desired.
+    """
     orig_size_before = path.getsize(orig_file)
     new_size = path.getsize(new_file)
     print_verbose('orig file size before append: %s' %

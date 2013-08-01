@@ -367,11 +367,11 @@ SSD, we get:
     create the test data..........done
 
     Input file size: 1.49G
-    Will now run bloscpack... 
+    Will now run bloscpack...
     Time: 1.72 seconds
     Output file size: 198.55M
     Ratio: 0.13
-    Will now run gzip... 
+    Will now run gzip...
     Time: 131.63 seconds
     Output file size: 924.05M
     Ratio: 0.61
@@ -390,11 +390,11 @@ since dropping the caches requires root privileges:
     create the test data..........done
 
     Input file size: 1.49G
-    Will now run bloscpack... 
+    Will now run bloscpack...
     Time: 4.30 seconds
     Output file size: 198.55M
     Ratio: 0.13
-    Will now run gzip... 
+    Will now run gzip...
     Time: 135.15 seconds
     Output file size: 924.05M
     Ratio: 0.61

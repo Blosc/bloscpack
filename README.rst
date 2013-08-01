@@ -355,27 +355,53 @@ The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
 Benchmark
 ---------
 
-Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM) i7
-CPU 960  @ 3.20GHz`` CPU with 4 cores, 6GB of memory and active hyperthreading
-yields the following results:
+Using the provided ``bench/blpk_vs_gzip.py`` script on a ``Intel(R) Core(TM)
+i7-3667U CPU @ 2.00GHz`` CPU with 2 cores and 4 threads (active
+hyperthreading), cpu frequency scaling activated but set to the ``performance``
+governor (all cores scaled to ``2.0 GHz``), 8GB of DDR3 memory and a Luks encrypted
+SSD, we get:
 
 .. code-block:: console
 
     $ PYTHONPATH=. ./bench/blpk_vs_gzip.py
-    create the test data..........
+    create the test data..........done
+
     Input file size: 1.49G
-    Will now run bloscpack...
-    Time: 4.56 seconds
-    Output file size: 198.43M
+    Will now run bloscpack... 
+    Time: 1.72 seconds
+    Output file size: 198.55M
     Ratio: 0.13
-    Will now run gzip...
-    Time: 141.38 seconds
+    Will now run gzip... 
+    Time: 131.63 seconds
     Output file size: 924.05M
     Ratio: 0.61
 
 As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
-kind of structured data.
+kind of structured data. One thing to note here, is that we are not dropping
+the system file cache after every step, so the file to read will be cached in
+memory. To get a more accurate picture we can use the ``--drop-caches`` switch
+of the benchmark which requires you however, to run the benchmark as root,
+since dropping the caches requires root privileges:
+
+.. code-block:: console
+
+    $ PYTHONPATH=. bench/blpk_vs_gzip.py --drop-caches
+    create the test data..........done
+
+    Input file size: 1.49G
+    Will now run bloscpack... 
+    Time: 4.30 seconds
+    Output file size: 198.55M
+    Ratio: 0.13
+    Will now run gzip... 
+    Time: 135.15 seconds
+    Output file size: 924.05M
+    Ratio: 0.61
+
+While the absolute improvement for `gzip` when using the file system cache is
+higher, when looking at the relative improvement `bloscpack` runs twice as fast
+when the input file comes from the file cache.
 
 Bloscpack Format
 ----------------

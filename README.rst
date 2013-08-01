@@ -703,15 +703,19 @@ Changelog
 
 * v0.3.0-rc1 - XXX XXX XX XXXX
 
+  * Bloscpack format changes (format version 3)
+
+    * Variable length metadata section with it's own header
+    * Ability to preallocate offsets for appending data (``max_app_chunks``)
+
   * Refactor compression and decompression to use file pointers instead of
     file name strings, allows using StringIO/cStringIO.
-  * Sanitize calculation of nchunks and chunk-size a little
-  * Introduce a metadata section with own header
+  * Sanitize calculation of nchunks and chunk-size
   * Special keyword ``max`` for use with chunk-size in the CLI
   * Support appending to a file and ``append`` subcommand
     (including the ability to preallocate offsets)
   * Support rudimentary ``info`` subcommand
-  * Add tests of the command line interface using cram
+  * Add tests of the command line interface using ``cram``
   * Minor bugfixes and corrections as usual
 
 * v0.2.1     - Mon Nov 26 2012

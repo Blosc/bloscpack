@@ -88,7 +88,7 @@ Examples
 --------
 
 Basics
-......
+~~~~~~
 
 Basic compression:
 
@@ -129,7 +129,7 @@ Incidentally this works for compression too:
     $ ./blpk -f c data.dat
 
 Settings
-........
+~~~~~~~~
 
 By default, the number of threads that Blosc uses is determined by the number
 of cores detected on your system. You can change this using the ``[-n |
@@ -178,7 +178,7 @@ There are two options that influence how the data is stored:
   preallocated to allow for appending data to the file.
 
 Info Subcommand
-...............
+~~~~~~~~~~~~~~~
 
 If you just need some info on how the file was compressed ``[i | info]``:
 
@@ -199,7 +199,7 @@ If you just need some info on how the file was compressed ``[i | info]``:
    blpk: [134320,354002,552182,709597,870494,...]
 
 Adding Metdata
-..............
+~~~~~~~~~~~~~~
 
 Using the ``[-m | --metadata]`` option you can include JSON from a file:
 
@@ -243,7 +243,7 @@ It will be printed when decompressing:
     blpk: '{u'dtype': u'float64', u'shape': [200000000], u'container': u'numpy'}'
 
 Appending
-.........
+~~~~~~~~~
 
 You can also append data to an existing bloscpack compressed file:
 
@@ -261,7 +261,7 @@ however possible to change the compression level, the typesize and the shuffle
 option for the appended chunks.
 
 Verbose and Debug mode
-......................
+~~~~~~~~~~~~~~~~~~~~~~
 
 Lastly there are two options to control how much output is produced,
 
@@ -369,6 +369,7 @@ The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
 .. code-block:: console
 
    $ ./test_bloscpack.cram
+   [...]
 
 Benchmark
 ---------
@@ -425,7 +426,7 @@ Bloscpack Format
 ----------------
 
 The input is split into chunks since a) we wish to put less stress on main
-memory and b) because Blosc has a buffer limit of 2GB (Version ``1.0.0`` and
+memory and b) because Blosc has a buffer limit of ``2GB`` (Version ``1.0.0`` and
 above). By default the chunk-size is a moderate ``1MB`` which should be fine,
 even for less powerful machines.
 

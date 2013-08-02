@@ -8,6 +8,8 @@ from __future__ import division
 
 import argparse
 import contextlib
+import collections
+import copy
 import hashlib
 import json
 import itertools
@@ -1013,7 +1015,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     return max_app_chunks
 
 
-class BloscPackHeader(object):
+class BloscPackHeader(collections.MutableMapping):
 
     def __init__(self,
                  format_version=FORMAT_VERSION,
@@ -1042,15 +1044,49 @@ class BloscPackHeader(object):
             raise ValueError("'last_chunk' (%d) is larger than 'chunk_size' (%d)"
                     % (last_chunk, chunk_size))
 
-        self.format_version = format_version
-        self.offsets = offsets
-        self.metadata = metadata
-        self.checksum = checksum
-        self.typesize = typesize
-        self.chunk_size = chunk_size
-        self.last_chunk = last_chunk
-        self.nchunks = nchunks
-        self.max_app_chunks = max_app_chunks
+        self._attrs = ['format_version',
+                      'offsets',
+                      'metadata',
+                      'checksum',
+                      'typesize',
+                      'chunk_size',
+                      'last_chunk',
+                      'nchunks',
+                      'max_app_chunks']
+        self._len = len(self._attrs)
+
+        self.format_version  = format_version
+        self.offsets         = offsets
+        self.metadata        = metadata
+        self.checksum        = checksum
+        self.typesize        = typesize
+        self.chunk_size      = chunk_size
+        self.last_chunk      = last_chunk
+        self.nchunks         = nchunks
+        self.max_app_chunks  = max_app_chunks
+
+    def __getitem__(self, key):
+        if key not in self._attrs:
+            raise KeyError('%s not in BloscPackHeader' % key)
+        return getattr(self, key)
+
+    def __setitem__(self, key, value):
+        if key not in self._attrs:
+            raise KeyError('%s not in BloscPackHeader' % key)
+        setattr(self, key, value)
+
+    def __delitem__(self, key):
+        raise NotImplementedError(
+            'BloscPackHeader does not support __delitem__ or derivatives')
+
+    def __len__(self):
+        return self._len
+
+    def __iter__(self):
+        return iter(self._attrs)
+
+    def copy(self):
+        return copy.copy(self)
 
     def encode(self):
         format_version = encode_uint8(self.format_version)

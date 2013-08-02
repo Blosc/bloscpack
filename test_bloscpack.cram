@@ -106,6 +106,7 @@ Help for the subcommands:
     -l [0, 9], --clevel [0, 9]
                           compression level (default: 7)
     -s, --no-shuffle      deactivate shuffle
+
   $ blpk info --help
   usage: blpk info [-h] <file>
   

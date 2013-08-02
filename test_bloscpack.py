@@ -291,48 +291,48 @@ def test_check_options():
     nt.assert_raises(ValueError, bloscpack._check_options, 'aaaaaaaa')
 
 
-def test_create_bloscpack_header_arguments():
+def test_BloscPackHeader_constructor_arguments():
     # check format_version
-    nt.assert_raises(ValueError, create_bloscpack_header, format_version=-1)
-    nt.assert_raises(ValueError, create_bloscpack_header,
+    nt.assert_raises(ValueError, BloscPackHeader, format_version=-1)
+    nt.assert_raises(ValueError, BloscPackHeader,
             format_version=MAX_FORMAT_VERSION+1)
-    nt.assert_raises(TypeError, create_bloscpack_header, format_version='foo')
+    nt.assert_raises(TypeError, BloscPackHeader, format_version='foo')
     # check checksum
-    nt.assert_raises(ValueError, create_bloscpack_header, checksum=-1)
-    nt.assert_raises(ValueError, create_bloscpack_header,
+    nt.assert_raises(ValueError, BloscPackHeader, checksum=-1)
+    nt.assert_raises(ValueError, BloscPackHeader,
             checksum=len(CHECKSUMS)+1)
-    nt.assert_raises(NoSuchChecksum, create_bloscpack_header, checksum='foo')
+    nt.assert_raises(NoSuchChecksum, BloscPackHeader, checksum='foo')
     # check the typesize
-    nt.assert_raises(ValueError, create_bloscpack_header, typesize=-1)
-    nt.assert_raises(ValueError, create_bloscpack_header,
+    nt.assert_raises(ValueError, BloscPackHeader, typesize=-1)
+    nt.assert_raises(ValueError, BloscPackHeader,
             typesize=blosc.BLOSC_MAX_TYPESIZE+1)
     # check chunk_size
-    nt.assert_raises(ValueError, create_bloscpack_header,
+    nt.assert_raises(ValueError, BloscPackHeader,
             chunk_size=blosc.BLOSC_MAX_BUFFERSIZE+1)
-    nt.assert_raises(ValueError, create_bloscpack_header, chunk_size=-2)
-    nt.assert_raises(TypeError, create_bloscpack_header, chunk_size='foo')
+    nt.assert_raises(ValueError, BloscPackHeader, chunk_size=-2)
+    nt.assert_raises(TypeError, BloscPackHeader, chunk_size='foo')
     # check last_chunk
-    nt.assert_raises(ValueError, create_bloscpack_header,
+    nt.assert_raises(ValueError, BloscPackHeader,
             last_chunk=blosc.BLOSC_MAX_BUFFERSIZE+1)
-    nt.assert_raises(ValueError, create_bloscpack_header, last_chunk=-2)
-    nt.assert_raises(TypeError, create_bloscpack_header, last_chunk='foo')
+    nt.assert_raises(ValueError, BloscPackHeader, last_chunk=-2)
+    nt.assert_raises(TypeError, BloscPackHeader, last_chunk='foo')
     # check value of nchunks
-    nt.assert_raises(ValueError, create_bloscpack_header, nchunks=MAX_CHUNKS+1)
-    nt.assert_raises(ValueError, create_bloscpack_header, nchunks=-2)
-    nt.assert_raises(TypeError, create_bloscpack_header, nchunks='foo')
+    nt.assert_raises(ValueError, BloscPackHeader, nchunks=MAX_CHUNKS+1)
+    nt.assert_raises(ValueError, BloscPackHeader, nchunks=-2)
+    nt.assert_raises(TypeError, BloscPackHeader, nchunks='foo')
 
     # check value of max_app_chunks
-    nt.assert_raises(ValueError, create_bloscpack_header, max_app_chunks=MAX_CHUNKS+1)
-    nt.assert_raises(ValueError, create_bloscpack_header, max_app_chunks=-1)
-    nt.assert_raises(TypeError, create_bloscpack_header, max_app_chunks='foo')
+    nt.assert_raises(ValueError, BloscPackHeader, max_app_chunks=MAX_CHUNKS+1)
+    nt.assert_raises(ValueError, BloscPackHeader, max_app_chunks=-1)
+    nt.assert_raises(TypeError, BloscPackHeader, max_app_chunks='foo')
 
     # check sum
-    nt.assert_raises(ValueError, create_bloscpack_header,
+    nt.assert_raises(ValueError, BloscPackHeader,
             nchunks=MAX_CHUNKS/2+1,
             max_app_chunks=MAX_CHUNKS/2+1)
 
     # check constrain on last_chunk
-    nt.assert_raises(ValueError, create_bloscpack_header,
+    nt.assert_raises(ValueError, BloscPackHeader,
             chunk_size=1,
             last_chunk=2)
 

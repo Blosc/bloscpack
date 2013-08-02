@@ -1013,6 +1013,85 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     return max_app_chunks
 
 
+class BloscPackHeader(object):
+
+    def __init__(self,
+                 format_version=FORMAT_VERSION,
+                 offsets=False,
+                 metadata=False,
+                 checksum='None',
+                 typesize=0,
+                 chunk_size=-1,
+                 last_chunk=-1,
+                 nchunks=-1,
+                 max_app_chunks=0):
+
+        check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
+        _check_valid_checksum(checksum)
+        check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
+        check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
+        check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
+        check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
+        check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
+        if nchunks != -1:
+            check_range('nchunks + max_app_chunks',
+                nchunks + max_app_chunks, 0, MAX_CHUNKS)
+        elif max_app_chunks != 0:
+            raise ValueError("'max_app_chunks' can not be non '0' if 'nchunks' is '-1'")
+        if chunk_size != -1 and last_chunk != -1 and last_chunk > chunk_size:
+            raise ValueError("'last_chunk' (%d) is larger than 'chunk_size' (%d)"
+                    % (last_chunk, chunk_size))
+
+        self.format_version = format_version
+        self.offsets = offsets
+        self.metadata = metadata
+        self.self.checksum = checksum
+        self.typesize = typesize
+        self.chunk_size = chunk_size
+        self.last_chunk = last_chunk
+        self.max_app_chunks = max_app_chunks
+
+    def encode(self):
+        format_version = encode_uint8(self.format_version)
+        options = encode_uint8(int(
+            create_options(offsets=self.offsets, metadata=self.metadata),
+            2))
+        checksum = encode_uint8(CHECKSUMS_AVAIL.index(self.checksum))
+        typesize = encode_uint8(self.typesize)
+        chunk_size = encode_int32(self.chunk_size)
+        last_chunk = encode_int32(self.last_chunk)
+        nchunks = encode_int64(self.nchunks)
+        max_app_chunks = encode_int64(self.max_app_chunks)
+
+        return (MAGIC + format_version + options + checksum + typesize +
+                chunk_size + last_chunk +
+                nchunks + max_app_chunks)
+
+    @staticmethod
+    def decode(buffer_):
+        if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
+            raise ValueError(
+                "attempting to decode a bloscpack header of length '%d', not '%d'"
+                % (len(buffer_), BLOSCPACK_HEADER_LENGTH))
+        elif buffer_[0:4] != MAGIC:
+            raise ValueError(
+                "the magic marker '%s' is missing from the bloscpack " % MAGIC +
+                "header, instead we found: %s" % repr(buffer_[0:4]))
+
+        options = decode_options(decode_bitfield(buffer_[5]))
+        bph_dict = {'format_version': decode_uint8(buffer_[4]),
+                    'offsets':        options['offsets'],
+                    'metadata':       options['metadata'],
+                    'checksum':       CHECKSUMS_AVAIL[decode_uint8(buffer_[6])],
+                    'typesize':       decode_uint8(buffer_[7]),
+                    'chunk_size':     decode_int32(buffer_[8:12]),
+                    'last_chunk':     decode_int32(buffer_[12:16]),
+                    'nchunks':        decode_int64(buffer_[16:24]),
+                    'max_app_chunks': decode_int64(buffer_[24:32]),
+                    }
+        return BloscPackHeader(**bph_dict)
+
+
 def create_bloscpack_header(format_version=FORMAT_VERSION,
         offsets=False,
         metadata=False,

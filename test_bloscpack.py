@@ -337,7 +337,11 @@ def test_BloscPackHeader_constructor_arguments():
             last_chunk=2)
 
 
-def test_create_bloscpack_header():
+def test_BloscPackHeader_encode():
+
+    def create_bloscpack_header(**kwargs):
+        return BloscPackHeader(**kwargs).encode()
+
     # test with no arguments
     raw = MAGIC + struct.pack('<B', FORMAT_VERSION) + \
         '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \

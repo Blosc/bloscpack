@@ -1045,10 +1045,11 @@ class BloscPackHeader(object):
         self.format_version = format_version
         self.offsets = offsets
         self.metadata = metadata
-        self.self.checksum = checksum
+        self.checksum = checksum
         self.typesize = typesize
         self.chunk_size = chunk_size
         self.last_chunk = last_chunk
+        self.nchunks = nchunks
         self.max_app_chunks = max_app_chunks
 
     def encode(self):

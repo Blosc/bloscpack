@@ -214,6 +214,23 @@ Get some info on the file:
   blpk: error: This might not be a bloscpack compressed file.
   [1]
 
+Try using no offsets:
+
+  $ blpk compress --no-offsets data.dat
+  $ blpk info data.dat.blp
+  blpk: 'bloscpack_header':
+  blpk: {   'checksum': 'adler32',
+  blpk:     'chunk_size': 1048576,
+  blpk:     'format_version': 3,
+  blpk:     'last_chunk': 616448,
+  blpk:     'max_app_chunks': 0,
+  blpk:     'metadata': False,
+  blpk:     'nchunks': 153,
+  blpk:     'offsets': False,
+  blpk:     'typesize': 8}
+  $ rm data.dat.blp
+
+
 Get more information using --verbose:
 
   $ blpk --verbose compress data.dat

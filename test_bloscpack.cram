@@ -230,6 +230,24 @@ Try using no offsets:
   blpk:     'typesize': 8}
   $ rm data.dat.blp
 
+Try using alternative checksum:
+
+  $ blpk compress --checksum sha512 data.dat
+  $ blpk info data.dat.blp
+  blpk: 'bloscpack_header':
+  blpk: {   'checksum': 'sha512',
+  blpk:     'chunk_size': 1048576,
+  blpk:     'format_version': 3,
+  blpk:     'last_chunk': 616448,
+  blpk:     'max_app_chunks': 1530,
+  blpk:     'metadata': False,
+  blpk:     'nchunks': 153,
+  blpk:     'offsets': True,
+  blpk:     'typesize': 8}
+  blpk: 'offsets':
+  blpk: [13496,168728,311111,471773,628470,...]
+  $ rm data.dat.blp
+
 
 Get more information using --verbose:
 

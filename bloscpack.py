@@ -1054,6 +1054,8 @@ class BloscPackHeader(collections.MutableMapping):
                        'nchunks',
                        'max_app_chunks']
         self._len = len(self._attrs)
+        self._bytes_attrs = ['chunk_size',
+                             'last_chunk']
 
         self.format_version  = format_version
         self.offsets         = offsets
@@ -1086,12 +1088,19 @@ class BloscPackHeader(collections.MutableMapping):
         return iter(self._attrs)
 
     def __str__(self):
-        return "\n".join([("%s: '%s'" % (arg, value))
-                          for arg, value in self.iteritems()])
+        return pprint.pformat(dict(self))
 
     def __repr__(self):
         return "BloscPackHeader(%s)" % ", ".join((("%s=%s" % (arg, repr(value)))
                           for arg, value in self.iteritems()))
+
+    def pformat(self, indent=4):
+        indent = " " * indent
+        # don't ask, was feeling functional
+        return "bloscpack header: \n%s%s" % (indent, (",\n%s" % indent).join((("%s=%s" % 
+            (key, (repr(value) if (key not in self._bytes_attrs or value == -1)
+                         else double_pretty_size(value)))
+             for key, value in self.iteritems()))))
 
     def copy(self):
         return copy.copy(self)
@@ -2372,7 +2381,7 @@ if __name__ == '__main__':
             error(str(ve) + "\n" +
             "This might not be a bloscpack compressed file.")
         print_normal("'bloscpack_header':")
-        print_normal(pprint.pformat(bloscpack_header, indent=4))
+        print_normal(bloscpack_header.pformat())
         if metadata is not None:
             print_normal("'metadata':")
             print_normal(pprint.pformat(metadata, indent=4))

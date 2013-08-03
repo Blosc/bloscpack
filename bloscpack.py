@@ -2026,7 +2026,7 @@ def _seek_to_metadata(target_fp):
 
     """
     bloscpack_header = _read_bloscpack_header(target_fp)
-    if not bloscpack_header['metadata']:
+    if not bloscpack_header.metadata:
         raise NoMetadataFound("unable to seek to metadata if it does not exist")
     else:
         return target_fp.tell()

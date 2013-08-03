@@ -2380,7 +2380,6 @@ if __name__ == '__main__':
         except ValueError as ve:
             error(str(ve) + "\n" +
             "This might not be a bloscpack compressed file.")
-        print_normal("'bloscpack_header':")
         print_normal(bloscpack_header.pformat())
         if metadata is not None:
             print_normal("'metadata':")

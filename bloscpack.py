@@ -1016,7 +1016,40 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
 
 
 class BloscPackHeader(collections.MutableMapping):
+    """ The Bloscpack header.
 
+    Parameters
+    ----------
+    format_version : int
+        the version format for the compressed file
+    offsets: bool
+        if the offsets to the chunks are present
+    metadata: bool
+        if the metadata is present
+    checksum : str
+        the checksum to be used
+    typesize : int
+        the typesize used for blosc in the chunks
+    chunk_size : int
+        the size of a regular chunk
+    last_chunk : int
+        the size of the last chunk
+    nchunks : int
+        the number of chunks
+    max_app_chunks : int
+        the total number of possible append chunks
+
+    Notes
+    -----
+    See the README distributed for details on the header format.
+
+    Raises
+    ------
+    ValueError
+        if any of the arguments have an invalid value
+    TypeError
+        if any of the arguments have the wrong type
+    """
     def __init__(self,
                  format_version=FORMAT_VERSION,
                  offsets=False,
@@ -1106,6 +1139,14 @@ class BloscPackHeader(collections.MutableMapping):
         return copy.copy(self)
 
     def encode(self):
+        """ Encode the Bloscpack header.
+
+        Returns
+        -------
+
+        raw_bloscpack_header : string
+            the header as string of bytes
+        """
         format_version = encode_uint8(self.format_version)
         options = encode_uint8(int(
             create_options(offsets=self.offsets, metadata=self.metadata),
@@ -1123,6 +1164,18 @@ class BloscPackHeader(collections.MutableMapping):
 
     @staticmethod
     def decode(buffer_):
+        """ Decode an encoded Bloscpack header.
+
+        Parameters
+        ----------
+        buffer_ : str of length BLOSCPACK_HEADER_LENGTH
+
+        Returns
+        -------
+        bloscpack_header : BloscPackHeader
+            the decoded Bloscpack header object
+
+        """
         if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
             raise ValueError(
                 "attempting to decode a bloscpack header of length '%d', not '%d'"

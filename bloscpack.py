@@ -1899,7 +1899,7 @@ def _read_beginning(input_fp):
     """
     bloscpack_header = _read_bloscpack_header(input_fp)
     metadata, metadata_header = _read_metadata(input_fp) \
-            if bloscpack_header['metadata'] \
+            if bloscpack_header.metadata\
             else (None, None)
     offsets = _read_offsets(input_fp, bloscpack_header)
     return bloscpack_header, metadata, metadata_header, offsets

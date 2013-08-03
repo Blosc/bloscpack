@@ -1085,6 +1085,14 @@ class BloscPackHeader(collections.MutableMapping):
     def __iter__(self):
         return iter(self._attrs)
 
+    def __str__(self):
+        return "\n".join([("%s: '%s'" % (arg, value))
+                          for arg, value in self.iteritems()])
+
+    def __repr__(self):
+        return "BloscPackHeader(%s)" % ", ".join((("%s=%s" % (arg, repr(value)))
+                          for arg, value in self.iteritems()))
+
     def copy(self):
         return copy.copy(self)
 

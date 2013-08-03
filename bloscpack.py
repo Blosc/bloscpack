@@ -1184,19 +1184,17 @@ class BloscPackHeader(collections.MutableMapping):
             raise ValueError(
                 "the magic marker '%s' is missing from the bloscpack " % MAGIC +
                 "header, instead we found: %s" % repr(buffer_[0:4]))
-
         options = decode_options(decode_bitfield(buffer_[5]))
-        bph_dict = {'format_version': decode_uint8(buffer_[4]),
-                    'offsets':        options['offsets'],
-                    'metadata':       options['metadata'],
-                    'checksum':       CHECKSUMS_AVAIL[decode_uint8(buffer_[6])],
-                    'typesize':       decode_uint8(buffer_[7]),
-                    'chunk_size':     decode_int32(buffer_[8:12]),
-                    'last_chunk':     decode_int32(buffer_[12:16]),
-                    'nchunks':        decode_int64(buffer_[16:24]),
-                    'max_app_chunks': decode_int64(buffer_[24:32]),
-                    }
-        return BloscPackHeader(**bph_dict)
+        return BloscPackHeader(
+            format_version=decode_uint8(buffer_[4]),
+            offsets=options['offsets'],
+            metadata=options['metadata'],
+            checksum=CHECKSUMS_AVAIL[decode_uint8(buffer_[6])],
+            typesize=decode_uint8(buffer_[7]),
+            chunk_size=decode_int32(buffer_[8:12]),
+            last_chunk=decode_int32(buffer_[12:16]),
+            nchunks=decode_int64(buffer_[16:24]),
+            max_app_chunks=decode_int64(buffer_[24:32]))
 
 
 def create_metadata_header(magic_format='',

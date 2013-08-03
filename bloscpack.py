@@ -1867,14 +1867,14 @@ def _read_offsets(input_fp, bloscpack_header):
     unused offsets will not be returned.
 
     """
-    if bloscpack_header['offsets']:
-        total_entries = bloscpack_header['nchunks'] + \
-                bloscpack_header['max_app_chunks']
+    if bloscpack_header.offsets:
+        total_entries = bloscpack_header.nchunks + \
+                bloscpack_header.max_app_chunks
         offsets_raw = input_fp.read(8 * total_entries)
         print_verbose('Read raw offsets: %s' % repr(offsets_raw),
                 level=DEBUG)
         offsets = [decode_int64(offsets_raw[j - 8:j]) for j in
-                xrange(8, bloscpack_header['nchunks'] * 8 + 1, 8)]
+                xrange(8, bloscpack_header.nchunks * 8 + 1, 8)]
         print_verbose('Offsets: %s' % offsets, level=DEBUG)
         return offsets
     else:

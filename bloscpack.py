@@ -1045,14 +1045,14 @@ class BloscPackHeader(collections.MutableMapping):
                     % (last_chunk, chunk_size))
 
         self._attrs = ['format_version',
-                      'offsets',
-                      'metadata',
-                      'checksum',
-                      'typesize',
-                      'chunk_size',
-                      'last_chunk',
-                      'nchunks',
-                      'max_app_chunks']
+                       'offsets',
+                       'metadata',
+                       'checksum',
+                       'typesize',
+                       'chunk_size',
+                       'last_chunk',
+                       'nchunks',
+                       'max_app_chunks']
         self._len = len(self._attrs)
 
         self.format_version  = format_version

@@ -701,8 +701,8 @@ def test_offsets():
         bloscpack.pack_file(in_file, out_file, chunk_size='2M')
         with open(out_file, 'r+b') as input_fp:
             bloscpack_header = bloscpack._read_bloscpack_header(input_fp)
-            total_entries = bloscpack_header['nchunks'] + \
-                    bloscpack_header['max_app_chunks']
+            total_entries = bloscpack_header.nchunks + \
+                    bloscpack_header.max_app_chunks
             offsets = bloscpack._read_offsets(input_fp, bloscpack_header)
             # First chunks should start after header and offsets
             first = BLOSCPACK_HEADER_LENGTH + 8 * total_entries
@@ -738,7 +738,7 @@ def test_offsets():
             )
     output_fp.seek(0, 0)
     bloscpack_header = bloscpack._read_bloscpack_header(output_fp)
-    nt.assert_equal(0, bloscpack_header['max_app_chunks'])
+    nt.assert_equal(0, bloscpack_header.max_app_chunks)
     offsets = bloscpack._read_offsets(output_fp, bloscpack_header)
     nt.assert_equal([96, 417938, 736230, 1049687,
         1362724, 1660126, 1958578, 2257063],
@@ -1014,17 +1014,17 @@ def test_append_fp():
 
     # check that the header and offsets are as we expected them to be
     orig_bloscpack_header, orig_offsets = reset_read_beginning(orig)[0:4:3]
-    expected_orig_bloscpack_header = {
-            'chunk_size': 1048576,
-            'nchunks': 16,
-            'last_chunk': 271360,
-            'max_app_chunks': 160,
-            'format_version': 3,
-            'offsets': True,
-            'checksum': 'adler32',
-            'typesize': 8,
-            'metadata': False,
-    }
+    expected_orig_bloscpack_header = BloscPackHeader(
+            format_version=3,
+            offsets=True,
+            metadata=False,
+            checksum='adler32',
+            typesize=8,
+            chunk_size=1048576,
+            last_chunk=271360,
+            nchunks=16,
+            max_app_chunks=160,
+            )
     expected_orig_offsets = [1440, 221122, 419302, 576717, 737614,
                              894182, 1051091, 1208872, 1364148,
                              1512476, 1661570, 1811035, 1960042,

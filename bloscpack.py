@@ -1641,8 +1641,8 @@ class CompressedFPSource(CompressedSource):
         self.input_fp = input_fp
         self.bloscpack_header, self.metadata, self.metadata_header, \
                 self.offsets = _read_beginning(input_fp)
-        self.checksum_impl = CHECKSUMS_LOOKUP[self.bloscpack_header['checksum']]
-        self.nchunks = self.bloscpack_header['nchunks']
+        self.checksum_impl = CHECKSUMS_LOOKUP[self.bloscpack_header.checksum]
+        self.nchunks = self.bloscpack_header.nchunks
 
     def __call__(self):
         for i in xrange(self.nchunks):

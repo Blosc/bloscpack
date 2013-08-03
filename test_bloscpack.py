@@ -415,18 +415,7 @@ def test_BloscPackHeader_encode():
             BloscPackHeader(nchunks=1, max_app_chunks=MAX_CHUNKS-1).encode())
 
 def test_decode_bloscpack_header():
-    no_arg_return  = {
-            'format_version': FORMAT_VERSION,
-            'offsets':       False,
-            'metadata':      False,
-            'checksum':      'None',
-            'typesize':      0,
-            'chunk_size':    -1,
-            'last_chunk':    -1,
-            'nchunks':       -1,
-            'max_app_chunks': 0,
-            }
-    bloscpack_header = BloscPackHeader(**no_arg_return)
+    bloscpack_header = BloscPackHeader()
 
     def copy_and_set_return(key, value):
         copy_ = bloscpack_header.copy()

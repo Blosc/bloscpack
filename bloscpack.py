@@ -1712,7 +1712,7 @@ def _pack_fp(input_fp, output_fp,
             nchunks,
             bloscpack_args['max_app_chunks'])
     # create the bloscpack header
-    raw_bloscpack_header = create_bloscpack_header(
+    bloscpack_header = BloscPackHeader(
             offsets=bloscpack_args['offsets'],
             metadata=True if metadata is not None else False,
             checksum=bloscpack_args['checksum'],
@@ -1722,6 +1722,7 @@ def _pack_fp(input_fp, output_fp,
             nchunks=nchunks,
             max_app_chunks=max_app_chunks
             )
+    raw_bloscpack_header = bloscpack_header.encode()
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)
     output_fp.write(raw_bloscpack_header)
@@ -1780,14 +1781,12 @@ def _read_bloscpack_header(input_fp):
     bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
     print_verbose('bloscpack_header_raw: %s' %
             repr(bloscpack_header_raw), level=DEBUG)
-    bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
-    print_verbose("bloscpack header: ", level=DEBUG)
-    for arg, value in bloscpack_header.iteritems():
-        print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
-    if FORMAT_VERSION != bloscpack_header['format_version']:
+    bloscpack_header = BloscPackHeader.decode(bloscpack_header_raw)
+    print_verbose("bloscpack header: %s" % repr(bloscpack_header), level=DEBUG)
+    if FORMAT_VERSION != bloscpack_header.format_version:
         raise FormatVersionMismatch(
                 "format version of file was not '%s' as expected, but '%d'" %
-                (FORMAT_VERSION, bloscpack_header['format_version']))
+                (FORMAT_VERSION, bloscpack_header.format_version))
     return bloscpack_header
 
 

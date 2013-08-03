@@ -2157,7 +2157,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     """
     bloscpack_header, metadata, metadata_header, offsets = \
         _read_beginning(original_fp)
-    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
+    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
     if not offsets:
         raise RuntimeError(
                 'Appending to a file without offsets is not yet supported')
@@ -2165,11 +2165,12 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         blosc_args = dict(zip(BLOSC_ARGS, [None] * len(BLOSC_ARGS)))
     # handle blosc_args
     if blosc_args['typesize'] is None:
-        if bloscpack_header['typesize'] == -1:
+        if bloscpack_header.typesize == -1:
             raise NonUniformTypesize(
                     "Non uniform type size, can not append to file.")
         else:
             # use the typesize from the bloscpack header
+            # FIXME bloscpack_header does not have typesize
             blosc_args['typesize'] = bloscpack_header['typesize']
     if blosc_args['clevel'] is None:
         # use the default
@@ -2187,7 +2188,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     compressed, decompressed, blosc_header = _unpack_chunk_fp(original_fp, checksum_impl)
     # figure out how many bytes we need to read to rebuild the last chunk
     ultimo_length = len(decompressed)
-    bytes_to_read = bloscpack_header['chunk_size'] - ultimo_length
+    bytes_to_read = bloscpack_header.chunk_size - ultimo_length
     if new_size <= bytes_to_read:
         # special case
         # must squeeze data into last chunk
@@ -2200,10 +2201,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
                 blosc_args, checksum_impl)
         # return 0 to indicate that no new chunks have been written
         # build the new header
-        bloscpack_header['last_chunk'] += new_size
+        bloscpack_header.last_chunk += new_size
         # create the new header
-        raw_bloscpack_header = create_bloscpack_header(
-                **bloscpack_header)
+        raw_bloscpack_header = bloscpack_header.encode()
         original_fp.seek(0)
         original_fp.write(raw_bloscpack_header)
         return 0
@@ -2215,9 +2215,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # figure out how many chunks we will need
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(new_new_size,
-                chunk_size=bloscpack_header['chunk_size'])
+                chunk_size=bloscpack_header.chunk_size)
     # make sure that we actually have that kind of space
-    if nchunks > bloscpack_header['max_app_chunks']:
+    if nchunks > bloscpack_header.max_app_chunks:
         raise NotEnoughSpace('not enough space')
     # seek back to the position of the original last chunk
     original_fp.seek(offsets[-1], 0)
@@ -2232,7 +2232,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # append to the original file, again original_fp should be adequately
     # positioned
     sink = CompressedFPSink(original_fp,
-            checksum=bloscpack_header['checksum'],
+            checksum=bloscpack_header.checksum,
             blosc_args=blosc_args)
     # read, compress, write loop
     for i, chunk in enumerate(source()):
@@ -2242,12 +2242,11 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         offset_storage[i] = offset
 
     # build the new header
-    bloscpack_header['last_chunk'] = last_chunk_size
-    bloscpack_header['nchunks'] += nchunks
-    bloscpack_header['max_app_chunks'] -= nchunks
+    bloscpack_header.last_chunk = last_chunk_size
+    bloscpack_header.nchunks += nchunks
+    bloscpack_header.max_app_chunks -= nchunks
     # create the new header
-    raw_bloscpack_header = create_bloscpack_header(
-            **bloscpack_header)
+    raw_bloscpack_header = bloscpack_header.encode()
     original_fp.seek(0)
     original_fp.write(raw_bloscpack_header)
     # write the new offsets, but only those that changed

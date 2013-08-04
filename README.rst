@@ -1,6 +1,10 @@
 Bloscpack
 =========
 
+
+.. image:: https://travis-ci.org/esc/bloscpack.png?branch=master
+        :target: https://travis-ci.org/esc/bloscpack
+
 Command line interface to Blosc via python-blosc
 
 Description

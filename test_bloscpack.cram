@@ -27,7 +27,7 @@ Help for global options and subcommands:
     -f, --force           disable overwrite checks for existing files
                           (use with caution)
     -n [1, 256], --nthreads [1, 256]
-                          set number of threads, (default: ? (ncores)) (glob)
+                          set number of threads, (default: * (ncores)) (glob)
   
   subcommands:
     
@@ -252,7 +252,7 @@ Try using alternative checksum:
 Get more information using --verbose:
 
   $ blpk --verbose compress data.dat
-  blpk: using ? threads (glob)
+  blpk: using [0-9]+ threads (re)
   blpk: getting ready for compression
   blpk: input file is: 'data.dat'
   blpk: output file is: 'data.dat.blp'
@@ -300,7 +300,7 @@ Test basic append:
 
 
   $ ls -lah  data.dat.blp
-  -rw------- 1 esc esc 17M .* data.dat.blp (re)
+  .* 1 .* .* 17M .* .* .* data.dat.blp (re)
   $ blpk append data.dat.blp data.dat
   $ ls -lah  data.dat.blp
-  -rw------- 1 esc esc 33M .* data.dat.blp (re)
+  .* 1 .* .* 33M .* .* .* data.dat.blp (re)

@@ -7,7 +7,7 @@ import bloscpack as bp
 setup(
     name = "bloscpack",
     version = bp.__version__,
-    modules = ['bloscpack'],
+    py_modules = ['bloscpack'],
     scripts = ['blpk'],
     author = "Valentin Haenel",
     author_email = "valentin.haenel@gmx.de",

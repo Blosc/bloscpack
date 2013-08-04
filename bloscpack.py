@@ -22,7 +22,7 @@ except ImportError:
     from ordereddict import OrderedDict
 import blosc
 
-__version__ = '0.3.0'
+__version__ = '0.4.0-dev'
 __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 # miscellaneous

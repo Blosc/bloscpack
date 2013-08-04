@@ -1609,7 +1609,11 @@ class PlainMemorySource(PlainSource):
             yield c
 
 
-class CompressedMemorySource(object):
+class CompressedMemorySource(CompressedSource):
+
+    @property
+    def metadata(self):
+        return self.compressed_memory_sink.metadata
 
     def __init__(self, compressed_memory_sink):
         self.compressed_memory_sink = compressed_memory_sink

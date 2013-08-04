@@ -1721,7 +1721,7 @@ class CompressedFPSink(CompressedSink):
         return offset, compressed, digest
 
 
-def PlainMemorySink(object):
+class PlainMemorySink(PlainSink):
 
     def __init__(self, nchunks=None):
         if nchunks is not None:

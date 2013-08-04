@@ -1741,8 +1741,6 @@ class PlainMemorySink(PlainSink):
 
 
 class CompressedMemorySink(CompressedSink):
-    """ Keep compressed chunks and checksums as list of str in memory.
-    """
 
     def configure(self, blosc_args, bloscpack_header):
         self.blosc_args = blosc_args

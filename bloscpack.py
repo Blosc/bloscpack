@@ -1599,6 +1599,16 @@ class CompressedFPSource(CompressedSource):
             yield decompressed
 
 
+class PlainMemorySource(object):
+
+    def __init__(self, chunks):
+        self.chunks = chunks
+
+    def __call__(self):
+        for c in self.chunks:
+            yield c
+
+
 class CompressedMemorySource(object):
 
     def __init__(self, compressed_memory_sink):

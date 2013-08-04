@@ -1594,10 +1594,10 @@ class PlainSink(object):
 
 class CompressedSink(object):
 
-    def configure(self, blosc_args, bloscpack_args):
+    def configure(self, blosc_args, bloscpack_header):
         self.blosc_args = blosc_args
-        self.bloscpack_args = bloscpack_args
-        self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_args['checksum']]
+        self.bloscpack_header = bloscpack_header
+        self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
 
     def put(self, chunk):
         pass
@@ -1675,7 +1675,7 @@ def _pack_fp(input_fp, output_fp,
     # define source and sink
     source = PlainFPSource(input_fp, chunk_size, last_chunk, nchunks)
     sink = CompressedFPSink(output_fp)
-    sink.configure(blosc_args, bloscpack_args)
+    sink.configure(blosc_args, bloscpack_header)
 
     # read-compress-write loop
     for i, chunk in enumerate(source()):
@@ -2164,11 +2164,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # append to the original file, again original_fp should be adequately
     # positioned
     sink = CompressedFPSink(original_fp)
-    bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
-    bloscpack_args['offsets'] = True
-    bloscpack_args['checksum'] = bloscpack_header.checksum
-    bloscpack_args['max_app_chunks'] = bloscpack_header.max_app_chunks
-    sink.configure(blosc_args, bloscpack_args)
+    sink.configure(blosc_args, bloscpack_header)
     # read, compress, write loop
     for i, chunk in enumerate(source()):
         print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1

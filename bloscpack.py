@@ -1603,6 +1603,7 @@ class CompressedSink(object):
         self.blosc_args = blosc_args
         self.bloscpack_header = bloscpack_header
         self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
+        self.offsets = bloscpack_header.offsets
 
     @abc.abstractmethod
     def write_bloscpack_header(self):
@@ -1644,7 +1645,7 @@ class CompressedFPSink(CompressedSink):
                 metadata, metadata_args)
 
     def init_offsets(self):
-        if self.bloscpack_header.offsets:
+        if self.offsets:
             total_entries = self.bloscpack_header.nchunks + \
                     self.bloscpack_header.max_app_chunks
             self.offset_storage = list(itertools.repeat(-1,
@@ -1652,7 +1653,7 @@ class CompressedFPSink(CompressedSink):
             self.output_fp.write(encode_int64(-1) * total_entries)
 
     def finalize(self):
-        if self.bloscpack_header.offsets:
+        if self.offsets:
             self.output_fp.seek(BLOSCPACK_HEADER_LENGTH + self.meta_total, 0)
             _write_offsets(self.output_fp, self.offset_storage)
 
@@ -1660,7 +1661,7 @@ class CompressedFPSink(CompressedSink):
         offset = self.output_fp.tell()
         compressed, digest = _pack_chunk_fp(self.output_fp, chunk,
                 self.blosc_args, self.checksum_impl)
-        if self.bloscpack_header.offsets:
+        if self.offsets:
             self.offset_storage[i] = offset
         return offset, compressed, digest
 

@@ -17,6 +17,7 @@ from cStringIO import StringIO
 import bloscpack
 from bloscpack import *
 
+
 def test_hashes():
     nt.assert_equal(len(CHECKSUMS), 9)
     checksums_avail = ['None', 'adler32', 'crc32',
@@ -38,15 +39,17 @@ def test_hashes():
         '\x12w\xc9V/\x84\xe4\x0cd\xf0@\xd2U:Ae\xd9\x9b\xfbm\xe2^*\xdc\x96KG'+\
             '\x06\xa9\xc7\xee\x02\x1d\xac\x08\xf3\x9a*/\x02\x8b\x89\xa0\x0b'+\
             '\xa5=r\xd2\x9b\xf5Z\xf0\xe9z\xb6d\xa7\x00\x12<7\x11\x08e',]
-    for i,csum in enumerate(CHECKSUMS):
+    for i, csum in enumerate(CHECKSUMS):
         nt.assert_equal(csum("\x23\x42\xbe\xef"), csum_targets[i])
+
 
 def test_codecs():
     nt.assert_equal(CODECS_AVAIL, ['None', 'zlib'])
     random_str = "4KzGCl7SxTsYLaerommsMWyZg1TXbV6wsR9Xk"
-    for i,c in enumerate(CODECS):
+    for i, c in enumerate(CODECS):
         nt.assert_equal(random_str, c.decompress(
             c.compress(random_str, DEFAULT_META_LEVEL)))
+
 
 def test_serializers():
     nt.assert_equal(SERIZLIALIZERS_AVAIL, ['JSON'])
@@ -64,6 +67,7 @@ def test_print_verbose():
     print_verbose('notification')
     bloscpack.LEVEL = NORMAL
 
+
 def test_error():
     # switch out the exit, to make sure test-suite doesn't fall over
     backup = bloscpack.sys.exit
@@ -71,6 +75,7 @@ def test_error():
     # should probably hijack the print statement
     error('error')
     bloscpack.sys.exit = backup
+
 
 def test_pretty_filesieze():
 
@@ -89,9 +94,11 @@ def test_pretty_filesieze():
     # can't handle Petabytes, yet
     nt.assert_raises(ValueError, reverse_pretty, '2P')
 
+
 def test_parser():
     # hmmm I guess we could override the error
     parser = create_parser()
+
 
 def test_check_files():
     args = namedtuple('Args', 'force')(False)
@@ -135,9 +142,9 @@ def test_check_metadata_arguments():
 
 
 def test_check_range():
-    nt.assert_raises(TypeError,  check_range, 'test', 'a', 0, 1 )
-    nt.assert_raises(ValueError, check_range, 'test', -1, 0, 1 )
-    nt.assert_raises(ValueError, check_range, 'test', 2, 0, 1 )
+    nt.assert_raises(TypeError,  check_range, 'test', 'a', 0, 1)
+    nt.assert_raises(ValueError, check_range, 'test', -1, 0, 1)
+    nt.assert_raises(ValueError, check_range, 'test', 2, 0, 1)
 
 
 def test_calculate_nchunks():
@@ -181,6 +188,7 @@ def test_calculate_nchunks():
             calculate_nchunks(reverse_pretty('5.2M'),
                 chunk_size='2M'))
 
+
 def test_decode_blosc_header():
     array_ = numpy.linspace(0, 100, 2e4).tostring()
     # basic test case
@@ -215,12 +223,13 @@ def test_decode_blosc_header():
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
                 'blocksize': 88,
-                'ctbytes': len(array_) + 16, # original + 16 header bytes
+                'ctbytes': len(array_) + 16,  # original + 16 header bytes
                 'version': 2,
-                'flags': 3, # 1 for shuffle 2 for non-compressed
+                'flags': 3,  # 1 for shuffle 2 for non-compressed
                 'nbytes': len(array_),
                 'typesize': blosc_args['typesize']}
     nt.assert_equal(expected, header)
+
 
 def test_create_options():
     nt.assert_equal('00000001', create_options())
@@ -258,6 +267,7 @@ def test_decode_options():
     nt.assert_raises(ValueError, decode_options, '00000100')
     nt.assert_raises(ValueError, decode_options, '00001100')
     nt.assert_raises(ValueError, decode_options, '11111100')
+
 
 def test_create_metadata_options():
     nt.assert_equal('00000000', create_metadata_options())
@@ -341,7 +351,7 @@ def test_BloscPackHeader_encode():
 
     # test with no arguments
     raw = MAGIC + struct.pack('<B', FORMAT_VERSION) + \
-        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
 
     def mod_raw(offset, value):
@@ -355,7 +365,7 @@ def test_BloscPackHeader_encode():
     nt.assert_equal(mod_raw(5, '\x01'), BloscPackHeader(offsets=True).encode())
     nt.assert_equal(mod_raw(5, '\x02'), BloscPackHeader(metadata=True).encode())
     nt.assert_equal(mod_raw(5, '\x03'),
-            BloscPackHeader(offsets=True,metadata=True).encode())
+            BloscPackHeader(offsets=True, metadata=True).encode())
     # test with checksum
     nt.assert_equal(mod_raw(6, '\x01'),
             BloscPackHeader(checksum='adler32').encode())
@@ -414,6 +424,7 @@ def test_BloscPackHeader_encode():
         '\xfe\xff\xff\xff\xff\xff\xff\x7f'),
             BloscPackHeader(nchunks=1, max_app_chunks=MAX_CHUNKS-1).encode())
 
+
 def test_decode_bloscpack_header():
     bloscpack_header = BloscPackHeader()
 
@@ -422,9 +433,9 @@ def test_decode_bloscpack_header():
         setattr(copy_, key, value)
         return copy_
 
-    format_version =struct.pack('<B', FORMAT_VERSION)
+    format_version = struct.pack('<B', FORMAT_VERSION)
     no_arg_input = MAGIC + format_version + \
-        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
 
     def copy_and_set_input(offset, value):
@@ -495,7 +506,7 @@ def test_decode_bloscpack_header():
     # set nchunks to be 1 in header and raw
     bloscpack_header.nchunks = 1
     no_arg_input = MAGIC + format_version + \
-        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'+ \
+        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
         '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
     nt.assert_equal(copy_and_set_return('max_app_chunks', 1),
@@ -553,7 +564,7 @@ def test_create_metadata_header():
             create_metadata_header(user_codec='sesame'))
 
 def test_decode_metadata_header():
-    no_arg_return  = {
+    no_arg_return = {
             'magic_format':        '',
             'meta_options':        '00000000',
             'meta_checksum':       'None',
@@ -645,6 +656,7 @@ def create_array(repeats, in_file, progress=False):
     with open(in_file, 'w') as in_fp:
         create_array_fp(repeats, in_fp, progress=progress)
 
+
 def create_array_fp(repeats, in_fp, progress=False):
     if progress:
         def progress(i):
@@ -669,6 +681,7 @@ def atexit_tmpremover(dirname):
         # if the temp dir was removed already, by the context manager
         pass
 
+
 @contextlib.contextmanager
 def create_tmp_files():
     tdir = tempfile.mkdtemp(prefix='blpk')
@@ -680,6 +693,7 @@ def create_tmp_files():
     yield tdir, in_file, out_file, dcmp_file
     # context manager remover
     shutil.rmtree(tdir)
+
 
 def test_offsets():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
@@ -732,6 +746,7 @@ def test_offsets():
         1362724, 1660126, 1958578, 2257063],
             offsets)
 
+
 def test_metadata():
     test_metadata = {'dtype': 'float64',
                      'shape': [1024],
@@ -739,6 +754,7 @@ def test_metadata():
                      }
     received_metadata = pack_unpack_fp(1, metadata=test_metadata)
     nt.assert_equal(test_metadata, received_metadata)
+
 
 def test_recreate_metadata():
     old_meta_header = create_metadata_header(magic_format='',
@@ -767,6 +783,7 @@ def test_recreate_metadata():
             header_dict,
             '',
             checksum='adler32')
+
 
 def test_rewrite_metadata():
     test_metadata = {'dtype': 'float64',
@@ -902,6 +919,7 @@ def test_file_corruption():
         # now attempt to unpack it
         nt.assert_raises(ChecksumMismatch, unpack_file, out_file, dcmp_file)
 
+
 def pack_unpack(repeats, chunk_size=None, progress=False):
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         if progress:
@@ -916,6 +934,7 @@ def pack_unpack(repeats, chunk_size=None, progress=False):
         if progress:
             print("Verifying")
         cmp(in_file, dcmp_file)
+
 
 def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
         progress=False, metadata=None):
@@ -946,17 +965,20 @@ def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
     if metadata:
         return metadata
 
+
 def test_pack_unpack():
     pack_unpack(1, chunk_size=reverse_pretty('1M'))
     pack_unpack(1, chunk_size=reverse_pretty('2M'))
     pack_unpack(1, chunk_size=reverse_pretty('4M'))
     pack_unpack(1, chunk_size=reverse_pretty('8M'))
 
+
 def test_pack_unpack_fp():
     pack_unpack_fp(1, chunk_size=reverse_pretty('1M'))
     pack_unpack_fp(1, chunk_size=reverse_pretty('2M'))
     pack_unpack_fp(1, chunk_size=reverse_pretty('4M'))
     pack_unpack_fp(1, chunk_size=reverse_pretty('8M'))
+
 
 def pack_unpack_hard():
     """ Test on somewhat larger arrays, but be nice to memory. """
@@ -966,11 +988,13 @@ def pack_unpack_hard():
     # should make apprx 1536 chunks
     pack_unpack(100, chunk_size=reverse_pretty('1M'), progress=True)
 
+
 def pack_unpack_extreme():
     """ Test on somewhat larer arrays, uses loads of memory. """
     # this will create a huge array, and then use the
     # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
     pack_unpack(300, chunk_size=blosc.BLOSC_MAX_BUFFERSIZE, progress=True)
+
 
 def prep_array_for_append(blosc_args=DEFAULT_BLOSC_ARGS,
         bloscpack_args=DEFAULT_BLOSCPACK_ARGS):
@@ -987,6 +1011,7 @@ def prep_array_for_append(blosc_args=DEFAULT_BLOSC_ARGS,
     orig.reset()
     new.reset()
     return orig, new, new_size, dcmp
+
 
 def reset_append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     """ like ``append_fp`` but with ``reset()`` on the file pointers. """
@@ -1084,6 +1109,7 @@ def test_append():
         nt.assert_equal(len(dcmp_content), len(in_content) * 2)
         nt.assert_equal(dcmp_content, in_content * 2)
 
+
 def test_append_into_last_chunk():
     # first create an array with a single chunk
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
@@ -1119,6 +1145,7 @@ def test_append_into_last_chunk():
     dcmp_str = dcmp.read()
     nt.assert_equal(len(dcmp_str), len(new_str) + 2046)
     nt.assert_equal(dcmp_str, new_str + new_str[:1023] * 2)
+
 
 def test_append_single_chunk():
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
@@ -1194,6 +1221,7 @@ def test_append_metadata():
     dcmp_str = dcmp.read()
     nt.assert_equal(len(dcmp_str), len(new_str) * 2)
     nt.assert_equal(dcmp_str, new_str * 2)
+
 
 def test_append_fp_no_offsets():
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
@@ -1296,11 +1324,13 @@ def test_append_mix_shuffle():
     # last chunk doesn't
     nt.assert_equal(blosc_header_last['flags'], 0)
 
+
 def cmp(file1, file2):
     """ File comparison utility with a small chunksize """
     with open_two_file(open(file1, 'rb'), open(file2, 'rb')) as \
             (fp1, fp2):
         cmp_fp(fp1, fp2)
+
 
 def cmp_fp(fp1, fp2):
     chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)

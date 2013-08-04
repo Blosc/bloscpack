@@ -8,6 +8,8 @@ from __future__ import division
 
 import argparse
 import contextlib
+import collections
+import copy
 import hashlib
 import json
 import itertools
@@ -1013,16 +1015,8 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     return max_app_chunks
 
 
-def create_bloscpack_header(format_version=FORMAT_VERSION,
-        offsets=False,
-        metadata=False,
-        checksum='None',
-        typesize=0,
-        chunk_size=-1,
-        last_chunk=-1,
-        nchunks=-1,
-        max_app_chunks=0):
-    """ Create the bloscpack header string.
+class BloscPackHeader(collections.MutableMapping):
+    """ The Bloscpack header.
 
     Parameters
     ----------
@@ -1045,11 +1039,6 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
     max_app_chunks : int
         the total number of possible append chunks
 
-    Returns
-    -------
-    bloscpack_header : string
-        the header as string
-
     Notes
     -----
     See the README distributed for details on the header format.
@@ -1060,90 +1049,158 @@ def create_bloscpack_header(format_version=FORMAT_VERSION,
         if any of the arguments have an invalid value
     TypeError
         if any of the arguments have the wrong type
-
     """
-    check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
-    _check_valid_checksum(checksum)
-    check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
-    check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
-    check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
-    check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
-    check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
-    if nchunks != -1:
-        check_range('nchunks + max_app_chunks',
-            nchunks + max_app_chunks, 0, MAX_CHUNKS)
-    elif max_app_chunks != 0:
-        raise ValueError("'max_app_chunks' can not be non '0' if 'nchunks' is '-1'")
-    if chunk_size != -1 and last_chunk != -1 and last_chunk > chunk_size:
-        raise ValueError("'last_chunk' (%d) is larger than 'chunk_size' (%d)"
-                % (last_chunk, chunk_size))
+    def __init__(self,
+                 format_version=FORMAT_VERSION,
+                 offsets=False,
+                 metadata=False,
+                 checksum='None',
+                 typesize=0,
+                 chunk_size=-1,
+                 last_chunk=-1,
+                 nchunks=-1,
+                 max_app_chunks=0):
 
-    format_version = encode_uint8(format_version)
-    options = encode_uint8(int(
-        create_options(offsets=offsets, metadata=metadata),
-        2))
-    checksum = encode_uint8(CHECKSUMS_AVAIL.index(checksum))
-    typesize = encode_uint8(typesize)
-    chunk_size = encode_int32(chunk_size)
-    last_chunk = encode_int32(last_chunk)
-    nchunks = encode_int64(nchunks)
-    max_app_chunks = encode_int64(max_app_chunks)
+        check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
+        _check_valid_checksum(checksum)
+        check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
+        check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
+        check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
+        check_range('nchunks',    nchunks,    -1, MAX_CHUNKS)
+        check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
+        if nchunks != -1:
+            check_range('nchunks + max_app_chunks',
+                nchunks + max_app_chunks, 0, MAX_CHUNKS)
+        elif max_app_chunks != 0:
+            raise ValueError("'max_app_chunks' can not be non '0' if 'nchunks' is '-1'")
+        if chunk_size != -1 and last_chunk != -1 and last_chunk > chunk_size:
+            raise ValueError("'last_chunk' (%d) is larger than 'chunk_size' (%d)"
+                    % (last_chunk, chunk_size))
 
-    return (MAGIC + format_version + options + checksum + typesize +
-            chunk_size + last_chunk +
-            nchunks + max_app_chunks)
+        self._attrs = ['format_version',
+                       'offsets',
+                       'metadata',
+                       'checksum',
+                       'typesize',
+                       'chunk_size',
+                       'last_chunk',
+                       'nchunks',
+                       'max_app_chunks']
+        self._len = len(self._attrs)
+        self._bytes_attrs = ['chunk_size',
+                             'last_chunk']
 
+        self.format_version  = format_version
+        self.offsets         = offsets
+        self.metadata        = metadata
+        self.checksum        = checksum
+        self.typesize        = typesize
+        self.chunk_size      = chunk_size
+        self.last_chunk      = last_chunk
+        self.nchunks         = nchunks
+        self.max_app_chunks  = max_app_chunks
 
-def decode_bloscpack_header(buffer_):
-    """ Check that the magic marker exists and return number of chunks.
+    def __getitem__(self, key):
+        if key not in self._attrs:
+            raise KeyError('%s not in BloscPackHeader' % key)
+        return getattr(self, key)
 
-    Parameters
-    ----------
-    buffer_ : str of length 32 (but probably any sequence would work)
-        the header
+    def __setitem__(self, key, value):
+        if key not in self._attrs:
+            raise KeyError('%s not in BloscPackHeader' % key)
+        setattr(self, key, value)
 
-    Returns
-    -------
-    format_version : int
-        the version format for the compressed file
-    offsets: bool
-        if the offsets to the chunks are present
-    metadata: bool
-        if the metadata is present
-    checksum : str
-        the checksum to be used
-    typesize : int
-        the typesize used for blosc in the chunks
-    chunk_size : int
-        the size of a regular chunk
-    last_chunk : int
-        the size of the last chunk
-    nchunks : int
-        the number of chunks
-    max_app_chunks : int
-        the maximum number of chunks that can be appended
+    def __delitem__(self, key):
+        raise NotImplementedError(
+            'BloscPackHeader does not support __delitem__ or derivatives')
 
-    """
-    if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
-        raise ValueError(
-            "attempting to decode a bloscpack header of length '%d', not '%d'"
-            % (len(buffer_), BLOSCPACK_HEADER_LENGTH))
-    elif buffer_[0:4] != MAGIC:
-        raise ValueError(
-            "the magic marker '%s' is missing from the bloscpack " % MAGIC +
-            "header, instead we found: %s" % repr(buffer_[0:4]))
+    def __len__(self):
+        return self._len
 
-    options = decode_options(decode_bitfield(buffer_[5]))
-    return {'format_version': decode_uint8(buffer_[4]),
-            'offsets':        options['offsets'],
-            'metadata':       options['metadata'],
-            'checksum':       CHECKSUMS_AVAIL[decode_uint8(buffer_[6])],
-            'typesize':       decode_uint8(buffer_[7]),
-            'chunk_size':     decode_int32(buffer_[8:12]),
-            'last_chunk':     decode_int32(buffer_[12:16]),
-            'nchunks':        decode_int64(buffer_[16:24]),
-            'max_app_chunks': decode_int64(buffer_[24:32]),
-            }
+    def __iter__(self):
+        return iter(self._attrs)
+
+    def __str__(self):
+        return pprint.pformat(dict(self))
+
+    def __repr__(self):
+        return "BloscPackHeader(%s)" % ", ".join((("%s=%s" % (arg, repr(value)))
+                          for arg, value in self.iteritems()))
+
+    def pformat(self, indent=4):
+        indent = " " * indent
+        # don't ask, was feeling functional
+        return "bloscpack header: \n%s%s" % (indent, (",\n%s" % indent).join((("%s=%s" % 
+            (key, (repr(value) if (key not in self._bytes_attrs or value == -1)
+                         else double_pretty_size(value)))
+             for key, value in self.iteritems()))))
+
+    def copy(self):
+        return copy.copy(self)
+
+    def encode(self):
+        """ Encode the Bloscpack header.
+
+        Returns
+        -------
+
+        raw_bloscpack_header : string
+            the header as string of bytes
+        """
+        format_version = encode_uint8(self.format_version)
+        options = encode_uint8(int(
+            create_options(offsets=self.offsets, metadata=self.metadata),
+            2))
+        checksum = encode_uint8(CHECKSUMS_AVAIL.index(self.checksum))
+        typesize = encode_uint8(self.typesize)
+        chunk_size = encode_int32(self.chunk_size)
+        last_chunk = encode_int32(self.last_chunk)
+        nchunks = encode_int64(self.nchunks)
+        max_app_chunks = encode_int64(self.max_app_chunks)
+
+        return (MAGIC + format_version + options + checksum + typesize +
+                chunk_size + last_chunk +
+                nchunks + max_app_chunks)
+
+    @staticmethod
+    def decode(buffer_):
+        """ Decode an encoded Bloscpack header.
+
+        Parameters
+        ----------
+        buffer_ : str of length BLOSCPACK_HEADER_LENGTH
+
+        Returns
+        -------
+        bloscpack_header : BloscPackHeader
+            the decoded Bloscpack header object
+
+        Raises
+        ------
+        ValueError
+            If the buffer_ is not equal to BLOSCPACK_HEADER_LENGTH or the the
+            first four bytes are not the Bloscpack magic.
+
+        """
+        if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
+            raise ValueError(
+                "attempting to decode a bloscpack header of length '%d', not '%d'"
+                % (len(buffer_), BLOSCPACK_HEADER_LENGTH))
+        elif buffer_[0:4] != MAGIC:
+            raise ValueError(
+                "the magic marker '%s' is missing from the bloscpack " % MAGIC +
+                "header, instead we found: %s" % repr(buffer_[0:4]))
+        options = decode_options(decode_bitfield(buffer_[5]))
+        return BloscPackHeader(
+            format_version=decode_uint8(buffer_[4]),
+            offsets=options['offsets'],
+            metadata=options['metadata'],
+            checksum=CHECKSUMS_AVAIL[decode_uint8(buffer_[6])],
+            typesize=decode_uint8(buffer_[7]),
+            chunk_size=decode_int32(buffer_[8:12]),
+            last_chunk=decode_int32(buffer_[12:16]),
+            nchunks=decode_int64(buffer_[16:24]),
+            max_app_chunks=decode_int64(buffer_[24:32]))
 
 
 def create_metadata_header(magic_format='',
@@ -1517,8 +1574,8 @@ class CompressedFPSource(CompressedSource):
         self.input_fp = input_fp
         self.bloscpack_header, self.metadata, self.metadata_header, \
                 self.offsets = _read_beginning(input_fp)
-        self.checksum_impl = CHECKSUMS_LOOKUP[self.bloscpack_header['checksum']]
-        self.nchunks = self.bloscpack_header['nchunks']
+        self.checksum_impl = CHECKSUMS_LOOKUP[self.bloscpack_header.checksum]
+        self.nchunks = self.bloscpack_header.nchunks
 
     def __call__(self):
         for i in xrange(self.nchunks):
@@ -1588,7 +1645,7 @@ def _pack_fp(input_fp, output_fp,
             nchunks,
             bloscpack_args['max_app_chunks'])
     # create the bloscpack header
-    raw_bloscpack_header = create_bloscpack_header(
+    bloscpack_header = BloscPackHeader(
             offsets=bloscpack_args['offsets'],
             metadata=True if metadata is not None else False,
             checksum=bloscpack_args['checksum'],
@@ -1598,6 +1655,7 @@ def _pack_fp(input_fp, output_fp,
             nchunks=nchunks,
             max_app_chunks=max_app_chunks
             )
+    raw_bloscpack_header = bloscpack_header.encode()
     print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
             level=DEBUG)
     output_fp.write(raw_bloscpack_header)
@@ -1656,14 +1714,12 @@ def _read_bloscpack_header(input_fp):
     bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
     print_verbose('bloscpack_header_raw: %s' %
             repr(bloscpack_header_raw), level=DEBUG)
-    bloscpack_header = decode_bloscpack_header(bloscpack_header_raw)
-    print_verbose("bloscpack header: ", level=DEBUG)
-    for arg, value in bloscpack_header.iteritems():
-        print_verbose('\t%s: %s' % (arg, value), level=DEBUG)
-    if FORMAT_VERSION != bloscpack_header['format_version']:
+    bloscpack_header = BloscPackHeader.decode(bloscpack_header_raw)
+    print_verbose("bloscpack header: %s" % repr(bloscpack_header), level=DEBUG)
+    if FORMAT_VERSION != bloscpack_header.format_version:
         raise FormatVersionMismatch(
                 "format version of file was not '%s' as expected, but '%d'" %
-                (FORMAT_VERSION, bloscpack_header['format_version']))
+                (FORMAT_VERSION, bloscpack_header.format_version))
     return bloscpack_header
 
 
@@ -1744,14 +1800,14 @@ def _read_offsets(input_fp, bloscpack_header):
     unused offsets will not be returned.
 
     """
-    if bloscpack_header['offsets']:
-        total_entries = bloscpack_header['nchunks'] + \
-                bloscpack_header['max_app_chunks']
+    if bloscpack_header.offsets:
+        total_entries = bloscpack_header.nchunks + \
+                bloscpack_header.max_app_chunks
         offsets_raw = input_fp.read(8 * total_entries)
         print_verbose('Read raw offsets: %s' % repr(offsets_raw),
                 level=DEBUG)
         offsets = [decode_int64(offsets_raw[j - 8:j]) for j in
-                xrange(8, bloscpack_header['nchunks'] * 8 + 1, 8)]
+                xrange(8, bloscpack_header.nchunks * 8 + 1, 8)]
         print_verbose('Offsets: %s' % offsets, level=DEBUG)
         return offsets
     else:
@@ -1776,7 +1832,7 @@ def _read_beginning(input_fp):
     """
     bloscpack_header = _read_bloscpack_header(input_fp)
     metadata, metadata_header = _read_metadata(input_fp) \
-            if bloscpack_header['metadata'] \
+            if bloscpack_header.metadata\
             else (None, None)
     offsets = _read_offsets(input_fp, bloscpack_header)
     return bloscpack_header, metadata, metadata_header, offsets
@@ -1903,7 +1959,7 @@ def _seek_to_metadata(target_fp):
 
     """
     bloscpack_header = _read_bloscpack_header(target_fp)
-    if not bloscpack_header['metadata']:
+    if not bloscpack_header.metadata:
         raise NoMetadataFound("unable to seek to metadata if it does not exist")
     else:
         return target_fp.tell()
@@ -2034,7 +2090,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     """
     bloscpack_header, metadata, metadata_header, offsets = \
         _read_beginning(original_fp)
-    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
+    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
     if not offsets:
         raise RuntimeError(
                 'Appending to a file without offsets is not yet supported')
@@ -2042,12 +2098,12 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         blosc_args = dict(zip(BLOSC_ARGS, [None] * len(BLOSC_ARGS)))
     # handle blosc_args
     if blosc_args['typesize'] is None:
-        if bloscpack_header['typesize'] == -1:
+        if bloscpack_header.typesize == -1:
             raise NonUniformTypesize(
                     "Non uniform type size, can not append to file.")
         else:
             # use the typesize from the bloscpack header
-            blosc_args['typesize'] = bloscpack_header['typesize']
+            blosc_args['typesize'] = bloscpack_header.typesize
     if blosc_args['clevel'] is None:
         # use the default
         blosc_args['clevel'] = DEFAULT_CLEVEL
@@ -2064,7 +2120,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     compressed, decompressed, blosc_header = _unpack_chunk_fp(original_fp, checksum_impl)
     # figure out how many bytes we need to read to rebuild the last chunk
     ultimo_length = len(decompressed)
-    bytes_to_read = bloscpack_header['chunk_size'] - ultimo_length
+    bytes_to_read = bloscpack_header.chunk_size - ultimo_length
     if new_size <= bytes_to_read:
         # special case
         # must squeeze data into last chunk
@@ -2077,10 +2133,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
                 blosc_args, checksum_impl)
         # return 0 to indicate that no new chunks have been written
         # build the new header
-        bloscpack_header['last_chunk'] += new_size
+        bloscpack_header.last_chunk += new_size
         # create the new header
-        raw_bloscpack_header = create_bloscpack_header(
-                **bloscpack_header)
+        raw_bloscpack_header = bloscpack_header.encode()
         original_fp.seek(0)
         original_fp.write(raw_bloscpack_header)
         return 0
@@ -2092,9 +2147,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # figure out how many chunks we will need
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(new_new_size,
-                chunk_size=bloscpack_header['chunk_size'])
+                chunk_size=bloscpack_header.chunk_size)
     # make sure that we actually have that kind of space
-    if nchunks > bloscpack_header['max_app_chunks']:
+    if nchunks > bloscpack_header.max_app_chunks:
         raise NotEnoughSpace('not enough space')
     # seek back to the position of the original last chunk
     original_fp.seek(offsets[-1], 0)
@@ -2109,7 +2164,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # append to the original file, again original_fp should be adequately
     # positioned
     sink = CompressedFPSink(original_fp,
-            checksum=bloscpack_header['checksum'],
+            checksum=bloscpack_header.checksum,
             blosc_args=blosc_args)
     # read, compress, write loop
     for i, chunk in enumerate(source()):
@@ -2119,12 +2174,11 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         offset_storage[i] = offset
 
     # build the new header
-    bloscpack_header['last_chunk'] = last_chunk_size
-    bloscpack_header['nchunks'] += nchunks
-    bloscpack_header['max_app_chunks'] -= nchunks
+    bloscpack_header.last_chunk = last_chunk_size
+    bloscpack_header.nchunks += nchunks
+    bloscpack_header.max_app_chunks -= nchunks
     # create the new header
-    raw_bloscpack_header = create_bloscpack_header(
-            **bloscpack_header)
+    raw_bloscpack_header = bloscpack_header.encode()
     original_fp.seek(0)
     original_fp.write(raw_bloscpack_header)
     # write the new offsets, but only those that changed
@@ -2250,8 +2304,7 @@ if __name__ == '__main__':
         except ValueError as ve:
             error(str(ve) + "\n" +
             "This might not be a bloscpack compressed file.")
-        print_normal("'bloscpack_header':")
-        print_normal(pprint.pformat(bloscpack_header, indent=4))
+        print_normal(bloscpack_header.pformat())
         if metadata is not None:
             print_normal("'metadata':")
             print_normal(pprint.pformat(metadata, indent=4))

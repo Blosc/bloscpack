@@ -180,29 +180,29 @@ Use the force, Luke:
 Get some info on the file:
 
   $ blpk info data.dat.blp
-  blpk: 'bloscpack_header':
-  blpk: {   'checksum': 'adler32',
-  blpk:     'chunk_size': 1048576,
-  blpk:     'format_version': 3,
-  blpk:     'last_chunk': 616448,
-  blpk:     'max_app_chunks': 1530,
-  blpk:     'metadata': False,
-  blpk:     'nchunks': 153,
-  blpk:     'offsets': True,
-  blpk:     'typesize': 8}
+  blpk: bloscpack header: 
+  blpk:     format_version=3,
+  blpk:     offsets=True,
+  blpk:     metadata=False,
+  blpk:     checksum='adler32',
+  blpk:     typesize=8,
+  blpk:     chunk_size=1.0M (1048576B),
+  blpk:     last_chunk=602.0K (616448B),
+  blpk:     nchunks=153,
+  blpk:     max_app_chunks=1530
   blpk: 'offsets':
   blpk: [13496,168668,310991,471593,628230,...]
   $ blpk i data.dat.blp
-  blpk: 'bloscpack_header':
-  blpk: {   'checksum': 'adler32',
-  blpk:     'chunk_size': 1048576,
-  blpk:     'format_version': 3,
-  blpk:     'last_chunk': 616448,
-  blpk:     'max_app_chunks': 1530,
-  blpk:     'metadata': False,
-  blpk:     'nchunks': 153,
-  blpk:     'offsets': True,
-  blpk:     'typesize': 8}
+  blpk: bloscpack header: 
+  blpk:     format_version=3,
+  blpk:     offsets=True,
+  blpk:     metadata=False,
+  blpk:     checksum='adler32',
+  blpk:     typesize=8,
+  blpk:     chunk_size=1.0M (1048576B),
+  blpk:     last_chunk=602.0K (616448B),
+  blpk:     nchunks=153,
+  blpk:     max_app_chunks=1530
   blpk: 'offsets':
   blpk: [13496,168668,310991,471593,628230,...]
   $ rm data.dat.blp
@@ -218,32 +218,32 @@ Try using no offsets:
 
   $ blpk compress --no-offsets data.dat
   $ blpk info data.dat.blp
-  blpk: 'bloscpack_header':
-  blpk: {   'checksum': 'adler32',
-  blpk:     'chunk_size': 1048576,
-  blpk:     'format_version': 3,
-  blpk:     'last_chunk': 616448,
-  blpk:     'max_app_chunks': 0,
-  blpk:     'metadata': False,
-  blpk:     'nchunks': 153,
-  blpk:     'offsets': False,
-  blpk:     'typesize': 8}
+  blpk: bloscpack header: 
+  blpk:     format_version=3,
+  blpk:     offsets=False,
+  blpk:     metadata=False,
+  blpk:     checksum='adler32',
+  blpk:     typesize=8,
+  blpk:     chunk_size=1.0M (1048576B),
+  blpk:     last_chunk=602.0K (616448B),
+  blpk:     nchunks=153,
+  blpk:     max_app_chunks=0
   $ rm data.dat.blp
 
 Try using alternative checksum:
 
   $ blpk compress --checksum sha512 data.dat
   $ blpk info data.dat.blp
-  blpk: 'bloscpack_header':
-  blpk: {   'checksum': 'sha512',
-  blpk:     'chunk_size': 1048576,
-  blpk:     'format_version': 3,
-  blpk:     'last_chunk': 616448,
-  blpk:     'max_app_chunks': 1530,
-  blpk:     'metadata': False,
-  blpk:     'nchunks': 153,
-  blpk:     'offsets': True,
-  blpk:     'typesize': 8}
+  blpk: bloscpack header: 
+  blpk:     format_version=3,
+  blpk:     offsets=True,
+  blpk:     metadata=False,
+  blpk:     checksum='sha512',
+  blpk:     typesize=8,
+  blpk:     chunk_size=1.0M (1048576B),
+  blpk:     last_chunk=602.0K (616448B),
+  blpk:     nchunks=153,
+  blpk:     max_app_chunks=1530
   blpk: 'offsets':
   blpk: [13496,168728,311111,471773,628470,...]
   $ rm data.dat.blp
@@ -268,16 +268,16 @@ Add metadata to the file:
 
   $ blpk compress --metadata meta.json data.dat
   $ blpk info data.dat.blp
-  blpk: 'bloscpack_header':
-  blpk: {   'checksum': 'adler32',
-  blpk:     'chunk_size': 1048576,
-  blpk:     'format_version': 3,
-  blpk:     'last_chunk': 616448,
-  blpk:     'max_app_chunks': 1530,
-  blpk:     'metadata': True,
-  blpk:     'nchunks': 153,
-  blpk:     'offsets': True,
-  blpk:     'typesize': 8}
+  blpk: bloscpack header: 
+  blpk:     format_version=3,
+  blpk:     offsets=True,
+  blpk:     metadata=True,
+  blpk:     checksum='adler32',
+  blpk:     typesize=8,
+  blpk:     chunk_size=1.0M (1048576B),
+  blpk:     last_chunk=602.0K (616448B),
+  blpk:     nchunks=153,
+  blpk:     max_app_chunks=1530
   blpk: 'metadata':
   blpk: {   u'container': u'numpy', u'dtype': u'float64', u'shape': [20000000]}
   blpk: 'metadata_header':

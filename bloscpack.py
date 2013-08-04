@@ -1771,7 +1771,7 @@ class CompressedMemorySink(CompressedSink):
         pass
 
     def put(self, i, chunk):
-        compressed = blosc.compress(chunk, self.blosc_args)
+        compressed = blosc.compress(chunk, **self.blosc_args)
         self.chunks[i] = compressed
         if self.checksum:
             self.checksums[i] = self.checksum_impl(compressed)

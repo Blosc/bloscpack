@@ -1,4 +1,4 @@
 blosc>=1.0.5
 numpy
 nose
-cram
+cram>=0.6

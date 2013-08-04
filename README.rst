@@ -11,11 +11,11 @@ Bloscpack
 Description
 -----------
 
-This script provides a command line interface to
-`Blosc <http://blosc.pytables.org/trac>`_, a high performance, multi-threaded,
-blocking and shuffling compressor. The interface is realized by using the
-`argparse <http://docs.python.org/dev/library/argparse.html>`_ library
-and `python-blosc <https://github.com/FrancescAlted/python-blosc>`_ bindings.
+Command line interface to and serialization format for `Blosc
+<http://blosc.pytables.org/trac>`_, a high performance, multi-threaded,
+blocking and shuffling compressor. Uses `python-blosc
+<https://github.com/FrancescAlted/python-blosc>`_ bindings to interface with
+blosc.
 
 Website
 -------

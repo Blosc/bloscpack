@@ -1546,8 +1546,17 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
 
 class PlainSource(object):
 
+    _metaclass__ = abc.ABCMeta
+
+    def configure(self, chunk_size, last_chunk, nchunks):
+        self.chunk_size = chunk_size
+        self.last_chunk = last_chunk
+        self.nchunks = nchunks
+
+    @abc.abstractmethod
     def __iter__(self):
         return self()
+
 
 class CompressedSource(object):
 
@@ -1557,11 +1566,8 @@ class CompressedSource(object):
 
 class PlainFPSource(PlainSource):
 
-    def __init__(self, input_fp, chunk_size, last_chunk, nchunks):
+    def __init__(self, input_fp):
         self.input_fp = input_fp
-        self.chunk_size = chunk_size
-        self.last_chunk = last_chunk
-        self.nchunks = nchunks
 
     def __call__(self):
         # if nchunks == 1 the last_chunk_size is the size of the single chunk
@@ -1699,6 +1705,8 @@ def _pack_fp(input_fp, output_fp,
             nchunks=nchunks,
             max_app_chunks=max_app_chunks
             )
+    source = PlainFPSource(input_fp)
+    source.configure(chunk_size, last_chunk, nchunks)
     sink = CompressedFPSink(output_fp)
     sink.configure(blosc_args, bloscpack_header)
     sink.write_bloscpack_header()
@@ -1708,7 +1716,6 @@ def _pack_fp(input_fp, output_fp,
     elif metadata_args is not None:
         print_verbose('metadata_args will be silently ignored', level=DEBUG)
     sink.init_offsets()
-    source = PlainFPSource(input_fp, chunk_size, last_chunk, nchunks)
 
     # read-compress-write loop
     for i, chunk in enumerate(source()):
@@ -2193,7 +2200,8 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     sink.offset_storage = list(itertools.repeat(-1, nchunks))
     # read from the new input file, new_content_fp should be adequately
     # positioned
-    source = PlainFPSource(new_content_fp, chunk_size, last_chunk_size, nchunks)
+    source = PlainFPSource(new_content_fp)
+    source.configure(chunk_size, last_chunk_size, nchunks)
     # read, compress, write loop
     for i, chunk in enumerate(source()):
         print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1

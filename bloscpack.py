@@ -1546,11 +1546,14 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
 
 class PlainSource(object):
 
+    _metaclass__ = abc.ABCMeta
+
     def configure(self, chunk_size, last_chunk, nchunks):
         self.chunk_size = chunk_size
         self.last_chunk = last_chunk
         self.nchunks = nchunks
 
+    @abc.abstractmethod
     def __iter__(self):
         return self()
 

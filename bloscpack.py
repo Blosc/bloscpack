@@ -1555,18 +1555,28 @@ class PlainSource(object):
         self.last_chunk = last_chunk
         self.nchunks = nchunks
 
-    @abc.abstractmethod
     def __iter__(self):
         return self()
+
+    @abc.abstractmethod
+    def __call__(self):
+        pass
 
 
 class CompressedSource(object):
 
+    _metaclass__ = abc.ABCMeta
+
     def __iter__(self):
         return self()
 
+    @abc.abstractmethod
+    def __call__(self):
+        pass
 
 class PlainFPSource(PlainSource):
+
+    _metaclass__ = abc.ABCMeta
 
     def __init__(self, input_fp):
         self.input_fp = input_fp
@@ -1641,6 +1651,9 @@ class CompressedMemorySource(CompressedSource):
 
 class PlainSink(object):
 
+    _metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def put(self, chunk):
         pass
 

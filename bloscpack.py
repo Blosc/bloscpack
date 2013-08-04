@@ -1740,7 +1740,7 @@ class PlainMemorySink(PlainSink):
             self.chunks.append(chunk)
 
 
-def CompressedMemorySink(object):
+class CompressedMemorySink(CompressedSink):
     """ Keep compressed chunks and checksums as list of str in memory.
     """
 

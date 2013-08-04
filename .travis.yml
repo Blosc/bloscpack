@@ -12,6 +12,6 @@ script:
   - nosetests --with-coverage --cover-package=bloscpack
   - ./test_bloscpack.cram
 after_success:
-    coveralls
+  - "if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then coveralls ; fi"
 notifications:
   email: false

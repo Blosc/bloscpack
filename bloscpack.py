@@ -1555,18 +1555,28 @@ class PlainSource(object):
         self.last_chunk = last_chunk
         self.nchunks = nchunks
 
-    @abc.abstractmethod
     def __iter__(self):
         return self()
+
+    @abc.abstractmethod
+    def __call__(self):
+        pass
 
 
 class CompressedSource(object):
 
+    _metaclass__ = abc.ABCMeta
+
     def __iter__(self):
         return self()
 
+    @abc.abstractmethod
+    def __call__(self):
+        pass
 
 class PlainFPSource(PlainSource):
+
+    _metaclass__ = abc.ABCMeta
 
     def __init__(self, input_fp):
         self.input_fp = input_fp
@@ -1598,10 +1608,55 @@ class CompressedFPSource(CompressedSource):
                         pretty_size(len(decompressed))), level=DEBUG)
             yield decompressed
 
+
+class PlainMemorySource(PlainSource):
+
+    def __init__(self, chunks):
+        self.chunks = chunks
+
+    def __call__(self):
+        for c in self.chunks:
+            yield c
+
+
+class CompressedMemorySource(CompressedSource):
+
+    @property
+    def metadata(self):
+        return self.compressed_memory_sink.metadata
+
+    def __init__(self, compressed_memory_sink):
+        self.compressed_memory_sink = compressed_memory_sink
+        self.checksum_impl = compressed_memory_sink.checksum_impl
+        self.checksum = compressed_memory_sink.checksum
+        self.nchunks = compressed_memory_sink.nchunks
+
+        self.chunks = compressed_memory_sink.chunks
+        if self.checksum:
+            self.checksums = compressed_memory_sink.checksums
+
+    def __call__(self):
+        for i in xrange(self.nchunks):
+            compressed = self.chunks[i]
+            if self.checksum:
+                expected_digest = self.checksums[i]
+                received_digest = self.checksum_impl(compressed)
+                if received_digest != expected_digest:
+                    raise ChecksumMismatch(
+                            "Checksum mismatch detected in chunk, "
+                            "expected: '%s', received: '%s'" %
+                            (repr(expected_digest), repr(received_digest)))
+            yield blosc.decompress(compressed)
+
+
 class PlainSink(object):
 
+    _metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def put(self, chunk):
         pass
+
 
 class CompressedSink(object):
 
@@ -1618,7 +1673,7 @@ class CompressedSink(object):
         pass
 
     @abc.abstractmethod
-    def write_metadata(self):
+    def write_metadata(self, metadata, metadata_args):
         pass
 
     @abc.abstractmethod
@@ -1626,8 +1681,13 @@ class CompressedSink(object):
         pass
 
     @abc.abstractmethod
+    def finalize(self):
+        pass
+
+    @abc.abstractmethod
     def put(self, i, chunk):
         pass
+
 
 class PlainFPSink(PlainSink):
 
@@ -1672,6 +1732,60 @@ class CompressedFPSink(CompressedSink):
         if self.offsets:
             self.offset_storage[i] = offset
         return offset, compressed, digest
+
+
+class PlainMemorySink(PlainSink):
+
+    def __init__(self, nchunks=None):
+        if nchunks is not None:
+            self.have_chunks = True
+            self.chunks = [None] * nchunks
+            self.i = 0
+        else:
+            self.have_chunks = False
+            self.chunks = []
+
+    def put(self, chunk):
+        if self.have_chunks:
+            self.chunks[self.i] = chunk
+            self.i += 1
+        else:
+            self.chunks.append(chunk)
+
+
+class CompressedMemorySink(CompressedSink):
+
+    def configure(self, blosc_args, bloscpack_header):
+        self.blosc_args = blosc_args
+        self.bloscpack_header = bloscpack_header
+        self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
+        self.checksum = self.checksum_impl.size > 0
+        self.nchunks = self.bloscpack_header.nchunks
+
+        self.chunks = [None] * self.bloscpack_header.nchunks
+        if self.checksum:
+            self.checksums = [None] * self.bloscpack_header.nchunks
+
+        self.metadata = None
+        self.metadata_args = None
+
+    def write_bloscpack_header(self):
+        # no op
+        pass
+
+    def write_metadata(self, metadata, metadata_args):
+        self.metadata = metadata
+        self.metadata_args = metadata_args
+
+    def init_offsets(self):
+        # no op
+        pass
+
+    def put(self, i, chunk):
+        compressed = blosc.compress(chunk, **self.blosc_args)
+        self.chunks[i] = compressed
+        if self.checksum:
+            self.checksums[i] = self.checksum_impl(compressed)
 
 
 def pack(source, sink,

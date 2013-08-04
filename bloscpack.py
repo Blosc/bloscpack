@@ -1729,15 +1729,15 @@ class PlainMemorySink(PlainSink):
             self.chunks = [None] * nchunks
             self.i = 0
         else:
-            self.have_chunks = True
+            self.have_chunks = False
             self.chunks = []
 
     def put(self, chunk):
         if self.have_chunks:
-            self.nchunks[self.i] = chunk
+            self.chunks[self.i] = chunk
             self.i += 1
         else:
-            self.nchunks.append(chunk)
+            self.chunks.append(chunk)
 
 
 def CompressedMemorySink(object):

@@ -747,7 +747,12 @@ TODO
 Changelog
 ---------
 
-* v0.3.0-rc1 - Thu Jul 08 2013
+* v0.3.0     - Sun Aug 04 2013
+
+  * Minor readme fixes
+  * Increase number of cram tests
+
+* v0.3.0-rc1 - Thu Aug 01 2013
 
   * Bloscpack format changes (format version 3)
 

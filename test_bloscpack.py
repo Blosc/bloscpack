@@ -1099,12 +1099,12 @@ def test_append_into_last_chunk():
     # append a few bytes, creating a new, smaller, last_chunk
     new_content = new.read()
     new.reset()
-    nchunks  = reset_append_fp(orig, StringIO(new_content[:1023]), 1023)
+    nchunks = reset_append_fp(orig, StringIO(new_content[:1023]), 1023)
     bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(nchunks, 1)
     nt.assert_equal(bloscpack_header['last_chunk'], 1023)
     # now append into that last chunk
-    nchunks  = reset_append_fp(orig, StringIO(new_content[:1023]), 1023)
+    nchunks = reset_append_fp(orig, StringIO(new_content[:1023]), 1023)
     bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(nchunks, 0)
     nt.assert_equal(bloscpack_header['last_chunk'], 2046)

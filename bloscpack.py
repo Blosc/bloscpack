@@ -1680,6 +1680,25 @@ class CompressedFPSink(CompressedSink):
         return offset, compressed, digest
 
 
+def PlainMemorySink(object):
+
+    def __init__(self, nchunks=None):
+        if nchunks is not None:
+            self.have_chunks = True
+            self.chunks = [None] * nchunks
+            self.i = 0
+        else:
+            self.have_chunks = True
+            self.chunks = []
+
+    def put(self, chunk):
+        if self.have_chunks:
+            self.nchunks[self.i] = chunk
+            self.i += 1
+        else:
+            self.nchunks.append(chunk)
+
+
 def CompressedMemorySink(object):
     """ Keep compressed chunks and checksums as list of str in memory.
     """

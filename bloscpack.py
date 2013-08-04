@@ -6,6 +6,7 @@
 
 from __future__ import division
 
+import abc
 import argparse
 import contextlib
 import collections
@@ -1158,9 +1159,11 @@ class BloscPackHeader(collections.MutableMapping):
         nchunks = encode_int64(self.nchunks)
         max_app_chunks = encode_int64(self.max_app_chunks)
 
-        return (MAGIC + format_version + options + checksum + typesize +
-                chunk_size + last_chunk +
-                nchunks + max_app_chunks)
+        raw_bloscpack_header = (MAGIC + format_version + options + checksum +
+                                typesize + chunk_size + last_chunk + nchunks +
+                                max_app_chunks)
+        print_debug('raw_bloscpack_header: %s' % repr(raw_bloscpack_header))
+        return raw_bloscpack_header
 
     @staticmethod
     def decode(buffer_):
@@ -1594,7 +1597,28 @@ class PlainSink(object):
 
 class CompressedSink(object):
 
-    def put(self, chunk):
+    _metaclass__ = abc.ABCMeta
+
+    def configure(self, blosc_args, bloscpack_header):
+        self.blosc_args = blosc_args
+        self.bloscpack_header = bloscpack_header
+        self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
+        self.offsets = bloscpack_header.offsets
+
+    @abc.abstractmethod
+    def write_bloscpack_header(self):
+        pass
+
+    @abc.abstractmethod
+    def write_metadata(self):
+        pass
+
+    @abc.abstractmethod
+    def init_offsets(self):
+        pass
+
+    @abc.abstractmethod
+    def put(self, i, chunk):
         pass
 
 class PlainFPSink(PlainSink):
@@ -1608,17 +1632,37 @@ class PlainFPSink(PlainSink):
 
 class CompressedFPSink(CompressedSink):
 
-    def __init__(self, output_fp,
-            checksum=DEFAULT_CHECKSUM,
-            blosc_args=DEFAULT_BLOSC_ARGS):
+    def __init__(self, output_fp):
         self.output_fp = output_fp
-        self.checksum_impl = CHECKSUMS_LOOKUP[checksum]
-        self.blosc_args = blosc_args
+        self.meta_total = 0
 
-    def put(self, chunk):
+    def write_bloscpack_header(self):
+        raw_bloscpack_header = self.bloscpack_header.encode()
+        self.output_fp.write(raw_bloscpack_header)
+
+    def write_metadata(self, metadata, metadata_args):
+        self.meta_total += _write_metadata(self.output_fp,
+                metadata, metadata_args)
+
+    def init_offsets(self):
+        if self.offsets:
+            total_entries = self.bloscpack_header.nchunks + \
+                    self.bloscpack_header.max_app_chunks
+            self.offset_storage = list(itertools.repeat(-1,
+                self.bloscpack_header.nchunks))
+            self.output_fp.write(encode_int64(-1) * total_entries)
+
+    def finalize(self):
+        if self.offsets:
+            self.output_fp.seek(BLOSCPACK_HEADER_LENGTH + self.meta_total, 0)
+            _write_offsets(self.output_fp, self.offset_storage)
+
+    def put(self, i, chunk):
         offset = self.output_fp.tell()
-        compressed, digest = _pack_chunk_fp(self.output_fp, chunk, self.blosc_args,
-                self.checksum_impl)
+        compressed, digest = _pack_chunk_fp(self.output_fp, chunk,
+                self.blosc_args, self.checksum_impl)
+        if self.offsets:
+            self.offset_storage[i] = offset
         return offset, compressed, digest
 
 
@@ -1655,39 +1699,24 @@ def _pack_fp(input_fp, output_fp,
             nchunks=nchunks,
             max_app_chunks=max_app_chunks
             )
-    raw_bloscpack_header = bloscpack_header.encode()
-    print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
-            level=DEBUG)
-    output_fp.write(raw_bloscpack_header)
-    # need to store how much space was used by metadata, for seeking later
-    metadata_total = 0
+    sink = CompressedFPSink(output_fp)
+    sink.configure(blosc_args, bloscpack_header)
+    sink.write_bloscpack_header()
     # deal with metadata
     if metadata is not None:
-        metadata_total += _write_metadata(output_fp, metadata, metadata_args)
+        sink.write_metadata(metadata, metadata_args)
     elif metadata_args is not None:
         print_verbose('metadata_args will be silently ignored', level=DEBUG)
-    # preallocate space for the offsets, including extra space for growing
-    if bloscpack_args['offsets']:
-        total_entries = nchunks + max_app_chunks
-        offset_storage = list(itertools.repeat(-1, nchunks))
-        output_fp.write(encode_int64(-1) * total_entries)
-    # define source and sink
+    sink.init_offsets()
     source = PlainFPSource(input_fp, chunk_size, last_chunk, nchunks)
-    sink = CompressedFPSink(output_fp,
-            checksum=bloscpack_args['checksum'],
-            blosc_args=blosc_args)
 
     # read-compress-write loop
     for i, chunk in enumerate(source()):
         print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
             else ''), level=DEBUG)
-        offset, compressed, digest = sink.put(chunk)
-        if bloscpack_args['offsets']:
-            offset_storage[i] = offset
+        sink.put(i, chunk)
 
-    if bloscpack_args['offsets']:
-        output_fp.seek(BLOSCPACK_HEADER_LENGTH + metadata_total, 0)
-        _write_offsets(output_fp, offset_storage)
+    sink.finalize()
 
 
 def _read_bloscpack_header(input_fp):
@@ -2156,22 +2185,20 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # write the chunk that has been filled up
     compressed, digest = _pack_chunk_fp(original_fp, decompressed + fill_up,
             blosc_args, checksum_impl)
+    # append to the original file, again original_fp should be adequately
+    # positioned
+    sink = CompressedFPSink(original_fp)
+    sink.configure(blosc_args, bloscpack_header)
     # allocate new offsets
-    offset_storage = list(itertools.repeat(-1, nchunks))
+    sink.offset_storage = list(itertools.repeat(-1, nchunks))
     # read from the new input file, new_content_fp should be adequately
     # positioned
     source = PlainFPSource(new_content_fp, chunk_size, last_chunk_size, nchunks)
-    # append to the original file, again original_fp should be adequately
-    # positioned
-    sink = CompressedFPSink(original_fp,
-            checksum=bloscpack_header.checksum,
-            blosc_args=blosc_args)
     # read, compress, write loop
     for i, chunk in enumerate(source()):
         print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
             else ''), level=DEBUG)
-        offset, compressed, digest = sink.put(chunk)
-        offset_storage[i] = offset
+        offset, compressed, digest = sink.put(i, chunk)
 
     # build the new header
     bloscpack_header.last_chunk = last_chunk_size
@@ -2184,7 +2211,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # write the new offsets, but only those that changed
     original_fp.seek(offsets_pos)
     # FIXME: write only those that changed
-    _write_offsets(original_fp, offsets + offset_storage)
+    _write_offsets(sink.output_fp, offsets + sink.offset_storage)
     return nchunks
 
 

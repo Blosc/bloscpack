@@ -1636,7 +1636,7 @@ class CompressedMemorySource(CompressedSource):
                             "Checksum mismatch detected in chunk, "
                             "expected: '%s', received: '%s'" %
                             (repr(expected_digest), repr(received_digest)))
-            yield blosc.decompress()
+            yield blosc.decompress(compressed)
 
 
 class PlainSink(object):

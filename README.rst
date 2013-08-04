@@ -716,10 +716,8 @@ TODO
 * Add ability to marshall/unmarshall Numpy arrays using new features in
   python-blosc v1.1
 * Allow to save metadata to a file during decompression
-* The info subcommand should use human readable sizes when printing the header
 * Refactor certain collections of functions that operate on data into objects
 
-  * BloscpackHeader
   * BloscHeader
   * MetadataHeader
   * Offsets (maybe)
@@ -739,13 +737,18 @@ TODO
 * Announcement RST
 * Announce on scipy/numpy lists, comp.compression, freshmeat, ohloh ...
 * Debian packages (for python-blosc and bloscpack)
-* Use cram to test the command-line user interface
 * Establish and document proper exit codes
 * Use Travis CI for testing
+* Use tox for tetsing multiple python versions
 
 
 Changelog
 ---------
+
+* v0.4.0     - XXX XXX XX 2013
+
+  * BloscpackHeader class introduced
+  * The info subcommand shows human readable sizes when printing the header
 
 * v0.3.0     - Sun Aug 04 2013
 

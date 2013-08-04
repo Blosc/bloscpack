@@ -1175,6 +1175,12 @@ class BloscPackHeader(collections.MutableMapping):
         bloscpack_header : BloscPackHeader
             the decoded Bloscpack header object
 
+        Raises
+        ------
+        ValueError
+            If the buffer_ is not equal to BLOSCPACK_HEADER_LENGTH or the the
+            first four bytes are not the Bloscpack magic.
+
         """
         if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
             raise ValueError(

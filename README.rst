@@ -742,7 +742,6 @@ TODO
 * Announce on scipy/numpy lists, comp.compression, freshmeat, ohloh ...
 * Debian packages (for python-blosc and bloscpack)
 * Establish and document proper exit codes
-* Use Travis CI for testing
 * Use tox for tetsing multiple python versions
 
 
@@ -753,6 +752,7 @@ Changelog
 
   * BloscpackHeader class introduced
   * The info subcommand shows human readable sizes when printing the header
+  * Now using Travis-CI for testing
 
 * v0.3.0     - Sun Aug 04 2013
 

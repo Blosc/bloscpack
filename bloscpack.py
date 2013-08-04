@@ -1618,7 +1618,7 @@ class CompressedSink(object):
         pass
 
     @abc.abstractmethod
-    def write_metadata(self):
+    def write_metadata(self, metadata, metadata_args):
         pass
 
     @abc.abstractmethod

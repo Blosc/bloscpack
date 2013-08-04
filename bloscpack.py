@@ -1158,9 +1158,11 @@ class BloscPackHeader(collections.MutableMapping):
         nchunks = encode_int64(self.nchunks)
         max_app_chunks = encode_int64(self.max_app_chunks)
 
-        return (MAGIC + format_version + options + checksum + typesize +
-                chunk_size + last_chunk +
-                nchunks + max_app_chunks)
+        raw_bloscpack_header = (MAGIC + format_version + options + checksum +
+                                typesize + chunk_size + last_chunk + nchunks +
+                                max_app_chunks)
+        print_debug('raw_bloscpack_header: %s' % repr(raw_bloscpack_header))
+        return raw_bloscpack_header
 
     @staticmethod
     def decode(buffer_):
@@ -1599,6 +1601,9 @@ class CompressedSink(object):
         self.bloscpack_header = bloscpack_header
         self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
 
+    def write_bloscpack_header(self):
+        pass
+
     def put(self, chunk):
         pass
 
@@ -1615,6 +1620,10 @@ class CompressedFPSink(CompressedSink):
 
     def __init__(self, output_fp):
         self.output_fp = output_fp
+
+    def write_bloscpack_header(self):
+        raw_bloscpack_header = self.bloscpack_header.encode()
+        self.output_fp.write(raw_bloscpack_header)
 
     def put(self, chunk):
         offset = self.output_fp.tell()
@@ -1656,10 +1665,9 @@ def _pack_fp(input_fp, output_fp,
             nchunks=nchunks,
             max_app_chunks=max_app_chunks
             )
-    raw_bloscpack_header = bloscpack_header.encode()
-    print_verbose('raw_bloscpack_header: %s' % repr(raw_bloscpack_header),
-            level=DEBUG)
-    output_fp.write(raw_bloscpack_header)
+    sink = CompressedFPSink(output_fp)
+    sink.configure(blosc_args, bloscpack_header)
+    sink.write_bloscpack_header()
     # need to store how much space was used by metadata, for seeking later
     metadata_total = 0
     # deal with metadata
@@ -1674,8 +1682,6 @@ def _pack_fp(input_fp, output_fp,
         output_fp.write(encode_int64(-1) * total_entries)
     # define source and sink
     source = PlainFPSource(input_fp, chunk_size, last_chunk, nchunks)
-    sink = CompressedFPSink(output_fp)
-    sink.configure(blosc_args, bloscpack_header)
 
     # read-compress-write loop
     for i, chunk in enumerate(source()):

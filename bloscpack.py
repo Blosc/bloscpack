@@ -1748,12 +1748,15 @@ class CompressedMemorySink(CompressedSink):
         self.blosc_args = blosc_args
         self.bloscpack_header = bloscpack_header
         self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
-        self.checksum = self.chunk_size.size > 0
+        self.checksum = self.checksum_impl.size > 0
         self.nchunks = self.bloscpack_header.nchunks
 
         self.chunks = [None] * self.bloscpack_header.nchunks
         if self.checksum:
             self.checksums = [None] * self.bloscpack_header.nchunks
+
+        self.metadata = None
+        self.metadata_args = None
 
     def write_bloscpack_header(self):
         # no op

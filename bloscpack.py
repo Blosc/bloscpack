@@ -1598,6 +1598,33 @@ class CompressedFPSource(CompressedSource):
                         pretty_size(len(decompressed))), level=DEBUG)
             yield decompressed
 
+
+class CompressedMemorySource(object):
+
+    def __init__(self, compressed_memory_sink):
+        self.compressed_memory_sink = compressed_memory_sink
+        self.checksum_impl = compressed_memory_sink.checksum_impl
+        self.checksum = compressed_memory_sink.checksum
+        self.nchunks = compressed_memory_sink.nchunks
+
+        self.chunks = compressed_memory_sink.chunks
+        if self.checksum:
+            self.checksums = compressed_memory_sink.checksums
+
+    def __call__(self):
+        for i in xrange(self.nchunks):
+            compressed = self.chunks[i]
+            if self.checksum:
+                expected_digest = self.checksums[i]
+                received_digest = self.checksum_impl(compressed)
+                if received_digest != expected_digest:
+                    raise ChecksumMismatch(
+                            "Checksum mismatch detected in chunk, "
+                            "expected: '%s', received: '%s'" %
+                            (repr(expected_digest), repr(received_digest)))
+            yield blosc.decompress()
+
+
 class PlainSink(object):
 
     def put(self, chunk):

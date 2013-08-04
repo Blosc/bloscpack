@@ -1626,6 +1626,10 @@ class CompressedSink(object):
         pass
 
     @abc.abstractmethod
+    def finalize(self):
+        pass
+
+    @abc.abstractmethod
     def put(self, i, chunk):
         pass
 

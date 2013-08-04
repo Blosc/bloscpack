@@ -1603,6 +1603,7 @@ class PlainSink(object):
     def put(self, chunk):
         pass
 
+
 class CompressedSink(object):
 
     _metaclass__ = abc.ABCMeta
@@ -1632,6 +1633,7 @@ class CompressedSink(object):
     @abc.abstractmethod
     def put(self, i, chunk):
         pass
+
 
 class PlainFPSink(PlainSink):
 

@@ -1959,20 +1959,20 @@ def unpack_file(in_file, out_file):
     print_verbose('input file size: %s' % pretty_size(in_file_size))
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
-        metadata = _unpack_fp(input_fp, output_fp)
+        source = CompressedFPSource(input_fp)
+        sink = PlainFPSink(output_fp)
+        metadata = unpack(source, sink)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
     print_verbose('decompression ratio: %f' % (out_file_size / in_file_size))
     return metadata
 
 
-def _unpack_fp(input_fp, output_fp):
-    compressed_fp_source = CompressedFPSource(input_fp)
-    plain_fp_sink = PlainFPSink(output_fp)
+def unpack(source, sink):
     # read, decompress, write loop
-    for decompressed_chunk in iter(compressed_fp_source):
-        plain_fp_sink.put(decompressed_chunk)
-    return compressed_fp_source.metadata
+    for decompressed_chunk in iter(source):
+        sink.put(decompressed_chunk)
+    return source.metadata
 
 
 def _seek_to_metadata(target_fp):

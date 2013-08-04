@@ -981,17 +981,19 @@ def pack_unpack_mem(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
     # let us play merry go round
     source = PlainFPSource(in_fp)
     sink = CompressedMemorySink()
-    pack(source, sink, nchunks, chunk_size, last_chunk_size)
+    pack(source, sink, nchunks, chunk_size, last_chunk_size, metadata=metadata)
     source = CompressedMemorySource(sink)
     sink = PlainMemorySink()
-    unpack(source, sink)
+    received_metadata = unpack(source, sink)
+    nt.assert_equal(metadata, received_metadata)
     source = PlainMemorySource(sink.chunks)
     sink = CompressedFPSink(out_fp)
-    pack(source, sink, nchunks, chunk_size, last_chunk_size)
+    pack(source, sink, nchunks, chunk_size, last_chunk_size, metadata=metadata)
     out_fp.seek(0)
     source = CompressedFPSource(out_fp)
     sink = PlainFPSink(dcmp_fp)
-    unpack(source, sink)
+    received_metadata = unpack(source, sink)
+    nt.assert_equal(metadata, received_metadata)
     cmp_fp(in_fp, dcmp_fp)
     if metadata:
         return metadata
@@ -1017,6 +1019,12 @@ def test_pack_unpack_mem():
     pack_unpack_mem(1, chunk_size=reverse_pretty('4M'))
     pack_unpack_mem(1, chunk_size=reverse_pretty('8M'))
 
+    metadata = {"dtype": "float64", "shape": [1024], "others": []}
+
+    pack_unpack_mem(1, chunk_size=reverse_pretty('1M'), metadata=metadata)
+    pack_unpack_mem(1, chunk_size=reverse_pretty('2M'), metadata=metadata)
+    pack_unpack_mem(1, chunk_size=reverse_pretty('4M'), metadata=metadata)
+    pack_unpack_mem(1, chunk_size=reverse_pretty('8M'), metadata=metadata)
 
 def pack_unpack_hard():
     """ Test on somewhat larger arrays, but be nice to memory. """

@@ -6,6 +6,7 @@
 
 from __future__ import division
 
+import abc
 import argparse
 import contextlib
 import collections
@@ -1596,21 +1597,27 @@ class PlainSink(object):
 
 class CompressedSink(object):
 
+    _metaclass__ = abc.ABCMeta
+
     def configure(self, blosc_args, bloscpack_header):
         self.blosc_args = blosc_args
         self.bloscpack_header = bloscpack_header
         self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
 
+    @abc.abstractmethod
     def write_bloscpack_header(self):
         pass
 
+    @abc.abstractmethod
     def write_metadata(self):
         pass
 
+    @abc.abstractmethod
     def init_offsets(self):
         pass
 
-    def put(self, chunk):
+    @abc.abstractmethod
+    def put(self, i, chunk):
         pass
 
 class PlainFPSink(PlainSink):

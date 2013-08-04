@@ -1708,7 +1708,6 @@ def _pack_fp(input_fp, output_fp,
     elif metadata_args is not None:
         print_verbose('metadata_args will be silently ignored', level=DEBUG)
     sink.init_offsets()
-    # define source and sink
     source = PlainFPSource(input_fp, chunk_size, last_chunk, nchunks)
 
     # read-compress-write loop

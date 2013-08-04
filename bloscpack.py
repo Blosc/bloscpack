@@ -1599,7 +1599,7 @@ class CompressedFPSource(CompressedSource):
             yield decompressed
 
 
-class PlainMemorySource(object):
+class PlainMemorySource(PlainSource):
 
     def __init__(self, chunks):
         self.chunks = chunks

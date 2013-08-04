@@ -937,7 +937,9 @@ def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
     out_fp.seek(0)
     if progress:
         print("Decompressing")
-    metadata = bloscpack._unpack_fp(out_fp, dcmp_fp)
+    source = CompressedFPSource(out_fp)
+    sink = PlainFPSink(dcmp_fp)
+    metadata = bloscpack.unpack(source, sink)
     if progress:
         print("Verifying")
     cmp_fp(in_fp, dcmp_fp)
@@ -1055,7 +1057,9 @@ def test_append_fp():
     nt.assert_equal(expected_app_offsets, app_offsets)
 
     # now check by unpacking
-    bloscpack._unpack_fp(orig, dcmp)
+    source = CompressedFPSource(orig)
+    sink = PlainFPSink(dcmp)
+    bloscpack.unpack(source, sink)
     dcmp.reset()
     new.reset()
     new_str = new.read()
@@ -1106,7 +1110,9 @@ def test_append_into_last_chunk():
     nt.assert_equal(bloscpack_header['last_chunk'], 2046)
 
     # now check by unpacking
-    bloscpack._unpack_fp(orig, dcmp)
+    source = CompressedFPSource(orig)
+    sink = PlainFPSink(dcmp)
+    bloscpack.unpack(source, sink)
     dcmp.reset()
     new.reset()
     new_str = new.read()
@@ -1155,7 +1161,9 @@ def test_double_append():
     reset_append_fp(orig, new, new_size)
     reset_append_fp(orig, new, new_size)
     new_str = new.read()
-    bloscpack._unpack_fp(orig, dcmp)
+    source = CompressedFPSource(orig)
+    sink = PlainFPSink(dcmp)
+    bloscpack.unpack(source, sink)
     dcmp.reset()
     dcmp_str = dcmp.read()
     nt.assert_equal(len(dcmp_str), len(new_str) * 3)
@@ -1176,8 +1184,9 @@ def test_append_metadata():
     orig.reset()
     new.reset()
     reset_append_fp(orig, new, new_size)
-
-    ans = bloscpack._unpack_fp(orig, dcmp)
+    source = CompressedFPSource(orig)
+    sink = PlainFPSink(dcmp)
+    ans = bloscpack.unpack(source, sink)
     print(ans)
     dcmp.reset()
     new.reset()
@@ -1239,7 +1248,9 @@ def test_mixing_clevel():
     nt.assert_equal(final_size, appended_size + discounted_orig_size)
 
     # check by unpacking
-    bloscpack._unpack_fp(orig, dcmp)
+    source = CompressedFPSource(orig)
+    sink = PlainFPSink(dcmp)
+    bloscpack.unpack(source, sink)
     dcmp.reset()
     new.reset()
     new_str = new.read()
@@ -1259,7 +1270,9 @@ def test_append_mix_shuffle():
     # will be screwed later on
     blosc_args['clevel'] = 9
     reset_append_fp(orig, new, new_size, blosc_args=blosc_args)
-    bloscpack._unpack_fp(orig, dcmp)
+    source = CompressedFPSource(orig)
+    sink = PlainFPSink(dcmp)
+    bloscpack.unpack(source, sink)
     orig.reset()
     dcmp.reset()
     new.reset()

@@ -1533,7 +1533,9 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
             calculate_nchunks(in_file_size, chunk_size)
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
-        _pack_fp(input_fp, output_fp,
+        source = PlainFPSource(input_fp)
+        sink = CompressedFPSink(output_fp)
+        pack(source, sink,
                 nchunks, chunk_size, last_chunk_size,
                 metadata=metadata,
                 blosc_args=blosc_args,
@@ -1672,7 +1674,7 @@ class CompressedFPSink(CompressedSink):
         return offset, compressed, digest
 
 
-def _pack_fp(input_fp, output_fp,
+def pack(source, sink,
         nchunks, chunk_size, last_chunk,
         metadata=None,
         blosc_args=DEFAULT_BLOSC_ARGS,
@@ -1705,9 +1707,7 @@ def _pack_fp(input_fp, output_fp,
             nchunks=nchunks,
             max_app_chunks=max_app_chunks
             )
-    source = PlainFPSource(input_fp)
     source.configure(chunk_size, last_chunk, nchunks)
-    sink = CompressedFPSink(output_fp)
     sink.configure(blosc_args, bloscpack_header)
     sink.write_bloscpack_header()
     # deal with metadata

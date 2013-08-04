@@ -718,7 +718,9 @@ def test_offsets():
     input_fp.seek(0, 0)
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
     bloscpack_args['max_app_chunks'] = 0
-    bloscpack._pack_fp(input_fp, output_fp,
+    source = PlainFPSource(input_fp)
+    sink = CompressedFPSink(output_fp)
+    bloscpack.pack(source, sink,
             nchunks, chunk_size, last_chunk_size,
             bloscpack_args=bloscpack_args
             )
@@ -855,7 +857,9 @@ def test_disable_offsets():
     in_fp.seek(0)
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
     bloscpack_args['offsets'] = False
-    bloscpack._pack_fp(in_fp, out_fp,
+    source = PlainFPSource(in_fp)
+    sink = CompressedFPSink(out_fp)
+    bloscpack.pack(source, sink,
             *calculate_nchunks(in_fp_size),
             bloscpack_args=bloscpack_args)
     out_fp.seek(0)
@@ -925,7 +929,9 @@ def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
     in_fp.seek(0)
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_fp_size, chunk_size)
-    bloscpack._pack_fp(in_fp, out_fp,
+    source = PlainFPSource(in_fp)
+    sink = CompressedFPSink(out_fp)
+    bloscpack.pack(source, sink,
             nchunks, chunk_size, last_chunk_size,
             metadata=metadata)
     out_fp.seek(0)
@@ -971,7 +977,9 @@ def prep_array_for_append(blosc_args=DEFAULT_BLOSC_ARGS,
     new_size = new.tell()
     new.reset()
     chunking = calculate_nchunks(new_size)
-    bloscpack._pack_fp(new, orig, *chunking,
+    source = PlainFPSource(new)
+    sink = CompressedFPSink(orig)
+    bloscpack.pack(source, sink, *chunking,
             blosc_args=blosc_args,
             bloscpack_args=bloscpack_args)
     orig.reset()
@@ -1079,7 +1087,9 @@ def test_append_into_last_chunk():
     new_size = new.tell()
     new.reset()
     chunking = calculate_nchunks(new_size, chunk_size=new_size)
-    bloscpack._pack_fp(new, orig, *chunking)
+    source = PlainFPSource(new)
+    sink = CompressedFPSink(orig)
+    bloscpack.pack(source, sink, *chunking)
     orig.reset()
     new.reset()
     # append a few bytes, creating a new, smaller, last_chunk
@@ -1110,7 +1120,9 @@ def test_append_single_chunk():
     new_size = new.tell()
     new.reset()
     chunking = calculate_nchunks(new_size, chunk_size=new_size)
-    bloscpack._pack_fp(new, orig, *chunking)
+    source = PlainFPSource(new)
+    sink = CompressedFPSink(orig)
+    bloscpack.pack(source, sink, *chunking)
     orig.reset()
     new.reset()
 
@@ -1158,7 +1170,9 @@ def test_append_metadata():
 
     metadata = {"dtype": "float64", "shape": [1024], "others": []}
     chunking = calculate_nchunks(new_size, chunk_size=new_size)
-    bloscpack._pack_fp(new, orig, *chunking, metadata=metadata)
+    source = PlainFPSource(new)
+    sink = CompressedFPSink(orig)
+    bloscpack.pack(source, sink, *chunking, metadata=metadata)
     orig.reset()
     new.reset()
     reset_append_fp(orig, new, new_size)

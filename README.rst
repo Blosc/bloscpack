@@ -5,7 +5,8 @@ Bloscpack
 .. image:: https://travis-ci.org/esc/bloscpack.png?branch=master
         :target: https://travis-ci.org/esc/bloscpack
 
-Command line interface to Blosc via python-blosc
+.. image:: https://coveralls.io/repos/esc/bloscpack/badge.png
+        :target: https://coveralls.io/r/esc/bloscpack
 
 Description
 -----------

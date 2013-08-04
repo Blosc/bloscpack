@@ -1680,6 +1680,40 @@ class CompressedFPSink(CompressedSink):
         return offset, compressed, digest
 
 
+def CompressedMemorySink(object):
+    """ Keep compressed chunks and checksums as list of str in memory.
+    """
+
+    def configure(self, blosc_args, bloscpack_header):
+        self.blosc_args = blosc_args
+        self.bloscpack_header = bloscpack_header
+        self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
+        self.checksum = self.chunk_size.size > 0
+        self.nchunks = self.bloscpack_header.nchunks
+
+        self.chunks = [None] * self.bloscpack_header.nchunks
+        if self.checksum:
+            self.checksums = [None] * self.bloscpack_header.nchunks
+
+    def write_bloscpack_header(self):
+        # no op
+        pass
+
+    def write_metadata(self, metadata, metadata_args):
+        self.metadata = metadata
+        self.metadata_args = metadata_args
+
+    def init_offsets(self):
+        # no op
+        pass
+
+    def put(self, i, chunk):
+        compressed = blosc.compress(chunk, self.blosc_args)
+        self.chunks[i] = compressed
+        if self.checksum:
+            self.checksums[i] = self.checksum_impl(compressed)
+
+
 def pack(source, sink,
         nchunks, chunk_size, last_chunk,
         metadata=None,

@@ -336,12 +336,18 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
 Testing
 -------
 
+Basic Tests
+~~~~~~~~~~~
+
 Basic tests, runs quickly:
 
 .. code-block:: console
 
     $ nosetests
     [...]
+
+Heavier Tests
+~~~~~~~~~~~~~
 
 Extended tests using a larger file, may take some time, but will be nice to
 memory:
@@ -369,12 +375,28 @@ triggered on abort you may be left with large files polluting your temporary
 space.  Depending on your partitioning scheme etc.. doing this repeatedly, may
 lead to you running out of space on the file-system.
 
+Command Line Interface Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
 
 .. code-block:: console
 
    $ ./test_bloscpack.cram
    [...]
+
+Coverage
+~~~~~~~~
+
+To determine coverage you can pool togeher the coverage from the cram tests and
+the unit tests:
+
+.. code-block:: console
+
+    $ COVERAGE=1 ./test_bloscpack.cram
+    [...]
+    $nosetests test_bloscpack.py --with-coverage --cover-package=bloscpack
+    [...]
 
 Benchmark
 ---------

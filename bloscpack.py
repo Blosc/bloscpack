@@ -1685,7 +1685,7 @@ class CompressedSink(object):
         pass
 
     @abc.abstractmethod
-    def put(self, i, chunk):
+    def put(self, i, compressed, digest):
         pass
 
 

@@ -21,7 +21,7 @@ import sys
 import zlib
 try:
     from collections import OrderedDict
-except ImportError:
+except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict
 import blosc
 
@@ -2463,7 +2463,7 @@ if __name__ == '__main__':
             print_normal("'offsets':")
             print_normal("[%s,...]" % (",".join(str(o) for o in offsets[:5])))
 
-    else:
+    else:  # pragma: no cover
         # we should never reach this
         error('You found the easter-egg, please contact the author')
     print_verbose('done')

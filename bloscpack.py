@@ -1478,24 +1478,20 @@ def _write_metadata(output_fp, metadata, metadata_args):
             double_pretty_size(metadata_total), level=DEBUG)
     return metadata_total
 
-def _pack_chunk_fp(output_fp, chunk, blosc_args, checksum_impl):
+def _compress_chunk_str(chunk, blosc_args, checksum_impl):
     compressed = blosc.compress(chunk, **blosc_args)
-    output_fp.write(compressed)
-    if LEVEL == DEBUG:
-        print_verbose("chunk compressed, in: %s out: %s ratio: %s" %
-                (double_pretty_size(len(chunk)),
-                double_pretty_size(len(compressed)),
-                "%0.3f" % (len(compressed) / len(chunk))),
-                level=DEBUG)
     if checksum_impl.size > 0:
         # compute the checksum on the compressed data
         digest = checksum_impl(compressed)
-        # write digest
-        output_fp.write(digest)
         print_verbose('checksum (%s): %s ' %
                 (checksum_impl.name, repr(digest)),
                 level=DEBUG)
     return compressed, digest
+
+def _write_compressed_chunk(output_fp, compressed, digest):
+    output_fp.write(compressed)
+    if len(digest) > 0:
+        output_fp.write(digest)
 
 
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
@@ -1729,10 +1725,9 @@ class CompressedFPSink(CompressedSink):
             self.output_fp.seek(BLOSCPACK_HEADER_LENGTH + self.meta_total, 0)
             _write_offsets(self.output_fp, self.offset_storage)
 
-    def put(self, i, chunk):
+    def put(self, i, compressed, digest):
         offset = self.output_fp.tell()
-        compressed, digest = _pack_chunk_fp(self.output_fp, chunk,
-                self.blosc_args, self.checksum_impl)
+        _write_compressed_chunk(self.output_fp, compressed, digest)
         if self.offsets:
             self.offset_storage[i] = offset
         return offset, compressed, digest
@@ -1785,11 +1780,10 @@ class CompressedMemorySink(CompressedSink):
         # no op
         pass
 
-    def put(self, i, chunk):
-        compressed = blosc.compress(chunk, **self.blosc_args)
+    def put(self, i, compressed, digest):
         self.chunks[i] = compressed
         if self.checksum:
-            self.checksums[i] = self.checksum_impl(compressed)
+            self.checksums[i] = digest
 
 
 def pack(source, sink,
@@ -1839,7 +1833,9 @@ def pack(source, sink,
     for i, chunk in enumerate(source()):
         print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
             else ''), level=DEBUG)
-        sink.put(i, chunk)
+        compressed, digest = _compress_chunk_str(chunk, blosc_args,
+                sink.checksum_impl)
+        sink.put(i, compressed, digest)
 
     sink.finalize()
 
@@ -2282,9 +2278,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         # seek back to the position of the original last chunk
         original_fp.seek(offsets[-1], 0)
         # write the chunk that has been filled up
-        compressed, digest = _pack_chunk_fp(original_fp,
-                decompressed + fill_up,
+        compressed, digest = _compress_chunk_str(decompressed + fill_up,
                 blosc_args, checksum_impl)
+        _write_compressed_chunk(original_fp, compressed, digest)
         # return 0 to indicate that no new chunks have been written
         # build the new header
         bloscpack_header.last_chunk += new_size
@@ -2308,8 +2304,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # seek back to the position of the original last chunk
     original_fp.seek(offsets[-1], 0)
     # write the chunk that has been filled up
-    compressed, digest = _pack_chunk_fp(original_fp, decompressed + fill_up,
+    compressed, digest = _compress_chunk_str(decompressed + fill_up,
             blosc_args, checksum_impl)
+    _write_compressed_chunk(original_fp, compressed, digest)
     # append to the original file, again original_fp should be adequately
     # positioned
     sink = CompressedFPSink(original_fp)
@@ -2324,7 +2321,10 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     for i, chunk in enumerate(source()):
         print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
             else ''), level=DEBUG)
-        offset, compressed, digest = sink.put(i, chunk)
+
+        compressed, digest = _compress_chunk_str(chunk,
+            blosc_args, checksum_impl)
+        offset, compressed, digest = sink.put(i, compressed, digest)
 
     # build the new header
     bloscpack_header.last_chunk = last_chunk_size

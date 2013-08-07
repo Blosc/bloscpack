@@ -1139,6 +1139,10 @@ class BloscPackHeader(collections.MutableMapping):
     def copy(self):
         return copy.copy(self)
 
+    @property
+    def checksum_impl(self):
+        return CHECKSUMS_LOOKUP[self.checksum]
+
     def encode(self):
         """ Encode the Bloscpack header.
 
@@ -1595,7 +1599,7 @@ class CompressedFPSource(CompressedSource):
         self.input_fp = input_fp
         self.bloscpack_header, self.metadata, self.metadata_header, \
                 self.offsets = _read_beginning(input_fp)
-        self.checksum_impl = CHECKSUMS_LOOKUP[self.bloscpack_header.checksum]
+        self.checksum_impl = self.bloscpack_header.checksum_impl
         self.nchunks = self.bloscpack_header.nchunks
 
     def __call__(self):
@@ -1665,7 +1669,7 @@ class CompressedSink(object):
     def configure(self, blosc_args, bloscpack_header):
         self.blosc_args = blosc_args
         self.bloscpack_header = bloscpack_header
-        self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
+        self.checksum_impl = bloscpack_header.checksum_impl
         self.offsets = bloscpack_header.offsets
 
     @abc.abstractmethod
@@ -1758,9 +1762,9 @@ class CompressedMemorySink(CompressedSink):
     def configure(self, blosc_args, bloscpack_header):
         self.blosc_args = blosc_args
         self.bloscpack_header = bloscpack_header
-        self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
-        self.checksum = self.checksum_impl.size > 0
-        self.nchunks = self.bloscpack_header.nchunks
+        self.checksum_impl = bloscpack_header.checksum_impl
+        self.checksum = bloscpack_header.checksum
+        self.nchunks = bloscpack_header.nchunks
 
         self.chunks = [None] * self.bloscpack_header.nchunks
         if self.checksum:
@@ -2240,7 +2244,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     """
     bloscpack_header, metadata, metadata_header, offsets = \
         _read_beginning(original_fp)
-    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
+    checksum_impl = bloscpack_header.checksum_impl
     if not offsets:
         raise RuntimeError(
                 'Appending to a file without offsets is not yet supported')

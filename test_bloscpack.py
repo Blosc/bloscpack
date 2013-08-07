@@ -920,6 +920,13 @@ def test_file_corruption():
         nt.assert_raises(ChecksumMismatch, unpack_file, out_file, dcmp_file)
 
 
+def test_pack_numpy():
+    a = np.arange(1e3)
+    sio = StringIO()
+    pack_numpy_fp(a, sio)
+
+
+
 def pack_unpack(repeats, chunk_size=None, progress=False):
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         if progress:

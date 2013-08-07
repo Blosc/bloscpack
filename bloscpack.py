@@ -24,6 +24,7 @@ try:
 except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict
 import blosc
+import numpy as np
 
 __version__ = '0.4.0-dev'
 __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
@@ -91,6 +92,7 @@ SUFFIXES = OrderedDict((
              ("M", 2**20),
              ("G", 2**30),
              ("T", 2**40)))
+
 
 
 class ChunkingException(BaseException):
@@ -1488,6 +1490,17 @@ def _compress_chunk_str(chunk, blosc_args, checksum_impl):
                 level=DEBUG)
     return compressed, digest
 
+def _compress_chunk_ptr(chunk, blosc_args, checksum_impl):
+    ptr, size = chunk
+    compressed = blosc.compress_ptr(ptr, size, **blosc_args)
+    if checksum_impl.size > 0:
+        # compute the checksum on the compressed data
+        digest = checksum_impl(compressed)
+        print_verbose('checksum (%s): %s ' %
+                (checksum_impl.name, repr(digest)),
+                level=DEBUG)
+    return compressed, digest
+
 def _write_compressed_chunk(output_fp, compressed, digest):
     output_fp.write(compressed)
     if len(digest) > 0:
@@ -1554,6 +1567,10 @@ class PlainSource(object):
         self.chunk_size = chunk_size
         self.last_chunk = last_chunk
         self.nchunks = nchunks
+
+    @property
+    def compress_func(self):
+        return _compress_chunk_str
 
     def __iter__(self):
         return self()
@@ -1647,6 +1664,33 @@ class CompressedMemorySource(CompressedSource):
                             "expected: '%s', received: '%s'" %
                             (repr(expected_digest), repr(received_digest)))
             yield blosc.decompress(compressed)
+
+
+class PlainNumpySource(PlainSource):
+
+    def __init__(self, ndarray):
+        self.metadata = {'dtype': ndarray.dtype.descr,
+                         'shape': ndarray.shape,
+                         'container': 'numpy',
+                         }
+        # TODO only one dim for now
+        self.size = int(ndarray.dtype.itemsize * ndarray.shape[0])
+        # TODO check that the array is contiguous
+        self.ndarray = ndarray
+        self.ptr = ndarray.__array_interface__['data'][0]
+
+    @property
+    def compress_func(self):
+        return _compress_chunk_ptr
+
+    def __call__(self):
+        self.nitems = int(self.chunk_size / self.ndarray.itemsize)
+        offset = self.ptr
+        for i in xrange(self.nchunks - 1):
+            yield offset, self.nitems
+            offset += self.chunk_size
+        yield offset, int(self.last_chunk / self.ndarray.itemsize)
+
 
 
 class PlainSink(object):
@@ -1829,16 +1873,37 @@ def pack(source, sink,
         print_verbose('metadata_args will be silently ignored', level=DEBUG)
     sink.init_offsets()
 
+    compress_func = source.compress_func
     # read-compress-write loop
     for i, chunk in enumerate(source()):
         print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
             else ''), level=DEBUG)
-        compressed, digest = _compress_chunk_str(chunk, blosc_args,
+        compressed, digest =compress_func(chunk, blosc_args,
                 sink.checksum_impl)
         sink.put(i, compressed, digest)
 
     sink.finalize()
 
+
+def pack_numpy_fp(ndarray, file_pointer,
+        chunk_size=DEFAULT_CHUNK_SIZE,
+        blosc_args=DEFAULT_BLOSC_ARGS,
+        bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+        metadata_args=DEFAULT_METADATA_ARGS):
+
+    source = PlainNumpySource(ndarray)
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(source.size, chunk_size)
+    sink = CompressedFPSink(file_pointer)
+    pack(source, sink,
+            nchunks, chunk_size, last_chunk_size,
+            metadata=source.metadata,
+            blosc_args=blosc_args,
+            bloscpack_args=bloscpack_args,
+            metadata_args=metadata_args)
+    #out_file_size = path.getsize(file_pointer)
+    #print_verbose('output file size: %s' % double_pretty_size(out_file_size))
+    #print_verbose('compression ratio: %f' % (out_file_size/source.size))
 
 def _read_bloscpack_header(input_fp):
     """ Read the bloscpack header.

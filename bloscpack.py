@@ -1832,6 +1832,22 @@ class CompressedMemorySink(CompressedSink):
             self.checksums[i] = self.do_checksum(compressed)
 
 
+class PlainNumpySink(PlainSink):
+
+    def configure(self, metadata):
+        self.metadata = metadata
+        if metadata is None or metadata['container'] != 'numpy':
+            raise ValueError
+        self.ndarray = np.empty(metadata['shape'],
+                dtype=metadata['dtype'],
+                order=metadata['order'])
+        self.ptr = self.ndarray.__array_interface__['data'][0]
+
+    def put(self, chunk)
+        bwritten = blosc.decompress_ptr(chunk, self.ptr)
+        self.ptr += bwritten
+
+
 def pack(source, sink,
         nchunks, chunk_size, last_chunk,
         metadata=None,

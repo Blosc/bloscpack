@@ -1659,11 +1659,11 @@ class PlainNumpySource(PlainSource):
     def __init__(self, ndarray):
         self.metadata = {'dtype': ndarray.dtype.descr,
                          'shape': ndarray.shape,
-                         'order': ndarray.order
+                         'order': 'F' if np.isfortran(ndarray) else 'C',
                          'container': 'numpy',
                          }
         # TODO only one dim for now
-        self.size = int(ndarray.dtype.itemsize * ndarray.shape[0])
+        self.size = ndarray.size
         # TODO check that the array is contiguous
         self.ndarray = ndarray
         self.ptr = ndarray.__array_interface__['data'][0]

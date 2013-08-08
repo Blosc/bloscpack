@@ -1834,7 +1834,7 @@ class CompressedMemorySink(CompressedSink):
 
 class PlainNumpySink(PlainSink):
 
-    def configure(self, metadata):
+    def __init__(self, metadata):
         self.metadata = metadata
         if metadata is None or metadata['container'] != 'numpy':
             raise ValueError
@@ -1921,6 +1921,14 @@ def pack_numpy_fp(ndarray, file_pointer,
     #out_file_size = path.getsize(file_pointer)
     #print_verbose('output file size: %s' % double_pretty_size(out_file_size))
     #print_verbose('compression ratio: %f' % (out_file_size/source.size))
+
+
+def unpack_numpy_fp(file_pointer):
+    source = CompressedFPSource(file_pointer)
+    sink = PlainNumpySink(source.metadat)
+    for compressed in iter(source):
+        sink.put(compressed)
+
 
 def _read_bloscpack_header(input_fp):
     """ Read the bloscpack header.
@@ -2166,8 +2174,8 @@ def unpack_file(in_file, out_file):
 
 def unpack(source, sink):
     # read, decompress, write loop
-    for decompressed_chunk in iter(source):
-        sink.put(decompressed_chunk)
+    for compressed_chunk in iter(source):
+        sink.put(compressed_chunk)
     return source.metadata
 
 

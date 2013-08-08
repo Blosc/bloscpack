@@ -1605,13 +1605,8 @@ class CompressedFPSource(CompressedSource):
 
     def __call__(self):
         for i in xrange(self.nchunks):
-            print_verbose("decompressing chunk '%d'%s" %
-                    (i, ' (last)' if i == self.nchunks - 1 else ''), level=DEBUG)
-            compressed, decompressed, header= _unpack_chunk_fp(self.input_fp, self.checksum_impl)
-            print_verbose("chunk handled, in: %s out: %s" %
-                    (pretty_size(len(compressed)),
-                        pretty_size(len(decompressed))), level=DEBUG)
-            yield decompressed
+            compressed, header = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
+            yield compressed
 
 
 class PlainMemorySource(PlainSource):
@@ -1736,11 +1731,20 @@ class CompressedSink(object):
 
 class PlainFPSink(PlainSink):
 
-    def __init__(self, output_fp):
+    def __init__(self, output_fp, nchunks):
         self.output_fp = output_fp
+        self.nchunks = nchunks
+        self.i = 0
 
-    def put(self, chunk):
-        self.output_fp.write(chunk)
+    def put(self, compressed):
+        print_verbose("decompressing chunk '%d'%s" %
+                (self.i, ' (last)' if self.i == self.nchunks - 1 else ''), level=DEBUG)
+        decompressed = blosc.decompress(compressed)
+        print_verbose("chunk handled, in: %s out: %s" %
+                (pretty_size(len(compressed)),
+                    pretty_size(len(decompressed))), level=DEBUG)
+        self.output_fp.write(decompressed)
+        self.i += 1
 
 
 class CompressedFPSink(CompressedSink):
@@ -2088,13 +2092,13 @@ def _write_offsets(output_fp, offsets):
     output_fp.write(encoded_offsets)
 
 
-def _unpack_chunk_fp(input_fp, checksum_impl):
-    """ Unpack a chunk.
+def _read_compressed_chunk_fp(input_fp, checksum_impl):
+    """ Read a compressed chunk from a file pointer.
 
     Parameters
     ----------
     input_fp : file like
-        the file pointer to unpack the chunk from
+        the file pointer to read the chunk from
     checksum_impl : Checksum
         the checksum that has been used
 
@@ -2102,8 +2106,6 @@ def _unpack_chunk_fp(input_fp, checksum_impl):
     -------
     compressed : str
         the compressed data
-    decompressed : str
-        the decompressed data
     blosc_header : dict
         the blosc header from the chunk
     """
@@ -2131,9 +2133,7 @@ def _unpack_chunk_fp(input_fp, checksum_impl):
             print_verbose('checksum OK (%s): %s ' %
                     (checksum_impl.name, repr(received_digest)),
                     level=DEBUG)
-    # if checksum OK, decompress buffer
-    decompressed = blosc.decompress(compressed)
-    return compressed, decompressed, blosc_header
+    return compressed, blosc_header
 
 
 def unpack_file(in_file, out_file):
@@ -2164,7 +2164,7 @@ def unpack_file(in_file, out_file):
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
         source = CompressedFPSource(input_fp)
-        sink = PlainFPSink(output_fp)
+        sink = PlainFPSink(output_fp, source.nchunks)
         metadata = unpack(source, sink)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
@@ -2174,8 +2174,8 @@ def unpack_file(in_file, out_file):
 
 def unpack(source, sink):
     # read, decompress, write loop
-    for compressed_chunk in iter(source):
-        sink.put(compressed_chunk)
+    for compressed in iter(source):
+        sink.put(compressed)
     return source.metadata
 
 
@@ -2357,7 +2357,8 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # seek to the final offset
     original_fp.seek(offsets[-1], 0)
     # decompress the last chunk
-    compressed, decompressed, blosc_header = _unpack_chunk_fp(original_fp, checksum_impl)
+    compressed, blosc_header = _read_compressed_chunk_fp(original_fp, checksum_impl)
+    decompressed = blosc.decompress(compressed)
     # figure out how many bytes we need to read to rebuild the last chunk
     ultimo_length = len(decompressed)
     bytes_to_read = bloscpack_header.chunk_size - ultimo_length

@@ -1676,7 +1676,6 @@ class PlainNumpySource(PlainSource):
         yield offset, int(self.last_chunk / self.ndarray.itemsize)
 
 
-
 class PlainSink(object):
 
     _metaclass__ = abc.ABCMeta

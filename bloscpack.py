@@ -1659,6 +1659,7 @@ class PlainNumpySource(PlainSource):
     def __init__(self, ndarray):
         self.metadata = {'dtype': ndarray.dtype.descr,
                          'shape': ndarray.shape,
+                         'order': ndarray.order
                          'container': 'numpy',
                          }
         # TODO only one dim for now

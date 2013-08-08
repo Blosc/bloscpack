@@ -94,7 +94,6 @@ SUFFIXES = OrderedDict((
              ("T", 2**40)))
 
 
-
 class ChunkingException(BaseException):
     pass
 

@@ -11,6 +11,7 @@ import shutil
 import struct
 import atexit
 import numpy
+import numpy.testing as npt
 import nose.tools as nt
 from collections import namedtuple
 from cStringIO import StringIO
@@ -921,9 +922,12 @@ def test_file_corruption():
 
 
 def test_pack_numpy():
-    a = np.arange(1e3)
+    a = np.arange(50)
     sio = StringIO()
     pack_numpy_fp(a, sio)
+    sio.seek(0)
+    b = unpack_numpy_fp(sio)
+    npt.assert_array_almost_equal(a, b)
 
 
 

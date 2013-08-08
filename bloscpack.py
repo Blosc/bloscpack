@@ -1658,7 +1658,7 @@ class PlainNumpySource(PlainSource):
                          'container': 'numpy',
                          }
         # TODO only one dim for now
-        self.size = ndarray.size
+        self.size = ndarray.size * ndarray.itemsize
         # TODO check that the array is contiguous
         self.ndarray = ndarray
         self.ptr = ndarray.__array_interface__['data'][0]
@@ -1843,12 +1843,12 @@ class PlainNumpySink(PlainSink):
         if metadata is None or metadata['container'] != 'numpy':
             raise ValueError
         self.ndarray = np.empty(metadata['shape'],
-                dtype=metadata['dtype'],
+                dtype=metadata['dtype'][0][1],
                 order=metadata['order'])
         self.ptr = self.ndarray.__array_interface__['data'][0]
 
-    def put(self, chunk):
-        bwritten = blosc.decompress_ptr(chunk, self.ptr)
+    def put(self, compressed):
+        bwritten = blosc.decompress_ptr(compressed, self.ptr)
         self.ptr += bwritten
 
 
@@ -1929,9 +1929,10 @@ def pack_numpy_fp(ndarray, file_pointer,
 
 def unpack_numpy_fp(file_pointer):
     source = CompressedFPSource(file_pointer)
-    sink = PlainNumpySink(source.metadat)
+    sink = PlainNumpySink(source.metadata)
     for compressed in iter(source):
         sink.put(compressed)
+    return sink.ndarray
 
 
 def _read_bloscpack_header(input_fp):

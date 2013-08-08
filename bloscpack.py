@@ -1905,7 +1905,7 @@ def pack(source, sink,
     sink.finalize()
 
 
-def pack_numpy_fp(ndarray, file_pointer,
+def pack_ndarray(ndarray, sink,
         chunk_size=DEFAULT_CHUNK_SIZE,
         blosc_args=DEFAULT_BLOSC_ARGS,
         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
@@ -1914,7 +1914,6 @@ def pack_numpy_fp(ndarray, file_pointer,
     source = PlainNumpySource(ndarray)
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(source.size, chunk_size)
-    sink = CompressedFPSink(file_pointer)
     pack(source, sink,
             nchunks, chunk_size, last_chunk_size,
             metadata=source.metadata,
@@ -1926,8 +1925,7 @@ def pack_numpy_fp(ndarray, file_pointer,
     #print_verbose('compression ratio: %f' % (out_file_size/source.size))
 
 
-def unpack_numpy_fp(file_pointer):
-    source = CompressedFPSource(file_pointer)
+def unpack_ndarray(source):
     sink = PlainNumpySink(source.metadata)
     for compressed in iter(source):
         sink.put(compressed)

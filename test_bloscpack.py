@@ -921,14 +921,15 @@ def test_file_corruption():
         nt.assert_raises(ChecksumMismatch, unpack_file, out_file, dcmp_file)
 
 
-def test_pack_numpy():
+def test_roundtrip_numpy():
     a = np.arange(50)
     sio = StringIO()
-    pack_numpy_fp(a, sio)
+    sink = CompressedFPSink(sio)
+    pack_ndarray(a, sink)
     sio.seek(0)
-    b = unpack_numpy_fp(sio)
+    source = CompressedFPSource(sio)
+    b = unpack_ndarray(source)
     npt.assert_array_almost_equal(a, b)
-
 
 
 def pack_unpack(repeats, chunk_size=None, progress=False):

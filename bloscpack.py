@@ -2161,7 +2161,7 @@ def _seek_to_metadata(target_fp):
     ----------
 
     target_fp : file like
-        the taregt file pointer
+        the target file pointer
 
     Returns
     -------

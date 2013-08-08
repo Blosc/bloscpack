@@ -10,7 +10,7 @@ import contextlib
 import shutil
 import struct
 import atexit
-import numpy
+import numpy as np
 import numpy.testing as npt
 import nose.tools as nt
 from collections import namedtuple
@@ -191,7 +191,7 @@ def test_calculate_nchunks():
 
 
 def test_decode_blosc_header():
-    array_ = numpy.linspace(0, 100, 2e4).tostring()
+    array_ = np.linspace(0, 100, 2e4).tostring()
     # basic test case
     blosc_args = DEFAULT_BLOSC_ARGS
     compressed = blosc.compress(array_, **blosc_args)
@@ -217,8 +217,8 @@ def test_decode_blosc_header():
                 'typesize': blosc_args['typesize']}
     nt.assert_equal(expected, header)
     # uncompressible data
-    array_ = numpy.asarray(numpy.random.randn(23),
-            dtype=numpy.float32).tostring()
+    array_ = np.asarray(np.random.randn(23),
+            dtype=np.float32).tostring()
     blosc_args['shuffle'] = True
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
@@ -665,7 +665,7 @@ def create_array_fp(repeats, in_fp, progress=False):
                 print('.', end='')
             sys.stdout.flush()
     for i in range(repeats):
-        array_ = numpy.linspace(i, i+1, 2e6)
+        array_ = np.linspace(i, i+1, 2e6)
         in_fp.write(array_.tostring())
         if progress:
             progress(i)

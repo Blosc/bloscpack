@@ -1843,7 +1843,7 @@ class PlainNumpySink(PlainSink):
                 order=metadata['order'])
         self.ptr = self.ndarray.__array_interface__['data'][0]
 
-    def put(self, chunk)
+    def put(self, chunk):
         bwritten = blosc.decompress_ptr(chunk, self.ptr)
         self.ptr += bwritten
 

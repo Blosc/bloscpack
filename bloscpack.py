@@ -1194,6 +1194,7 @@ class BloscPackHeader(collections.MutableMapping):
             first four bytes are not the Bloscpack magic.
 
         """
+        buffer_ = memoryview(buffer_)
         if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
             raise ValueError(
                 "attempting to decode a bloscpack header of length '%d', not '%d'"

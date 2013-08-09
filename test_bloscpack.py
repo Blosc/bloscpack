@@ -941,14 +941,40 @@ def test_roundtrip_numpy():
     npt.assert_array_almost_equal(a, b)
 
 
-def test_numpy_dtypes():
+def test_numpy_dtypes_shapes_order():
     for dt in np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
-        a = np.arange(8, dtype=dt)
-        sink = CompressedMemorySink()
-        pack_ndarray(a, sink)
-        source = CompressedMemorySource(sink)
-        b = unpack_ndarray(source)
-        npt.assert_array_almost_equal(a, b)
+        a = np.arange(64, dtype=dt)
+        roundtrip_ndarray(a)
+        a = a.copy().reshape(8, 8)
+        roundtrip_ndarray(a)
+        a = a.copy().reshape(4, 16)
+        roundtrip_ndarray(a)
+        a = a.copy().reshape(4, 4, 4)
+        roundtrip_ndarray(a)
+        a = np.asfortranarray(a)
+        nt.assert_true(np.isfortran(a))
+        roundtrip_ndarray(a)
+
+
+def test_larger_arrays():
+    for dt in ('uint64', 'int64', 'float64'):
+        a = np.arange(2e4, dtype=dt)
+        roundtrip_ndarray(a)
+
+
+def huge_arrays():
+    for dt in ('uint64', 'int64', 'float64'):
+        # needs plenty of memory
+        a = np.arange(1e8, dtype=dt)
+        roundtrip_ndarray(a)
+
+
+def roundtrip_ndarray(ndarray):
+    sink = CompressedMemorySink()
+    pack_ndarray(ndarray, sink)
+    source = CompressedMemorySource(sink)
+    result = unpack_ndarray(source)
+    npt.assert_array_almost_equal(ndarray, result)
 
 
 def pack_unpack(repeats, chunk_size=None, progress=False):

@@ -1915,6 +1915,27 @@ def pack_ndarray(ndarray, sink,
         blosc_args=DEFAULT_BLOSC_ARGS,
         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
         metadata_args=DEFAULT_METADATA_ARGS):
+    """ Serialialize a Numpy array.
+
+    Parameters
+    ----------
+    ndarray : ndarray
+        the numpy array to serialize
+    sink : CompressedSink
+        the sink to serialize to
+    blosc_args : dict
+        the args for blosc
+    bloscpack_args : dict
+        the args for bloscpack
+    metadata_args : dict
+        the args for the metadata
+
+    Notes
+    -----
+
+    The 'typesize' value of 'blosc_args' will be silently ignored and replaced
+    with the itemsize of the Numpy array's dtype.
+    """
 
     blosc_args = blosc_args.copy()
     blosc_args['typesize'] = ndarray.dtype.itemsize
@@ -1933,6 +1954,24 @@ def pack_ndarray(ndarray, sink,
 
 
 def unpack_ndarray(source):
+    """ Deserialize a Numpy array.
+
+    Parameters
+    ----------
+    source : CompressedSource
+        the source containing the serialized Numpy array
+
+    Returns
+    -------
+    ndarray : ndarray
+        the Numpy array
+
+    Raises
+    ------
+    NotANumpyArray
+        if the source doesn't seem to contain a Numpy array
+    """
+
     sink = PlainNumpySink(source.metadata)
     for compressed in iter(source):
         sink.put(compressed)

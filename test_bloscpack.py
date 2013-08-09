@@ -922,6 +922,7 @@ def test_file_corruption():
 
 
 def test_roundtrip_numpy():
+    # first try with the standard StringIO
     a = np.arange(50)
     sio = StringIO()
     sink = CompressedFPSink(sio)
@@ -931,12 +932,23 @@ def test_roundtrip_numpy():
     b = unpack_ndarray(source)
     npt.assert_array_almost_equal(a, b)
 
+    # now use ths shiny CompressedMemorySink/Source combo
     a = np.arange(50)
     sink = CompressedMemorySink()
     pack_ndarray(a, sink)
     source = CompressedMemorySource(sink)
     b = unpack_ndarray(source)
     npt.assert_array_almost_equal(a, b)
+
+
+def test_numpy_dtypes():
+    for dt in np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
+        a = np.arange(8, dtype=dt)
+        sink = CompressedMemorySink()
+        pack_ndarray(a, sink)
+        source = CompressedMemorySource(sink)
+        b = unpack_ndarray(source)
+        npt.assert_array_almost_equal(a, b)
 
 
 def pack_unpack(repeats, chunk_size=None, progress=False):

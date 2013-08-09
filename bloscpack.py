@@ -1911,6 +1911,8 @@ def pack_ndarray(ndarray, sink,
         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
         metadata_args=DEFAULT_METADATA_ARGS):
 
+    blosc_args = blosc_args.copy()
+    blosc_args['typesize'] = ndarray.dtype.itemsize
     source = PlainNumpySource(ndarray)
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(source.size, chunk_size)

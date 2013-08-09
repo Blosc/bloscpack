@@ -146,6 +146,10 @@ class NotEnoughSpace(RuntimeError):
     pass
 
 
+class NotANumpyArray(RuntimeError):
+    pass
+
+
 class Hash(object):
     """ Uniform hash object.
 
@@ -1840,7 +1844,7 @@ class PlainNumpySink(PlainSink):
     def __init__(self, metadata):
         self.metadata = metadata
         if metadata is None or metadata['container'] != 'numpy':
-            raise ValueError
+            raise NotANumpyArray
         self.ndarray = np.empty(metadata['shape'],
                 dtype=metadata['dtype'][0][1],
                 order=metadata['order'])

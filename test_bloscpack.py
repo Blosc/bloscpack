@@ -931,6 +931,13 @@ def test_roundtrip_numpy():
     b = unpack_ndarray(source)
     npt.assert_array_almost_equal(a, b)
 
+    a = np.arange(50)
+    sink = CompressedMemorySink()
+    pack_ndarray(a, sink)
+    source = CompressedMemorySource(sink)
+    b = unpack_ndarray(source)
+    npt.assert_array_almost_equal(a, b)
+
 
 def pack_unpack(repeats, chunk_size=None, progress=False):
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):

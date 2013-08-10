@@ -1735,7 +1735,7 @@ class CompressedSink(object):
 
 class PlainFPSink(PlainSink):
 
-    def __init__(self, output_fp, nchunks):
+    def __init__(self, output_fp, nchunks=None):
         self.output_fp = output_fp
         self.nchunks = nchunks
         self.i = 0

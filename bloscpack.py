@@ -1953,6 +1953,19 @@ def pack_ndarray(ndarray, sink,
     #print_verbose('compression ratio: %f' % (out_file_size/source.size))
 
 
+def pack_ndarray_file(ndarray, filename,
+                      chunk_size=DEFAULT_CHUNK_SIZE,
+                      blosc_args=DEFAULT_BLOSC_ARGS,
+                      bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+                      metadata_args=DEFAULT_METADATA_ARGS):
+    sink = CompressedFPSink(open(filename, 'wb'))
+    pack_ndarray(ndarray, sink,
+                 chunk_size=chunk_size,
+                 blosc_args=blosc_args,
+                 bloscpack_args=bloscpack_args,
+                 metadata_args=metadata_args)
+
+
 def unpack_ndarray(source):
     """ Deserialize a Numpy array.
 
@@ -1976,6 +1989,11 @@ def unpack_ndarray(source):
     for compressed in iter(source):
         sink.put(compressed)
     return sink.ndarray
+
+
+def unpack_ndarray_file(filename):
+    source = CompressedFPSource(open(filename, 'rb'))
+    return unpack_ndarray(source)
 
 
 def _read_bloscpack_header(input_fp):

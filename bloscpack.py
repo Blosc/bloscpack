@@ -2175,7 +2175,8 @@ def _read_compressed_chunk_fp(input_fp, checksum_impl):
     # read blosc header
     blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
     blosc_header = decode_blosc_header(blosc_header_raw)
-    print_verbose('blosc_header: %s' % repr(blosc_header), level=DEBUG)
+    if LEVEL == DEBUG:
+        print_debug('blosc_header: %s' % repr(blosc_header))
     ctbytes = blosc_header['ctbytes']
     # Seek back BLOSC_HEADER_LENGTH bytes in file relative to current
     # position. Blosc needs the header too and presumably this is

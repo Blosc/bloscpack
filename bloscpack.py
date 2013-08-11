@@ -14,6 +14,7 @@ import copy
 import hashlib
 import json
 import itertools
+import os
 import os.path as path
 import pprint
 import struct
@@ -372,6 +373,13 @@ def reverse_pretty(readable):
                 (suffix, SUFFIXES.keys()))
     else:
         return int(float(readable[:-1]) * SUFFIXES[suffix])
+
+
+def drop_caches():
+    if os.geteuid() == 0:
+        os.system('echo 3 > /proc/sys/vm/drop_caches')
+    else:
+        raise RuntimeError('Need root permission to drop caches')
 
 
 def decode_uint8(byte):

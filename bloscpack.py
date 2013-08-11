@@ -673,6 +673,7 @@ def decode_blosc_header(buffer_):
     format.
 
     """
+    buffer_ = memoryview(buffer_)
     return {'version':   decode_uint8(buffer_[0]),
             'versionlz': decode_uint8(buffer_[1]),
             'flags':     decode_uint8(buffer_[2]),

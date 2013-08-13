@@ -10,7 +10,8 @@ import contextlib
 import shutil
 import struct
 import atexit
-import numpy
+import numpy as np
+import numpy.testing as npt
 import nose.tools as nt
 from collections import namedtuple
 from cStringIO import StringIO
@@ -190,7 +191,7 @@ def test_calculate_nchunks():
 
 
 def test_decode_blosc_header():
-    array_ = numpy.linspace(0, 100, 2e4).tostring()
+    array_ = np.linspace(0, 100, 2e4).tostring()
     # basic test case
     blosc_args = DEFAULT_BLOSC_ARGS
     compressed = blosc.compress(array_, **blosc_args)
@@ -216,8 +217,8 @@ def test_decode_blosc_header():
                 'typesize': blosc_args['typesize']}
     nt.assert_equal(expected, header)
     # uncompressible data
-    array_ = numpy.asarray(numpy.random.randn(23),
-            dtype=numpy.float32).tostring()
+    array_ = np.asarray(np.random.randn(23),
+            dtype=np.float32).tostring()
     blosc_args['shuffle'] = True
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
@@ -664,7 +665,7 @@ def create_array_fp(repeats, in_fp, progress=False):
                 print('.', end='')
             sys.stdout.flush()
     for i in range(repeats):
-        array_ = numpy.linspace(i, i+1, 2e6)
+        array_ = np.linspace(i, i+1, 2e6)
         in_fp.write(array_.tostring())
         if progress:
             progress(i)
@@ -918,6 +919,62 @@ def test_file_corruption():
             input_fp.write(replace)
         # now attempt to unpack it
         nt.assert_raises(ChecksumMismatch, unpack_file, out_file, dcmp_file)
+
+
+def test_roundtrip_numpy():
+    # first try with the standard StringIO
+    a = np.arange(50)
+    sio = StringIO()
+    sink = CompressedFPSink(sio)
+    pack_ndarray(a, sink)
+    sio.seek(0)
+    source = CompressedFPSource(sio)
+    b = unpack_ndarray(source)
+    npt.assert_array_almost_equal(a, b)
+
+    # now use ths shiny CompressedMemorySink/Source combo
+    a = np.arange(50)
+    sink = CompressedMemorySink()
+    pack_ndarray(a, sink)
+    source = CompressedMemorySource(sink)
+    b = unpack_ndarray(source)
+    npt.assert_array_almost_equal(a, b)
+
+
+def test_numpy_dtypes_shapes_order():
+    for dt in np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
+        a = np.arange(64, dtype=dt)
+        roundtrip_ndarray(a)
+        a = a.copy().reshape(8, 8)
+        roundtrip_ndarray(a)
+        a = a.copy().reshape(4, 16)
+        roundtrip_ndarray(a)
+        a = a.copy().reshape(4, 4, 4)
+        roundtrip_ndarray(a)
+        a = np.asfortranarray(a)
+        nt.assert_true(np.isfortran(a))
+        roundtrip_ndarray(a)
+
+
+def test_larger_arrays():
+    for dt in ('uint64', 'int64', 'float64'):
+        a = np.arange(2e4, dtype=dt)
+        roundtrip_ndarray(a)
+
+
+def huge_arrays():
+    for dt in ('uint64', 'int64', 'float64'):
+        # needs plenty of memory
+        a = np.arange(1e8, dtype=dt)
+        roundtrip_ndarray(a)
+
+
+def roundtrip_ndarray(ndarray):
+    sink = CompressedMemorySink()
+    pack_ndarray(ndarray, sink)
+    source = CompressedMemorySource(sink)
+    result = unpack_ndarray(source)
+    npt.assert_array_almost_equal(ndarray, result)
 
 
 def pack_unpack(repeats, chunk_size=None, progress=False):
@@ -1360,11 +1417,13 @@ def test_append_mix_shuffle():
     bloscpack_header, offsets = reset_read_beginning(orig)[0:4:3]
     orig.seek(offsets[0])
     checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
-    compressed_zero, decompressed_zero, blosc_header_zero = \
-        bloscpack._unpack_chunk_fp(orig, checksum_impl)
+    compressed_zero,  blosc_header_zero = \
+        bloscpack._read_compressed_chunk_fp(orig, checksum_impl)
+    decompressed_zero = blosc.decompress(compressed_zero)
     orig.seek(offsets[-1])
-    compressed_last, decompressed_last, blosc_header_last = \
-        bloscpack._unpack_chunk_fp(orig, checksum_impl)
+    compressed_last,  blosc_header_last = \
+        bloscpack._read_compressed_chunk_fp(orig, checksum_impl)
+    decompressed_last = blosc.decompress(compressed_last)
     # first chunk has shuffle active
     nt.assert_equal(blosc_header_zero['flags'], 1)
     # last chunk doesn't

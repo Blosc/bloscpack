@@ -14,6 +14,7 @@ import copy
 import hashlib
 import json
 import itertools
+import os
 import os.path as path
 import pprint
 import struct
@@ -24,6 +25,7 @@ try:
 except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict
 import blosc
+import numpy as np
 
 __version__ = '0.4.0-dev'
 __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
@@ -142,6 +144,10 @@ class NonUniformTypesize(RuntimeError):
 
 
 class NotEnoughSpace(RuntimeError):
+    pass
+
+
+class NotANumpyArray(RuntimeError):
     pass
 
 
@@ -367,6 +373,13 @@ def reverse_pretty(readable):
                 (suffix, SUFFIXES.keys()))
     else:
         return int(float(readable[:-1]) * SUFFIXES[suffix])
+
+
+def drop_caches():
+    if os.geteuid() == 0:
+        os.system('echo 3 > /proc/sys/vm/drop_caches')
+    else:
+        raise RuntimeError('Need root permission to drop caches')
 
 
 def decode_uint8(byte):
@@ -668,6 +681,7 @@ def decode_blosc_header(buffer_):
     format.
 
     """
+    buffer_ = memoryview(buffer_)
     return {'version':   decode_uint8(buffer_[0]),
             'versionlz': decode_uint8(buffer_[1]),
             'flags':     decode_uint8(buffer_[2]),
@@ -1139,6 +1153,10 @@ class BloscPackHeader(collections.MutableMapping):
     def copy(self):
         return copy.copy(self)
 
+    @property
+    def checksum_impl(self):
+        return CHECKSUMS_LOOKUP[self.checksum]
+
     def encode(self):
         """ Encode the Bloscpack header.
 
@@ -1185,6 +1203,7 @@ class BloscPackHeader(collections.MutableMapping):
             first four bytes are not the Bloscpack magic.
 
         """
+        buffer_ = memoryview(buffer_)
         if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
             raise ValueError(
                 "attempting to decode a bloscpack header of length '%d', not '%d'"
@@ -1474,24 +1493,20 @@ def _write_metadata(output_fp, metadata, metadata_args):
             double_pretty_size(metadata_total), level=DEBUG)
     return metadata_total
 
-def _pack_chunk_fp(output_fp, chunk, blosc_args, checksum_impl):
-    compressed = blosc.compress(chunk, **blosc_args)
+
+def _compress_chunk_str(chunk, blosc_args):
+    return blosc.compress(chunk, **blosc_args)
+
+
+def _compress_chunk_ptr(chunk, blosc_args):
+    ptr, size = chunk
+    return blosc.compress_ptr(ptr, size, **blosc_args)
+
+
+def _write_compressed_chunk(output_fp, compressed, digest):
     output_fp.write(compressed)
-    if LEVEL == DEBUG:
-        print_verbose("chunk compressed, in: %s out: %s ratio: %s" %
-                (double_pretty_size(len(chunk)),
-                double_pretty_size(len(compressed)),
-                "%0.3f" % (len(compressed) / len(chunk))),
-                level=DEBUG)
-    if checksum_impl.size > 0:
-        # compute the checksum on the compressed data
-        digest = checksum_impl(compressed)
-        # write digest
+    if len(digest) > 0:
         output_fp.write(digest)
-        print_verbose('checksum (%s): %s ' %
-                (checksum_impl.name, repr(digest)),
-                level=DEBUG)
-    return compressed, digest
 
 
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
@@ -1555,6 +1570,10 @@ class PlainSource(object):
         self.last_chunk = last_chunk
         self.nchunks = nchunks
 
+    @property
+    def compress_func(self):
+        return _compress_chunk_str
+
     def __iter__(self):
         return self()
 
@@ -1595,18 +1614,13 @@ class CompressedFPSource(CompressedSource):
         self.input_fp = input_fp
         self.bloscpack_header, self.metadata, self.metadata_header, \
                 self.offsets = _read_beginning(input_fp)
-        self.checksum_impl = CHECKSUMS_LOOKUP[self.bloscpack_header.checksum]
+        self.checksum_impl = self.bloscpack_header.checksum_impl
         self.nchunks = self.bloscpack_header.nchunks
 
     def __call__(self):
         for i in xrange(self.nchunks):
-            print_verbose("decompressing chunk '%d'%s" %
-                    (i, ' (last)' if i == self.nchunks - 1 else ''), level=DEBUG)
-            compressed, decompressed, header= _unpack_chunk_fp(self.input_fp, self.checksum_impl)
-            print_verbose("chunk handled, in: %s out: %s" %
-                    (pretty_size(len(compressed)),
-                        pretty_size(len(decompressed))), level=DEBUG)
-            yield decompressed
+            compressed, header = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
+            yield compressed
 
 
 class PlainMemorySource(PlainSource):
@@ -1646,7 +1660,34 @@ class CompressedMemorySource(CompressedSource):
                             "Checksum mismatch detected in chunk, "
                             "expected: '%s', received: '%s'" %
                             (repr(expected_digest), repr(received_digest)))
-            yield blosc.decompress(compressed)
+            yield compressed
+
+
+class PlainNumpySource(PlainSource):
+
+    def __init__(self, ndarray):
+        self.metadata = {'dtype': ndarray.dtype.descr,
+                         'shape': ndarray.shape,
+                         'order': 'F' if np.isfortran(ndarray) else 'C',
+                         'container': 'numpy',
+                         }
+        # TODO only one dim for now
+        self.size = ndarray.size * ndarray.itemsize
+        # TODO check that the array is contiguous
+        self.ndarray = np.ascontiguousarray(ndarray)
+        self.ptr = ndarray.__array_interface__['data'][0]
+
+    @property
+    def compress_func(self):
+        return _compress_chunk_ptr
+
+    def __call__(self):
+        self.nitems = int(self.chunk_size / self.ndarray.itemsize)
+        offset = self.ptr
+        for i in xrange(self.nchunks - 1):
+            yield offset, self.nitems
+            offset += self.chunk_size
+        yield offset, int(self.last_chunk / self.ndarray.itemsize)
 
 
 class PlainSink(object):
@@ -1665,7 +1706,7 @@ class CompressedSink(object):
     def configure(self, blosc_args, bloscpack_header):
         self.blosc_args = blosc_args
         self.bloscpack_header = bloscpack_header
-        self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
+        self.checksum_impl = bloscpack_header.checksum_impl
         self.offsets = bloscpack_header.offsets
 
     @abc.abstractmethod
@@ -1685,17 +1726,38 @@ class CompressedSink(object):
         pass
 
     @abc.abstractmethod
-    def put(self, i, chunk):
+    def put(self, i, compressed):
         pass
+
+    def do_checksum(self, compressed):
+        if self.checksum_impl.size > 0:
+            # compute the checksum on the compressed data
+            digest = self.checksum_impl(compressed)
+            print_verbose('checksum (%s): %s ' %
+                    (self.checksum_impl.name, repr(digest)),
+                    level=DEBUG)
+        else:
+            digest = ''
+            print_debug('no checksum')
+        return digest
 
 
 class PlainFPSink(PlainSink):
 
-    def __init__(self, output_fp):
+    def __init__(self, output_fp, nchunks=None):
         self.output_fp = output_fp
+        self.nchunks = nchunks
+        self.i = 0
 
-    def put(self, chunk):
-        self.output_fp.write(chunk)
+    def put(self, compressed):
+        print_verbose("decompressing chunk '%d'%s" %
+                (self.i, ' (last)' if self.i == self.nchunks - 1 else ''), level=DEBUG)
+        decompressed = blosc.decompress(compressed)
+        print_verbose("chunk handled, in: %s out: %s" %
+                (pretty_size(len(compressed)),
+                    pretty_size(len(decompressed))), level=DEBUG)
+        self.output_fp.write(decompressed)
+        self.i += 1
 
 
 class CompressedFPSink(CompressedSink):
@@ -1725,10 +1787,10 @@ class CompressedFPSink(CompressedSink):
             self.output_fp.seek(BLOSCPACK_HEADER_LENGTH + self.meta_total, 0)
             _write_offsets(self.output_fp, self.offset_storage)
 
-    def put(self, i, chunk):
+    def put(self, i, compressed):
         offset = self.output_fp.tell()
-        compressed, digest = _pack_chunk_fp(self.output_fp, chunk,
-                self.blosc_args, self.checksum_impl)
+        digest = self.do_checksum(compressed)
+        _write_compressed_chunk(self.output_fp, compressed, digest)
         if self.offsets:
             self.offset_storage[i] = offset
         return offset, compressed, digest
@@ -1758,9 +1820,9 @@ class CompressedMemorySink(CompressedSink):
     def configure(self, blosc_args, bloscpack_header):
         self.blosc_args = blosc_args
         self.bloscpack_header = bloscpack_header
-        self.checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
-        self.checksum = self.checksum_impl.size > 0
-        self.nchunks = self.bloscpack_header.nchunks
+        self.checksum_impl = bloscpack_header.checksum_impl
+        self.checksum = bloscpack_header.checksum
+        self.nchunks = bloscpack_header.nchunks
 
         self.chunks = [None] * self.bloscpack_header.nchunks
         if self.checksum:
@@ -1781,11 +1843,26 @@ class CompressedMemorySink(CompressedSink):
         # no op
         pass
 
-    def put(self, i, chunk):
-        compressed = blosc.compress(chunk, **self.blosc_args)
+    def put(self, i, compressed):
         self.chunks[i] = compressed
         if self.checksum:
-            self.checksums[i] = self.checksum_impl(compressed)
+            self.checksums[i] = self.do_checksum(compressed)
+
+
+class PlainNumpySink(PlainSink):
+
+    def __init__(self, metadata):
+        self.metadata = metadata
+        if metadata is None or metadata['container'] != 'numpy':
+            raise NotANumpyArray
+        self.ndarray = np.empty(metadata['shape'],
+                dtype=metadata['dtype'][0][1],
+                order=metadata['order'])
+        self.ptr = self.ndarray.__array_interface__['data'][0]
+
+    def put(self, compressed):
+        bwritten = blosc.decompress_ptr(compressed, self.ptr)
+        self.ptr += bwritten
 
 
 def pack(source, sink,
@@ -1831,13 +1908,101 @@ def pack(source, sink,
         print_verbose('metadata_args will be silently ignored', level=DEBUG)
     sink.init_offsets()
 
+    compress_func = source.compress_func
     # read-compress-write loop
     for i, chunk in enumerate(source()):
         print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
             else ''), level=DEBUG)
-        sink.put(i, chunk)
+        compressed = compress_func(chunk, blosc_args)
+        sink.put(i, compressed)
 
     sink.finalize()
+
+
+def pack_ndarray(ndarray, sink,
+        chunk_size=DEFAULT_CHUNK_SIZE,
+        blosc_args=DEFAULT_BLOSC_ARGS,
+        bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+        metadata_args=DEFAULT_METADATA_ARGS):
+    """ Serialialize a Numpy array.
+
+    Parameters
+    ----------
+    ndarray : ndarray
+        the numpy array to serialize
+    sink : CompressedSink
+        the sink to serialize to
+    blosc_args : dict
+        the args for blosc
+    bloscpack_args : dict
+        the args for bloscpack
+    metadata_args : dict
+        the args for the metadata
+
+    Notes
+    -----
+
+    The 'typesize' value of 'blosc_args' will be silently ignored and replaced
+    with the itemsize of the Numpy array's dtype.
+    """
+
+    blosc_args = blosc_args.copy()
+    blosc_args['typesize'] = ndarray.dtype.itemsize
+    source = PlainNumpySource(ndarray)
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(source.size, chunk_size)
+    pack(source, sink,
+            nchunks, chunk_size, last_chunk_size,
+            metadata=source.metadata,
+            blosc_args=blosc_args,
+            bloscpack_args=bloscpack_args,
+            metadata_args=metadata_args)
+    #out_file_size = path.getsize(file_pointer)
+    #print_verbose('output file size: %s' % double_pretty_size(out_file_size))
+    #print_verbose('compression ratio: %f' % (out_file_size/source.size))
+
+
+def pack_ndarray_file(ndarray, filename,
+                      chunk_size=DEFAULT_CHUNK_SIZE,
+                      blosc_args=DEFAULT_BLOSC_ARGS,
+                      bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+                      metadata_args=DEFAULT_METADATA_ARGS):
+    sink = CompressedFPSink(open(filename, 'wb'))
+    pack_ndarray(ndarray, sink,
+                 chunk_size=chunk_size,
+                 blosc_args=blosc_args,
+                 bloscpack_args=bloscpack_args,
+                 metadata_args=metadata_args)
+
+
+def unpack_ndarray(source):
+    """ Deserialize a Numpy array.
+
+    Parameters
+    ----------
+    source : CompressedSource
+        the source containing the serialized Numpy array
+
+    Returns
+    -------
+    ndarray : ndarray
+        the Numpy array
+
+    Raises
+    ------
+    NotANumpyArray
+        if the source doesn't seem to contain a Numpy array
+    """
+
+    sink = PlainNumpySink(source.metadata)
+    for compressed in iter(source):
+        sink.put(compressed)
+    return sink.ndarray
+
+
+def unpack_ndarray_file(filename):
+    source = CompressedFPSource(open(filename, 'rb'))
+    return unpack_ndarray(source)
 
 
 def _read_bloscpack_header(input_fp):
@@ -1998,13 +2163,13 @@ def _write_offsets(output_fp, offsets):
     output_fp.write(encoded_offsets)
 
 
-def _unpack_chunk_fp(input_fp, checksum_impl):
-    """ Unpack a chunk.
+def _read_compressed_chunk_fp(input_fp, checksum_impl):
+    """ Read a compressed chunk from a file pointer.
 
     Parameters
     ----------
     input_fp : file like
-        the file pointer to unpack the chunk from
+        the file pointer to read the chunk from
     checksum_impl : Checksum
         the checksum that has been used
 
@@ -2012,15 +2177,14 @@ def _unpack_chunk_fp(input_fp, checksum_impl):
     -------
     compressed : str
         the compressed data
-    decompressed : str
-        the decompressed data
     blosc_header : dict
         the blosc header from the chunk
     """
     # read blosc header
     blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
     blosc_header = decode_blosc_header(blosc_header_raw)
-    print_verbose('blosc_header: %s' % repr(blosc_header), level=DEBUG)
+    if LEVEL == DEBUG:
+        print_debug('blosc_header: %s' % repr(blosc_header))
     ctbytes = blosc_header['ctbytes']
     # Seek back BLOSC_HEADER_LENGTH bytes in file relative to current
     # position. Blosc needs the header too and presumably this is
@@ -2041,9 +2205,7 @@ def _unpack_chunk_fp(input_fp, checksum_impl):
             print_verbose('checksum OK (%s): %s ' %
                     (checksum_impl.name, repr(received_digest)),
                     level=DEBUG)
-    # if checksum OK, decompress buffer
-    decompressed = blosc.decompress(compressed)
-    return compressed, decompressed, blosc_header
+    return compressed, blosc_header
 
 
 def unpack_file(in_file, out_file):
@@ -2074,7 +2236,7 @@ def unpack_file(in_file, out_file):
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
         source = CompressedFPSource(input_fp)
-        sink = PlainFPSink(output_fp)
+        sink = PlainFPSink(output_fp, source.nchunks)
         metadata = unpack(source, sink)
     out_file_size = path.getsize(out_file)
     print_verbose('output file size: %s' % pretty_size(out_file_size))
@@ -2084,8 +2246,8 @@ def unpack_file(in_file, out_file):
 
 def unpack(source, sink):
     # read, decompress, write loop
-    for decompressed_chunk in iter(source):
-        sink.put(decompressed_chunk)
+    for compressed in iter(source):
+        sink.put(compressed)
     return source.metadata
 
 
@@ -2096,7 +2258,7 @@ def _seek_to_metadata(target_fp):
     ----------
 
     target_fp : file like
-        the taregt file pointer
+        the target file pointer
 
     Returns
     -------
@@ -2240,7 +2402,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     """
     bloscpack_header, metadata, metadata_header, offsets = \
         _read_beginning(original_fp)
-    checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header.checksum]
+    checksum_impl = bloscpack_header.checksum_impl
     if not offsets:
         raise RuntimeError(
                 'Appending to a file without offsets is not yet supported')
@@ -2267,7 +2429,8 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # seek to the final offset
     original_fp.seek(offsets[-1], 0)
     # decompress the last chunk
-    compressed, decompressed, blosc_header = _unpack_chunk_fp(original_fp, checksum_impl)
+    compressed, blosc_header = _read_compressed_chunk_fp(original_fp, checksum_impl)
+    decompressed = blosc.decompress(compressed)
     # figure out how many bytes we need to read to rebuild the last chunk
     ultimo_length = len(decompressed)
     bytes_to_read = bloscpack_header.chunk_size - ultimo_length
@@ -2278,9 +2441,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         # seek back to the position of the original last chunk
         original_fp.seek(offsets[-1], 0)
         # write the chunk that has been filled up
-        compressed, digest = _pack_chunk_fp(original_fp,
-                decompressed + fill_up,
-                blosc_args, checksum_impl)
+        compressed = _compress_chunk_str(decompressed + fill_up, blosc_args)
+        digest = checksum_impl(compressed)
+        _write_compressed_chunk(original_fp, compressed, digest)
         # return 0 to indicate that no new chunks have been written
         # build the new header
         bloscpack_header.last_chunk += new_size
@@ -2304,8 +2467,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # seek back to the position of the original last chunk
     original_fp.seek(offsets[-1], 0)
     # write the chunk that has been filled up
-    compressed, digest = _pack_chunk_fp(original_fp, decompressed + fill_up,
-            blosc_args, checksum_impl)
+    compressed = _compress_chunk_str(decompressed + fill_up, blosc_args)
+    digest = checksum_impl(compressed)
+    _write_compressed_chunk(original_fp, compressed, digest)
     # append to the original file, again original_fp should be adequately
     # positioned
     sink = CompressedFPSink(original_fp)
@@ -2320,7 +2484,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     for i, chunk in enumerate(source()):
         print_verbose("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
             else ''), level=DEBUG)
-        offset, compressed, digest = sink.put(i, chunk)
+
+        compressed = _compress_chunk_str(chunk, blosc_args)
+        sink.put(i, compressed)
 
     # build the new header
     bloscpack_header.last_chunk = last_chunk_size

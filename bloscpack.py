@@ -429,7 +429,8 @@ def open_two_file(input_fp, output_fp):
     input_fp.close()
     output_fp.close()
 
-if sys.version_info == (2, 6):
+PYTHON_VERSION = sys.version_info[0:3]
+if sys.version_info < (2, 7, 5):
     memoryview = lambda x: x
 
 
@@ -1212,9 +1213,13 @@ class BloscPackHeader(collections.MutableMapping):
                 "attempting to decode a bloscpack header of length '%d', not '%d'"
                 % (len(buffer_), BLOSCPACK_HEADER_LENGTH))
         elif buffer_[0:4] != MAGIC:
+            try:
+                rep = buffer_[0:4].tobytes()
+            except AttributeError:
+                rep = buffer_[0:4]
             raise ValueError(
                 "the magic marker '%s' is missing from the bloscpack " % MAGIC +
-                "header, instead we found: %s" % repr(buffer_[0:4]))
+                "header, instead we found: %s" % repr(rep))
         options = decode_options(decode_bitfield(buffer_[5]))
         return BloscPackHeader(
             format_version=decode_uint8(buffer_[4]),

@@ -796,8 +796,6 @@ TODO
 * possibly provide a BloscPackFile abstraction, like GzipFile
 * document library usage
 * Expose the ability to set 'max_app_chunks' from the command line
-* Add ability to marshall/unmarshall Numpy arrays using new features in
-  python-blosc v1.1
 * Allow to save metadata to a file during decompression
 * Refactor certain collections of functions that operate on data into objects
 

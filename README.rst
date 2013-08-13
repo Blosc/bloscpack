@@ -819,7 +819,7 @@ TODO
 * Announce on scipy/numpy lists, comp.compression, freshmeat, ohloh ...
 * Debian packages (for python-blosc and bloscpack)
 * Establish and document proper exit codes
-* Use tox for tetsing multiple python versions
+* Use tox for testing multiple python versions
 
 
 Changelog

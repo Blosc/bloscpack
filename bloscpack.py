@@ -429,6 +429,9 @@ def open_two_file(input_fp, output_fp):
     input_fp.close()
     output_fp.close()
 
+if sys.version_info == (2, 6):
+    memoryview = lambda x: x
+
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.

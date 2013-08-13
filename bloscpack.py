@@ -1751,7 +1751,9 @@ class PlainFPSink(PlainSink):
 
     def put(self, compressed):
         print_verbose("decompressing chunk '%d'%s" %
-                (self.i, ' (last)' if self.i == self.nchunks - 1 else ''), level=DEBUG)
+                (self.i, ' (last)' if self.nchunks is not None
+                                   and self.i == self.nchunks - 1 else ''),
+                level=DEBUG)
         decompressed = blosc.decompress(compressed)
         print_verbose("chunk handled, in: %s out: %s" %
                 (pretty_size(len(compressed)),

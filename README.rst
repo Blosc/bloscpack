@@ -333,6 +333,62 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: compression ratio: 0.106100
     blpk: done
 
+Python API
+----------
+
+The Python API is still in flux, so this section is deliberately sparse.
+
+Numpy
+~~~~~
+
+Numpy arrays can be serialized as bloscpack files, here is a very brief example:
+
+.. code-block:: pycon
+
+    >>> a = np.linspace(0, 1, 3e8)
+    >>> print a.size, a.dtype
+    300000000 float64
+    >>> bp.pack_ndarray_file(a, 'a.blp')
+    >>> b = bp.unpack_ndarray_file('a.blp')
+    >>> (a == b).all()
+    True
+
+Looking at the generated file, we can see the Numpy metadata being saved:
+
+.. code-block:: console
+
+    $ lh a.blp
+    -rw------- 1 esc esc 266M Aug 13 23:21 a.blp
+    anaconda ~ esc@toolbox 
+    $ blpk info a.blp
+    blpk: bloscpack header: 
+    blpk:     format_version=3,
+    blpk:     offsets=True,
+    blpk:     metadata=True,
+    blpk:     checksum='adler32',
+    blpk:     typesize=8,
+    blpk:     chunk_size=1.0M (1048576B),
+    blpk:     last_chunk=838.0K (858112B),
+    blpk:     nchunks=2289,
+    blpk:     max_app_chunks=22890
+    blpk: 'metadata':
+    blpk: {   u'container': u'numpy',
+    blpk:     u'dtype': [[u'', u'<f8']],
+    blpk:     u'order': u'C',
+    blpk:     u'shape': [300000000]}
+    blpk: 'metadata_header':
+    blpk: {   'magic_format': 'JSON',
+    blpk:     'max_meta_size': 740,
+    blpk:     'meta_checksum': 'adler32',
+    blpk:     'meta_codec': 'zlib',
+    blpk:     'meta_comp_size': 68,
+    blpk:     'meta_level': 6,
+    blpk:     'meta_options': '00000000',
+    blpk:     'meta_size': 74,
+    blpk:     'user_codec': ''}
+    blpk: 'offsets':
+    blpk: [202240,408134,554982,690522,819749,...]
+
 Testing
 -------
 

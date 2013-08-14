@@ -542,7 +542,7 @@ def create_parser():
                     else:
                         value = int(value)
                 except ValueError as ve:
-                    error('%s error: %s' % (option_string, ve.message +
+                    error('%s error: %s' % (option_string, str(ve) +
                         " or 'max'"))
                 if value < 0:
                     error('%s must be > 0 ' % option_string)

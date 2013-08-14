@@ -375,7 +375,7 @@ def reverse_pretty(readable):
         return int(float(readable[:-1]) * SUFFIXES[suffix])
 
 
-def drop_caches():
+def drop_caches():  # pragma: no cover
     if os.geteuid() == 0:
         os.system('echo 3 > /proc/sys/vm/drop_caches')
     else:
@@ -430,7 +430,7 @@ def open_two_file(input_fp, output_fp):
     output_fp.close()
 
 PYTHON_VERSION = sys.version_info[0:3]
-if sys.version_info < (2, 7, 5):
+if sys.version_info < (2, 7, 5):  # pragma: no cover
     memoryview = lambda x: x
 
 

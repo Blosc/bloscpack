@@ -312,3 +312,9 @@ Test basic append:
   $ blpk append data.dat.blp data.dat
   $ ls -lah  data.dat.blp
   .* 1 .* .* 33M .* .* .* data.dat.blp (re)
+
+Use an invalid number of threads:
+
+  $ blpk -n 257
+  blpk: error: -n must be 1 <= n <= 256
+  [1]

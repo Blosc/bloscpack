@@ -1981,12 +1981,13 @@ def pack_ndarray_file(ndarray, filename,
                       blosc_args=DEFAULT_BLOSC_ARGS,
                       bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
                       metadata_args=DEFAULT_METADATA_ARGS):
-    sink = CompressedFPSink(open(filename, 'wb'))
-    pack_ndarray(ndarray, sink,
-                 chunk_size=chunk_size,
-                 blosc_args=blosc_args,
-                 bloscpack_args=bloscpack_args,
-                 metadata_args=metadata_args)
+    with open(filename, 'wb') as fp:
+        sink = CompressedFPSink(fp)
+        pack_ndarray(ndarray, sink,
+                    chunk_size=chunk_size,
+                    blosc_args=blosc_args,
+                    bloscpack_args=bloscpack_args,
+                    metadata_args=metadata_args)
 
 
 def unpack_ndarray(source):

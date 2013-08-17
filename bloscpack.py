@@ -382,6 +382,10 @@ def drop_caches():  # pragma: no cover
         raise RuntimeError('Need root permission to drop caches')
 
 
+def sync():
+    os.system('sync')
+
+
 def decode_uint8(byte):
     return struct.unpack('<B', byte)[0]
 

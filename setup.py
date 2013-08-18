@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# flake8: noqa
 
 from distutils.core import setup
 import bloscpack as bp

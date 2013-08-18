@@ -848,6 +848,13 @@ TODO
 * Debian packages (for python-blosc and bloscpack)
 * Establish and document proper exit codes
 * Use tox for testing multiple python versions
+* Investigate if we can use a StringIO object that returns memoryviews on read.
+* Implement a memoryview Compressed/PlainSource
+* Use a bytearray to read chunks from a file. Then re-use that bytearray
+  during every read to avoid allocating deallocating strings the whole time.
+* Document the metadata saved during Numpy serialization
+* The keyword arguments to many functions are global dicts, this is a bad idea,
+  Make the immutable with a forzendict.
 
 
 Changelog

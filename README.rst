@@ -12,7 +12,7 @@ Bloscpack
         :target: https://crate.io/packages/bloscpack
 
 .. image:: https://pypip.in/v/bloscpack/badge.png
-    :target: https://crate.io/packages/bloscpack/
+    :target: https://crate.io/packages/bloscpack
 
 Description
 -----------

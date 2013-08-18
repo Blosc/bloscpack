@@ -820,7 +820,6 @@ TODO
 * check Python 3.x compatibility
 * make a note in the README that the chunk-size benchmark can be used to tune
 * print the compression time, either as verbose or debug
-* PyPi upload
 * Announcement RST
 * Announce on scipy/numpy lists, comp.compression, freshmeat, ohloh ...
 * Debian packages (for python-blosc and bloscpack)

@@ -853,7 +853,7 @@ TODO
 Changelog
 ---------
 
-* v0.4.0     - XXX XXX XX 2013
+* v0.4.0-rc1 - Sun Aug 18 2013
 
   * BloscpackHeader class introduced
   * The info subcommand shows human readable sizes when printing the header

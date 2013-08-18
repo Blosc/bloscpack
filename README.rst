@@ -831,6 +831,7 @@ Changelog
   * The info subcommand shows human readable sizes when printing the header
   * Now using Travis-CI for testing and Coveralls for coverage
   * Further work on the Plain/Compressed-Source/Sink abstractions
+  * Start using memoryview in places
   * Learned to serialize Numpy arrays
 
 * v0.3.0     - Sun Aug 04 2013

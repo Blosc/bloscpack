@@ -59,20 +59,35 @@ in the licence at the end of this file.
 Installation
 ------------
 
-Add the ``blpk`` file to your ``$PATH`` somehow. For example by copying using
-dereferencing (``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``:
+The package is available on PyPi, so you may use pip to install it:
 
 .. code-block:: console
 
-    $ cp -L blpk ~/bin
+    $ pip install bloscpack
 
-Or, of course, use the standard ``setup.py``:
+If you want to install straight from GitHub, use pip's VCS support:
+
+.. code-block:: console
+
+    $ pip install git+https://github.com/esc/bloscpack
+
+Or, of course, download the source code or clone the repository and then use
+the standard ``setup.py``:
 
 .. code-block:: console
 
     $ python setup.py install
 
-... which may require superuser privileges.
+All of the above may or may not -- depending on the incantation used -- require
+superuser privileges.
+
+Alternatively, if you just need the command line interface, add the ``blpk``
+file to your ``$PATH`` somehow. For example by copying using dereferencing
+(``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``:
+
+.. code-block:: console
+
+    $ cp -L blpk ~/bin
 
 Usage
 -----

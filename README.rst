@@ -23,10 +23,16 @@ blocking and shuffling compressor. Uses `python-blosc
 <https://github.com/FrancescAlted/python-blosc>`_ bindings to interface with
 blosc.
 
-Website
--------
+Website(s)
+----------
 
-Repository is at: https://github.com/esc/bloscpack
+* `Repository at Github <https://github.com/esc/bloscpack>`_
+
+* `Crate.io <https://crate.io/packages/bloscpack/>`_
+* `PyPi <https://pypi.python.org/pypi/bloscpack>`_
+* `Ohloh <https://www.ohloh.net/p/bloscpack>`_
+* `Masterbranch <https://masterbranch.com/bloscpack-project/1751103>`_
+
 
 Contact
 -------

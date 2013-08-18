@@ -853,6 +853,10 @@ TODO
 Changelog
 ---------
 
+* v0.4.0-rc2 - XXX XXX XX XXXX
+
+  * Package available via PyPi (since 0.4.0-rc1)
+
 * v0.4.0-rc1 - Sun Aug 18 2013
 
   * BloscpackHeader class introduced

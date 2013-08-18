@@ -8,6 +8,9 @@ Bloscpack
 .. image:: https://coveralls.io/repos/esc/bloscpack/badge.png
         :target: https://coveralls.io/r/esc/bloscpack
 
+.. image:: https://pypip.in/d/bloscpack/badge.png
+        :target: https://crate.io/packages/bloscpack
+
 Description
 -----------
 

@@ -855,6 +855,7 @@ TODO
 * Document the metadata saved during Numpy serialization
 * The keyword arguments to many functions are global dicts, this is a bad idea,
   Make the immutable with a forzendict.
+* Check that source and sink are of the correct type
 
 
 Changelog

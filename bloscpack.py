@@ -10,6 +10,7 @@ import abc
 import argparse
 import contextlib
 import collections
+import cStringIO
 import copy
 import hashlib
 import json
@@ -1990,6 +1991,16 @@ def pack_ndarray_file(ndarray, filename,
                     metadata_args=metadata_args)
 
 
+def pack_ndarray_str(ndarray,
+                      chunk_size=DEFAULT_CHUNK_SIZE,
+                      blosc_args=DEFAULT_BLOSC_ARGS,
+                      bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+                      metadata_args=DEFAULT_METADATA_ARGS):
+    sio = cStringIO.StringIO()
+    sink = CompressedFPSink(sio)
+    pack_ndarray(ndarray, sink)
+    return sio.getvalue()
+
 def unpack_ndarray(source):
     """ Deserialize a Numpy array.
 
@@ -2018,6 +2029,15 @@ def unpack_ndarray(source):
 def unpack_ndarray_file(filename):
     source = CompressedFPSource(open(filename, 'rb'))
     return unpack_ndarray(source)
+
+def unpack_ndarray_str(str_):
+    sio = cStringIO.StringIO(str_)
+
+    source = CompressedFPSource(sio)
+    sink = PlainNumpySink(source.metadata)
+    for compressed in iter(source):
+        sink.put(compressed)
+    return sink.ndarray
 
 
 def _read_bloscpack_header(input_fp):

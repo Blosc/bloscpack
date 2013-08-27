@@ -940,6 +940,12 @@ def test_roundtrip_numpy():
     b = unpack_ndarray(source)
     npt.assert_array_almost_equal(a, b)
 
+    # and lastly try the pack_*_str
+    s = pack_ndarray_str(a)
+    b = unpack_ndarray_str(s)
+    npt.assert_array_almost_equal(a, b)
+
+
 
 def test_numpy_dtypes_shapes_order():
     for dt in np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:

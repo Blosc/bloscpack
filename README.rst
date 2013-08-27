@@ -864,6 +864,8 @@ Changelog
 * v0.4.0-rc2 - XXX XXX XX XXXX
 
   * Package available via PyPi (since 0.4.0-rc1)
+  * Support for packing/unpacking numpy arrays to/from string
+  * Check that string and record arrays work
 
 * v0.4.0-rc1 - Sun Aug 18 2013
 

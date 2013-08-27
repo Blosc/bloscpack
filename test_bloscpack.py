@@ -930,7 +930,7 @@ def test_roundtrip_numpy():
     sio.seek(0)
     source = CompressedFPSource(sio)
     b = unpack_ndarray(source)
-    npt.assert_array_almost_equal(a, b)
+    npt.assert_array_equal(a, b)
 
     # now use ths shiny CompressedMemorySink/Source combo
     a = np.arange(50)
@@ -938,12 +938,12 @@ def test_roundtrip_numpy():
     pack_ndarray(a, sink)
     source = CompressedMemorySource(sink)
     b = unpack_ndarray(source)
-    npt.assert_array_almost_equal(a, b)
+    npt.assert_array_equal(a, b)
 
     # and lastly try the pack_*_str
     s = pack_ndarray_str(a)
     b = unpack_ndarray_str(s)
-    npt.assert_array_almost_equal(a, b)
+    npt.assert_array_equal(a, b)
 
 
 

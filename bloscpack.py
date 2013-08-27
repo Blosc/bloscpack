@@ -2050,7 +2050,7 @@ def _read_bloscpack_header(input_fp):
 
     Returns
     -------
-    bloscpack_header : dict
+    bloscpack_header : BloscPackHeader
         the decoded bloscpack header
 
     Raises

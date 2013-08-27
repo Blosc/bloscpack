@@ -962,6 +962,9 @@ def test_numpy_dtypes_shapes_order():
         roundtrip_ndarray(a)
 
     a = np.array(['abc', 'def', 'ghi'])
+    roundtrip_ndarray(a)
+    a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')])
+    roundtrip_ndarray(a)
 
 
 def test_larger_arrays():
@@ -982,7 +985,7 @@ def roundtrip_ndarray(ndarray):
     pack_ndarray(ndarray, sink)
     source = CompressedMemorySource(sink)
     result = unpack_ndarray(source)
-    npt.assert_array_almost_equal(ndarray, result)
+    npt.assert_array_equal(ndarray, result)
 
 
 def pack_unpack(repeats, chunk_size=None, progress=False):

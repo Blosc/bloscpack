@@ -961,6 +961,8 @@ def test_numpy_dtypes_shapes_order():
         nt.assert_true(np.isfortran(a))
         roundtrip_ndarray(a)
 
+    a = np.array(['abc', 'def', 'ghi'])
+
 
 def test_larger_arrays():
     for dt in ('uint64', 'int64', 'float64'):

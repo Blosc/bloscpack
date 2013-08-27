@@ -416,6 +416,17 @@ Looking at the generated file, we can see the Numpy metadata being saved:
     blpk: 'offsets':
     blpk: [202240,408134,554982,690522,819749,...]
 
+Alternatively, we can also use a string as storage:
+
+.. code-block::
+
+    >>> a = np.linspace(0, 1, 3e8)
+    >>> c = pack_ndarray_str(a)
+    >>> b = unpack_ndarray_str(c)
+    >>> (a == b).all()
+    True
+
+
 Testing
 -------
 

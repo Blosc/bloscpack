@@ -418,7 +418,7 @@ Looking at the generated file, we can see the Numpy metadata being saved:
 
 Alternatively, we can also use a string as storage:
 
-.. code-block::
+.. code-block:: pycon
 
     >>> a = np.linspace(0, 1, 3e8)
     >>> c = pack_ndarray_str(a)

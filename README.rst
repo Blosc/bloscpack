@@ -872,11 +872,12 @@ TODO
 Changelog
 ---------
 
-* v0.4.0-rc2 - XXX XXX XX XXXX
+* v0.4.0-rc2 - Tue Sep 03 2013
 
   * Package available via PyPi (since 0.4.0-rc1)
   * Support for packing/unpacking numpy arrays to/from string
   * Check that string and record arrays work
+  * Fix installation problems with PyPi package (Thanks to Olivier Grisel)
 
 * v0.4.0-rc1 - Sun Aug 18 2013
 

@@ -1998,7 +1998,11 @@ def pack_ndarray_str(ndarray,
                       metadata_args=DEFAULT_METADATA_ARGS):
     sio = cStringIO.StringIO()
     sink = CompressedFPSink(sio)
-    pack_ndarray(ndarray, sink)
+    pack_ndarray(ndarray, sink,
+                    chunk_size=chunk_size,
+                    blosc_args=blosc_args,
+                    bloscpack_args=bloscpack_args,
+                    metadata_args=metadata_args)
     return sio.getvalue()
 
 def unpack_ndarray(source):

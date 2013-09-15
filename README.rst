@@ -837,6 +837,7 @@ TODO
 * document library usage
 * Expose the ability to set 'max_app_chunks' from the command line
 * Allow to save metadata to a file during decompression
+* Allow to not-prealloc additional space for metadata
 * Refactor certain collections of functions that operate on data into objects
 
   * BloscHeader

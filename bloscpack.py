@@ -28,7 +28,7 @@ except ImportError:  # pragma: no cover
 import blosc
 import numpy as np
 
-__version__ = '0.4.0-rc3-dev'
+__version__ = '0.4.0'
 __author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
 
 # miscellaneous

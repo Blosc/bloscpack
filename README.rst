@@ -873,6 +873,10 @@ TODO
 Changelog
 ---------
 
+* v0.4.0     - Sun Sep 15 2013
+
+  * Fix a bug when serializing numpy arrays to strings
+
 * v0.4.0-rc2 - Tue Sep 03 2013
 
   * Package available via PyPi (since 0.4.0-rc1)

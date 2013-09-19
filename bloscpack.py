@@ -1886,11 +1886,7 @@ def pack(source, sink,
         blosc_args=DEFAULT_BLOSC_ARGS,
         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
         metadata_args=DEFAULT_METADATA_ARGS):
-    """ Helper function for pack_file.
-
-    Use file_pointers, which could potentially be cStringIO objects.
-
-    """
+    """ Core packing function.  """
     _check_blosc_args(blosc_args)
     print_verbose('blosc args are:', level=DEBUG)
     for arg, value in blosc_args.iteritems():

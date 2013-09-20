@@ -1608,8 +1608,6 @@ class CompressedSource(object):
 
 class PlainFPSource(PlainSource):
 
-    _metaclass__ = abc.ABCMeta
-
     def __init__(self, input_fp):
         self.input_fp = input_fp
 

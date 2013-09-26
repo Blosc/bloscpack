@@ -971,11 +971,30 @@ def test_numpy_dtypes_shapes_order():
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
     roundtrip_ndarray(a)
 
+    # record array
     x = np.array([(1, 'O', 1)],
-                dtype=np.dtype([('step', 'int32'),
+                 dtype=np.dtype([('step', 'int32'),
                                 ('symbol', '|S1'),
                                 ('index', 'int32')]))
     roundtrip_ndarray(x)
+
+    # and a nested record array
+    dt = [('year', '<i4'),
+          ('countries', [('c1', [('iso', 'a3'), ('value', '<f4')]),
+                         ('c2', [('iso', 'a3'), ('value', '<f4')])
+                         ])
+          ]
+    x = np.array([(2009, (('USA', 10.),
+                          ('CHN', 12.))),
+                  (2010, (('BRA', 10.),
+                          ('ARG', 12.)))],
+                 dt)
+    roundtrip_ndarray(x)
+
+    # what about endianess
+    x = np.arange(10, dtype='>i8')
+    roundtrip_ndarray(x)
+
 
 def test_larger_arrays():
     for dt in ('uint64', 'int64', 'float64'):

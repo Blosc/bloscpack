@@ -1677,7 +1677,18 @@ class CompressedMemorySource(CompressedSource):
 class PlainNumpySource(PlainSource):
 
     def __init__(self, ndarray):
-        self.metadata = {'dtype': ndarray.dtype.descr,
+
+        # Reagrding the dtype, quote from numpy/lib/format.py:dtype_to_descr
+        #
+        # The .descr attribute of a dtype object cannot be round-tripped
+        # through the dtype() constructor. Simple types, like dtype('float32'),
+        # have a descr which looks like a record array with one field with ''
+        # as a name. The dtype() constructor interprets this as a request to
+        # give a default name.  Instead, we construct descriptor that can be
+        # passed to dtype().
+        self.metadata = {'dtype': ndarray.dtype.descr
+                         if ndarray.dtype.names is not None
+                         else ndarray.dtype.str,
                          'shape': ndarray.shape,
                          'order': 'F' if np.isfortran(ndarray) else 'C',
                          'container': 'numpy',
@@ -1869,7 +1880,7 @@ class PlainNumpySink(PlainSink):
         if metadata is None or metadata['container'] != 'numpy':
             raise NotANumpyArray
         self.ndarray = np.empty(metadata['shape'],
-                dtype=metadata['dtype'][0][1],
+                dtype=np.dtype(metadata['dtype']),
                 order=metadata['order'])
         self.ptr = self.ndarray.__array_interface__['data'][0]
 

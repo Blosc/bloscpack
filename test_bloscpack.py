@@ -961,11 +961,21 @@ def test_numpy_dtypes_shapes_order():
         nt.assert_true(np.isfortran(a))
         roundtrip_ndarray(a)
 
+    # Fixed with string arrays
     a = np.array(['abc', 'def', 'ghi'])
     roundtrip_ndarray(a)
+    # This actually get's cast to a fixed width string array
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')])
     roundtrip_ndarray(a)
+    # object arrays
+    a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
+    roundtrip_ndarray(a)
 
+    x = np.array([(1, 'O', 1)],
+                dtype=np.dtype([('step', 'int32'),
+                                ('symbol', '|S1'),
+                                ('index', 'int32')]))
+    roundtrip_ndarray(x)
 
 def test_larger_arrays():
     for dt in ('uint64', 'int64', 'float64'):

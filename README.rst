@@ -873,6 +873,11 @@ TODO
 Changelog
 ---------
 
+* v0.4.1     - Fri Sep 27 2013
+
+  * Fixed the `pack_unpack_hard` test suite
+  * Fixed handling Numpy record and nested record arrays
+
 * v0.4.0     - Sun Sep 15 2013
 
   * Fix a bug when serializing numpy arrays to strings

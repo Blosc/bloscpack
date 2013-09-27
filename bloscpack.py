@@ -1693,9 +1693,7 @@ class PlainNumpySource(PlainSource):
                          'order': 'F' if np.isfortran(ndarray) else 'C',
                          'container': 'numpy',
                          }
-        # TODO only one dim for now
         self.size = ndarray.size * ndarray.itemsize
-        # TODO check that the array is contiguous
         self.ndarray = np.ascontiguousarray(ndarray)
         self.ptr = ndarray.__array_interface__['data'][0]
 

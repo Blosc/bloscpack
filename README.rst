@@ -1001,7 +1001,7 @@ Thanks
 Author, Copyright and License
 -----------------------------
 
-© 2012-2013 Valentin Haenel <valentin.haenel@gmx.de>
+© 2012-2014 Valentin Haenel <valentin.haenel@gmx.de>
 
 Bloscpack is licensed under the terms of the MIT License.
 

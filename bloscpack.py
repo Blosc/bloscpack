@@ -596,7 +596,8 @@ def create_parser():
                 choices=CNAME_AVAIL,
                 default=DEFAULT_CNAME,
                 dest='cname',
-                help="codec to be used by Blosc")
+                help="codec to be used by Blosc: \n%s"
+                     % join_with_eol(CNAME_AVAIL))
 
 
     decompress_parser = subparsers.add_parser('decompress',

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env nosetests
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 

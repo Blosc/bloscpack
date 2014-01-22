@@ -440,6 +440,13 @@ Basic tests, runs quickly:
     $ nosetests
     [...]
 
+Or, alternatively:
+
+.. code-block:: console
+
+    $ ./test_bloscpack.py
+    [...]
+
 Heavier Tests
 ~~~~~~~~~~~~~
 

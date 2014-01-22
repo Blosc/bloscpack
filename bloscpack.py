@@ -442,6 +442,8 @@ PYTHON_VERSION = sys.version_info[0:3]
 if sys.version_info < (2, 7, 5):  # pragma: no cover
     memoryview = lambda x: x
 
+def join_with_eol(items):
+    return ', '.join(items) + '\n'
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
@@ -484,6 +486,14 @@ def _inject_blosc_group(parser):
             default=DEFAULT_SHUFFLE,
             dest='shuffle',
             help='deactivate shuffle')
+    blosc_group.add_argument('-c', '--codec',
+            metavar='<codec>',
+            type=str,
+            choices=CNAME_AVAIL,
+            default=DEFAULT_CNAME,
+            dest='cname',
+            help="codec to be used by Blosc: \n%s"
+                    % join_with_eol(CNAME_AVAIL))
 
 
 def create_parser():
@@ -567,8 +577,6 @@ def create_parser():
                 dest='chunk_size',
                 help="set desired chunk size or 'max'")
         bloscpack_group = p.add_argument_group(title='bloscpack settings')
-        def join_with_eol(items):
-            return ', '.join(items) + '\n'
         checksum_format = join_with_eol(CHECKSUMS_AVAIL[0:3]) + \
                 join_with_eol(CHECKSUMS_AVAIL[3:6]) + \
                 join_with_eol(CHECKSUMS_AVAIL[6:])
@@ -590,14 +598,6 @@ def create_parser():
                 type=str,
                 dest='metadata',
                 help="file containing the metadata, must contain valid JSON")
-        bloscpack_group.add_argument('-c', '--codec',
-                metavar='<codec>',
-                type=str,
-                choices=CNAME_AVAIL,
-                default=DEFAULT_CNAME,
-                dest='cname',
-                help="codec to be used by Blosc: \n%s"
-                     % join_with_eol(CNAME_AVAIL))
 
 
     decompress_parser = subparsers.add_parser('decompress',

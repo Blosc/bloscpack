@@ -81,6 +81,9 @@ DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
     (DEFAULT_MAGIC_FORMAT, DEFAULT_META_CHECKSUM,
      DEFAULT_META_CODEC, DEFAULT_META_LEVEL, DEFAULT_MAX_META_SIZE)))
 
+# Codecs available from Blosc
+CNAME_AVAIL = blosc.compressor_list()
+
 # verbosity levels
 NORMAL  = 'NORMAL'
 VERBOSE = 'VERBOSE'
@@ -587,6 +590,14 @@ def create_parser():
                 type=str,
                 dest='metadata',
                 help="file containing the metadata, must contain valid JSON")
+        bloscpack_group.add_argument('-c', '--codec',
+                metavar='<codec>',
+                type=str,
+                choices=CNAME_AVAIL,
+                default=DEFAULT_CNAME,
+                dest='cname',
+                help="codec to be used by Blosc")
+
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,

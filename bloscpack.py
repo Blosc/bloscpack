@@ -59,14 +59,15 @@ DEFAULT_BLOSCPACK_ARGS = dict(zip(BLOSCPACK_ARGS,
 DEFAULT_CHUNK_SIZE = '1M'
 
 # Blosc args
-BLOSC_ARGS = ('typesize', 'clevel', 'shuffle')
+BLOSC_ARGS = ('typesize', 'clevel', 'shuffle', 'cname')
 _BLOSC_ARGS_SET = set(BLOSC_ARGS)  # cached
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
 MAX_CLEVEL = 9
 DEFAULT_SHUFFLE = True
+DEFAULT_CNAME = 'blosclz'
 DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
-    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE)))
+    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE, DEFAULT_CNAME)))
 
 # metadata args
 METADATA_ARGS = ('magic_format', 'meta_checksum', 'meta_codec', 'meta_level', 'max_meta_size')
@@ -2463,6 +2464,8 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         blosc_args['clevel'] = DEFAULT_CLEVEL
     if blosc_args['shuffle'] is None:
         blosc_args['shuffle'] = DEFAULT_SHUFFLE
+    if blosc_args['cname']:
+        blosc_args['cname'] = DEFAULT_CNAME
     _check_blosc_args(blosc_args)
     offsets_pos = (BLOSCPACK_HEADER_LENGTH +
                   (METADATA_HEADER_LENGTH + metadata_header['max_meta_size'] +

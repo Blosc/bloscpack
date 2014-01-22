@@ -51,8 +51,8 @@ Help for global options and subcommands:
 Help for the subcommands:
 
   $ blpk compress --help
-  usage: blpk compress [-h] [-t <size>] [-l [0, 9]] [-s] [-z <size>]
-                       [-k <checksum>] [-o] [-m <metadata>]
+  usage: blpk compress [-h] [-t <size>] [-l [0, 9]] [-s] [-c <codec>]
+                       [-z <size>] [-k <checksum>] [-o] [-m <metadata>]
                        <in_file> [<out_file>]
   
   positional arguments:
@@ -70,6 +70,10 @@ Help for the subcommands:
     -l [0, 9], --clevel [0, 9]
                           compression level (default: 7)
     -s, --no-shuffle      deactivate shuffle
+    -c <codec>, --codec <codec>
+                          codec to be used by Blosc: 
+                          blosclz, lz4, lz4hc, snappy, zlib
+                           (default: blosclz)
   
   bloscpack settings:
     -k <checksum>, --checksum <checksum>
@@ -94,7 +98,8 @@ Help for the subcommands:
                           disable checking input file for extension (*.blp)
                           (requires use of <out_file>)
   $ blpk append --help
-  usage: blpk append [-h] [-t <size>] [-l [0, 9]] [-s] [-e] [-m <metadata>]
+  usage: blpk append [-h] [-t <size>] [-l [0, 9]] [-s] [-c <codec>] [-e]
+                     [-m <metadata>]
                      <original_file> <new_file>
   
   positional arguments:
@@ -114,6 +119,10 @@ Help for the subcommands:
     -l [0, 9], --clevel [0, 9]
                           compression level (default: 7)
     -s, --no-shuffle      deactivate shuffle
+    -c <codec>, --codec <codec>
+                          codec to be used by Blosc: 
+                          blosclz, lz4, lz4hc, snappy, zlib
+                           (default: blosclz)
 
   $ blpk info --help
   usage: blpk info [-h] <file>

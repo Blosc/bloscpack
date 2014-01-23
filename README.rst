@@ -437,7 +437,7 @@ Basic tests, runs quickly:
 
 .. code-block:: console
 
-    $ nosetests
+    $ nosetests test_bloscpack.py
     [...]
 
 Or, alternatively:

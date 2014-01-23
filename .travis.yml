@@ -8,7 +8,7 @@ install:
   - "pip install coveralls --use-mirrors"
 script:
   - COVERAGE=1 ./test_bloscpack.cram
-  - nosetests --with-coverage --cover-package=bloscpack
+  - nosetests --with-coverage --cover-package=bloscpack test_bloscpack.py
   - nosetests test_bloscpack.py:pack_unpack_hard
 after_success:
   - "if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then coveralls ; fi"

@@ -868,6 +868,16 @@ def test_metadata_opportunisitic_compression():
     nt.assert_equal('None', header['meta_codec'])
 
 
+def test_alternate_cname():
+    blosc_args = DEFAULT_BLOSC_ARGS.copy()
+    blosc_args['cname'] = 'lz4'
+    array_ = np.linspace(0, 1, 2e6)
+    sink = CompressedMemorySink()
+    pack_ndarray(array_, sink, blosc_args=blosc_args)
+    blosc_header = decode_blosc_header(sink.chunks[0])
+    print(blosc_header)
+
+
 def test_disable_offsets():
     in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, in_fp)

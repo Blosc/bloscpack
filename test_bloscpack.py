@@ -875,7 +875,7 @@ def test_alternate_cname():
     sink = CompressedMemorySink()
     pack_ndarray(array_, sink, blosc_args=blosc_args)
     blosc_header = decode_blosc_header(sink.chunks[0])
-    print(blosc_header)
+    nt.assert_equal(blosc_header['flags'] >> 5, 1)
 
 
 def test_disable_offsets():

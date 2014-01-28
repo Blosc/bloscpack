@@ -946,7 +946,6 @@ def test_roundtrip_numpy():
     npt.assert_array_equal(a, b)
 
 
-
 def test_numpy_dtypes_shapes_order():
     for dt in np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
         a = np.arange(64, dtype=dt)

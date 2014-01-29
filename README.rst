@@ -183,6 +183,9 @@ directly to Blosc:
 * ``[-s | --no-shuffle]``
   Deactivate shuffle:
   ``$ ./blpk c -s data.dat``
+* ``[-c | --codec]``
+  Use alternative codec:
+  ``$ ./blpk c -c lz4 data.dat``
 
 In addition, the desired size of the chunks may be specified.
 

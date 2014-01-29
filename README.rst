@@ -834,6 +834,7 @@ Coding Conventions
 * Debug messages: as close to where the data was generated
 * Single quotes around ambiguities in messages ``overwriting existing file: 'testfile'``
 * Exceptions instead of exit
+* nose-parametrized for parameterized tests
 
 TODO
 ----
@@ -875,6 +876,10 @@ TODO
 * The keyword arguments to many functions are global dicts, this is a bad idea,
   Make the immutable with a forzendict.
 * Check that source and sink are of the correct type
+* Use more of nose-parametrized
+* Use the faster version of struct where you have a single string
+* Memory profiler, might be able to reduce memory used by reusing the buffer
+  during compression and decompression
 
 
 Changelog

@@ -13,6 +13,7 @@ import atexit
 import numpy as np
 import numpy.testing as npt
 import nose.tools as nt
+from nose_parameterized import parameterized
 from collections import namedtuple
 from cStringIO import StringIO
 import bloscpack
@@ -868,14 +869,21 @@ def test_metadata_opportunisitic_compression():
     nt.assert_equal('None', header['meta_codec'])
 
 
-def test_alternate_cname():
+@parameterized([
+        ('blosclz', 0),
+        ('lz4', 1),
+        ('lz4hc', 1),
+        ('snappy', 2),
+        ('zlib', 3),
+    ])
+def test_alternate_cname(cname, int_id):
     blosc_args = DEFAULT_BLOSC_ARGS.copy()
-    blosc_args['cname'] = 'lz4'
+    blosc_args['cname'] = cname
     array_ = np.linspace(0, 1, 2e6)
     sink = CompressedMemorySink()
     pack_ndarray(array_, sink, blosc_args=blosc_args)
     blosc_header = decode_blosc_header(sink.chunks[0])
-    nt.assert_equal(blosc_header['flags'] >> 5, 1)
+    nt.assert_equal(blosc_header['flags'] >> 5, int_id)
 
 
 def test_disable_offsets():

@@ -308,6 +308,15 @@ Try using an alternative codec ('lz4' should be available):
   blpk: [13496,173720,305178,438821,571575,...]
   $ rm data.dat.blp
 
+Try using an  codec that is not available:
+
+  $ blpk compress --codec NO_SUCH_CODEC data.dat
+  usage: blpk compress [-h] [-t <size>] [-l [0, 9]] [-s] [-c <codec>]
+                       [-z <size>] [-k <checksum>] [-o] [-m <metadata>]
+                       <in_file> [<out_file>]
+  blpk compress: error: argument -c/--codec: invalid choice: 'NO_SUCH_CODEC' (choose from 'blosclz', 'lz4', 'lz4hc', 'snappy', 'zlib')
+  [2]
+
 Get more information using --verbose:
 
   $ blpk --verbose compress data.dat

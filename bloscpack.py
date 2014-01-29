@@ -2476,7 +2476,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         blosc_args['clevel'] = DEFAULT_CLEVEL
     if blosc_args['shuffle'] is None:
         blosc_args['shuffle'] = DEFAULT_SHUFFLE
-    if blosc_args['cname']:
+    if blosc_args['cname'] is None:
         blosc_args['cname'] = DEFAULT_CNAME
     _check_blosc_args(blosc_args)
     offsets_pos = (BLOSCPACK_HEADER_LENGTH +

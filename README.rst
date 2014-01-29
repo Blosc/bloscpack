@@ -836,6 +836,16 @@ Coding Conventions
 * Exceptions instead of exit
 * nose-parametrized for parameterized tests
 
+Maintainers Notes
+-----------------
+
+#. Update the changelog
+#. Set the version number in ``bloscpack.py``
+#. Make the tag using ``git tag -s -m "Bloscpack $VERSION [FINAL | release candidate NUMBER]" $VERSION``
+#. Push the tag to github ``git push esc $VERSION``
+#. Upload tp PyPi using ``python setup.py sdist upload``
+#. Bump version number to next dev version
+
 TODO
 ----
 

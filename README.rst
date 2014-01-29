@@ -880,6 +880,10 @@ TODO
 Changelog
 ---------
 
+* v0.5.0     - XXX XXX XX XXXX
+
+  * Support for Blosc 1.3.x (alternative codecs)
+
 * v0.4.1     - Fri Sep 27 2013
 
   * Fixed the `pack_unpack_hard` test suite

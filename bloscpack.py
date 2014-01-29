@@ -59,14 +59,15 @@ DEFAULT_BLOSCPACK_ARGS = dict(zip(BLOSCPACK_ARGS,
 DEFAULT_CHUNK_SIZE = '1M'
 
 # Blosc args
-BLOSC_ARGS = ('typesize', 'clevel', 'shuffle')
+BLOSC_ARGS = ('typesize', 'clevel', 'shuffle', 'cname')
 _BLOSC_ARGS_SET = set(BLOSC_ARGS)  # cached
 DEFAULT_TYPESIZE = 8
 DEFAULT_CLEVEL = 7
 MAX_CLEVEL = 9
 DEFAULT_SHUFFLE = True
+DEFAULT_CNAME = 'blosclz'
 DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
-    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE)))
+    (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE, DEFAULT_CNAME)))
 
 # metadata args
 METADATA_ARGS = ('magic_format', 'meta_checksum', 'meta_codec', 'meta_level', 'max_meta_size')
@@ -79,6 +80,9 @@ DEFAULT_MAX_META_SIZE = lambda x: 10 * x
 DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
     (DEFAULT_MAGIC_FORMAT, DEFAULT_META_CHECKSUM,
      DEFAULT_META_CODEC, DEFAULT_META_LEVEL, DEFAULT_MAX_META_SIZE)))
+
+# Codecs available from Blosc
+CNAME_AVAIL = blosc.compressor_list()
 
 # verbosity levels
 NORMAL  = 'NORMAL'
@@ -438,6 +442,8 @@ PYTHON_VERSION = sys.version_info[0:3]
 if sys.version_info < (2, 7, 5):  # pragma: no cover
     memoryview = lambda x: x
 
+def join_with_eol(items):
+    return ', '.join(items) + '\n'
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
@@ -480,6 +486,14 @@ def _inject_blosc_group(parser):
             default=DEFAULT_SHUFFLE,
             dest='shuffle',
             help='deactivate shuffle')
+    blosc_group.add_argument('-c', '--codec',
+            metavar='<codec>',
+            type=str,
+            choices=CNAME_AVAIL,
+            default=DEFAULT_CNAME,
+            dest='cname',
+            help="codec to be used by Blosc: \n%s"
+                    % join_with_eol(CNAME_AVAIL))
 
 
 def create_parser():
@@ -563,8 +577,6 @@ def create_parser():
                 dest='chunk_size',
                 help="set desired chunk size or 'max'")
         bloscpack_group = p.add_argument_group(title='bloscpack settings')
-        def join_with_eol(items):
-            return ', '.join(items) + '\n'
         checksum_format = join_with_eol(CHECKSUMS_AVAIL[0:3]) + \
                 join_with_eol(CHECKSUMS_AVAIL[3:6]) + \
                 join_with_eol(CHECKSUMS_AVAIL[6:])
@@ -586,6 +598,7 @@ def create_parser():
                 type=str,
                 dest='metadata',
                 help="file containing the metadata, must contain valid JSON")
+
 
     decompress_parser = subparsers.add_parser('decompress',
             formatter_class=BloscPackCustomFormatter,
@@ -2463,6 +2476,8 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
         blosc_args['clevel'] = DEFAULT_CLEVEL
     if blosc_args['shuffle'] is None:
         blosc_args['shuffle'] = DEFAULT_SHUFFLE
+    if blosc_args['cname'] is None:
+        blosc_args['cname'] = DEFAULT_CNAME
     _check_blosc_args(blosc_args)
     offsets_pos = (BLOSCPACK_HEADER_LENGTH +
                   (METADATA_HEADER_LENGTH + metadata_header['max_meta_size'] +

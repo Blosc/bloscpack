@@ -489,6 +489,17 @@ The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
    $ ./test_bloscpack.cram
    [...]
 
+Test Runner
+~~~~~~~~~~~
+
+To run the command line interface tests and the unit tests and analyse
+coverage, use the convenience ``test`` runner:
+
+.. code-block:: console
+
+   $ ./test
+   [...]
+
 Coverage
 ~~~~~~~~
 

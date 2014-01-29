@@ -880,6 +880,7 @@ TODO
 * Use the faster version of struct where you have a single string
 * Memory profiler, might be able to reduce memory used by reusing the buffer
   during compression and decompression
+* Benchmark different codecs
 
 
 Changelog

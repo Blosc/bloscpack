@@ -432,6 +432,17 @@ Alternatively, we can also use a string as storage:
     >>> (a == b).all()
     True
 
+Or use alternate compressors:
+
+.. code-block:: pycon
+
+    >>> blosc_args = DEFAULT_BLOSC_ARGS
+    >>> blosc_args['cname'] = 'lz4'
+    >>> a = np.linspace(0, 1, 3e8)
+    >>> c = pack_ndarray_str(a, blosc_args=blosc_args)
+    >>> b = unpack_ndarray_str(c)
+    >>> (a == b).all()
+    True
 
 Testing
 -------

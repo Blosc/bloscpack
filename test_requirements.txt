@@ -1,5 +1,5 @@
 blosc>=1.0.5
 numpy
 nose
-nose-parametrized
+nose-parameterized
 cram>=0.6

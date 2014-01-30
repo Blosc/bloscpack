@@ -859,6 +859,7 @@ Maintainers Notes on Cutting a Release
 #. Push the tag to github ``git push esc $VERSION``
 #. Upload tp PyPi using ``python setup.py sdist upload``
 #. Bump version number to next dev version
+#. Announce release on the Blosc list
 
 TODO
 ----

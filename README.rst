@@ -910,7 +910,7 @@ TODO
 Changelog
 ---------
 
-* v0.5.0     - XXX XXX XX XXXX
+* v0.5.0-rc1 - Thu Jan 30 2014
 
   * Support for Blosc 1.3.x (alternative codecs)
 

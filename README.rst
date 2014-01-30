@@ -43,9 +43,12 @@ Dependencies
 ------------
 
 * Python 2.6 (requires ``ordereddict`` and ``argparse``) or Python 2.7
-* `python-blosc  <https://github.com/FrancescAlted/python-blosc>`_
-  `(at least v1.0.5) <https://github.com/FrancescAlted/python-blosc/tree/v1.0.5>`_ (provides Blosc)
-* The Python packages ``numpy``, ``nose`` and ``cram`` for testing
+* `python-blosc  <https://github.com/FrancescAlted/python-blosc>`_ (provides Blosc)
+* `Numpy <http://www.numpy.org/>`_
+* The Python packages ``nose``, ``nose-parameterized`` and ``cram`` for testing
+
+Check the files ``requirements.txt`` and ``test_requirements.txt`` for
+up-to-date version numbers.
 
 Stability of File Format
 ------------------------

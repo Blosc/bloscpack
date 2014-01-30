@@ -850,8 +850,8 @@ Coding Conventions
 * Exceptions instead of exit
 * nose-parametrized for parameterized tests
 
-Maintainers Notes
------------------
+Maintainers Notes on Cutting a Release
+--------------------------------------
 
 #. Update the changelog
 #. Set the version number in ``bloscpack.py``

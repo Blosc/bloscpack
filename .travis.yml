@@ -3,6 +3,7 @@ python:
   - 2.6
   - 2.7
 install:
+  - "pip install -r requirements.txt --use-mirrors"
   - "pip install -r test_requirements.txt --use-mirrors"
   - "if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install ordereddict --use-mirrors && pip install argparse --use-mirrors; fi"
   - "pip install coveralls --use-mirrors"

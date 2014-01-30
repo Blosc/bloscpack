@@ -1,5 +1,3 @@
-blosc>=1.2.0
-numpy
 nose
 nose-parameterized
 cram>=0.6

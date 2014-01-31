@@ -1353,8 +1353,7 @@ def process_decompression_args(args):
             error('--no-check-extension requires use of <out_file>')
     else:
         if in_file.endswith(EXTENSION):
-            out_file = in_file[:-len(EXTENSION)] \
-                    if args.out_file is None else args.out_file
+            out_file = args.out_file or in_file[:-len(EXTENSION)]
         else:
             error("input file '%s' does not end with '%s'" %
                     (in_file, EXTENSION))

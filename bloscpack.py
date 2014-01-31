@@ -1921,7 +1921,7 @@ def pack(source, sink,
     # create the bloscpack header
     bloscpack_header = BloscPackHeader(
             offsets=bloscpack_args['offsets'],
-            metadata=True if metadata is not None else False,
+            metadata=metadata is not None,
             checksum=bloscpack_args['checksum'],
             typesize=blosc_args['typesize'],
             chunk_size=chunk_size,

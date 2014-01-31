@@ -1324,8 +1324,7 @@ def process_compression_args(args):
         typesize, clevel and shuffle
     """
     in_file = args.in_file
-    out_file = in_file + EXTENSION \
-        if args.out_file is None else args.out_file
+    out_file = args.out_file or in_file + EXTENSION
     return in_file, out_file, _blosc_args_from_args(args)
 
 

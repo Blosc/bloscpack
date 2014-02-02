@@ -43,10 +43,10 @@ from .constants import (FORMAT_VERSION,
                         MAX_CHUNKS,
                         MAX_META_SIZE,
                         )
-from .metacodec import (CODECS_AVAIL,
-                        CODECS_LOOKUP,
-                        check_valid_codec,
-                        )
+from .metacodecs import (CODECS_AVAIL,
+                         CODECS_LOOKUP,
+                         check_valid_codec,
+                         )
 
 __version__ = '0.6.0-rc1'
 __author__ = 'Valentin Haenel <valentin@haenel.co>'

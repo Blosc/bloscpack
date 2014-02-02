@@ -29,7 +29,7 @@ import blosc
 import numpy as np
 
 __version__ = '0.5.1-dev'
-__author__ = 'Valentin Haenel <valentin.haenel@gmx.de>'
+__author__ = 'Valentin Haenel <valentin@haenel.co>'
 
 # miscellaneous
 FORMAT_VERSION = 3

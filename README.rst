@@ -1,9 +1,6 @@
 Bloscpack
 =========
 
-.. image:: https://badge.fury.io/py/bloscpack.png
-    :target: https://crate.io/packages/bloscpack
-
 .. image:: https://travis-ci.org/Blosc/bloscpack.png?branch=master
         :target: https://travis-ci.org/Blosc/bloscpack
 
@@ -11,7 +8,7 @@ Bloscpack
         :target: https://coveralls.io/r/Blosc/bloscpack
 
 .. image:: https://pypip.in/d/bloscpack/badge.png
-        :target: https://crate.io/packages/bloscpack
+        :target: https://pypi.python.org/pypi/bloscpack 
 
 
 Description

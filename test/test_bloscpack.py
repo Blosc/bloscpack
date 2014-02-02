@@ -17,7 +17,7 @@ from nose_parameterized import parameterized
 from cStringIO import StringIO
 import bloscpack
 from bloscpack import *
-from bloscpack.checksum import CHECKSUMS
+from bloscpack.checksums import CHECKSUMS
 from bloscpack.exceptions import NoSuchChecksum
 
 

@@ -11,11 +11,14 @@ import pprint
 import blosc
 
 
-from bloscpack import (MAGIC,
-               FORMAT_VERSION,
-               MAX_FORMAT_VERSION,
-               MAX_CHUNKS,
-               BLOSCPACK_HEADER_LENGTH,
+from .constants import (MAGIC,
+                        FORMAT_VERSION,
+                        MAX_FORMAT_VERSION,
+                        MAX_CHUNKS,
+                        BLOSCPACK_HEADER_LENGTH,
+                        )
+
+from bloscpack import (
                check_valid_checksum,
                double_pretty_size,
                check_range,

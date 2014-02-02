@@ -11,13 +11,12 @@ import nose.tools as nt
 
 import blosc
 
-
-from bloscpack import (MAGIC,
-                       FORMAT_VERSION,
-                       MAX_FORMAT_VERSION,
-                       MAX_CHUNKS,
-                       reverse_pretty,
-                       )
+from bloscpack.constants import (MAGIC,
+                                 FORMAT_VERSION,
+                                 MAX_FORMAT_VERSION,
+                                 MAX_CHUNKS,
+                                 )
+from bloscpack import reverse_pretty
 from bloscpack import checksums
 from bloscpack import exceptions
 from bloscpack.headers import BloscPackHeader

@@ -34,25 +34,20 @@ from .checksums import (check_valid_checksum,
 
 from .exceptions import FileNotFound
 
+from .constants import (FORMAT_VERSION,
+                        EXTENSION,
+                        PREFIX,
+                        BLOSC_HEADER_LENGTH,
+                        BLOSCPACK_HEADER_LENGTH,
+                        METADATA_HEADER_LENGTH,
+                        MAX_FORMAT_VERSION,
+                        MAX_CHUNKS,
+                        MAX_META_SIZE,
+                       )
 
 __version__ = '0.6.0-rc1'
 __author__ = 'Valentin Haenel <valentin@haenel.co>'
 
-# miscellaneous
-FORMAT_VERSION = 3
-MAGIC = 'blpk'
-EXTENSION = '.blp'
-PREFIX = "bloscpack.py"
-
-# header lengths
-BLOSC_HEADER_LENGTH = 16
-BLOSCPACK_HEADER_LENGTH = 32
-METADATA_HEADER_LENGTH = 32
-
-# maximum values
-MAX_FORMAT_VERSION = 255
-MAX_CHUNKS = (2**63)-1
-MAX_META_SIZE = (2**32-1)  # uint32 max val
 
 # Bloscpack args
 BLOSCPACK_ARGS = ('offsets', 'checksum', 'max_app_chunks')

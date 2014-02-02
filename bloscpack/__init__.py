@@ -28,9 +28,9 @@ import blosc
 import numpy as np
 
 from .checksums import (check_valid_checksum,
-                       CHECKSUMS_LOOKUP,
-                       CHECKSUMS_AVAIL,
-                       )
+                        CHECKSUMS_LOOKUP,
+                        CHECKSUMS_AVAIL,
+                        )
 
 from .exceptions import FileNotFound
 
@@ -42,7 +42,7 @@ from .constants import (FORMAT_VERSION,
                         METADATA_HEADER_LENGTH,
                         MAX_CHUNKS,
                         MAX_META_SIZE,
-                       )
+                        )
 
 __version__ = '0.6.0-rc1'
 __author__ = 'Valentin Haenel <valentin@haenel.co>'

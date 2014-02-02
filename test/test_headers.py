@@ -7,7 +7,7 @@ import struct
 
 
 import nose.tools as nt
-
+from nose_parameterized import parameterized
 
 import blosc
 
@@ -22,41 +22,72 @@ from bloscpack import exceptions
 from bloscpack.headers import BloscPackHeader
 
 
+@parameterized([
+    (ValueError, -1),
+    (ValueError, MAX_FORMAT_VERSION+1),
+    (TypeError, 'foo')
+])
+def test_invalid_format_version(error_type, format_version):
+    nt.assert_raises(error_type, BloscPackHeader,
+                     format_version=format_version)
+
+
+@parameterized([
+    (ValueError, -1),
+    (ValueError, len(checksums.CHECKSUMS)+1),
+    (exceptions.NoSuchChecksum, 'foo')
+])
+def test_invalid_checksum(error_type, checksum):
+    nt.assert_raises(error_type, BloscPackHeader,
+                     checksum=checksum)
+
+
+@parameterized([
+    (ValueError, -1),
+    (ValueError, blosc.BLOSC_MAX_TYPESIZE+1),
+    (TypeError, 'foo'),
+])
+def test_invalid_type_size(error_type, typesize):
+    nt.assert_raises(error_type, BloscPackHeader, typesize=typesize)
+
+
+@parameterized([
+    (ValueError, blosc.BLOSC_MAX_BUFFERSIZE+1),
+    (ValueError, -2),
+    (TypeError, 'foo'),
+])
+def test_invalid_chunk_size(error_type, chunk_size):
+    nt.assert_raises(error_type, BloscPackHeader, chunk_size=chunk_size)
+
+
+@parameterized([
+    (ValueError, blosc.BLOSC_MAX_BUFFERSIZE+1),
+    (ValueError, -2),
+    (TypeError, 'foo'),
+])
+def test_invalid_last_chunk(error_type, last_chunk):
+    nt.assert_raises(error_type, BloscPackHeader, last_chunk=last_chunk)
+
+
+@parameterized([
+    (ValueError, MAX_CHUNKS+1),
+    (ValueError, -2),
+    (TypeError, 'foo'),
+])
+def test_invalid_nchunks(error_type, nchunks):
+    nt.assert_raises(error_type, BloscPackHeader, nchunks=nchunks)
+
+
+@parameterized([
+    (ValueError, MAX_CHUNKS+1),
+    (ValueError, -1),
+    (TypeError, 'foo'),
+])
+def test_invalid_max_app_chunks(error_type, max_app_chunks):
+    nt.assert_raises(error_type, BloscPackHeader, max_app_chunks=max_app_chunks)
+
+
 def test_BloscPackHeader_constructor_arguments():
-    # check format_version
-    nt.assert_raises(ValueError, BloscPackHeader, format_version=-1)
-    nt.assert_raises(ValueError, BloscPackHeader,
-            format_version=MAX_FORMAT_VERSION+1)
-    nt.assert_raises(TypeError, BloscPackHeader, format_version='foo')
-    # check checksum
-    nt.assert_raises(ValueError, BloscPackHeader, checksum=-1)
-    nt.assert_raises(ValueError, BloscPackHeader,
-            checksum=len(checksums.CHECKSUMS)+1)
-    nt.assert_raises(exceptions.NoSuchChecksum, BloscPackHeader, checksum='foo')
-    # check the typesize
-    nt.assert_raises(ValueError, BloscPackHeader, typesize=-1)
-    nt.assert_raises(ValueError, BloscPackHeader,
-            typesize=blosc.BLOSC_MAX_TYPESIZE+1)
-    # check chunk_size
-    nt.assert_raises(ValueError, BloscPackHeader,
-            chunk_size=blosc.BLOSC_MAX_BUFFERSIZE+1)
-    nt.assert_raises(ValueError, BloscPackHeader, chunk_size=-2)
-    nt.assert_raises(TypeError, BloscPackHeader, chunk_size='foo')
-    # check last_chunk
-    nt.assert_raises(ValueError, BloscPackHeader,
-            last_chunk=blosc.BLOSC_MAX_BUFFERSIZE+1)
-    nt.assert_raises(ValueError, BloscPackHeader, last_chunk=-2)
-    nt.assert_raises(TypeError, BloscPackHeader, last_chunk='foo')
-    # check value of nchunks
-    nt.assert_raises(ValueError, BloscPackHeader, nchunks=MAX_CHUNKS+1)
-    nt.assert_raises(ValueError, BloscPackHeader, nchunks=-2)
-    nt.assert_raises(TypeError, BloscPackHeader, nchunks='foo')
-
-    # check value of max_app_chunks
-    nt.assert_raises(ValueError, BloscPackHeader, max_app_chunks=MAX_CHUNKS+1)
-    nt.assert_raises(ValueError, BloscPackHeader, max_app_chunks=-1)
-    nt.assert_raises(TypeError, BloscPackHeader, max_app_chunks='foo')
-
     # check sum
     nt.assert_raises(ValueError, BloscPackHeader,
             nchunks=MAX_CHUNKS/2+1,

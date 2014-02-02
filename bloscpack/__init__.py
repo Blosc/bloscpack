@@ -368,8 +368,10 @@ PYTHON_VERSION = sys.version_info[0:3]
 if sys.version_info < (2, 7, 5):  # pragma: no cover
     memoryview = lambda x: x
 
+
 def join_with_eol(items):
     return ', '.join(items) + '\n'
+
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.

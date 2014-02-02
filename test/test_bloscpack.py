@@ -8,7 +8,6 @@ import os.path as path
 import tempfile
 import contextlib
 import shutil
-import struct
 import atexit
 import numpy as np
 import numpy.testing as npt

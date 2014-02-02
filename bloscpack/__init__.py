@@ -46,6 +46,7 @@ from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
                          check_valid_codec,
                          )
+from bloscpack.cli import check_files
 
 __version__ = '0.6.0-rc1'
 __author__ = 'Valentin Haenel <valentin@haenel.co>'

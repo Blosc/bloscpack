@@ -154,8 +154,6 @@ class NotANumpyArray(RuntimeError):
     pass
 
 
-
-
 class Codec(object):
     """ Uniform codec object.
 

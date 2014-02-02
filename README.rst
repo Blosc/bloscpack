@@ -18,7 +18,7 @@ Description
 -----------
 
 Command line interface to and serialization format for `Blosc
-<http://blosc.pytables.org/trac>`_, a high performance, multi-threaded,
+<http://blosc.org/>`_, a high performance, multi-threaded,
 blocking and shuffling compressor. Uses `python-blosc
 <https://github.com/FrancescAlted/python-blosc>`_ bindings to interface with
 blosc.

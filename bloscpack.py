@@ -539,7 +539,9 @@ def create_parser():
             help='set number of threads, (default: %(default)s (ncores))')
 
     subparsers = parser.add_subparsers(title='subcommands',
-            metavar='', dest='subcommand')
+            metavar='', dest='subcommand',
+            help="Additional help for subcommands is available\n"+
+            "e.g. %(prog)s compress --help")
 
     compress_parser = subparsers.add_parser('compress',
             formatter_class=BloscPackCustomFormatter,

@@ -25,7 +25,6 @@ Website(s)
 
 * `Repository at Github <https://github.com/Blosc/bloscpack>`_
 
-* `Crate.io <https://crate.io/packages/bloscpack/>`_
 * `PyPi <https://pypi.python.org/pypi/bloscpack>`_
 * `Ohloh <https://www.ohloh.net/p/bloscpack>`_
 * `Masterbranch <https://masterbranch.com/bloscpack-project/1751103>`_

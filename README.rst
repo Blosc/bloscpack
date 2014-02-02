@@ -155,6 +155,14 @@ Incidentally this works for compression too:
     blpk: error: output file 'data.dat.blp' exists!
     $ ./blpk -f c data.dat
 
+Lastly, if you want a different filename:
+
+.. code-block:: console
+
+    $ ./blpk c data.dat custom.filename.blp
+
+... will compress the file ``data.dat`` to ``custom.filename.blp``
+
 Settings
 ~~~~~~~~
 

@@ -449,6 +449,17 @@ Or use alternate compressors:
 Testing
 -------
 
+Installing Dependencies
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Testing requires some additional libraries, which you can install from PyPi
+with:
+
+.. code-block:: console
+
+    $ pip install -r test_requirements.txt
+
+
 Basic Tests
 ~~~~~~~~~~~
 

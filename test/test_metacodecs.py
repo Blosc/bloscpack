@@ -6,7 +6,7 @@
 import nose.tools as nt
 
 
-from bloscpack.metacodec import CODECS, CODECS_AVAIL
+from bloscpack.metacodecs import CODECS, CODECS_AVAIL
 
 from bloscpack import DEFAULT_META_LEVEL
 

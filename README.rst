@@ -861,11 +861,14 @@ Maintainers Notes on Cutting a Release
 
 #. Update the changelog
 #. Set the version number in ``bloscpack.py``
-#. Make the tag using ``git tag -s -m "Bloscpack $VERSION [FINAL | release candidate NUMBER]" $VERSION``
-#. Push the tag to github ``git push esc $VERSION``
+#. Commit with git commit -m ``"$VERSION"``
+#. Make the tag using ``git tag -s -m "Bloscpack $VERSION" $VERSION``
+#. Push the tag to Blosc github ``git push blosc $VERSION``
+#. Push the tag to own github ``git push esc $VERSION``
 #. Upload tp PyPi using ``python setup.py sdist upload``
 #. Bump version number to next dev version
 #. Announce release on the Blosc list
+#. Announce release via Twitter
 
 TODO
 ----

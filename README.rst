@@ -27,7 +27,6 @@ Website(s)
 
 * `PyPi <https://pypi.python.org/pypi/bloscpack>`_
 * `Ohloh <https://www.ohloh.net/p/bloscpack>`_
-* `Masterbranch <https://masterbranch.com/bloscpack-project/1751103>`_
 
 
 Contact

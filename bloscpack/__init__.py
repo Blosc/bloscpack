@@ -17,7 +17,6 @@ import os.path as path
 import pprint
 import struct
 import sys
-import zlib
 
 try:
     from collections import OrderedDict

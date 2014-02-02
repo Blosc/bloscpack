@@ -109,9 +109,6 @@ SUFFIXES = OrderedDict((
 class ChunkingException(BaseException):
     pass
 
-
-
-
 class NoSuchCodec(ValueError):
     pass
 

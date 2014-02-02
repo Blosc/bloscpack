@@ -20,13 +20,13 @@ Description
 Command line interface to and serialization format for `Blosc
 <http://blosc.org/>`_, a high performance, multi-threaded,
 blocking and shuffling compressor. Uses `python-blosc
-<https://github.com/FrancescAlted/python-blosc>`_ bindings to interface with
+<https://github.com/Blosc/python-blosc>`_ bindings to interface with
 blosc.
 
 Website(s)
 ----------
 
-* `Repository at Github <https://github.com/esc/bloscpack>`_
+* `Repository at Github <https://github.com/Blosc/bloscpack>`_
 
 * `Crate.io <https://crate.io/packages/bloscpack/>`_
 * `PyPi <https://pypi.python.org/pypi/bloscpack>`_
@@ -43,7 +43,7 @@ Dependencies
 ------------
 
 * Python 2.6 (requires ``ordereddict`` and ``argparse``) or Python 2.7
-* `python-blosc  <https://github.com/FrancescAlted/python-blosc>`_ (provides Blosc)
+* `python-blosc  <https://github.com/Blosc/python-blosc>`_ (provides Blosc)
 * `Numpy <http://www.numpy.org/>`_
 * The Python packages ``nose``, ``nose-parameterized`` and ``cram`` for testing
 
@@ -72,7 +72,7 @@ If you want to install straight from GitHub, use pip's VCS support:
 
 .. code-block:: console
 
-    $ pip install git+https://github.com/esc/bloscpack
+    $ pip install git+https://github.com/Blosc/bloscpack
 
 Or, of course, download the source code or clone the repository and then use
 the standard ``setup.py``:

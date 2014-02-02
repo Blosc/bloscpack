@@ -207,18 +207,6 @@ class BloscPackHeader(collections.MutableMapping):
             first four bytes are not the Bloscpack magic.
 
         """
-        # does weird things, like can't call decode on a slice of a memoryview
-        #buffer_ = memoryview(buffer_)
-        #In [1]: memoryview('abcd')[1:2]
-        #Out[1]: <memory at 0x3015180>
-        #
-        #In [2]: m = memoryview('abcd')
-        #
-        #In [3]: m[1]
-        #Out[3]: 'b'
-        #
-        #In [4]: m[0:2]
-        #Out[4]: <memory at 0x3015218>
         if len(buffer_) != BLOSCPACK_HEADER_LENGTH:
             raise ValueError(
                 "attempting to decode a bloscpack header of length '%d', not '%d'"

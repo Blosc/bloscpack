@@ -18,6 +18,8 @@ from collections import namedtuple
 from cStringIO import StringIO
 import bloscpack
 from bloscpack import *
+from bloscpack.checksum import CHECKSUMS
+from bloscpack.exceptions import NoSuchChecksum
 
 
 def test_hashes():

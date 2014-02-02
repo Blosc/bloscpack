@@ -7,9 +7,8 @@ import struct
 
 
 import nose.tools as nt
-from nose_parameterized import parameterized
-
 import blosc
+
 
 from bloscpack.constants import (MAGIC,
                                  FORMAT_VERSION,
@@ -22,81 +21,43 @@ from bloscpack import exceptions
 from bloscpack.headers import BloscPackHeader
 
 
-@parameterized([
-    (ValueError, -1),
-    (ValueError, MAX_FORMAT_VERSION+1),
-    (TypeError, 'foo')
-])
-def test_invalid_format_version(error_type, format_version):
-    nt.assert_raises(error_type, BloscPackHeader,
-                     format_version=format_version)
+def test_BloscPackHeader_constructor():
+    # uses nose test generators
 
+    def check(error_type, args_dict):
+        nt.assert_raises(error_type, BloscPackHeader, **args_dict)
 
-@parameterized([
-    (ValueError, -1),
-    (ValueError, len(checksums.CHECKSUMS)+1),
-    (exceptions.NoSuchChecksum, 'foo')
-])
-def test_invalid_checksum(error_type, checksum):
-    nt.assert_raises(error_type, BloscPackHeader,
-                     checksum=checksum)
-
-
-@parameterized([
-    (ValueError, -1),
-    (ValueError, blosc.BLOSC_MAX_TYPESIZE+1),
-    (TypeError, 'foo'),
-])
-def test_invalid_type_size(error_type, typesize):
-    nt.assert_raises(error_type, BloscPackHeader, typesize=typesize)
-
-
-@parameterized([
-    (ValueError, blosc.BLOSC_MAX_BUFFERSIZE+1),
-    (ValueError, -2),
-    (TypeError, 'foo'),
-])
-def test_invalid_chunk_size(error_type, chunk_size):
-    nt.assert_raises(error_type, BloscPackHeader, chunk_size=chunk_size)
-
-
-@parameterized([
-    (ValueError, blosc.BLOSC_MAX_BUFFERSIZE+1),
-    (ValueError, -2),
-    (TypeError, 'foo'),
-])
-def test_invalid_last_chunk(error_type, last_chunk):
-    nt.assert_raises(error_type, BloscPackHeader, last_chunk=last_chunk)
-
-
-@parameterized([
-    (ValueError, MAX_CHUNKS+1),
-    (ValueError, -2),
-    (TypeError, 'foo'),
-])
-def test_invalid_nchunks(error_type, nchunks):
-    nt.assert_raises(error_type, BloscPackHeader, nchunks=nchunks)
-
-
-@parameterized([
-    (ValueError, MAX_CHUNKS+1),
-    (ValueError, -1),
-    (TypeError, 'foo'),
-])
-def test_invalid_max_app_chunks(error_type, max_app_chunks):
-    nt.assert_raises(error_type, BloscPackHeader, max_app_chunks=max_app_chunks)
-
-
-def test_BloscPackHeader_constructor_arguments():
-    # check sum
-    nt.assert_raises(ValueError, BloscPackHeader,
-            nchunks=MAX_CHUNKS/2+1,
-            max_app_chunks=MAX_CHUNKS/2+1)
-
-    # check constrain on last_chunk
-    nt.assert_raises(ValueError, BloscPackHeader,
-            chunk_size=1,
-            last_chunk=2)
+    for error_type, args_dict in [
+            (ValueError, {'format_version': -1}),
+            (ValueError, {'format_version': MAX_FORMAT_VERSION+1}),
+            (TypeError,  {'format_version': 'foo'}),
+            (ValueError, {'checksum': -1}),
+            (ValueError, {'checksum': len(checksums.CHECKSUMS)+1}),
+            (exceptions.NoSuchChecksum, {'checksum': 'foo'}),
+            (ValueError, {'typesize': -1}),
+            (ValueError, {'typesize': blosc.BLOSC_MAX_TYPESIZE+1}),
+            (TypeError,  {'typesize': 'foo'}),
+            (ValueError, {'chunk_size': blosc.BLOSC_MAX_BUFFERSIZE+1}),
+            (ValueError, {'chunk_size': -2}),
+            (TypeError,  {'chunk_size': 'foo'}),
+            (ValueError, {'last_chunk': blosc.BLOSC_MAX_BUFFERSIZE+1}),
+            (ValueError, {'last_chunk': -2}),
+            (TypeError,  {'last_chunk': 'foo'}),
+            (ValueError, {'nchunks': MAX_CHUNKS+1}),
+            (ValueError, {'nchunks': -2}),
+            (TypeError,  {'nchunks': 'foo'}),
+            (ValueError, {'max_app_chunks': MAX_CHUNKS+1}),
+            (ValueError, {'max_app_chunks': -1}),
+            (TypeError,  {'max_app_chunks': 'foo'}),
+            # sum of nchunks and max_app_chunks
+            (ValueError, {'nchunks': MAX_CHUNKS/2+1,
+                          'max_app_chunks': MAX_CHUNKS/2+1}),
+            # check constraint on last chunk, must be equal to or smaller than
+            # chunk_size
+            (ValueError, {'chunk_size': 1,
+                          'last_chunk': 2}),
+            ]:
+        yield check, error_type, args_dict
 
 
 def test_BloscPackHeader_encode():

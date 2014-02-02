@@ -20,10 +20,12 @@ import pprint
 import struct
 import sys
 import zlib
+
 try:
     from collections import OrderedDict
 except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict
+
 import blosc
 import numpy as np
 

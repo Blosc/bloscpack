@@ -4,11 +4,11 @@ Bloscpack
 .. image:: https://badge.fury.io/py/bloscpack.png
     :target: https://crate.io/packages/bloscpack
 
-.. image:: https://travis-ci.org/esc/bloscpack.png?branch=master
-        :target: https://travis-ci.org/esc/bloscpack
+.. image:: https://travis-ci.org/Blosc/bloscpack.png?branch=master
+        :target: https://travis-ci.org/Blosc/bloscpack
 
-.. image:: https://coveralls.io/repos/esc/bloscpack/badge.png
-        :target: https://coveralls.io/r/esc/bloscpack
+.. image:: https://coveralls.io/repos/Blosc/bloscpack/badge.png
+        :target: https://coveralls.io/r/Blosc/bloscpack
 
 .. image:: https://pypip.in/d/bloscpack/badge.png
         :target: https://crate.io/packages/bloscpack

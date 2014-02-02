@@ -3,5 +3,9 @@
 # vim :set ft=py:
 
 
+class FileNotFound(IOError):
+    pass
+
+
 class NoSuchChecksum(ValueError):
     pass

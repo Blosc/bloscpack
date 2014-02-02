@@ -64,7 +64,7 @@ CHECKSUMS_AVAIL = [c.name for c in CHECKSUMS]
 CHECKSUMS_LOOKUP = dict(((c.name, c) for c in CHECKSUMS))
 
 
-def _check_valid_checksum(checksum):
+def check_valid_checksum(checksum):
     """ Check the validity of a checksum.
 
     Parameters

@@ -27,7 +27,7 @@ except ImportError:  # pragma: no cover
 import blosc
 import numpy as np
 
-from .checksum import (_check_valid_checksum,
+from .checksum import (check_valid_checksum,
                        CHECKSUMS_LOOKUP,
                        CHECKSUMS_AVAIL,
                        )
@@ -1031,7 +1031,7 @@ class BloscPackHeader(collections.MutableMapping):
                  max_app_chunks=0):
 
         check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
-        _check_valid_checksum(checksum)
+        check_valid_checksum(checksum)
         check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
         check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
         check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
@@ -1195,7 +1195,7 @@ def create_metadata_header(magic_format='',
        ):
     _check_str('magic-format',     magic_format,  8)
     _check_options(options)
-    _check_valid_checksum(meta_checksum)
+    check_valid_checksum(meta_checksum)
     _check_valid_codec(meta_codec)
     check_range('meta_level',      meta_level,     0, MAX_CLEVEL)
     check_range('meta_size',       meta_size,      0, MAX_META_SIZE)
@@ -2344,7 +2344,7 @@ def _recreate_metadata(old_metadata_header, new_metadata,
         _check_valid_serializer(magic_format)
         metadata_args['magic_format'] = magic_format
     if checksum is not None:
-        _check_valid_checksum(checksum)
+        check_valid_checksum(checksum)
         old_impl = CHECKSUMS_LOOKUP[old_metadata_header['meta_checksum']]
         new_impl = CHECKSUMS_LOOKUP[checksum]
         if old_impl.size != new_impl.size:

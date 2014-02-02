@@ -1,13 +1,23 @@
 Bloscpack
 =========
 
-.. image:: https://travis-ci.org/Blosc/bloscpack.png?branch=master
+:Author: Valentin Hänel
+:Contact: valentin@haenel.co
+:List: http://groups.google.com/group/blosc
+:Github: https://github.com/Blosc/bloscpack
+:PyPi: https://pypi.python.org/pypi/bloscpack
+:Ohloh: https://www.ohloh.net/p/bloscpack
+:Travis CI: |travis|
+:Coveralls: |coveralls|
+:Downloads: |pypi|
+
+.. |travis| image:: https://travis-ci.org/Blosc/bloscpack.png?branch=master
         :target: https://travis-ci.org/Blosc/bloscpack
 
-.. image:: https://coveralls.io/repos/Blosc/bloscpack/badge.png
+.. |coveralls| image:: https://coveralls.io/repos/Blosc/bloscpack/badge.png
         :target: https://coveralls.io/r/Blosc/bloscpack
 
-.. image:: https://pypip.in/d/bloscpack/badge.png
+.. |pypi| image:: https://pypip.in/d/bloscpack/badge.png
         :target: https://pypi.python.org/pypi/bloscpack 
 
 
@@ -20,19 +30,6 @@ blocking and shuffling compressor. Uses `python-blosc
 <https://github.com/Blosc/python-blosc>`_ bindings to interface with
 blosc.
 
-Website(s)
-----------
-
-* `Repository at Github <https://github.com/Blosc/bloscpack>`_
-
-* `PyPi <https://pypi.python.org/pypi/bloscpack>`_
-* `Ohloh <https://www.ohloh.net/p/bloscpack>`_
-
-
-Contact
--------
-
-There is an official Blosc mailing list at: http://groups.google.com/group/blosc
 
 Dependencies
 ------------
@@ -920,7 +917,7 @@ TODO
 Changelog
 ---------
 
-* v0.5.0     - Thu XXX XX XXXX
+* v0.5.0     - Thu Feb 02 2014
 
   * Moved project to the `Blosc organization on Github <https://github.com/Blosc>`_
 

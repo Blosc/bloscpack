@@ -925,6 +925,10 @@ TODO
 Changelog
 ---------
 
+* v0.5.0     - Thu XXX XX XXXX
+
+  * Moved project to the `Blosc organization on Github <https://github.com/Blosc>`_
+
 * v0.5.0-rc1 - Thu Jan 30 2014
 
   * Support for Blosc 1.3.x (alternative codecs)

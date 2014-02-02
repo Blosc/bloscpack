@@ -54,10 +54,12 @@ in the licence at the end of this file.
 Installation
 ------------
 
-The package is available on PyPi, so you may use pip to install it:
+The package is available on PyPi, so you may use pip to install the
+dependencies and bloscpack itself:
 
 .. code-block:: console
 
+    $ pip install -r requirements.txt
     $ pip install bloscpack
 
 If you want to install straight from GitHub, use pip's VCS support:

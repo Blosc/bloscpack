@@ -40,7 +40,6 @@ from .constants import (FORMAT_VERSION,
                         BLOSC_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
                         METADATA_HEADER_LENGTH,
-                        MAX_FORMAT_VERSION,
                         MAX_CHUNKS,
                         MAX_META_SIZE,
                        )

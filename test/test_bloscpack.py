@@ -17,17 +17,9 @@ from cStringIO import StringIO
 import bloscpack
 from bloscpack import *
 from bloscpack.checksums import CHECKSUMS
-from bloscpack.exceptions import NoSuchChecksum
+from bloscpack.exceptions import NoSuchCodec
+from bloscpack.constants import MAX_FORMAT_VERSION
 
-
-
-
-def test_codecs():
-    nt.assert_equal(CODECS_AVAIL, ['None', 'zlib'])
-    random_str = "4KzGCl7SxTsYLaerommsMWyZg1TXbV6wsR9Xk"
-    for i, c in enumerate(CODECS):
-        nt.assert_equal(random_str, c.decompress(
-            c.compress(random_str, DEFAULT_META_LEVEL)))
 
 
 def test_serializers():

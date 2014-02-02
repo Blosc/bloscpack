@@ -9,3 +9,7 @@ class FileNotFound(IOError):
 
 class NoSuchChecksum(ValueError):
     pass
+
+
+class NoSuchCodec(ValueError):
+    pass

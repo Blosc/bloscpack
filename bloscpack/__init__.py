@@ -43,6 +43,10 @@ from .constants import (FORMAT_VERSION,
                         MAX_CHUNKS,
                         MAX_META_SIZE,
                         )
+from .metacodec import (CODECS_AVAIL,
+                        CODECS_LOOKUP,
+                        check_valid_codec,
+                        )
 
 __version__ = '0.6.0-rc1'
 __author__ = 'Valentin Haenel <valentin@haenel.co>'
@@ -105,10 +109,6 @@ class ChunkingException(BaseException):
     pass
 
 
-class NoSuchCodec(ValueError):
-    pass
-
-
 class NoSuchSerializer(ValueError):
     pass
 
@@ -147,54 +147,6 @@ class NotEnoughSpace(RuntimeError):
 
 class NotANumpyArray(RuntimeError):
     pass
-
-
-class Codec(object):
-    """ Uniform codec object.
-
-    Parameters
-    ----------
-    name : str
-        the name of the codec
-    compress : callable
-        a compression function taking data and level as args
-    decompress : callable
-        a decompression function taking data as arg
-
-    """
-
-    def __init__(self, name, compress, decompress):
-        self.name = name
-        self._compress = compress
-        self._decompress = decompress
-
-    def compress(self, data, level):
-        return self._compress(data, level)
-
-    def decompress(self, data):
-        return self._decompress(data)
-
-CODECS = [Codec('None', lambda data, level: data, lambda data: data),
-          Codec('zlib', zlib.compress, zlib.decompress)]
-CODECS_AVAIL = [c.name for c in CODECS]
-CODECS_LOOKUP = dict(((c.name, c) for c in CODECS))
-
-
-def _check_valid_codec(codec):
-    """ Check the validity of a codec.
-
-    Parameters
-    ----------
-    codec : str
-        the string descriptor of the codec
-
-    Raises
-    ------
-    NoSuchCodec
-        if no such checksum exists.
-    """
-    if codec not in CODECS_AVAIL:
-        raise NoSuchCodec("codec '%s' does not exist" % codec)
 
 
 class Serializer(object):
@@ -992,7 +944,7 @@ def create_metadata_header(magic_format='',
     _check_str('magic-format',     magic_format,  8)
     _check_options(options)
     check_valid_checksum(meta_checksum)
-    _check_valid_codec(meta_codec)
+    check_valid_codec(meta_codec)
     check_range('meta_level',      meta_level,     0, MAX_CLEVEL)
     check_range('meta_size',       meta_size,      0, MAX_META_SIZE)
     check_range('max_meta_size',   max_meta_size,  0, MAX_META_SIZE)
@@ -2119,7 +2071,7 @@ def _recreate_metadata(old_metadata_header, new_metadata,
                     'checksums have a size mismatch')
         metadata_args['meta_checksum'] = checksum
     if codec is not None:
-        _check_valid_codec(codec)
+        check_valid_codec(codec)
         metadata_args['meta_codec'] = codec
     if level is not None:
         check_range('meta_level', level, 0, MAX_CLEVEL)

@@ -7,9 +7,14 @@ Bloscpack
 :Github: https://github.com/Blosc/bloscpack
 :PyPi: https://pypi.python.org/pypi/bloscpack
 :Ohloh: https://www.ohloh.net/p/bloscpack
+:Version: |version|
 :Travis CI: |travis|
 :Coveralls: |coveralls|
-:Downloads: |pypi|
+:Downloads: |downloads|
+:License: |license|
+
+.. |version| image:: https://pypip.in/v/bloscpack/badge.png
+        :target: https://pypi.python.org/pypi/bloscpack
 
 .. |travis| image:: https://travis-ci.org/Blosc/bloscpack.png?branch=master
         :target: https://travis-ci.org/Blosc/bloscpack
@@ -17,8 +22,12 @@ Bloscpack
 .. |coveralls| image:: https://coveralls.io/repos/Blosc/bloscpack/badge.png
         :target: https://coveralls.io/r/Blosc/bloscpack
 
-.. |pypi| image:: https://pypip.in/d/bloscpack/badge.png
-        :target: https://pypi.python.org/pypi/bloscpack 
+.. |downloads| image:: https://pypip.in/d/bloscpack/badge.png
+        :target: https://pypi.python.org/pypi/bloscpack
+
+.. |license| image:: https://pypip.in/license/bloscpack/badge.png
+        :target: https://pypi.python.org/pypi/bloscpack
+
 
 
 Description

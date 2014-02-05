@@ -123,11 +123,23 @@ Basic compression:
 
 .. code-block:: console
 
+    $ ./blpk compress data.dat
+
+Or:
+
+.. code-block:: console
+
     $ ./blpk c data.dat
 
 ... will compress the file ``data.dat`` to ``data.dat.blp``
 
 Basic decompression:
+
+.. code-block:: console
+
+    $ ./blpk decompress data.dat.blp data.dcmp
+
+Or:
 
 .. code-block:: console
 
@@ -139,7 +151,7 @@ leave out the ``[<out_file>]`` argument, Bloscpack will complain that the file
 
 .. code-block:: console
 
-    $ ./blpk d data.dat.blp
+    $ ./blpk decompress data.dat.blp
     blpk: error: output file 'data.dat' exists!
 
 If you know what you are doing, you can use the global option ``[-f |
@@ -147,75 +159,72 @@ If you know what you are doing, you can use the global option ``[-f |
 
 .. code-block:: console
 
-    $ ./blpk -f d data.dat.blp
+    $ ./blpk --force decompress data.dat.blp
 
 Incidentally this works for compression too:
 
 .. code-block:: console
 
-    $ ./blpk c data.dat
+    $ ./blpk compress data.dat
     blpk: error: output file 'data.dat.blp' exists!
-    $ ./blpk -f c data.dat
+    $ ./blpk --force compress data.dat
 
 Lastly, if you want a different filename:
 
 .. code-block:: console
 
-    $ ./blpk c data.dat custom.filename.blp
+    $ ./blpk compress data.dat custom.filename.blp
 
 ... will compress the file ``data.dat`` to ``custom.filename.blp``
 
 Settings
 ~~~~~~~~
 
-By default, the number of threads that Blosc uses is determined by the number
-of cores detected on your system. You can change this using the ``[-n |
---nthreads]`` option:
+By default, the number of threads that Blosc uses during compression and
+decompressoion is determined by the number of cores detected on your system.
+You can change this using the ``[-n | --nthreads]`` option:
 
 .. code-block:: console
 
-    $ ./blpk -n 1 c data.dat
+    $ ./blpk --nthreads 1 compress data.dat
 
-There are some useful additional options for compression, that are passed
-directly to Blosc:
+Compression with Blosc is controlled with the following options:
 
 * ``[-t | --typesize]``
   Typesize used by Blosc (default: 8):
-  ``$ ./blpk c -t 8 data.dat``
+  ``$ ./blpk compress --typesize 8 data.dat``
 * ``[-l | --level]``
   Compression level (default: 7):
-  ``$ ./blpk c -l 3 data.dat``
+  ``$ ./blpk compress --level 3 data.dat``
 * ``[-s | --no-shuffle]``
   Deactivate shuffle:
-  ``$ ./blpk c -s data.dat``
+  ``$ ./blpk compress --no-shuffle data.dat``
 * ``[-c | --codec]``
   Use alternative codec:
-  ``$ ./blpk c -c lz4 data.dat``
+  ``$ ./blpk compress --codec lz4 data.dat``
 
-In addition, the desired size of the chunks may be specified.
+In addition, there are the following options that control the Bloscpack file:
 
 * ``[-z | --chunk-size]``
   Desired approximate size of the chunks, where you can use human readable
   strings like ``8M`` or ``128K`` or ``max`` to use the maximum chunk size of
   apprx. ``2GB`` (default: ``1MB``):
-  ``$ ./blpk -d c -z 128K data.dat``
-  ``$ ./blpk -d c -z max data.dat``
-
-There are two options that influence how the data is stored:
-
+  ``$ ./blpk compress --chunk-size 128K data.dat`` or
+  ``$ ./blpk c -z max data.dat``
 * ``[-k | --checksum <checksum>]``
   Chose which checksum to use. The following values are permissible:
   ``None``, ``adler32``, ``crc32``, ``md5``,
   ``sha1``, ``sha224``, ``sha256``, ``sha384``,
   ``sha512``, (default: ``adler32``). As described in the header format, each
   compressed chunk can be stored with a checksum, which aids corruption
-  detection on decompression.
-
+  detection on decompression:
+  ``$ ./blpk compress --checksum crc32 data.dat``
 * ``[-o | --no-offsets]``
   By default, offsets to the individual chunks are stored. These are included
   to allow for partial decompression in the future. This option disables that
   feature. Also, a certain number of offsets (default: 10 * 'nchunks') are
-  preallocated to allow for appending data to the file.
+  preallocated to allow for appending data to the file:
+  ``$ ./blpk compress --no-offsets data.dat``
 
 Info Subcommand
 ~~~~~~~~~~~~~~~
@@ -300,10 +309,13 @@ compression options. For example, one cannot change the checksum used. It is
 however possible to change the compression level, the typesize and the shuffle
 option for the appended chunks.
 
+Also note that appending is still considered experimental as of ``v0.5.0``.
+
 Verbose and Debug mode
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Lastly there are two options to control how much output is produced,
+Lastly there are two mutually exclusive options to control how much output is
+produced.
 
 The first causes basic info to be printed, ``[-v | --verbose]``:
 
@@ -458,6 +470,7 @@ with:
 .. code-block:: console
 
     $ pip install -r test_requirements.txt
+    [...]
 
 
 Basic Tests

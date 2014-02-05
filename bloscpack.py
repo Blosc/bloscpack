@@ -467,6 +467,8 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
         return text.splitlines()
 
+    def _fill_text(self, text, width, indent):
+        return ''.join([indent + line for line in text.splitlines(True)])
 
 def _inject_blosc_group(parser):
     blosc_group = parser.add_argument_group(title='blosc settings')
@@ -502,7 +504,10 @@ def create_parser():
             #usage='%(prog)s [GLOBAL_OPTIONS] (compress | decompress)
             # [COMMAND_OPTIONS] <in_file> [<out_file>]',
             description='command line de/compression with blosc',
-            formatter_class=BloscPackCustomFormatter)
+            formatter_class=BloscPackCustomFormatter,
+            epilog="Additional help for subcommands is available:\n"+
+            "  %(prog)s 'subcommand' [ -h | --help ]")
+
     ## print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version',
             action='version',
@@ -539,9 +544,7 @@ def create_parser():
             help='set number of threads, (default: %(default)s (ncores))')
 
     subparsers = parser.add_subparsers(title='subcommands',
-            metavar='', dest='subcommand',
-            help="Additional help for subcommands is available\n"+
-            "e.g. %(prog)s compress --help")
+            metavar='', dest='subcommand')
 
     compress_parser = subparsers.add_parser('compress',
             formatter_class=BloscPackCustomFormatter,

@@ -47,6 +47,9 @@ Help for global options and subcommands:
       a                   alias for 'append'
       info                print information about a compressed file
       i                   alias for 'info'
+  
+  Additional help for subcommands is available:
+    blpk 'subcommand' [ -h | --help ]
 
 Help for the subcommands:
 

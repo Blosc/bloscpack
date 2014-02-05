@@ -64,8 +64,6 @@ Help for the subcommands:
   
   optional arguments:
     -h, --help            show this help message and exit
-    -z <size>, --chunk-size <size>
-                          set desired chunk size or 'max' (default: 1M)
   
   blosc settings:
     -t <size>, --typesize <size>
@@ -79,6 +77,8 @@ Help for the subcommands:
                            (default: blosclz)
   
   bloscpack settings:
+    -z <size>, --chunk-size <size>
+                          set desired chunk size or 'max' (default: 1M)
     -k <checksum>, --checksum <checksum>
                           set desired checksum:
                           None, adler32, crc32

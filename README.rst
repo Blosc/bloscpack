@@ -12,6 +12,7 @@ Bloscpack
 :Coveralls: |coveralls|
 :Downloads: |downloads|
 :License: |license|
+:And...: |powered|
 
 .. |version| image:: https://pypip.in/v/bloscpack/badge.png
         :target: https://pypi.python.org/pypi/bloscpack
@@ -28,6 +29,8 @@ Bloscpack
 .. |license| image:: https://pypip.in/license/bloscpack/badge.png
         :target: https://pypi.python.org/pypi/bloscpack
 
+.. |license| image:: http://b.repl.ca/v1/Powered--By-Blosc-blue.png
+        :target: https://blosc.org
 
 
 Description

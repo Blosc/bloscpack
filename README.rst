@@ -29,7 +29,7 @@ Bloscpack
 .. |license| image:: https://pypip.in/license/bloscpack/badge.png
         :target: https://pypi.python.org/pypi/bloscpack
 
-.. |license| image:: http://b.repl.ca/v1/Powered--By-Blosc-blue.png
+.. |powered| image:: http://b.repl.ca/v1/Powered--By-Blosc-blue.png
         :target: https://blosc.org
 
 

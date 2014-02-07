@@ -13,3 +13,7 @@ class NoSuchChecksum(ValueError):
 
 class NoSuchCodec(ValueError):
     pass
+
+
+class NoSuchSerializer(ValueError):
+    pass

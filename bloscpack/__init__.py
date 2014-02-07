@@ -46,6 +46,8 @@ from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
                          check_valid_codec,
                          )
+from .serializers import(SERIZLIALIZERS_LOOKUP,
+                         )
 from bloscpack.cli import check_files
 
 __version__ = '0.6.0-rc1'
@@ -109,10 +111,6 @@ class ChunkingException(BaseException):
     pass
 
 
-class NoSuchSerializer(ValueError):
-    pass
-
-
 class FormatVersionMismatch(RuntimeError):
     pass
 
@@ -149,53 +147,6 @@ class NotANumpyArray(RuntimeError):
     pass
 
 
-class Serializer(object):
-    """ Uniform serializer object.
-
-    Parameters
-    ----------
-    name : str
-        the name of the serializer
-    compress : callable
-        a compression function taking a dict as arg
-    decompress : callable
-        a decompression function taking serialized data as arg
-
-    """
-    def __init__(self, name, dumps, loads):
-        self.name = name
-        self._loads = loads
-        self._dumps = dumps
-
-    def dumps(self, dict_):
-        return self._dumps(dict_)
-
-    def loads(self, data):
-        return self._loads(data)
-
-
-SERIZLIALIZERS = [Serializer('JSON',
-                  lambda x: json.dumps(x, separators=(',', ':')),
-                  lambda x: json.loads(x))]
-SERIZLIALIZERS_AVAIL = [s.name for s in SERIZLIALIZERS]
-SERIZLIALIZERS_LOOKUP = dict(((s.name, s) for s in SERIZLIALIZERS))
-
-
-def _check_valid_serializer(serializer):
-    """ Check the validity of a serializer.
-
-    Parameters
-    ----------
-    serializer : str
-        the magic format of the serializer
-
-    Raises
-    ------
-    NoSuchSerializer
-        if no such serializer exists.
-    """
-    if serializer not in SERIZLIALIZERS_AVAIL:
-        raise NoSuchSerializer("serializer '%s' does not exist" % serializer)
 
 
 def print_verbose(message, level=VERBOSE):

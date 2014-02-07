@@ -269,8 +269,6 @@ def join_with_eol(items):
     return ', '.join(items) + '\n'
 
 
-
-
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
 

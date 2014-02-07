@@ -35,7 +35,6 @@ from .exceptions import FileNotFound
 
 from .constants import (FORMAT_VERSION,
                         EXTENSION,
-                        PREFIX,
                         BLOSC_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
                         METADATA_HEADER_LENGTH,
@@ -49,6 +48,11 @@ from .metacodecs import (CODECS_AVAIL,
 from .serializers import(SERIZLIALIZERS_LOOKUP,
                          )
 from .cli import check_files
+from log import (print_verbose,
+                 print_debug,
+                 print_normal,
+                 error,
+                 )
 
 __version__ = '0.6.0-rc1'
 __author__ = 'Valentin Haenel <valentin@haenel.co>'
@@ -91,12 +95,6 @@ DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
 # Codecs available from Blosc
 CNAME_AVAIL = blosc.compressor_list()
 
-# verbosity levels
-NORMAL  = 'NORMAL'
-VERBOSE = 'VERBOSE'
-DEBUG   = 'DEBUG'
-LEVEL = NORMAL
-VERBOSITY_LEVELS = (NORMAL, VERBOSE, DEBUG)
 
 # lookup table for human readable sizes
 SUFFIXES = OrderedDict((
@@ -145,33 +143,6 @@ class NotEnoughSpace(RuntimeError):
 
 class NotANumpyArray(RuntimeError):
     pass
-
-
-def print_verbose(message, level=VERBOSE):
-    """ Print message with desired verbosity level. """
-    if level not in VERBOSITY_LEVELS:
-        raise TypeError("Desired level '%s' is not one of %s" % (level,
-                        str(VERBOSITY_LEVELS)))
-    if VERBOSITY_LEVELS.index(level) <= VERBOSITY_LEVELS.index(LEVEL):
-        for line in [l for l in message.split('\n') if l != '']:
-            print('%s: %s' % (PREFIX, line))
-
-
-def print_debug(message):
-    """ Print message with verbosity level ``DEBUG``. """
-    print_verbose(message, level=DEBUG)
-
-
-def print_normal(message):
-    """ Print message with verbosity level ``NORMAL``. """
-    print_verbose(message, level=NORMAL)
-
-
-def error(message, exit_code=1):
-    """ Print message and exit with desired code. """
-    for line in [l for l in message.split('\n') if l != '']:
-        print('%s: error: %s' % (PREFIX, line))
-    sys.exit(exit_code)
 
 
 def pretty_size(size_in_bytes):

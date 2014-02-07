@@ -6,7 +6,6 @@
 FORMAT_VERSION = 3
 MAGIC = 'blpk'
 EXTENSION = '.blp'
-PREFIX = "bloscpack.py"
 
 # header lengths
 BLOSC_HEADER_LENGTH = 16

@@ -17,17 +17,18 @@ from cStringIO import StringIO
 import bloscpack
 from bloscpack import *
 from bloscpack.checksums import CHECKSUMS
-from bloscpack.exceptions import NoSuchCodec
+from bloscpack.exceptions import NoSuchCodec, NoSuchSerializer
 from bloscpack.constants import MAX_FORMAT_VERSION
-
+from bloscpack.serializers import SERIZLIALIZERS
+from bloscpack import log
 
 
 def test_print_verbose():
     nt.assert_raises(TypeError, print_verbose, 'message', 'MAXIMUM')
-    bloscpack.LEVEL = DEBUG
+    log.LEVEL = log.DEBUG
     # should probably hijack the print statement
     print_verbose('notification')
-    bloscpack.LEVEL = NORMAL
+    log.LEVEL = log.NORMAL
 
 
 def test_error():

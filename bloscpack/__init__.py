@@ -48,7 +48,7 @@ from .metacodecs import (CODECS_AVAIL,
                          )
 from .serializers import(SERIZLIALIZERS_LOOKUP,
                          )
-from bloscpack.cli import check_files
+from .cli import check_files
 
 __version__ = '0.6.0-rc1'
 __author__ = 'Valentin Haenel <valentin@haenel.co>'

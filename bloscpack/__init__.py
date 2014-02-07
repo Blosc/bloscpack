@@ -585,7 +585,6 @@ def check_range(name, value, min_, max_):
                 tuple(map(str, (name, min_, max_, value))))
 
 
-
 def _check_str(name, value, max_len):
     if not isinstance(value, str):
         raise TypeError("'%s' must be of type 'int'" % name)

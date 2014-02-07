@@ -5,7 +5,7 @@
 
 from os import path
 
-from bloscpack import print_verbose
+from . import log
 from .exceptions import FileNotFound
 
 
@@ -33,8 +33,8 @@ def check_files(in_file, out_file, args):
         if not args.force:
             raise FileNotFound("output file '%s' exists!" % out_file)
         else:
-            print_verbose("overwriting existing file: '%s'" % out_file)
-    print_verbose("input file is: '%s'" % in_file)
-    print_verbose("output file is: '%s'" % out_file)
+            log.print_verbose("overwriting existing file: '%s'" % out_file)
+    log.print_verbose("input file is: '%s'" % in_file)
+    log.print_verbose("output file is: '%s'" % out_file)
 
 

@@ -12,7 +12,6 @@ import contextlib
 import cStringIO
 import json
 import itertools
-import os
 import os.path as path
 import pprint
 import struct

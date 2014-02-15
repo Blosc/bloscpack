@@ -36,3 +36,5 @@ def reverse_pretty(readable):
         return int(float(readable[:-1]) * SUFFIXES[suffix])
 
 
+def join_with_eol(items):
+    return ', '.join(items) + '\n'

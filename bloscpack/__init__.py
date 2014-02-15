@@ -45,6 +45,7 @@ from .metacodecs import (CODECS_AVAIL,
 from .pretty import (pretty_size,
                      double_pretty_size,
                      reverse_pretty,
+                     join_with_eol,
                      )
 from .serializers import(SERIZLIALIZERS_LOOKUP,
                          check_valid_serializer,
@@ -189,10 +190,6 @@ def open_two_file(input_fp, output_fp):
 PYTHON_VERSION = sys.version_info[0:3]
 if sys.version_info < (2, 7, 5):  # pragma: no cover
     memoryview = lambda x: x
-
-
-def join_with_eol(items):
-    return ', '.join(items) + '\n'
 
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):

@@ -23,6 +23,7 @@ from .defaults import DEFAULT_OFFSETS
 from .pretty import double_pretty_size
 import log
 
+
 def check_range(name, value, min_, max_):
     """ Check that a variable is in range. """
     if not isinstance(value, (int, long)):
@@ -72,12 +73,12 @@ def _check_options(options):
 
     if not isinstance(options, str):
         raise TypeError("'options' must be of type 'str', not '%s'" %
-                type(options))
+                        type(options))
     elif (not len(options) == 8 or
             not all(map(lambda x: x in ['0', '1'], iter(options)))):
         raise ValueError(
-                "'options' must be string of 0s and 1s of length 8, not '%s'" %
-                options)
+            "'options' must be string of 0s and 1s of length 8, not '%s'" %
+            options)
 
 
 def _check_options_zero(options, indices):
@@ -85,7 +86,6 @@ def _check_options_zero(options, indices):
         if options[i] != '0':
             raise ValueError(
                 'Element %i was non-zero when attempting to decode options')
-
 
 
 def decode_uint8(byte):
@@ -137,7 +137,7 @@ def create_options(offsets=DEFAULT_OFFSETS, metadata=False):
     metadata : bool
     """
     return "".join([str(int(i)) for i in
-            [False, False, False, False, False, False, metadata, offsets]])
+        [False, False, False, False, False, False, metadata, offsets]])
 
 
 def decode_options(options):
@@ -158,7 +158,6 @@ def decode_options(options):
     return {'offsets': bool(int(options[7])),
             'metadata': bool(int(options[6])),
             }
-
 
 
 def decode_blosc_header(buffer_):
@@ -245,12 +244,14 @@ class BloscPackHeader(collections.MutableMapping):
         check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
         if nchunks != -1:
             check_range('nchunks + max_app_chunks',
-                nchunks + max_app_chunks, 0, MAX_CHUNKS)
+                        nchunks + max_app_chunks, 0, MAX_CHUNKS)
         elif max_app_chunks != 0:
-            raise ValueError("'max_app_chunks' can not be non '0' if 'nchunks' is '-1'")
+            raise ValueError(
+                "'max_app_chunks' can not be non '0' if 'nchunks' is '-1'")
         if chunk_size != -1 and last_chunk != -1 and last_chunk > chunk_size:
-            raise ValueError("'last_chunk' (%d) is larger than 'chunk_size' (%d)"
-                    % (last_chunk, chunk_size))
+            raise ValueError(
+                "'last_chunk' (%d) is larger than 'chunk_size' (%d)"
+                % (last_chunk, chunk_size))
 
         self._attrs = ['format_version',
                        'offsets',
@@ -386,5 +387,3 @@ class BloscPackHeader(collections.MutableMapping):
             last_chunk=decode_int32(buffer_[12:16]),
             nchunks=decode_int64(buffer_[16:24]),
             max_app_chunks=decode_int64(buffer_[24:32]))
-
-

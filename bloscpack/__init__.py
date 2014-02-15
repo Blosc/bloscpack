@@ -35,7 +35,6 @@ from .constants import (FORMAT_VERSION,
                         MAX_CHUNKS,
                         MAX_META_SIZE,
                         MAX_CLEVEL,
-                        SUFFIXES,
                         )
 from .defaults import (DEFAULT_TYPESIZE,
                        DEFAULT_CLEVEL,

@@ -25,8 +25,8 @@ from bloscpack.headers import (BloscPackHeader,
                                create_metadata_options,
                                decode_metadata_options,
                                check_range,
-
                                )
+
 
 def test_check_range():
     nt.assert_raises(TypeError,  check_range, 'test', 'a', 0, 1)

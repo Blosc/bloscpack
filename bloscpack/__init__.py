@@ -13,7 +13,6 @@ import json
 import itertools
 import os.path as path
 import pprint
-import struct
 import sys
 
 
@@ -45,6 +44,24 @@ from .defaults import (DEFAULT_TYPESIZE,
                        DEFAULT_MAX_APP_CHUNKS,
                        DEFAULT_OFFSETS,
                        )
+from .headers import (BloscPackHeader,
+                      check_range,
+                      encode_int64,
+                      decode_int64,
+                      decode_blosc_header,
+                      _check_str,
+                      _check_options,
+                      _pad_with_nulls,
+                      encode_uint8,
+                      encode_uint32,
+                      decode_magic_string,
+                      decode_bitfield,
+                      decode_uint8,
+                      decode_uint32,
+                      decode_options,
+                      _check_options_zero,
+                      create_options,
+                      )
 from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
                          check_valid_codec,
@@ -136,46 +153,6 @@ class NotANumpyArray(RuntimeError):
     pass
 
 
-def decode_uint8(byte):
-    return struct.unpack('<B', byte)[0]
-
-
-def decode_uint32(fourbyte):
-    return struct.unpack('<I', fourbyte)[0]
-
-
-def decode_int32(fourbyte):
-    return struct.unpack('<i', fourbyte)[0]
-
-
-def decode_int64(eightbyte):
-    return struct.unpack('<q', eightbyte)[0]
-
-
-def decode_bitfield(byte):
-    return bin(decode_uint8(byte))[2:].rjust(8, '0')
-
-
-def decode_magic_string(str_):
-    return str_.strip('\x00')
-
-
-def encode_uint8(byte):
-    return struct.pack('<B', byte)
-
-
-def encode_uint32(byte):
-    return struct.pack('<I', byte)
-
-
-def encode_int32(fourbyte):
-    return struct.pack('<i', fourbyte)
-
-
-def encode_int64(eightbyte):
-    return struct.pack('<q', eightbyte)
-
-
 @contextlib.contextmanager
 def open_two_file(input_fp, output_fp):
     """ Hack for making with statement work on two files with 2.6. """
@@ -186,35 +163,6 @@ def open_two_file(input_fp, output_fp):
 PYTHON_VERSION = sys.version_info[0:3]
 if sys.version_info < (2, 7, 5):  # pragma: no cover
     memoryview = lambda x: x
-
-
-def decode_blosc_header(buffer_):
-    """ Read and decode header from compressed Blosc buffer.
-
-    Parameters
-    ----------
-    buffer_ : string of bytes
-        the compressed buffer
-
-    Returns
-    -------
-    settings : dict
-        a dict containing the settings from Blosc
-
-    Notes
-    -----
-    Please see the readme for a precise descripttion of the blosc header
-    format.
-
-    """
-    buffer_ = memoryview(buffer_)
-    return {'version':   decode_uint8(buffer_[0]),
-            'versionlz': decode_uint8(buffer_[1]),
-            'flags':     decode_uint8(buffer_[2]),
-            'typesize':  decode_uint8(buffer_[3]),
-            'nbytes':    decode_uint32(buffer_[4:8]),
-            'blocksize': decode_uint32(buffer_[8:12]),
-            'ctbytes':   decode_uint32(buffer_[12:16])}
 
 
 def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
@@ -280,70 +228,6 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
     print_verbose('chunk_size: %s' % double_pretty_size(chunk_size))
     print_verbose('last_chunk_size: %s' % double_pretty_size(last_chunk_size))
     return nchunks, chunk_size, last_chunk_size
-
-
-def check_range(name, value, min_, max_):
-    """ Check that a variable is in range. """
-    if not isinstance(value, (int, long)):
-        raise TypeError("'%s' must be of type 'int'" % name)
-    elif not min_ <= value <= max_:
-        raise ValueError(
-            "'%s' must be in the range %s <= n <= %s, not '%s'" %
-            tuple(map(str, (name, min_, max_, value))))
-
-
-def _check_str(name, value, max_len):
-    if not isinstance(value, str):
-        raise TypeError("'%s' must be of type 'int'" % name)
-    elif len(value) > max_len:
-        raise ValueError("'%s' can be of max length '%i' but is: '%s'" %
-                         (name, max_len, len(value)))
-
-
-def _pad_with_nulls(str_, len_):
-    """ Pad string with null bytes.
-
-    Parameters
-    ----------
-    str_ : str
-        the string to pad
-    len_ : int
-        the final desired length
-    """
-    return str_ + ("\x00" * (len_ - len(str_)))
-
-
-def _check_options(options):
-    """ Check the options bitfield.
-
-    Parameters
-    ----------
-    options : str
-
-    Raises
-    ------
-    TypeError
-        if options is not a string
-    ValueError
-        either if any character in option is not a zero or a one, or if options
-        is not of length 8
-    """
-
-    if not isinstance(options, str):
-        raise TypeError("'options' must be of type 'str', not '%s'" %
-                type(options))
-    elif (not len(options) == 8 or
-            not all(map(lambda x: x in ['0', '1'], iter(options)))):
-        raise ValueError(
-                "'options' must be string of 0s and 1s of length 8, not '%s'" %
-                options)
-
-
-def _check_options_zero(options, indices):
-    for i in indices:
-        if options[i] != '0':
-            raise ValueError(
-                'Element %i was non-zero when attempting to decode options')
 
 
 def _check_blosc_args(blosc_args):
@@ -434,38 +318,6 @@ def __check_args(name, received, expected):
         raise ValueError("%s args had some extras: '%s'" % (name, repr(extra)))
 
 
-def create_options(offsets=DEFAULT_OFFSETS, metadata=False):
-    """ Create the options bitfield.
-
-    Parameters
-    ----------
-    offsets : bool
-    metadata : bool
-    """
-    return "".join([str(int(i)) for i in
-            [False, False, False, False, False, False, metadata, offsets]])
-
-
-def decode_options(options):
-    """ Parse the options bitfield.
-
-    Parameters
-    ----------
-    options : str
-        the options bitfield
-
-    Returns
-    -------
-    options : dict mapping str -> bool
-    """
-
-    _check_options(options)
-    _check_options_zero(options, range(6))
-    return {'offsets': bool(int(options[7])),
-            'metadata': bool(int(options[6])),
-            }
-
-
 def create_metadata_options():
     """ Create the metadata options bitfield. """
     return "00000000"
@@ -476,7 +328,6 @@ def decode_metadata_options(options):
     _check_options_zero(options, range(8))
     return {}
 
-from .headers import BloscPackHeader
 
 def _handle_max_apps(offsets, nchunks, max_app_chunks):
     """ Process and handle the 'max_app_chunks' argument

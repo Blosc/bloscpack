@@ -23,16 +23,13 @@ from .checksums import (check_valid_checksum,
                         CHECKSUMS_LOOKUP,
                         CHECKSUMS_AVAIL,
                         )
-
 from .exceptions import FileNotFound
-
 from .constants import (FORMAT_VERSION,
                         EXTENSION,
                         BLOSC_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
                         METADATA_HEADER_LENGTH,
                         MAX_CHUNKS,
-                        MAX_META_SIZE,
                         MAX_CLEVEL,
                         )
 from .defaults import (DEFAULT_TYPESIZE,

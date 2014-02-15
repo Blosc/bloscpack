@@ -88,7 +88,6 @@ def test_check_options():
     nt.assert_raises(ValueError, check_options, 'aaaaaaaa')
 
 
-
 def test_create_metadata_options():
     nt.assert_equal('00000000', create_metadata_options())
 
@@ -103,7 +102,6 @@ def test_decode_metadata_options():
     nt.assert_raises(ValueError, decode_metadata_options, '00000001')
     nt.assert_raises(ValueError, decode_metadata_options, '00001111')
     nt.assert_raises(ValueError, decode_metadata_options, '11111111')
-
 
 
 def test_BloscPackHeader_constructor():

@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
+
+import blosc
+
+
 try:
     from collections import OrderedDict
 except ImportError:  # pragma: no cover
@@ -29,3 +33,6 @@ SUFFIXES = OrderedDict((
              ("M", 2**20),
              ("G", 2**30),
              ("T", 2**40)))
+
+# Codecs available from Blosc
+CNAME_AVAIL = blosc.compressor_list()

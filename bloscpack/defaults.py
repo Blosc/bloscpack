@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim :set ft=py:
 
 DEFAULT_OFFSETS = True
 DEFAULT_CHECKSUM = 'adler32'

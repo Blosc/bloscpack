@@ -18,10 +18,6 @@ import pprint
 import struct
 import sys
 
-try:
-    from collections import OrderedDict
-except ImportError:  # pragma: no cover
-    from ordereddict import OrderedDict
 
 import blosc
 import numpy as np
@@ -40,11 +36,16 @@ from .constants import (FORMAT_VERSION,
                         METADATA_HEADER_LENGTH,
                         MAX_CHUNKS,
                         MAX_META_SIZE,
+                        SUFFIXES,
                         )
 from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
                          check_valid_codec,
                          )
+from .pretty import (pretty_size,
+                     double_pretty_size,
+                     reverse_pretty,
+                     )
 from .serializers import(SERIZLIALIZERS_LOOKUP,
                          check_valid_serializer,
                          )
@@ -98,15 +99,6 @@ DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
 CNAME_AVAIL = blosc.compressor_list()
 
 
-# lookup table for human readable sizes
-SUFFIXES = OrderedDict((
-             ("B", 2**0 ),
-             ("K", 2**10),
-             ("M", 2**20),
-             ("G", 2**30),
-             ("T", 2**40)))
-
-
 class ChunkingException(BaseException):
     pass
 
@@ -145,34 +137,6 @@ class NotEnoughSpace(RuntimeError):
 
 class NotANumpyArray(RuntimeError):
     pass
-
-
-def pretty_size(size_in_bytes):
-    """ Pretty print filesize.  """
-    if size_in_bytes == 0:
-        return "0B"
-    for suf, lim in reversed(sorted(SUFFIXES.items(), key=lambda x: x[1])):
-        if size_in_bytes < lim:
-            continue
-        else:
-            return str(round(size_in_bytes/lim, 2))+suf
-
-
-def double_pretty_size(size_in_bytes):
-    """ Pretty print filesize including size in bytes. """
-    return ("%s (%dB)" % (pretty_size(size_in_bytes), size_in_bytes))
-
-
-def reverse_pretty(readable):
-    """ Reverse pretty printed file size. """
-    # otherwise we assume it has a suffix
-    suffix = readable[-1]
-    if suffix not in SUFFIXES.keys():
-        raise ValueError(
-                "'%s' is not a valid prefix multiplier, use one of: '%s'" %
-                (suffix, SUFFIXES.keys()))
-    else:
-        return int(float(readable[:-1]) * SUFFIXES[suffix])
 
 
 def drop_caches():  # pragma: no cover

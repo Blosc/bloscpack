@@ -296,8 +296,6 @@ def __check_args(name, received, expected):
         raise ValueError("%s args had some extras: '%s'" % (name, repr(extra)))
 
 
-
-
 def _handle_max_apps(offsets, nchunks, max_app_chunks):
     """ Process and handle the 'max_app_chunks' argument
 

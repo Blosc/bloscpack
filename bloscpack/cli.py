@@ -60,6 +60,92 @@ def check_files(in_file, out_file, args):
     log.print_verbose("output file is: '%s'" % out_file)
 
 
+def _blosc_args_from_args(args):
+    return dict((arg, args.__getattribute__(arg)) for arg in BLOSC_ARGS)
+
+
+def process_compression_args(args):
+    """ Extract and check the compression args after parsing by argparse.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        the parsed command line arguments
+
+    Returns
+    -------
+    in_file : str
+        the input file name
+    out_file : str
+        the out_file name
+    blosc_args : tuple of (int, int, bool)
+        typesize, clevel and shuffle
+    """
+    in_file = args.in_file
+    out_file = args.out_file or in_file + EXTENSION
+    return in_file, out_file, _blosc_args_from_args(args)
+
+
+def process_decompression_args(args):
+    """ Extract and check the decompression args after parsing by argparse.
+
+    Warning: may call sys.exit()
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        the parsed command line arguments
+
+    Returns
+    -------
+    in_file : str
+        the input file name
+    out_file : str
+        the out_file name
+    """
+    in_file = args.in_file
+    out_file = args.out_file
+    # remove the extension for output file
+    if args.no_check_extension:
+        if out_file is None:
+            error('--no-check-extension requires use of <out_file>')
+    else:
+        if in_file.endswith(EXTENSION):
+            out_file = args.out_file or in_file[:-len(EXTENSION)]
+        else:
+            error("input file '%s' does not end with '%s'" %
+                    (in_file, EXTENSION))
+    return in_file, out_file
+
+
+def process_append_args(args):
+    original_file = args.original_file
+    new_file = args.new_file
+    if not args.no_check_extension and not original_file.endswith(EXTENSION):
+        error("original file '%s' does not end with '%s'" %
+                    (original_file, EXTENSION))
+
+    return original_file, new_file
+
+
+def process_metadata_args(args):
+    if args.metadata is not None:
+        try:
+            with open(args.metadata, 'r') as metadata_file:
+                return json.loads(metadata_file.read().strip())
+        except IOError as ioe:
+            error(ioe.message)
+
+
+def process_nthread_arg(args):
+    """ Extract and set nthreads. """
+    if args.nthreads != blosc.ncores:
+        blosc.set_nthreads(args.nthreads)
+    print_verbose('using %d thread%s' %
+            (args.nthreads, 's' if args.nthreads > 1 else ''))
+
+
+
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
 

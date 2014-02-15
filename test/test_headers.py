@@ -13,6 +13,7 @@ import blosc
 from bloscpack.constants import (MAGIC,
                                  FORMAT_VERSION,
                                  MAX_FORMAT_VERSION,
+                                 MAX_META_SIZE,
                                  MAX_CHUNKS,
                                  )
 from bloscpack import reverse_pretty
@@ -24,6 +25,8 @@ from bloscpack.headers import (BloscPackHeader,
                                check_options,
                                create_metadata_options,
                                decode_metadata_options,
+                               create_metadata_header,
+                               decode_metadata_header,
                                check_range,
                                )
 

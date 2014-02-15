@@ -71,12 +71,6 @@ def test_check_metadata_arguments():
     nt.assert_raises(ValueError, bloscpack._check_metadata_arguments, extra)
 
 
-def test_check_range():
-    nt.assert_raises(TypeError,  check_range, 'test', 'a', 0, 1)
-    nt.assert_raises(ValueError, check_range, 'test', -1, 0, 1)
-    nt.assert_raises(ValueError, check_range, 'test', 2, 0, 1)
-
-
 def test_calculate_nchunks():
     # check for zero or negative chunk_size
     nt.assert_raises(ValueError, calculate_nchunks,
@@ -159,76 +153,6 @@ def test_decode_blosc_header():
                 'nbytes': len(array_),
                 'typesize': blosc_args['typesize']}
     nt.assert_equal(expected, header)
-
-
-def test_create_options():
-    nt.assert_equal('00000001', create_options())
-    nt.assert_equal('00000001', create_options(offsets=True))
-    nt.assert_equal('00000000', create_options(offsets=False))
-
-    nt.assert_equal('00000001', create_options(metadata=False))
-    nt.assert_equal('00000011', create_options(metadata=True))
-
-    nt.assert_equal('00000000', create_options(offsets=False, metadata=False))
-    nt.assert_equal('00000010', create_options(offsets=False, metadata=True))
-    nt.assert_equal('00000001', create_options(offsets=True, metadata=False))
-    nt.assert_equal('00000011', create_options(offsets=True, metadata=True))
-
-
-def test_decode_options():
-    nt.assert_equal({'offsets': False,
-        'metadata': False},
-            decode_options('00000000'))
-    nt.assert_equal({'offsets': False,
-        'metadata': True},
-            decode_options('00000010'))
-    nt.assert_equal({'offsets': True,
-        'metadata': False},
-            decode_options('00000001'))
-    nt.assert_equal({'offsets': True,
-        'metadata': True},
-            decode_options('00000011'))
-
-    nt.assert_raises(ValueError, decode_options, '0000000')
-    nt.assert_raises(ValueError, decode_options, '000000000')
-    nt.assert_raises(ValueError, decode_options, '0000000a')
-    nt.assert_raises(ValueError, decode_options, 'abc')
-
-    nt.assert_raises(ValueError, decode_options, '00000100')
-    nt.assert_raises(ValueError, decode_options, '00001100')
-    nt.assert_raises(ValueError, decode_options, '11111100')
-
-
-def test_create_metadata_options():
-    nt.assert_equal('00000000', create_metadata_options())
-
-
-def test_decode_metadata_options():
-    nt.assert_equal({}, decode_metadata_options('00000000'))
-    nt.assert_raises(ValueError, decode_metadata_options, '0000000')
-    nt.assert_raises(ValueError, decode_metadata_options, '000000000')
-    nt.assert_raises(ValueError, decode_metadata_options, '0000000a')
-    nt.assert_raises(ValueError, decode_metadata_options, 'abc')
-
-    nt.assert_raises(ValueError, decode_metadata_options, '00000001')
-    nt.assert_raises(ValueError, decode_metadata_options, '00001111')
-    nt.assert_raises(ValueError, decode_metadata_options, '11111111')
-
-
-def test_check_options():
-    # check for non-string
-    nt.assert_raises(TypeError, bloscpack._check_options, 0)
-    nt.assert_raises(TypeError, bloscpack._check_options, 1)
-    # check for lengths too small and too large
-    nt.assert_raises(ValueError, bloscpack._check_options, '0')
-    nt.assert_raises(ValueError, bloscpack._check_options, '1')
-    nt.assert_raises(ValueError, bloscpack._check_options, '0000000')
-    nt.assert_raises(ValueError, bloscpack._check_options, '000000000')
-    nt.assert_raises(ValueError, bloscpack._check_options, '1111111')
-    nt.assert_raises(ValueError, bloscpack._check_options, '111111111')
-    # check for non zeros and ones
-    nt.assert_raises(ValueError, bloscpack._check_options, '0000000a')
-    nt.assert_raises(ValueError, bloscpack._check_options, 'aaaaaaaa')
 
 
 

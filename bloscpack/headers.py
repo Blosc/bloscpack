@@ -12,14 +12,22 @@ import struct
 import blosc
 
 
-import checksums
+from checksums import (CHECKSUMS_AVAIL,
+                       CHECKSUMS_LOOKUP,
+                       check_valid_checksum,
+                       )
 from .constants import (MAGIC,
                         FORMAT_VERSION,
                         MAX_FORMAT_VERSION,
                         MAX_CHUNKS,
+                        MAX_CLEVEL,
                         BLOSCPACK_HEADER_LENGTH,
+                        MAX_META_SIZE,
                         )
 from .defaults import DEFAULT_OFFSETS
+from .metacodecs import (CODECS_AVAIL,
+                         check_valid_codec,
+                         )
 from .pretty import double_pretty_size
 import log
 
@@ -55,7 +63,7 @@ def _pad_with_nulls(str_, len_):
     return str_ + ("\x00" * (len_ - len(str_)))
 
 
-def _check_options(options):
+def check_options(options):
     """ Check the options bitfield.
 
     Parameters
@@ -81,7 +89,7 @@ def _check_options(options):
             options)
 
 
-def _check_options_zero(options, indices):
+def check_options_zero(options, indices):
     for i in indices:
         if options[i] != '0':
             raise ValueError(
@@ -153,11 +161,22 @@ def decode_options(options):
     options : dict mapping str -> bool
     """
 
-    _check_options(options)
-    _check_options_zero(options, range(6))
+    check_options(options)
+    check_options_zero(options, range(6))
     return {'offsets': bool(int(options[7])),
             'metadata': bool(int(options[6])),
             }
+
+
+def create_metadata_options():
+    """ Create the metadata options bitfield. """
+    return "00000000"
+
+
+def decode_metadata_options(options):
+    check_options(options)
+    check_options_zero(options, range(8))
+    return {}
 
 
 def decode_blosc_header(buffer_):
@@ -236,7 +255,7 @@ class BloscPackHeader(collections.MutableMapping):
                  max_app_chunks=0):
 
         check_range('format_version', format_version, 0, MAX_FORMAT_VERSION)
-        checksums.check_valid_checksum(checksum)
+        check_valid_checksum(checksum)
         check_range('typesize',   typesize,    0, blosc.BLOSC_MAX_TYPESIZE)
         check_range('chunk_size', chunk_size, -1, blosc.BLOSC_MAX_BUFFERSIZE)
         check_range('last_chunk', last_chunk, -1, blosc.BLOSC_MAX_BUFFERSIZE)
@@ -316,7 +335,7 @@ class BloscPackHeader(collections.MutableMapping):
 
     @property
     def checksum_impl(self):
-        return checksums.CHECKSUMS_LOOKUP[self.checksum]
+        return CHECKSUMS_LOOKUP[self.checksum]
 
     def encode(self):
         """ Encode the Bloscpack header.
@@ -331,7 +350,7 @@ class BloscPackHeader(collections.MutableMapping):
         options = encode_uint8(int(
             create_options(offsets=self.offsets, metadata=self.metadata),
             2))
-        checksum = encode_uint8(checksums.CHECKSUMS_AVAIL.index(self.checksum))
+        checksum = encode_uint8(CHECKSUMS_AVAIL.index(self.checksum))
         typesize = encode_uint8(self.typesize)
         chunk_size = encode_int32(self.chunk_size)
         last_chunk = encode_int32(self.last_chunk)
@@ -381,9 +400,63 @@ class BloscPackHeader(collections.MutableMapping):
             format_version=decode_uint8(buffer_[4]),
             offsets=options['offsets'],
             metadata=options['metadata'],
-            checksum=checksums.CHECKSUMS_AVAIL[decode_uint8(buffer_[6])],
+            checksum=CHECKSUMS_AVAIL[decode_uint8(buffer_[6])],
             typesize=decode_uint8(buffer_[7]),
             chunk_size=decode_int32(buffer_[8:12]),
             last_chunk=decode_int32(buffer_[12:16]),
             nchunks=decode_int64(buffer_[16:24]),
             max_app_chunks=decode_int64(buffer_[24:32]))
+
+
+def create_metadata_header(magic_format='',
+       options="00000000",
+       meta_checksum='None',
+       meta_codec='None',
+       meta_level=0,
+       meta_size=0,
+       max_meta_size=0,
+       meta_comp_size=0,
+       user_codec='',
+       ):
+    _check_str('magic-format',     magic_format,  8)
+    check_options(options)
+    check_valid_checksum(meta_checksum)
+    check_valid_codec(meta_codec)
+    check_range('meta_level',      meta_level,     0, MAX_CLEVEL)
+    check_range('meta_size',       meta_size,      0, MAX_META_SIZE)
+    check_range('max_meta_size',   max_meta_size,  0, MAX_META_SIZE)
+    check_range('meta_comp_size',  meta_comp_size, 0, MAX_META_SIZE)
+    _check_str('user_codec',       user_codec,     8)
+
+    magic_format        = _pad_with_nulls(magic_format, 8)
+    options             = encode_uint8(int(options, 2))
+    meta_checksum       = encode_uint8(CHECKSUMS_AVAIL.index(meta_checksum))
+    meta_codec          = encode_uint8(CODECS_AVAIL.index(meta_codec))
+    meta_level          = encode_uint8(meta_level)
+    meta_size           = encode_uint32(meta_size)
+    max_meta_size       = encode_uint32(max_meta_size)
+    meta_comp_size      = encode_uint32(meta_comp_size)
+    user_codec          = _pad_with_nulls(user_codec, 8)
+
+    return magic_format + options + meta_checksum + meta_codec + meta_level + \
+            meta_size + max_meta_size + meta_comp_size + user_codec
+
+
+def decode_metadata_header(buffer_):
+    if len(buffer_) != 32:
+        raise ValueError(
+            "attempting to decode a bloscpack metadata header of length '%d', not '32'"
+            % len(buffer_))
+    return {'magic_format':        decode_magic_string(buffer_[:8]),
+            'meta_options':        decode_bitfield(buffer_[8]),
+            'meta_checksum':       CHECKSUMS_AVAIL[decode_uint8(buffer_[9])],
+            'meta_codec':          CODECS_AVAIL[decode_uint8(buffer_[10])],
+            'meta_level':          decode_uint8(buffer_[11]),
+            'meta_size':           decode_uint32(buffer_[12:16]),
+            'max_meta_size':       decode_uint32(buffer_[16:20]),
+            'meta_comp_size':      decode_uint32(buffer_[20:24]),
+            'user_codec':          decode_magic_string(buffer_[24:32])
+            }
+
+
+

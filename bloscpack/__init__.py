@@ -49,18 +49,8 @@ from .headers import (BloscPackHeader,
                       encode_int64,
                       decode_int64,
                       decode_blosc_header,
-                      _check_str,
-                      _check_options,
-                      _pad_with_nulls,
-                      encode_uint8,
-                      encode_uint32,
-                      decode_magic_string,
-                      decode_bitfield,
-                      decode_uint8,
-                      decode_uint32,
-                      decode_options,
-                      _check_options_zero,
-                      create_options,
+                      create_metadata_header,
+                      decode_metadata_header,
                       )
 from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
@@ -318,15 +308,6 @@ def __check_args(name, received, expected):
         raise ValueError("%s args had some extras: '%s'" % (name, repr(extra)))
 
 
-def create_metadata_options():
-    """ Create the metadata options bitfield. """
-    return "00000000"
-
-
-def decode_metadata_options(options):
-    _check_options(options)
-    _check_options_zero(options, range(8))
-    return {}
 
 
 def _handle_max_apps(offsets, nchunks, max_app_chunks):
@@ -404,57 +385,6 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
         max_app_chunks = 0
     print_debug("max_app_chunks was set to: %d" % max_app_chunks)
     return max_app_chunks
-
-
-def create_metadata_header(magic_format='',
-       options="00000000",
-       meta_checksum='None',
-       meta_codec='None',
-       meta_level=0,
-       meta_size=0,
-       max_meta_size=0,
-       meta_comp_size=0,
-       user_codec='',
-       ):
-    _check_str('magic-format',     magic_format,  8)
-    _check_options(options)
-    check_valid_checksum(meta_checksum)
-    check_valid_codec(meta_codec)
-    check_range('meta_level',      meta_level,     0, MAX_CLEVEL)
-    check_range('meta_size',       meta_size,      0, MAX_META_SIZE)
-    check_range('max_meta_size',   max_meta_size,  0, MAX_META_SIZE)
-    check_range('meta_comp_size',  meta_comp_size, 0, MAX_META_SIZE)
-    _check_str('user_codec',       user_codec,     8)
-
-    magic_format        = _pad_with_nulls(magic_format, 8)
-    options             = encode_uint8(int(options, 2))
-    meta_checksum       = encode_uint8(CHECKSUMS_AVAIL.index(meta_checksum))
-    meta_codec          = encode_uint8(CODECS_AVAIL.index(meta_codec))
-    meta_level          = encode_uint8(meta_level)
-    meta_size           = encode_uint32(meta_size)
-    max_meta_size       = encode_uint32(max_meta_size)
-    meta_comp_size      = encode_uint32(meta_comp_size)
-    user_codec          = _pad_with_nulls(user_codec, 8)
-
-    return magic_format + options + meta_checksum + meta_codec + meta_level + \
-            meta_size + max_meta_size + meta_comp_size + user_codec
-
-
-def decode_metadata_header(buffer_):
-    if len(buffer_) != 32:
-        raise ValueError(
-            "attempting to decode a bloscpack metadata header of length '%d', not '32'"
-            % len(buffer_))
-    return {'magic_format':        decode_magic_string(buffer_[:8]),
-            'meta_options':        decode_bitfield(buffer_[8]),
-            'meta_checksum':       CHECKSUMS_AVAIL[decode_uint8(buffer_[9])],
-            'meta_codec':          CODECS_AVAIL[decode_uint8(buffer_[10])],
-            'meta_level':          decode_uint8(buffer_[11]),
-            'meta_size':           decode_uint32(buffer_[12:16]),
-            'max_meta_size':       decode_uint32(buffer_[16:20]),
-            'meta_comp_size':      decode_uint32(buffer_[20:24]),
-            'user_codec':          decode_magic_string(buffer_[24:32])
-            }
 
 
 def _blosc_args_from_args(args):

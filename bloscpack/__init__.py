@@ -96,7 +96,6 @@ DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
      DEFAULT_META_CODEC, DEFAULT_META_LEVEL, DEFAULT_MAX_META_SIZE)))
 
 
-
 class ChunkingException(BaseException):
     pass
 

@@ -25,6 +25,7 @@ METADATA_HEADER_LENGTH = 32
 MAX_FORMAT_VERSION = 255
 MAX_CHUNKS = (2**63)-1
 MAX_META_SIZE = (2**32-1)  # uint32 max val
+MAX_CLEVEL = 9
 
 # lookup table for human readable sizes
 SUFFIXES = OrderedDict((

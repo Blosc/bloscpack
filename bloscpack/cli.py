@@ -22,6 +22,7 @@ from .defaults import (DEFAULT_TYPESIZE,
                         )
 from .constants import (SUFFIXES,
                         CNAME_AVAIL,
+                        MAX_CLEVEL,
                         )
 from .exceptions import FileNotFound
 from .pretty import (reverse_pretty,

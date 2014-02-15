@@ -34,6 +34,7 @@ from .constants import (FORMAT_VERSION,
                         METADATA_HEADER_LENGTH,
                         MAX_CHUNKS,
                         MAX_META_SIZE,
+                        MAX_CLEVEL,
                         SUFFIXES,
                         )
 from .defaults import (DEFAULT_TYPESIZE,
@@ -52,7 +53,6 @@ from .metacodecs import (CODECS_AVAIL,
 from .pretty import (pretty_size,
                      double_pretty_size,
                      reverse_pretty,
-                     join_with_eol,
                      )
 from .serializers import(SERIZLIALIZERS_LOOKUP,
                          check_valid_serializer,
@@ -65,9 +65,8 @@ from .log import (print_verbose,
                   print_normal,
                   error,
                   )
-from . import log
 
-from .version import __version__
+from .version import __version__  # pragma: no cover
 
 
 # Bloscpack args
@@ -80,7 +79,6 @@ DEFAULT_BLOSCPACK_ARGS = dict(zip(BLOSCPACK_ARGS,
 # Blosc args
 BLOSC_ARGS = ('typesize', 'clevel', 'shuffle', 'cname')
 _BLOSC_ARGS_SET = set(BLOSC_ARGS)  # cached
-MAX_CLEVEL = 9
 DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
     (DEFAULT_TYPESIZE, DEFAULT_CLEVEL, DEFAULT_SHUFFLE, DEFAULT_CNAME)))
 

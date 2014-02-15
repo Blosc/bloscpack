@@ -246,7 +246,7 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
     """
     if in_file_size <= 0:
             raise ValueError("'in_file_size' must be strictly positive, not %d"
-                    % in_file_size)
+                             % in_file_size)
     # convert a human readable description to an int
     if isinstance(chunk_size, basestring):
         chunk_size = reverse_pretty(chunk_size)
@@ -254,9 +254,9 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
     # downcast
     if chunk_size > in_file_size:
         print_verbose(
-                "Input was smaller than the given 'chunk_size': %s using: %s"
-                % (double_pretty_size(chunk_size),
-                double_pretty_size(in_file_size)))
+            "Input was smaller than the given 'chunk_size': %s using: %s"
+            % (double_pretty_size(chunk_size),
+               double_pretty_size(in_file_size)))
         chunk_size = in_file_size
     quotient, remainder = divmod(in_file_size, chunk_size)
     # the user wants a single chunk
@@ -274,8 +274,8 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
         last_chunk_size = remainder
     if nchunks > MAX_CHUNKS:
         raise ChunkingException(
-                "nchunks: '%d' is greater than the MAX_CHUNKS: '%d'" %
-                (nchunks, MAX_CHUNKS))
+            "nchunks: '%d' is greater than the MAX_CHUNKS: '%d'" %
+            (nchunks, MAX_CHUNKS))
     print_verbose('nchunks: %d' % nchunks)
     print_verbose('chunk_size: %s' % double_pretty_size(chunk_size))
     print_verbose('last_chunk_size: %s' % double_pretty_size(last_chunk_size))
@@ -288,8 +288,8 @@ def check_range(name, value, min_, max_):
         raise TypeError("'%s' must be of type 'int'" % name)
     elif not min_ <= value <= max_:
         raise ValueError(
-                "'%s' must be in the range %s <= n <= %s, not '%s'" %
-                tuple(map(str, (name, min_, max_, value))))
+            "'%s' must be in the range %s <= n <= %s, not '%s'" %
+            tuple(map(str, (name, min_, max_, value))))
 
 
 def _check_str(name, value, max_len):
@@ -297,7 +297,7 @@ def _check_str(name, value, max_len):
         raise TypeError("'%s' must be of type 'int'" % name)
     elif len(value) > max_len:
         raise ValueError("'%s' can be of max length '%i' but is: '%s'" %
-                (name, max_len, len(value)))
+                         (name, max_len, len(value)))
 
 
 def _pad_with_nulls(str_, len_):

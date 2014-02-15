@@ -33,11 +33,11 @@ class Serializer(object):
         return self._loads(data)
 
 
-SERIZLIALIZERS = [Serializer('JSON',
+SERIALIZERS = [Serializer('JSON',
                   lambda x: json.dumps(x, separators=(',', ':')),
                   lambda x: json.loads(x))]
-SERIZLIALIZERS_AVAIL = [s.name for s in SERIZLIALIZERS]
-SERIZLIALIZERS_LOOKUP = dict(((s.name, s) for s in SERIZLIALIZERS))
+SERIALIZERS_AVAIL = [s.name for s in SERIALIZERS]
+SERIALIZERS_LOOKUP = dict(((s.name, s) for s in SERIALIZERS))
 
 
 def check_valid_serializer(serializer):
@@ -53,6 +53,6 @@ def check_valid_serializer(serializer):
     NoSuchSerializer
         if no such serializer exists.
     """
-    if serializer not in SERIZLIALIZERS_AVAIL:
+    if serializer not in SERIALIZERS_AVAIL:
         raise NoSuchSerializer("serializer '%s' does not exist" % serializer)
 

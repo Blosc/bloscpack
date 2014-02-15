@@ -18,7 +18,7 @@ import bloscpack
 from bloscpack import *
 from bloscpack.exceptions import NoSuchCodec, NoSuchSerializer
 from bloscpack.constants import MAX_FORMAT_VERSION
-from bloscpack.serializers import SERIZLIALIZERS
+from bloscpack.serializers import SERIALIZERS
 from bloscpack import log
 
 
@@ -442,7 +442,7 @@ def test_rewrite_metadata():
     test_metadata['container'] = 'numpy'
     test_metadata['data_origin'] = 'LHC'
     # compute the new length
-    new_metadata_length = len(SERIZLIALIZERS[0].dumps(test_metadata))
+    new_metadata_length = len(SERIALIZERS[0].dumps(test_metadata))
     # jam the new metadata into the cStringIO
     target_fp.seek(0, 0)
     bloscpack._rewrite_metadata_fp(target_fp, test_metadata,

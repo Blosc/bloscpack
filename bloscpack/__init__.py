@@ -57,7 +57,7 @@ from .pretty import (pretty_size,
                      double_pretty_size,
                      reverse_pretty,
                      )
-from .serializers import(SERIZLIALIZERS_LOOKUP,
+from .serializers import(SERIALIZERS_LOOKUP,
                          check_valid_serializer,
                          )
 from .cli import (check_files,
@@ -499,7 +499,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
     for arg, value in metadata_args.iteritems():
         print_debug('\t%s: %s' % (arg, value))
     metadata_total += METADATA_HEADER_LENGTH
-    serializer_impl = SERIZLIALIZERS_LOOKUP[metadata_args['magic_format']]
+    serializer_impl = SERIALIZERS_LOOKUP[metadata_args['magic_format']]
     metadata = serializer_impl.dumps(metadata)
     codec = 'None'
     if metadata_args['meta_codec'] != CODECS_AVAIL[0]:
@@ -1187,7 +1187,7 @@ def _read_metadata(input_fp):
             # FIXME meta_codec?
             ('compressed' if metadata_header['meta_codec'] != 'None' else
                 'uncompressed', metadata_header['meta_comp_size']))
-    serializer_impl = SERIZLIALIZERS_LOOKUP[metadata_header['magic_format']]
+    serializer_impl = SERIALIZERS_LOOKUP[metadata_header['magic_format']]
     metadata = serializer_impl.loads(metadata)
     return metadata, metadata_header
 

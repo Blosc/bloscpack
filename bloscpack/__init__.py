@@ -354,7 +354,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
                 raise ValueError(
                         'max_app_chunks callable returned a negative integer')
         elif isinstance(max_app_chunks, (int, long)):
-            # it's a plain int, check it's range
+            # it's a plain int, check its range
             print_debug("max_app_chunks is an int")
             check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
         else:

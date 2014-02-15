@@ -9,10 +9,8 @@ from __future__ import division
 import abc
 import contextlib
 import cStringIO
-import json
 import itertools
 import os.path as path
-import pprint
 import sys
 
 
@@ -23,9 +21,7 @@ from .checksums import (check_valid_checksum,
                         CHECKSUMS_LOOKUP,
                         CHECKSUMS_AVAIL,
                         )
-from .exceptions import FileNotFound
 from .constants import (FORMAT_VERSION,
-                        EXTENSION,
                         BLOSC_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
                         METADATA_HEADER_LENGTH,
@@ -60,13 +56,8 @@ from .pretty import (pretty_size,
 from .serializers import(SERIALIZERS_LOOKUP,
                          check_valid_serializer,
                          )
-from .cli import (check_files,
-                  create_parser,
-                  )
 from .log import (print_verbose,
                   print_debug,
-                  print_normal,
-                  error,
                   )
 
 from .version import __version__  # pragma: no cover

@@ -16,7 +16,6 @@ from nose_parameterized import parameterized
 from cStringIO import StringIO
 import bloscpack
 from bloscpack import *
-from bloscpack.checksums import CHECKSUMS
 from bloscpack.exceptions import NoSuchCodec, NoSuchSerializer
 from bloscpack.constants import MAX_FORMAT_VERSION
 from bloscpack.serializers import SERIZLIALIZERS

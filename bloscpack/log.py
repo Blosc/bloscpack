@@ -20,7 +20,7 @@ def set_prefix(prefix):
     PREFIX = prefix
 
 
-def print_verbose(message, level=VERBOSE):
+def verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
     if level not in VERBOSITY_LEVELS:
         raise TypeError("Desired level '%s' is not one of %s" % (level,
@@ -30,14 +30,14 @@ def print_verbose(message, level=VERBOSE):
             print('%s: %s' % (PREFIX, line))
 
 
-def print_debug(message):
+def debug(message):
     """ Print message with verbosity level ``DEBUG``. """
-    print_verbose(message, level=DEBUG)
+    verbose(message, level=DEBUG)
 
 
-def print_normal(message):
+def normal(message):
     """ Print message with verbosity level ``NORMAL``. """
-    print_verbose(message, level=NORMAL)
+    verbose(message, level=NORMAL)
 
 
 def error(message, exit_code=1):

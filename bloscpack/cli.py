@@ -5,6 +5,8 @@
 
 import argparse
 from os import path
+import json
+import pprint
 
 
 import blosc
@@ -19,6 +21,7 @@ from .defaults import (DEFAULT_TYPESIZE,
                         DEFAULT_CHUNK_SIZE,
                         DEFAULT_CHECKSUM,
                         DEFAULT_OFFSETS,
+                        EXTENSION,
                         )
 from .constants import (SUFFIXES,
                         CNAME_AVAIL,
@@ -55,9 +58,9 @@ def check_files(in_file, out_file, args):
         if not args.force:
             raise FileNotFound("output file '%s' exists!" % out_file)
         else:
-            log.print_verbose("overwriting existing file: '%s'" % out_file)
-    log.print_verbose("input file is: '%s'" % in_file)
-    log.print_verbose("output file is: '%s'" % out_file)
+            log.verbose("overwriting existing file: '%s'" % out_file)
+    log.verbose("input file is: '%s'" % in_file)
+    log.verbose("output file is: '%s'" % out_file)
 
 
 def _blosc_args_from_args(args):
@@ -108,12 +111,12 @@ def process_decompression_args(args):
     # remove the extension for output file
     if args.no_check_extension:
         if out_file is None:
-            error('--no-check-extension requires use of <out_file>')
+            log.error('--no-check-extension requires use of <out_file>')
     else:
         if in_file.endswith(EXTENSION):
             out_file = args.out_file or in_file[:-len(EXTENSION)]
         else:
-            error("input file '%s' does not end with '%s'" %
+            log.error("input file '%s' does not end with '%s'" %
                     (in_file, EXTENSION))
     return in_file, out_file
 
@@ -122,7 +125,7 @@ def process_append_args(args):
     original_file = args.original_file
     new_file = args.new_file
     if not args.no_check_extension and not original_file.endswith(EXTENSION):
-        error("original file '%s' does not end with '%s'" %
+        log.error("original file '%s' does not end with '%s'" %
                     (original_file, EXTENSION))
 
     return original_file, new_file
@@ -134,16 +137,15 @@ def process_metadata_args(args):
             with open(args.metadata, 'r') as metadata_file:
                 return json.loads(metadata_file.read().strip())
         except IOError as ioe:
-            error(ioe.message)
+            log.error(ioe.message)
 
 
 def process_nthread_arg(args):
     """ Extract and set nthreads. """
     if args.nthreads != blosc.ncores:
         blosc.set_nthreads(args.nthreads)
-    print_verbose('using %d thread%s' %
+    log.verbose('using %d thread%s' %
             (args.nthreads, 's' if args.nthreads > 1 else ''))
-
 
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
@@ -392,20 +394,20 @@ def main():
         log.LEVEL = log.VERBOSE
     elif args.debug:
         log.LEVEL = log.DEBUG
-    print_debug('command line argument parsing complete')
-    print_debug('command line arguments are: ')
+    log.debug('command line argument parsing complete')
+    log.debug('command line arguments are: ')
     for arg, val in vars(args).iteritems():
-        print_debug('\t%s: %s' % (arg, str(val)))
+        log.debug('\t%s: %s' % (arg, str(val)))
     process_nthread_arg(args)
 
     # compression and decompression handled via subparsers
     if args.subcommand in ['compress', 'c']:
-        print_verbose('getting ready for compression')
+        log.verbose('getting ready for compression')
         in_file, out_file, blosc_args = process_compression_args(args)
         try:
             check_files(in_file, out_file, args)
         except FileNotFound as fnf:
-            error(str(fnf))
+            log.error(str(fnf))
         metadata = process_metadata_args(args)
         bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
         bloscpack_args['offsets'] = args.offsets
@@ -417,24 +419,24 @@ def main():
                     bloscpack_args=bloscpack_args,
                     metadata_args=DEFAULT_METADATA_ARGS)
         except ChunkingException as ce:
-            error(str(ce))
+            log.error(str(ce))
     elif args.subcommand in ['decompress', 'd']:
-        print_verbose('getting ready for decompression')
+        log.verbose('getting ready for decompression')
         in_file, out_file = process_decompression_args(args)
         try:
             check_files(in_file, out_file, args)
         except FileNotFound as fnf:
-            error(str(fnf))
+            log.error(str(fnf))
         try:
             metadata = unpack_file(in_file, out_file)
             if metadata:
-                print_verbose("Metadata is:\n'%s'" % metadata)
+                log.verbose("Metadata is:\n'%s'" % metadata)
         except FormatVersionMismatch as fvm:
-            error(fvm.message)
+            log.error(fvm.message)
         except ChecksumMismatch as csm:
-            error(csm.message)
+            log.error(csm.message)
     elif args.subcommand in ['append', 'a']:
-        print_verbose('getting ready for append')
+        log.verbose('getting ready for append')
         original_file, new_file = process_append_args(args)
         try:
             if not path.exists(original_file):
@@ -444,9 +446,9 @@ def main():
                 raise FileNotFound("new file '%s' does not exist!" %
                         new_file)
         except FileNotFound as fnf:
-            error(str(fnf))
-        print_verbose("original file is: '%s'" % original_file)
-        print_verbose("new file is: '%s'" % new_file)
+            log.error(str(fnf))
+        log.verbose("original file is: '%s'" % original_file)
+        log.verbose("new file is: '%s'" % new_file)
         blosc_args = _blosc_args_from_args(args)
         metadata = process_metadata_args(args)
         append(original_file, new_file, blosc_args=blosc_args)
@@ -460,25 +462,25 @@ def main():
                 raise FileNotFound("file '%s' does not exist!" %
                         args.file_)
         except FileNotFound as fnf:
-            error(str(fnf))
+            log.error(str(fnf))
         try:
             with open(args.file_) as fp:
                 bloscpack_header, metadata, metadata_header, offsets = \
                         _read_beginning(fp)
         except ValueError as ve:
-            error(str(ve) + "\n" +
+            log.error(str(ve) + "\n" +
             "This might not be a bloscpack compressed file.")
-        print_normal(bloscpack_header.pformat())
+        log.normal(bloscpack_header.pformat())
         if metadata is not None:
-            print_normal("'metadata':")
-            print_normal(pprint.pformat(metadata, indent=4))
-            print_normal("'metadata_header':")
-            print_normal(pprint.pformat(metadata_header, indent=4))
+            log.normal("'metadata':")
+            log.normal(pprint.pformat(metadata, indent=4))
+            log.normal("'metadata_header':")
+            log.normal(pprint.pformat(metadata_header, indent=4))
         if offsets:
-            print_normal("'offsets':")
-            print_normal("[%s,...]" % (",".join(str(o) for o in offsets[:5])))
+            log.normal("'offsets':")
+            log.normal("[%s,...]" % (",".join(str(o) for o in offsets[:5])))
 
     else:  # pragma: no cover
         # we should never reach this
-        error('You found the easter-egg, please contact the author')
-    print_verbose('done')
+        log.error('You found the easter-egg, please contact the author')
+    log.verbose('done')

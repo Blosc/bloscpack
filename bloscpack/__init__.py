@@ -56,9 +56,7 @@ from .pretty import (pretty_size,
 from .serializers import(SERIALIZERS_LOOKUP,
                          check_valid_serializer,
                          )
-from .log import (print_verbose,
-                  print_debug,
-                  )
+import log
 
 from .version import __version__  # pragma: no cover
 
@@ -179,7 +177,7 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
     check_range('chunk_size', chunk_size, 1, blosc.BLOSC_MAX_BUFFERSIZE)
     # downcast
     if chunk_size > in_file_size:
-        print_verbose(
+        log.verbose(
             "Input was smaller than the given 'chunk_size': %s using: %s"
             % (double_pretty_size(chunk_size),
                double_pretty_size(in_file_size)))
@@ -202,9 +200,9 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
         raise ChunkingException(
             "nchunks: '%d' is greater than the MAX_CHUNKS: '%d'" %
             (nchunks, MAX_CHUNKS))
-    print_verbose('nchunks: %d' % nchunks)
-    print_verbose('chunk_size: %s' % double_pretty_size(chunk_size))
-    print_verbose('last_chunk_size: %s' % double_pretty_size(last_chunk_size))
+    log.verbose('nchunks: %d' % nchunks)
+    log.verbose('chunk_size: %s' % double_pretty_size(chunk_size))
+    log.verbose('last_chunk_size: %s' % double_pretty_size(last_chunk_size))
     return nchunks, chunk_size, last_chunk_size
 
 
@@ -343,7 +341,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     if offsets and nchunks != -1:
         if hasattr(max_app_chunks, '__call__'):
             # it's a callable all right
-            print_debug("max_app_chunks is a callable")
+            log.debug("max_app_chunks is a callable")
             max_app_chunks = max_app_chunks(nchunks)
             if not isinstance(max_app_chunks, (int, long)):
                 raise ValueError(
@@ -355,21 +353,21 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
                         'max_app_chunks callable returned a negative integer')
         elif isinstance(max_app_chunks, (int, long)):
             # it's a plain int, check its range
-            print_debug("max_app_chunks is an int")
+            log.debug("max_app_chunks is an int")
             check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
         else:
             raise TypeError('max_app_chunks was neither a callable or an int')
         # we managed to get a reasonable value, make sure it's not too large
         if nchunks + max_app_chunks > MAX_CHUNKS:
             max_app_chunks = MAX_CHUNKS - nchunks
-            print_debug(
+            log.debug(
                     "max_app_chunks was too large, setting to max value: %d"
                     % max_app_chunks)
     else:
         if max_app_chunks is not None:
-            print_debug('max_app_chunks will be silently ignored')
+            log.debug('max_app_chunks will be silently ignored')
         max_app_chunks = 0
-    print_debug("max_app_chunks was set to: %d" % max_app_chunks)
+    log.debug("max_app_chunks was set to: %d" % max_app_chunks)
     return max_app_chunks
 
 
@@ -399,9 +397,9 @@ def _write_metadata(output_fp, metadata, metadata_args):
     """
     _check_metadata_arguments(metadata_args)
     metadata_total = 0
-    print_debug('metadata args are:')
+    log.debug('metadata args are:')
     for arg, value in metadata_args.iteritems():
-        print_debug('\t%s: %s' % (arg, value))
+        log.debug('\t%s: %s' % (arg, value))
     metadata_total += METADATA_HEADER_LENGTH
     serializer_impl = SERIALIZERS_LOOKUP[metadata_args['magic_format']]
     metadata = serializer_impl.dumps(metadata)
@@ -414,7 +412,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
         meta_comp_size = len(metadata_compressed)
         # be opportunistic, avoid compression if not beneficial
         if meta_size < meta_comp_size:
-            print_debug('metadata compression requested, but it was not '
+            log.debug('metadata compression requested, but it was not '
                     'beneficial, deactivating '
                     "(raw: '%s' vs. compressed: '%s') " %
                     (meta_size, meta_comp_size))
@@ -425,14 +423,14 @@ def _write_metadata(output_fp, metadata, metadata_args):
     else:
         meta_size = len(metadata)
         meta_comp_size = meta_size
-    print_debug("Raw %s metadata of size '%s': %s" %
+    log.debug("Raw %s metadata of size '%s': %s" %
             ('compressed' if metadata_args['meta_codec'] != 'None' else
                 'uncompressed', meta_comp_size, repr(metadata)))
     if hasattr(metadata_args['max_meta_size'], '__call__'):
         max_meta_size = metadata_args['max_meta_size'](meta_size)
     elif isinstance(metadata_args['max_meta_size'], int):
         max_meta_size = metadata_args['max_meta_size']
-    print_debug('max meta size is deemed to be: %d' %
+    log.debug('max meta size is deemed to be: %d' %
             max_meta_size)
     if meta_comp_size > max_meta_size:
         raise MetadataSectionTooSmall(
@@ -449,22 +447,22 @@ def _write_metadata(output_fp, metadata, metadata_args):
             meta_size=meta_size,
             max_meta_size=max_meta_size,
             meta_comp_size=meta_comp_size)
-    print_debug('raw_metadata_header: %s' % repr(raw_metadata_header))
+    log.debug('raw_metadata_header: %s' % repr(raw_metadata_header))
     output_fp.write(raw_metadata_header)
     output_fp.write(metadata)
     prealloc = max_meta_size - meta_comp_size
     for i in xrange(prealloc):
         output_fp.write('\x00')
     metadata_total += prealloc
-    print_debug("metadata has %d preallocated empty bytes" % prealloc)
+    log.debug("metadata has %d preallocated empty bytes" % prealloc)
     if metadata_args['meta_checksum'] != CHECKSUMS_AVAIL[0]:
         metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_args['meta_checksum']]
         metadata_digest = metadata_checksum_impl(metadata)
         metadata_total += metadata_checksum_impl.size
         output_fp.write(metadata_digest)
-        print_debug("metadata checksum (%s): %s" %
+        log.debug("metadata checksum (%s): %s" %
                 (metadata_args['meta_checksum'], repr(metadata_digest)))
-    print_debug("metadata section occupies a total of %s" %
+    log.debug("metadata section occupies a total of %s" %
             double_pretty_size(metadata_total))
     return metadata_total
 
@@ -517,7 +515,7 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
 
     """
     in_file_size = path.getsize(in_file)
-    print_verbose('input file size: %s' % double_pretty_size(in_file_size))
+    log.verbose('input file size: %s' % double_pretty_size(in_file_size))
     # calculate chunk sizes
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, chunk_size)
@@ -532,8 +530,8 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
                 bloscpack_args=bloscpack_args,
                 metadata_args=metadata_args)
     out_file_size = path.getsize(out_file)
-    print_verbose('output file size: %s' % double_pretty_size(out_file_size))
-    print_verbose('compression ratio: %f' % (out_file_size/in_file_size))
+    log.verbose('output file size: %s' % double_pretty_size(out_file_size))
+    log.verbose('compression ratio: %f' % (out_file_size/in_file_size))
 
 
 class PlainSource(object):
@@ -715,11 +713,11 @@ class CompressedSink(object):
         if self.checksum_impl.size > 0:
             # compute the checksum on the compressed data
             digest = self.checksum_impl(compressed)
-            print_debug('checksum (%s): %s ' %
+            log.debug('checksum (%s): %s ' %
                     (self.checksum_impl.name, repr(digest)))
         else:
             digest = ''
-            print_debug('no checksum')
+            log.debug('no checksum')
         return digest
 
 
@@ -731,11 +729,11 @@ class PlainFPSink(PlainSink):
         self.i = 0
 
     def put(self, compressed):
-        print_debug("decompressing chunk '%d'%s" %
+        log.debug("decompressing chunk '%d'%s" %
                 (self.i, ' (last)' if self.nchunks is not None
                                    and self.i == self.nchunks - 1 else ''))
         decompressed = blosc.decompress(compressed)
-        print_debug("chunk handled, in: %s out: %s" %
+        log.debug("chunk handled, in: %s out: %s" %
                 (pretty_size(len(compressed)),
                     pretty_size(len(decompressed))))
         self.output_fp.write(decompressed)
@@ -855,13 +853,13 @@ def pack(source, sink,
         metadata_args=DEFAULT_METADATA_ARGS):
     """ Core packing function.  """
     _check_blosc_args(blosc_args)
-    print_debug('blosc args are:')
+    log.debug('blosc args are:')
     for arg, value in blosc_args.iteritems():
-        print_debug('\t%s: %s' % (arg, value))
+        log.debug('\t%s: %s' % (arg, value))
     _check_bloscpack_args(bloscpack_args)
-    print_debug('bloscpack args are:')
+    log.debug('bloscpack args are:')
     for arg, value in bloscpack_args.iteritems():
-        print_debug('\t%s: %s' % (arg, value))
+        log.debug('\t%s: %s' % (arg, value))
     max_app_chunks = _handle_max_apps(bloscpack_args['offsets'],
             nchunks,
             bloscpack_args['max_app_chunks'])
@@ -883,13 +881,13 @@ def pack(source, sink,
     if metadata is not None:
         sink.write_metadata(metadata, metadata_args)
     elif metadata_args is not None:
-        print_debug('metadata_args will be silently ignored')
+        log.debug('metadata_args will be silently ignored')
     sink.init_offsets()
 
     compress_func = source.compress_func
     # read-compress-write loop
     for i, chunk in enumerate(source()):
-        print_debug("Handle chunk '%d' %s" %
+        log.debug("Handle chunk '%d' %s" %
                     (i,'(last)' if i == nchunks -1 else ''))
         compressed = compress_func(chunk, blosc_args)
         sink.put(i, compressed)
@@ -936,8 +934,8 @@ def pack_ndarray(ndarray, sink,
             bloscpack_args=bloscpack_args,
             metadata_args=metadata_args)
     #out_file_size = path.getsize(file_pointer)
-    #print_verbose('output file size: %s' % double_pretty_size(out_file_size))
-    #print_verbose('compression ratio: %f' % (out_file_size/source.size))
+    #log.verbose('output file size: %s' % double_pretty_size(out_file_size))
+    #log.verbose('compression ratio: %f' % (out_file_size/source.size))
 
 
 def pack_ndarray_file(ndarray, filename,
@@ -1027,12 +1025,12 @@ def _read_bloscpack_header(input_fp):
         decode
 
     """
-    print_debug('reading bloscpack header')
+    log.debug('reading bloscpack header')
     bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
-    print_debug('bloscpack_header_raw: %s' %
+    log.debug('bloscpack_header_raw: %s' %
             repr(bloscpack_header_raw))
     bloscpack_header = BloscPackHeader.decode(bloscpack_header_raw)
-    print_debug("bloscpack header: %s" % repr(bloscpack_header))
+    log.debug("bloscpack header: %s" % repr(bloscpack_header))
     if FORMAT_VERSION != bloscpack_header.format_version:
         raise FormatVersionMismatch(
                 "format version of file was not '%s' as expected, but '%d'" %
@@ -1062,11 +1060,11 @@ def _read_metadata(input_fp):
 
     """
     raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
-    print_debug("raw metadata header: '%s'" % repr(raw_metadata_header))
+    log.debug("raw metadata header: '%s'" % repr(raw_metadata_header))
     metadata_header = decode_metadata_header(raw_metadata_header)
-    print_debug("metadata header: ")
+    log.debug("metadata header: ")
     for arg, value in metadata_header.iteritems():
-        print_debug('\t%s: %s' % (arg, value))
+        log.debug('\t%s: %s' % (arg, value))
     metadata = input_fp.read(metadata_header['meta_comp_size'])
     prealloc = metadata_header['max_meta_size'] - metadata_header['meta_comp_size']
     input_fp.seek(prealloc, 1)
@@ -1081,13 +1079,13 @@ def _read_metadata(input_fp):
                     (repr(metadata_expected_digest),
                         repr(metadata_received_digest)))
         else:
-            print_debug('metadata checksum OK (%s): %s ' %
+            log.debug('metadata checksum OK (%s): %s ' %
                     (metadata_checksum_impl.name,
                         repr(metadata_received_digest)))
     if metadata_header['meta_codec'] != 'None':
         metadata_codec_impl = CODECS_LOOKUP[metadata_header['meta_codec']]
         metadata = metadata_codec_impl.decompress(metadata)
-    print_verbose("read %s metadata of size: '%s'" %
+    log.verbose("read %s metadata of size: '%s'" %
             # FIXME meta_codec?
             ('compressed' if metadata_header['meta_codec'] != 'None' else
                 'uncompressed', metadata_header['meta_comp_size']))
@@ -1119,10 +1117,10 @@ def _read_offsets(input_fp, bloscpack_header):
         total_entries = bloscpack_header.nchunks + \
                 bloscpack_header.max_app_chunks
         offsets_raw = input_fp.read(8 * total_entries)
-        print_debug('Read raw offsets: %s' % repr(offsets_raw))
+        log.debug('Read raw offsets: %s' % repr(offsets_raw))
         offsets = [decode_int64(offsets_raw[j - 8:j]) for j in
                 xrange(8, bloscpack_header.nchunks * 8 + 1, 8)]
-        print_debug('Offsets: %s' % offsets)
+        log.debug('Offsets: %s' % offsets)
         return offsets
     else:
         return []
@@ -1153,11 +1151,11 @@ def _read_beginning(input_fp):
 
 
 def _write_offsets(output_fp, offsets):
-    print_debug("Writing '%d' offsets: '%s'" %
+    log.debug("Writing '%d' offsets: '%s'" %
             (len(offsets), repr(offsets)))
     # write the offsets encoded into the reserved space in the file
     encoded_offsets = "".join([encode_int64(i) for i in offsets])
-    print_debug("Raw offsets: %s" % repr(encoded_offsets))
+    log.debug("Raw offsets: %s" % repr(encoded_offsets))
     output_fp.write(encoded_offsets)
 
 
@@ -1182,7 +1180,7 @@ def _read_compressed_chunk_fp(input_fp, checksum_impl):
     blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
     blosc_header = decode_blosc_header(blosc_header_raw)
     if log.LEVEL == log.DEBUG:
-        print_debug('blosc_header: %s' % repr(blosc_header))
+        log.debug('blosc_header: %s' % repr(blosc_header))
     ctbytes = blosc_header['ctbytes']
     # Seek back BLOSC_HEADER_LENGTH bytes in file relative to current
     # position. Blosc needs the header too and presumably this is
@@ -1200,7 +1198,7 @@ def _read_compressed_chunk_fp(input_fp, checksum_impl):
                     "expected: '%s', received: '%s'" %
                     (repr(expected_digest), repr(received_digest)))
         else:
-            print_debug('checksum OK (%s): %s ' %
+            log.debug('checksum OK (%s): %s ' %
                     (checksum_impl.name, repr(received_digest)))
     return compressed, blosc_header
 
@@ -1229,15 +1227,15 @@ def unpack_file(in_file, out_file):
         if any of the chunks fail to produce the correct checksum
     """
     in_file_size = path.getsize(in_file)
-    print_verbose('input file size: %s' % pretty_size(in_file_size))
+    log.verbose('input file size: %s' % pretty_size(in_file_size))
     with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
             (input_fp, output_fp):
         source = CompressedFPSource(input_fp)
         sink = PlainFPSink(output_fp, source.nchunks)
         metadata = unpack(source, sink)
     out_file_size = path.getsize(out_file)
-    print_verbose('output file size: %s' % pretty_size(out_file_size))
-    print_verbose('decompression ratio: %f' % (out_file_size / in_file_size))
+    log.verbose('output file size: %s' % pretty_size(out_file_size))
+    log.verbose('decompression ratio: %f' % (out_file_size / in_file_size))
     return metadata
 
 
@@ -1481,7 +1479,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     source.configure(chunk_size, last_chunk_size, nchunks)
     # read, compress, write loop
     for i, chunk in enumerate(source()):
-        print_debug("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
+        log.debug("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
             else ''))
 
         compressed = _compress_chunk_str(chunk, blosc_args)
@@ -1521,15 +1519,15 @@ def append(orig_file, new_file, blosc_args=None):
     """
     orig_size_before = path.getsize(orig_file)
     new_size = path.getsize(new_file)
-    print_verbose('orig file size before append: %s' %
+    log.verbose('orig file size before append: %s' %
             double_pretty_size(orig_size_before))
-    print_verbose('new file size: %s' % double_pretty_size(new_size))
+    log.verbose('new file size: %s' % double_pretty_size(new_size))
 
     with open_two_file(open(orig_file, 'r+b'), open(new_file, 'rb')) as \
             (orig_fp, new_fp):
         append_fp(orig_fp, new_fp, new_size, blosc_args)
     orig_size_after = path.getsize(orig_file)
-    print_verbose('orig file size after append: %s' %
+    log.verbose('orig file size after append: %s' %
             double_pretty_size(orig_size_after))
-    print_verbose('Approximate compression ratio of appended data: %f' %
+    log.verbose('Approximate compression ratio of appended data: %f' %
             ((orig_size_after-orig_size_before)/new_size))

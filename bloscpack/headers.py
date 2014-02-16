@@ -360,7 +360,7 @@ class BloscPackHeader(collections.MutableMapping):
         raw_bloscpack_header = (MAGIC + format_version + options + checksum +
                                 typesize + chunk_size + last_chunk + nchunks +
                                 max_app_chunks)
-        log.print_debug('raw_bloscpack_header: %s' % repr(raw_bloscpack_header))
+        log.debug('raw_bloscpack_header: %s' % repr(raw_bloscpack_header))
         return raw_bloscpack_header
 
     @staticmethod

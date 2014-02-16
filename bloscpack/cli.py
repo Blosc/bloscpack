@@ -386,7 +386,7 @@ def create_parser():
 
 def main():
     parser = create_parser()
-    PREFIX = parser.prog
+    log.set_prefix(parser.prog)
     args = parser.parse_args()
     if args.verbose:
         log.LEVEL = log.VERBOSE

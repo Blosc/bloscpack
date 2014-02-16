@@ -15,6 +15,11 @@ LEVEL = NORMAL
 PREFIX = "bloscpack.py"
 
 
+def set_prefix(prefix):
+    global PREFIX
+    PREFIX = prefix
+
+
 def print_verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
     if level not in VERBOSITY_LEVELS:

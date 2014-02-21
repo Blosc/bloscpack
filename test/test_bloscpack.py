@@ -22,11 +22,6 @@ from bloscpack.serializers import SERIALIZERS
 from bloscpack import log
 
 
-def test_parser():
-    # hmmm I guess we could override the error
-    parser = create_parser()
-
-
 def test_check_blosc_arguments():
     missing = DEFAULT_BLOSC_ARGS.copy()
     missing.pop('typesize')

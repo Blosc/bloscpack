@@ -9,6 +9,10 @@ import nose.tools as nt
 from bloscpack import cli
 from bloscpack.exceptions import FileNotFound
 
+def test_parser():
+    # hmmm I guess we could override the error
+    parser = cli.create_parser()
+
 
 @patch('os.path.exists')
 def test_non_existing_input_file_raises_exception(mock_exists):

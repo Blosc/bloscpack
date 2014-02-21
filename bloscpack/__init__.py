@@ -243,6 +243,7 @@ class CompressedSource(object):
     def __call__(self):
         pass
 
+
 class PlainFPSource(PlainSource):
 
     def __init__(self, input_fp):
@@ -250,8 +251,9 @@ class PlainFPSource(PlainSource):
 
     def __call__(self):
         # if nchunks == 1 the last_chunk_size is the size of the single chunk
-        for num_bytes in ([self.chunk_size] * (self.nchunks - 1) +
-                [self.last_chunk]):
+        for num_bytes in ([self.chunk_size] *
+                          (self.nchunks - 1) +
+                          [self.last_chunk]):
             yield self.input_fp.read(num_bytes)
 
 
@@ -391,7 +393,7 @@ class CompressedSink(object):
             # compute the checksum on the compressed data
             digest = self.checksum_impl(compressed)
             log.debug('checksum (%s): %s ' %
-                    (self.checksum_impl.name, repr(digest)))
+                     (self.checksum_impl.name, repr(digest)))
         else:
             digest = ''
             log.debug('no checksum')
@@ -407,12 +409,12 @@ class PlainFPSink(PlainSink):
 
     def put(self, compressed):
         log.debug("decompressing chunk '%d'%s" %
-                (self.i, ' (last)' if self.nchunks is not None
-                                   and self.i == self.nchunks - 1 else ''))
+                  (self.i, ' (last)' if self.nchunks is not None
+                   and self.i == self.nchunks - 1 else ''))
         decompressed = blosc.decompress(compressed)
         log.debug("chunk handled, in: %s out: %s" %
-                (pretty_size(len(compressed)),
-                    pretty_size(len(decompressed))))
+                  (pretty_size(len(compressed)),
+                   pretty_size(len(decompressed))))
         self.output_fp.write(decompressed)
         self.i += 1
 
@@ -429,14 +431,15 @@ class CompressedFPSink(CompressedSink):
 
     def write_metadata(self, metadata, metadata_args):
         self.meta_total += _write_metadata(self.output_fp,
-                metadata, metadata_args)
+                                           metadata,
+                                           metadata_args)
 
     def init_offsets(self):
         if self.offsets:
             total_entries = self.bloscpack_header.nchunks + \
                     self.bloscpack_header.max_app_chunks
             self.offset_storage = list(itertools.repeat(-1,
-                self.bloscpack_header.nchunks))
+                                       self.bloscpack_header.nchunks))
             self.output_fp.write(encode_int64(-1) * total_entries)
 
     def finalize(self):
@@ -513,8 +516,8 @@ class PlainNumpySink(PlainSink):
         if metadata is None or metadata['container'] != 'numpy':
             raise NotANumpyArray
         self.ndarray = np.empty(metadata['shape'],
-                dtype=np.dtype(metadata['dtype']),
-                order=metadata['order'])
+                                dtype=np.dtype(metadata['dtype']),
+                                order=metadata['order'])
         self.ptr = self.ndarray.__array_interface__['data'][0]
 
     def put(self, compressed):
@@ -545,7 +548,7 @@ def _read_bloscpack_header(input_fp):
     log.debug('reading bloscpack header')
     bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
     log.debug('bloscpack_header_raw: %s' %
-            repr(bloscpack_header_raw))
+              repr(bloscpack_header_raw))
     bloscpack_header = BloscPackHeader.decode(bloscpack_header_raw)
     log.debug("bloscpack header: %s" % repr(bloscpack_header))
     if FORMAT_VERSION != bloscpack_header.format_version:
@@ -636,7 +639,7 @@ def _read_offsets(input_fp, bloscpack_header):
         offsets_raw = input_fp.read(8 * total_entries)
         log.debug('Read raw offsets: %s' % repr(offsets_raw))
         offsets = [decode_int64(offsets_raw[j - 8:j]) for j in
-                xrange(8, bloscpack_header.nchunks * 8 + 1, 8)]
+                   xrange(8, bloscpack_header.nchunks * 8 + 1, 8)]
         log.debug('Offsets: %s' % offsets)
         return offsets
     else:
@@ -669,7 +672,7 @@ def _read_beginning(input_fp):
 
 def _write_offsets(output_fp, offsets):
     log.debug("Writing '%d' offsets: '%s'" %
-            (len(offsets), repr(offsets)))
+              (len(offsets), repr(offsets)))
     # write the offsets encoded into the reserved space in the file
     encoded_offsets = "".join([encode_int64(i) for i in offsets])
     log.debug("Raw offsets: %s" % repr(encoded_offsets))
@@ -716,7 +719,7 @@ def _read_compressed_chunk_fp(input_fp, checksum_impl):
                     (repr(expected_digest), repr(received_digest)))
         else:
             log.debug('checksum OK (%s): %s ' %
-                    (checksum_impl.name, repr(received_digest)))
+                      (checksum_impl.name, repr(received_digest)))
     return compressed, blosc_header
 
 
@@ -747,8 +750,8 @@ def _seek_to_metadata(target_fp):
 
 
 def _rewrite_metadata_fp(target_fp, new_metadata,
-            magic_format=None, checksum=None,
-            codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
+                         magic_format=None, checksum=None,
+                         codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
     """ Rewrite the metadata section in a file pointer.
 
     Parameters
@@ -779,8 +782,8 @@ def _rewrite_metadata_fp(target_fp, new_metadata,
 
 
 def _recreate_metadata(old_metadata_header, new_metadata,
-            magic_format=None, checksum=None,
-            codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
+                       magic_format=None, checksum=None,
+                       codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
     """ Update the metadata section.
 
     Parameters

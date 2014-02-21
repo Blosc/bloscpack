@@ -7,9 +7,7 @@
 from __future__ import division
 
 import abc
-import contextlib
 import itertools
-import sys
 
 
 import blosc
@@ -86,18 +84,6 @@ class NotEnoughSpace(RuntimeError):
 
 class NotANumpyArray(RuntimeError):
     pass
-
-
-@contextlib.contextmanager
-def open_two_file(input_fp, output_fp):
-    """ Hack for making with statement work on two files with 2.6. """
-    yield input_fp, output_fp
-    input_fp.close()
-    output_fp.close()
-
-PYTHON_VERSION = sys.version_info[0:3]
-if sys.version_info < (2, 7, 5):  # pragma: no cover
-    memoryview = lambda x: x
 
 
 def _write_metadata(output_fp, metadata, metadata_args):

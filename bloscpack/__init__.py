@@ -13,6 +13,7 @@ import itertools
 import blosc
 import numpy as np
 
+
 from .args import (DEFAULT_META_CODEC,
                    DEFAULT_META_LEVEL,
                    METADATA_ARGS,

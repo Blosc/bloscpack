@@ -17,3 +17,8 @@ class NoSuchCodec(ValueError):
 
 class NoSuchSerializer(ValueError):
     pass
+
+class ChunkingException(BaseException):
+    pass
+
+

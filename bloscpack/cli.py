@@ -21,11 +21,11 @@ from .defaults import (DEFAULT_TYPESIZE,
                         DEFAULT_CHUNK_SIZE,
                         DEFAULT_CHECKSUM,
                         DEFAULT_OFFSETS,
-                        EXTENSION,
                         )
 from .constants import (SUFFIXES,
                         CNAME_AVAIL,
                         MAX_CLEVEL,
+                        EXTENSION,
                         )
 from .exceptions import FileNotFound
 from .pretty import (reverse_pretty,

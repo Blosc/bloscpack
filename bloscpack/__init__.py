@@ -15,18 +15,10 @@ import sys
 import blosc
 import numpy as np
 
-from .args import (DEFAULT_BLOSCPACK_ARGS,
-                   DEFAULT_BLOSC_ARGS,
-                   DEFAULT_METADATA_ARGS,
-                   DEFAULT_META_CODEC,
+from .args import (DEFAULT_META_CODEC,
                    DEFAULT_META_LEVEL,
-                   BLOSC_ARGS,
                    METADATA_ARGS,
-                   calculate_nchunks,
-                   _check_blosc_args,
-                   _check_bloscpack_args,
                    _check_metadata_arguments,
-                   _handle_max_apps,
                    )
 from .checksums import (check_valid_checksum,
                         CHECKSUMS_LOOKUP,
@@ -38,11 +30,6 @@ from .constants import (FORMAT_VERSION,
                         METADATA_HEADER_LENGTH,
                         MAX_CLEVEL,
                         )
-from .defaults import (DEFAULT_CLEVEL,
-                       DEFAULT_SHUFFLE,
-                       DEFAULT_CNAME,
-                       DEFAULT_CHUNK_SIZE,
-                       )
 from .headers import (BloscPackHeader,
                       check_range,
                       encode_int64,

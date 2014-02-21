@@ -34,8 +34,7 @@ from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
                          check_valid_codec,
                          )
-from .pretty import (pretty_size,
-                     double_pretty_size,
+from .pretty import (double_pretty_size,
                      )
 from .serializers import(SERIALIZERS_LOOKUP,
                          check_valid_serializer,

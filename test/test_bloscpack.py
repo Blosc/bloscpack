@@ -22,23 +22,6 @@ from bloscpack.serializers import SERIALIZERS
 from bloscpack import log
 
 
-def test_print_verbose():
-    nt.assert_raises(TypeError, print_verbose, 'message', 'MAXIMUM')
-    log.LEVEL = log.DEBUG
-    # should probably hijack the print statement
-    print_verbose('notification')
-    log.LEVEL = log.NORMAL
-
-
-def test_error():
-    # switch out the exit, to make sure test-suite doesn't fall over
-    backup = bloscpack.sys.exit
-    bloscpack.sys.exit = lambda x: x
-    # should probably hijack the print statement
-    error('error')
-    bloscpack.sys.exit = backup
-
-
 def test_parser():
     # hmmm I guess we could override the error
     parser = create_parser()

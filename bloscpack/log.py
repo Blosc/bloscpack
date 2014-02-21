@@ -20,6 +20,12 @@ def set_prefix(prefix):
     PREFIX = prefix
 
 
+def set_level(level):
+    if level not in VERBOSITY_LEVELS:
+        raise ValueError('Log level must be one of: %s, not %s' %
+                         (VERBOSITY_LEVELS, level))
+
+
 def verbose(message, level=VERBOSE):
     """ Print message with desired verbosity level. """
     if level not in VERBOSITY_LEVELS:

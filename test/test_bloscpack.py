@@ -19,7 +19,6 @@ from bloscpack import *
 from bloscpack.exceptions import NoSuchCodec, NoSuchSerializer
 from bloscpack.constants import MAX_FORMAT_VERSION
 from bloscpack.serializers import SERIALIZERS
-from bloscpack import log
 
 
 def test_check_blosc_arguments():

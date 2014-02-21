@@ -38,17 +38,12 @@ from .constants import (FORMAT_VERSION,
                         BLOSC_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
                         METADATA_HEADER_LENGTH,
-                        MAX_CHUNKS,
                         MAX_CLEVEL,
                         )
-from .defaults import (DEFAULT_TYPESIZE,
-                       DEFAULT_CLEVEL,
+from .defaults import (DEFAULT_CLEVEL,
                        DEFAULT_SHUFFLE,
                        DEFAULT_CNAME,
                        DEFAULT_CHUNK_SIZE,
-                       DEFAULT_CHECKSUM,
-                       DEFAULT_MAX_APP_CHUNKS,
-                       DEFAULT_OFFSETS,
                        )
 from .headers import (BloscPackHeader,
                       check_range,
@@ -64,13 +59,11 @@ from .metacodecs import (CODECS_AVAIL,
                          )
 from .pretty import (pretty_size,
                      double_pretty_size,
-                     reverse_pretty,
                      )
 from .serializers import(SERIALIZERS_LOOKUP,
                          check_valid_serializer,
                          )
 import log
-
 from .version import __version__  # pragma: no cover
 
 

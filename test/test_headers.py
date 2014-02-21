@@ -16,7 +16,7 @@ from bloscpack.constants import (MAGIC,
                                  MAX_META_SIZE,
                                  MAX_CHUNKS,
                                  )
-from bloscpack import reverse_pretty
+from bloscpack.pretty import reverse_pretty
 from bloscpack import checksums
 from bloscpack import exceptions
 from bloscpack.headers import (BloscPackHeader,

@@ -27,8 +27,9 @@ from .pretty import (double_pretty_size,
                      pretty_size,
                      )
 import log
-from . import (open_two_file,
-               PlainFPSource,
+from .util import (open_two_file,
+                   )
+from . import (PlainFPSource,
                PlainFPSink,
                CompressedFPSource,
                CompressedFPSink,

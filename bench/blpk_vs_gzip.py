@@ -61,7 +61,7 @@ with tb.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
     toc = time.time()
     print("Time: %.2f seconds" % (toc - tic))
     print("Output file size: %s" % get_fs(out_file))
-    print("Ratio: %.2f" % get_ratio(out_file, in_file))
+    print("Ratio: %.2f" % get_ratio(in_file, out_file))
     drop_caches()
 
     print("Will now run gzip... ")
@@ -70,4 +70,4 @@ with tb.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
     toc = time.time()
     print("Time: %.2f seconds" % (toc - tic))
     print("Output file size: %s" % get_fs(gz_out_file))
-    print("Ratio: %.2f" % get_ratio(gz_out_file, in_file))
+    print("Ratio: %.2f" % get_ratio(in_file, gz_out_file))

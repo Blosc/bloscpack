@@ -580,14 +580,14 @@ SSD, we get:
     create the test data..........done
 
     Input file size: 1.49G
-    Will now run bloscpack...
-    Time: 1.72 seconds
+    Will now run bloscpack... 
+    Time: 2.06 seconds
     Output file size: 198.55M
-    Ratio: 0.13
-    Will now run gzip...
-    Time: 131.63 seconds
+    Ratio: 7.69
+    Will now run gzip... 
+    Time: 134.20 seconds
     Output file size: 924.05M
-    Ratio: 0.61
+    Ratio: 1.65
 
 As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
@@ -599,22 +599,19 @@ since dropping the caches requires root privileges:
 
 .. code-block:: console
 
-    $ PYTHONPATH=. bench/blpk_vs_gzip.py --drop-caches
+    $ PYTHONPATH=. ./bench/blpk_vs_gzip.py --drop-caches
+    will drop caches
     create the test data..........done
 
     Input file size: 1.49G
-    Will now run bloscpack...
-    Time: 4.30 seconds
+    Will now run bloscpack... 
+    Time: 13.49 seconds
     Output file size: 198.55M
-    Ratio: 0.13
-    Will now run gzip...
-    Time: 135.15 seconds
+    Ratio: 7.69
+    Will now run gzip... 
+    Time: 137.49 seconds
     Output file size: 924.05M
-    Ratio: 0.61
-
-While the absolute improvement for `gzip` when using the file system cache is
-higher, when looking at the relative improvement `bloscpack` runs twice as fast
-when the input file comes from the file cache.
+    Ratio: 1.65
 
 Bloscpack Format
 ----------------

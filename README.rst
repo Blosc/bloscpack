@@ -7,9 +7,15 @@ Bloscpack
 :Github: https://github.com/Blosc/bloscpack
 :PyPi: https://pypi.python.org/pypi/bloscpack
 :Ohloh: https://www.ohloh.net/p/bloscpack
+:Version: |version|
 :Travis CI: |travis|
 :Coveralls: |coveralls|
-:Downloads: |pypi|
+:Downloads: |downloads|
+:License: |license|
+:And...: |powered|
+
+.. |version| image:: https://pypip.in/v/bloscpack/badge.png
+        :target: https://pypi.python.org/pypi/bloscpack
 
 .. |travis| image:: https://travis-ci.org/Blosc/bloscpack.png?branch=master
         :target: https://travis-ci.org/Blosc/bloscpack
@@ -17,8 +23,14 @@ Bloscpack
 .. |coveralls| image:: https://coveralls.io/repos/Blosc/bloscpack/badge.png
         :target: https://coveralls.io/r/Blosc/bloscpack
 
-.. |pypi| image:: https://pypip.in/d/bloscpack/badge.png
-        :target: https://pypi.python.org/pypi/bloscpack 
+.. |downloads| image:: https://pypip.in/d/bloscpack/badge.png
+        :target: https://pypi.python.org/pypi/bloscpack
+
+.. |license| image:: https://pypip.in/license/bloscpack/badge.png
+        :target: https://pypi.python.org/pypi/bloscpack
+
+.. |powered| image:: http://b.repl.ca/v1/Powered--By-Blosc-blue.png
+        :target: https://blosc.org
 
 
 Description
@@ -54,10 +66,12 @@ in the licence at the end of this file.
 Installation
 ------------
 
-The package is available on PyPi, so you may use pip to install it:
+The package is available on PyPi, so you may use pip to install the
+dependencies and bloscpack itself:
 
 .. code-block:: console
 
+    $ pip install -r requirements.txt
     $ pip install bloscpack
 
 If you want to install straight from GitHub, use pip's VCS support:
@@ -121,11 +135,23 @@ Basic compression:
 
 .. code-block:: console
 
+    $ ./blpk compress data.dat
+
+Or:
+
+.. code-block:: console
+
     $ ./blpk c data.dat
 
 ... will compress the file ``data.dat`` to ``data.dat.blp``
 
 Basic decompression:
+
+.. code-block:: console
+
+    $ ./blpk decompress data.dat.blp data.dcmp
+
+Or:
 
 .. code-block:: console
 
@@ -137,7 +163,7 @@ leave out the ``[<out_file>]`` argument, Bloscpack will complain that the file
 
 .. code-block:: console
 
-    $ ./blpk d data.dat.blp
+    $ ./blpk decompress data.dat.blp
     blpk: error: output file 'data.dat' exists!
 
 If you know what you are doing, you can use the global option ``[-f |
@@ -145,67 +171,72 @@ If you know what you are doing, you can use the global option ``[-f |
 
 .. code-block:: console
 
-    $ ./blpk -f d data.dat.blp
+    $ ./blpk --force decompress data.dat.blp
 
 Incidentally this works for compression too:
 
 .. code-block:: console
 
-    $ ./blpk c data.dat
+    $ ./blpk compress data.dat
     blpk: error: output file 'data.dat.blp' exists!
-    $ ./blpk -f c data.dat
+    $ ./blpk --force compress data.dat
+
+Lastly, if you want a different filename:
+
+.. code-block:: console
+
+    $ ./blpk compress data.dat custom.filename.blp
+
+... will compress the file ``data.dat`` to ``custom.filename.blp``
 
 Settings
 ~~~~~~~~
 
-By default, the number of threads that Blosc uses is determined by the number
-of cores detected on your system. You can change this using the ``[-n |
---nthreads]`` option:
+By default, the number of threads that Blosc uses during compression and
+decompressoion is determined by the number of cores detected on your system.
+You can change this using the ``[-n | --nthreads]`` option:
 
 .. code-block:: console
 
-    $ ./blpk -n 1 c data.dat
+    $ ./blpk --nthreads 1 compress data.dat
 
-There are some useful additional options for compression, that are passed
-directly to Blosc:
+Compression with Blosc is controlled with the following options:
 
 * ``[-t | --typesize]``
   Typesize used by Blosc (default: 8):
-  ``$ ./blpk c -t 8 data.dat``
+  ``$ ./blpk compress --typesize 8 data.dat``
 * ``[-l | --level]``
   Compression level (default: 7):
-  ``$ ./blpk c -l 3 data.dat``
+  ``$ ./blpk compress --level 3 data.dat``
 * ``[-s | --no-shuffle]``
   Deactivate shuffle:
-  ``$ ./blpk c -s data.dat``
+  ``$ ./blpk compress --no-shuffle data.dat``
 * ``[-c | --codec]``
   Use alternative codec:
-  ``$ ./blpk c -c lz4 data.dat``
+  ``$ ./blpk compress --codec lz4 data.dat``
 
-In addition, the desired size of the chunks may be specified.
+In addition, there are the following options that control the Bloscpack file:
 
 * ``[-z | --chunk-size]``
   Desired approximate size of the chunks, where you can use human readable
   strings like ``8M`` or ``128K`` or ``max`` to use the maximum chunk size of
   apprx. ``2GB`` (default: ``1MB``):
-  ``$ ./blpk -d c -z 128K data.dat``
-  ``$ ./blpk -d c -z max data.dat``
-
-There are two options that influence how the data is stored:
-
+  ``$ ./blpk compress --chunk-size 128K data.dat`` or
+  ``$ ./blpk c -z max data.dat``
 * ``[-k | --checksum <checksum>]``
   Chose which checksum to use. The following values are permissible:
   ``None``, ``adler32``, ``crc32``, ``md5``,
   ``sha1``, ``sha224``, ``sha256``, ``sha384``,
   ``sha512``, (default: ``adler32``). As described in the header format, each
   compressed chunk can be stored with a checksum, which aids corruption
-  detection on decompression.
-
+  detection on decompression:
+  ``$ ./blpk compress --checksum crc32 data.dat``
 * ``[-o | --no-offsets]``
   By default, offsets to the individual chunks are stored. These are included
   to allow for partial decompression in the future. This option disables that
   feature. Also, a certain number of offsets (default: 10 * 'nchunks') are
-  preallocated to allow for appending data to the file.
+  preallocated to allow for appending data to the file:
+  ``$ ./blpk compress --no-offsets data.dat``
 
 Info Subcommand
 ~~~~~~~~~~~~~~~
@@ -290,10 +321,13 @@ compression options. For example, one cannot change the checksum used. It is
 however possible to change the compression level, the typesize and the shuffle
 option for the appended chunks.
 
+Also note that appending is still considered experimental as of ``v0.5.0``.
+
 Verbose and Debug mode
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Lastly there are two options to control how much output is produced,
+Lastly there are two mutually exclusive options to control how much output is
+produced.
 
 The first causes basic info to be printed, ``[-v | --verbose]``:
 
@@ -439,6 +473,18 @@ Or use alternate compressors:
 Testing
 -------
 
+Installing Dependencies
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Testing requires some additional libraries, which you can install from PyPi
+with:
+
+.. code-block:: console
+
+    $ pip install -r test_requirements.txt
+    [...]
+
+
 Basic Tests
 ~~~~~~~~~~~
 
@@ -534,14 +580,14 @@ SSD, we get:
     create the test data..........done
 
     Input file size: 1.49G
-    Will now run bloscpack...
-    Time: 1.72 seconds
+    Will now run bloscpack... 
+    Time: 2.06 seconds
     Output file size: 198.55M
-    Ratio: 0.13
-    Will now run gzip...
-    Time: 131.63 seconds
+    Ratio: 7.69
+    Will now run gzip... 
+    Time: 134.20 seconds
     Output file size: 924.05M
-    Ratio: 0.61
+    Ratio: 1.65
 
 As was expected from previous benchmarks of Blosc using the python-blosc
 bindings, Blosc is both much faster and has a better compression ratio for this
@@ -553,22 +599,19 @@ since dropping the caches requires root privileges:
 
 .. code-block:: console
 
-    $ PYTHONPATH=. bench/blpk_vs_gzip.py --drop-caches
+    $ PYTHONPATH=. ./bench/blpk_vs_gzip.py --drop-caches
+    will drop caches
     create the test data..........done
 
     Input file size: 1.49G
-    Will now run bloscpack...
-    Time: 4.30 seconds
+    Will now run bloscpack... 
+    Time: 13.49 seconds
     Output file size: 198.55M
-    Ratio: 0.13
-    Will now run gzip...
-    Time: 135.15 seconds
+    Ratio: 7.69
+    Will now run gzip... 
+    Time: 137.49 seconds
     Output file size: 924.05M
-    Ratio: 0.61
-
-While the absolute improvement for `gzip` when using the file system cache is
-higher, when looking at the relative improvement `bloscpack` runs twice as fast
-when the input file comes from the file cache.
+    Ratio: 1.65
 
 Bloscpack Format
 ----------------
@@ -920,7 +963,7 @@ TODO
 Changelog
 ---------
 
-* v0.5.0     - Thu Feb 02 2014
+* v0.5.0     - Sun Feb 02 2014
 
   * Moved project to the `Blosc organization on Github <https://github.com/Blosc>`_
 

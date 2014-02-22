@@ -28,7 +28,7 @@ except ImportError:  # pragma: no cover
 import blosc
 import numpy as np
 
-__version__ = '0.6.0-rc1'
+__version__ = '0.6.0-dev'
 __author__ = 'Valentin Haenel <valentin@haenel.co>'
 
 # miscellaneous
@@ -467,6 +467,8 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
         return text.splitlines()
 
+    def _fill_text(self, text, width, indent):
+        return ''.join([indent + line for line in text.splitlines(True)])
 
 def _inject_blosc_group(parser):
     blosc_group = parser.add_argument_group(title='blosc settings')
@@ -502,7 +504,10 @@ def create_parser():
             #usage='%(prog)s [GLOBAL_OPTIONS] (compress | decompress)
             # [COMMAND_OPTIONS] <in_file> [<out_file>]',
             description='command line de/compression with blosc',
-            formatter_class=BloscPackCustomFormatter)
+            formatter_class=BloscPackCustomFormatter,
+            epilog="Additional help for subcommands is available:\n"+
+            "  %(prog)s 'subcommand' [ -h | --help ]")
+
     ## print version of bloscpack, python-blosc and blosc itself
     parser.add_argument('--version',
             action='version',
@@ -568,15 +573,14 @@ def create_parser():
             setattr(namespace, self.dest, value)
     for p in [compress_parser, c_parser]:
         _inject_blosc_group(p)
-        bloscpack_chunking_group = p.add_mutually_exclusive_group()
-        bloscpack_chunking_group.add_argument('-z', '--chunk-size',
+        bloscpack_group = p.add_argument_group(title='bloscpack settings')
+        bloscpack_group.add_argument('-z', '--chunk-size',
                 metavar='<size>',
                 action=CheckChunkSizeOption,
                 type=str,
                 default=DEFAULT_CHUNK_SIZE,
                 dest='chunk_size',
                 help="set desired chunk size or 'max'")
-        bloscpack_group = p.add_argument_group(title='bloscpack settings')
         checksum_format = join_with_eol(CHECKSUMS_AVAIL[0:3]) + \
                 join_with_eol(CHECKSUMS_AVAIL[3:6]) + \
                 join_with_eol(CHECKSUMS_AVAIL[6:])

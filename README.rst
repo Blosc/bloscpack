@@ -963,6 +963,10 @@ TODO
 Changelog
 ---------
 
+* v0.5.1     - Sat Feb 22 2014
+
+  * Documentation fixes and improvements
+
 * v0.5.0     - Sun Feb 02 2014
 
   * Moved project to the `Blosc organization on Github <https://github.com/Blosc>`_

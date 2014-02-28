@@ -35,7 +35,7 @@ from .headers import (create_metadata_header,
                       )
 from .pretty import (double_pretty_size,
                      )
-from .serializers import (SERIALIZERS_LOOKUP
+from .serializers import (SERIALIZERS_LOOKUP,
                           check_valid_serializer,
                           )
 import log

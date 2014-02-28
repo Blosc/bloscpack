@@ -15,10 +15,13 @@ import nose.tools as nt
 from nose_parameterized import parameterized
 from cStringIO import StringIO
 import bloscpack
-from bloscpack import *
+from bloscpack.defaults import (DEFAULT_CHUNK_SIZE,
+                                )
+from bloscpack.args import (DEFAULT_BLOSC_ARGS,
+                            DEFAULT_BLOSCPACK_ARGS,
+                            )
 from bloscpack.exceptions import (NoSuchCodec,
                                   NoSuchSerializer,
-                                  ChunkingException,
                                   )
 from bloscpack.constants import MAX_FORMAT_VERSION
 from bloscpack.serializers import SERIALIZERS

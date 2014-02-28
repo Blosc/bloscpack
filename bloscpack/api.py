@@ -29,13 +29,13 @@ from .pretty import (double_pretty_size,
 import log
 from .util import (open_two_file,
                    )
-from . import (PlainFPSource,
-               PlainFPSink,
-               CompressedFPSource,
-               CompressedFPSink,
-               PlainNumpySource,
-               PlainNumpySink,
-               )
+from .sourensink import (PlainFPSource,
+                          PlainFPSink,
+                          CompressedFPSource,
+                          CompressedFPSink,
+                          PlainNumpySource,
+                          PlainNumpySink,
+                          )
 
 
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,

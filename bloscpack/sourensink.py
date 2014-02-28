@@ -10,10 +10,10 @@ import itertools
 import blosc
 import numpy as np
 
-from .constans import (BLOSCPACK_HEADER_LENGTH,
-                       )
-from .header import (encode_int64,
-                     )
+from .constants import (BLOSCPACK_HEADER_LENGTH,
+                        )
+from .headers import (encode_int64,
+                      )
 from .exceptions import (ChecksumMismatch,
                          NotANumpyArray,
                          )

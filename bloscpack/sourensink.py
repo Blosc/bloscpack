@@ -17,6 +17,11 @@ from .headers import (encode_int64,
 from .exceptions import (ChecksumMismatch,
                          NotANumpyArray,
                          )
+from .fileio import (_write_offsets,
+                     _read_beginning,
+                     _read_compressed_chunk_fp,
+                     _write_metadata,
+                     )
 from .pretty import (pretty_size,
                      )
 import log

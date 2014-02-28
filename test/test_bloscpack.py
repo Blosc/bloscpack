@@ -22,11 +22,15 @@ from nose_parameterized import parameterized
 
 from bloscpack.api import (pack,
                            pack_file,
+                           unpack,
+                           append_fp,
                            )
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             DEFAULT_BLOSCPACK_ARGS,
                             calculate_nchunks,
                             )
+from bloscpack.checksums import (CHECKSUMS_LOOKUP,
+                                 )
 from bloscpack.constants import (MAX_FORMAT_VERSION,
                                  BLOSCPACK_HEADER_LENGTH,
                                  BLOSC_HEADER_LENGTH,
@@ -35,9 +39,12 @@ from bloscpack.defaults import (DEFAULT_CHUNK_SIZE,
                                 )
 from bloscpack.exceptions import (NoSuchCodec,
                                   NoSuchSerializer,
+                                  NotEnoughSpace,
                                   )
 from bloscpack.fileio import (_read_bloscpack_header,
                               _read_offsets,
+                              _read_beginning,
+                              _read_compressed_chunk_fp,
                               )
 from bloscpack.headers import (decode_blosc_header,
                                )
@@ -167,17 +174,17 @@ def test_recreate_metadata():
         )
     header_dict = decode_metadata_header(old_meta_header)
     nt.assert_raises(NoSuchSerializer,
-            bloscpack._recreate_metadata,
+            _recreate_metadata,
             header_dict,
             '',
             magic_format='NOSUCHSERIALIZER')
     nt.assert_raises(NoSuchCodec,
-            bloscpack._recreate_metadata,
+            _recreate_metadata,
             header_dict,
             '',
             codec='NOSUCHCODEC')
     nt.assert_raises(ChecksumLengthMismatch,
-            bloscpack._recreate_metadata,
+            _recreate_metadata,
             header_dict,
             '',
             checksum='adler32')
@@ -197,7 +204,7 @@ def test_rewrite_metadata():
     metadata_args['max_meta_size'] = 1000  # fixed preallocation
     target_fp = StringIO()
     # write the metadata section
-    bloscpack._write_metadata(target_fp, test_metadata, metadata_args)
+    _write_metadata(target_fp, test_metadata, metadata_args)
     # check that the length is correct
     nt.assert_equal(METADATA_HEADER_LENGTH + metadata_args['max_meta_size'],
             len(target_fp.getvalue()))
@@ -209,38 +216,38 @@ def test_rewrite_metadata():
     new_metadata_length = len(SERIALIZERS[0].dumps(test_metadata))
     # jam the new metadata into the cStringIO
     target_fp.seek(0, 0)
-    bloscpack._rewrite_metadata_fp(target_fp, test_metadata,
+    _rewrite_metadata_fp(target_fp, test_metadata,
             codec=None, level=None)
     # now seek back, read the metadata and make sure it has been updated
     # correctly
     target_fp.seek(0, 0)
-    result_metadata, result_header = bloscpack._read_metadata(target_fp)
+    result_metadata, result_header = _read_metadata(target_fp)
     nt.assert_equal(test_metadata, result_metadata)
     nt.assert_equal(new_metadata_length, result_header['meta_comp_size'])
 
     # make sure that NoChangeInMetadata is raised
     target_fp.seek(0, 0)
-    nt.assert_raises(NoChangeInMetadata, bloscpack._rewrite_metadata_fp,
+    nt.assert_raises(NoChangeInMetadata, _rewrite_metadata_fp,
             target_fp, test_metadata, codec=None, level=None)
 
     # make sure that ChecksumLengthMismatch is raised, needs modified metadata
     target_fp.seek(0, 0)
     test_metadata['fluxcompensator'] = 'back to the future'
-    nt.assert_raises(ChecksumLengthMismatch, bloscpack._rewrite_metadata_fp,
+    nt.assert_raises(ChecksumLengthMismatch, _rewrite_metadata_fp,
             target_fp, test_metadata,
             codec=None, level=None, checksum='sha512')
 
     # make sure if level is not None, this works
     target_fp.seek(0, 0)
     test_metadata['hoverboard'] = 'back to the future 2'
-    bloscpack._rewrite_metadata_fp(target_fp, test_metadata,
+    _rewrite_metadata_fp(target_fp, test_metadata,
             codec=None)
 
     # len of metadata when dumped to json should be around 1105
     for i in range(100):
         test_metadata[str(i)] = str(i)
     target_fp.seek(0, 0)
-    nt.assert_raises(MetadataSectionTooSmall, bloscpack._rewrite_metadata_fp,
+    nt.assert_raises(MetadataSectionTooSmall, _rewrite_metadata_fp,
             target_fp, test_metadata, codec=None, level=None)
 
 
@@ -249,18 +256,18 @@ def test_metadata_opportunisitic_compression():
     test_metadata = ("{'dtype': 'float64', 'shape': [1024], 'others': [],"
             "'original_container': 'carray'}")
     target_fp = StringIO()
-    bloscpack._write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
+    _write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
     target_fp.seek(0, 0)
-    metadata, header = bloscpack._read_metadata(target_fp)
+    metadata, header = _read_metadata(target_fp)
     nt.assert_equal('zlib', header['meta_codec'])
 
     # now do the same thing, but use badly compressible metadata
     test_metadata = "abc"
     target_fp = StringIO()
     # default args say: do compression...
-    bloscpack._write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
+    _write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
     target_fp.seek(0, 0)
-    metadata, header = bloscpack._read_metadata(target_fp)
+    metadata, header = _read_metadata(target_fp)
     # but it wasn't of any use
     nt.assert_equal('None', header['meta_codec'])
 
@@ -291,24 +298,24 @@ def test_disable_offsets():
     bloscpack_args['offsets'] = False
     source = PlainFPSource(in_fp)
     sink = CompressedFPSink(out_fp)
-    bloscpack.pack(source, sink,
+    pack(source, sink,
             *calculate_nchunks(in_fp_size),
             bloscpack_args=bloscpack_args)
     out_fp.seek(0)
     bloscpack_header, metadata, metadata_header, offsets = \
-            bloscpack._read_beginning(out_fp)
+            _read_beginning(out_fp)
     nt.assert_true(len(offsets) == 0)
 
 
 def test_invalid_format():
     # this will cause a bug if we ever reach 255 format versions
-    bloscpack.FORMAT_VERSION = MAX_FORMAT_VERSION
+    FORMAT_VERSION = MAX_FORMAT_VERSION
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        bloscpack.pack_file(in_file, out_file, blosc_args=blosc_args)
+        pack_file(in_file, out_file, blosc_args=blosc_args)
         nt.assert_raises(FormatVersionMismatch, unpack_file, out_file, dcmp_file)
-    bloscpack.FORMAT_VERSION = FORMAT_VERSION
+    FORMAT_VERSION = FORMAT_VERSION
 
 def test_file_corruption():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
@@ -317,8 +324,8 @@ def test_file_corruption():
         # now go in and modify a byte in the file
         with open(out_file, 'r+b') as input_fp:
             # read offsets and header
-            bloscpack._read_offsets(input_fp,
-                    bloscpack._read_bloscpack_header(input_fp))
+            _read_offsets(input_fp,
+                    _read_bloscpack_header(input_fp))
             # read the blosc header of the first chunk
             input_fp.read(BLOSC_HEADER_LENGTH)
             # read four bytes
@@ -460,7 +467,7 @@ def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
             calculate_nchunks(in_fp_size, chunk_size)
     source = PlainFPSource(in_fp)
     sink = CompressedFPSink(out_fp)
-    bloscpack.pack(source, sink,
+    pack(source, sink,
             nchunks, chunk_size, last_chunk_size,
             metadata=metadata)
     out_fp.seek(0)
@@ -468,7 +475,7 @@ def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
         print("Decompressing")
     source = CompressedFPSource(out_fp)
     sink = PlainFPSink(dcmp_fp)
-    metadata = bloscpack.unpack(source, sink)
+    metadata = unpack(source, sink)
     if progress:
         print("Verifying")
     cmp_fp(in_fp, dcmp_fp)
@@ -578,7 +585,7 @@ def reset_append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
 
 def reset_read_beginning(input_fp):
     """ like ``_read_beginning`` but with ``reset()`` on the file pointer. """
-    ans = bloscpack._read_beginning(input_fp)
+    ans = _read_beginning(input_fp)
     input_fp.reset()
     print(ans)
     return ans
@@ -638,7 +645,7 @@ def test_append_fp():
     # now check by unpacking
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
-    bloscpack.unpack(source, sink)
+    unpack(source, sink)
     dcmp.reset()
     new.reset()
     new_str = new.read()
@@ -673,7 +680,7 @@ def test_append_into_last_chunk():
     chunking = calculate_nchunks(new_size, chunk_size=new_size)
     source = PlainFPSource(new)
     sink = CompressedFPSink(orig)
-    bloscpack.pack(source, sink, *chunking)
+    pack(source, sink, *chunking)
     orig.reset()
     new.reset()
     # append a few bytes, creating a new, smaller, last_chunk
@@ -692,7 +699,7 @@ def test_append_into_last_chunk():
     # now check by unpacking
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
-    bloscpack.unpack(source, sink)
+    unpack(source, sink)
     dcmp.reset()
     new.reset()
     new_str = new.read()
@@ -709,7 +716,7 @@ def test_append_single_chunk():
     chunking = calculate_nchunks(new_size, chunk_size=new_size)
     source = PlainFPSource(new)
     sink = CompressedFPSink(orig)
-    bloscpack.pack(source, sink, *chunking)
+    pack(source, sink, *chunking)
     orig.reset()
     new.reset()
 
@@ -744,7 +751,7 @@ def test_double_append():
     new_str = new.read()
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
-    bloscpack.unpack(source, sink)
+    unpack(source, sink)
     dcmp.reset()
     dcmp_str = dcmp.read()
     nt.assert_equal(len(dcmp_str), len(new_str) * 3)
@@ -761,13 +768,13 @@ def test_append_metadata():
     chunking = calculate_nchunks(new_size, chunk_size=new_size)
     source = PlainFPSource(new)
     sink = CompressedFPSink(orig)
-    bloscpack.pack(source, sink, *chunking, metadata=metadata)
+    pack(source, sink, *chunking, metadata=metadata)
     orig.reset()
     new.reset()
     reset_append_fp(orig, new, new_size)
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
-    ans = bloscpack.unpack(source, sink)
+    ans = unpack(source, sink)
     print(ans)
     dcmp.reset()
     new.reset()
@@ -781,14 +788,14 @@ def test_append_fp_no_offsets():
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
     bloscpack_args['offsets'] = False
     orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
-    nt.assert_raises(RuntimeError, bloscpack.append_fp, orig, new, new_size)
+    nt.assert_raises(RuntimeError, append_fp, orig, new, new_size)
 
 
 def test_append_fp_not_enough_space():
     bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
     bloscpack_args['max_app_chunks'] = 0
     orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
-    nt.assert_raises(NotEnoughSpace, bloscpack.append_fp, orig, new, new_size)
+    nt.assert_raises(NotEnoughSpace, append_fp, orig, new, new_size)
 
 
 def test_mixing_clevel():
@@ -812,7 +819,7 @@ def test_mixing_clevel():
     blosc_args['typesize'] = None
     # make the second set of chunks have no compression
     blosc_args['clevel'] = 0
-    nchunks = bloscpack.append_fp(orig, new, new_size, blosc_args=blosc_args)
+    nchunks = append_fp(orig, new, new_size, blosc_args=blosc_args)
 
     # get the final size
     orig.seek(0, 2)
@@ -832,7 +839,7 @@ def test_mixing_clevel():
     # check by unpacking
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
-    bloscpack.unpack(source, sink)
+    unpack(source, sink)
     dcmp.reset()
     new.reset()
     new_str = new.read()
@@ -854,7 +861,7 @@ def test_append_mix_shuffle():
     reset_append_fp(orig, new, new_size, blosc_args=blosc_args)
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
-    bloscpack.unpack(source, sink)
+    unpack(source, sink)
     orig.reset()
     dcmp.reset()
     new.reset()
@@ -869,11 +876,11 @@ def test_append_mix_shuffle():
     orig.seek(offsets[0])
     checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
     compressed_zero,  blosc_header_zero = \
-        bloscpack._read_compressed_chunk_fp(orig, checksum_impl)
+        _read_compressed_chunk_fp(orig, checksum_impl)
     decompressed_zero = blosc.decompress(compressed_zero)
     orig.seek(offsets[-1])
     compressed_last,  blosc_header_last = \
-        bloscpack._read_compressed_chunk_fp(orig, checksum_impl)
+        _read_compressed_chunk_fp(orig, checksum_impl)
     decompressed_last = blosc.decompress(compressed_last)
     # first chunk has shuffle active
     nt.assert_equal(blosc_header_zero['flags'], 1)

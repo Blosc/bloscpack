@@ -5,6 +5,10 @@
 
 import cStringIO
 import os.path as path
+import itertools
+
+
+import blosc
 
 
 from .args import (DEFAULT_BLOSCPACK_ARGS,
@@ -16,11 +20,20 @@ from .args import (DEFAULT_BLOSCPACK_ARGS,
                    _check_bloscpack_args,
                    _handle_max_apps,
                    )
+from .constants import (BLOSCPACK_HEADER_LENGTH,
+                        METADATA_HEADER_LENGTH,
+                        )
 from .defaults import (DEFAULT_CLEVEL,
                        DEFAULT_SHUFFLE,
                        DEFAULT_CNAME,
                        DEFAULT_CHUNK_SIZE,
                        )
+from .exceptions import (NotEnoughSpace,
+                         )
+from .fileio import (_read_beginning,
+                     _read_compressed_chunk_fp,
+                     _write_offsets,
+                     )
 from .headers import (BloscPackHeader,
                       )
 from .pretty import (double_pretty_size,
@@ -35,6 +48,8 @@ from .sourensink import (PlainFPSource,
                           CompressedFPSink,
                           PlainNumpySource,
                           PlainNumpySink,
+                          _compress_chunk_str,
+                          _write_compressed_chunk,
                           )
 
 

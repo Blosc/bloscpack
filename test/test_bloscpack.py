@@ -4,16 +4,22 @@
 
 from __future__ import print_function
 
-import os.path as path
-import tempfile
-import contextlib
-import shutil
+from cStringIO import StringIO
 import atexit
+import contextlib
+import os.path as path
+import shutil
+import sys
+import tempfile
+
+
 import numpy as np
 import numpy.testing as npt
 import nose.tools as nt
+import blosc
 from nose_parameterized import parameterized
-from cStringIO import StringIO
+
+
 import bloscpack
 from bloscpack.defaults import (DEFAULT_CHUNK_SIZE,
                                 )
@@ -26,49 +32,6 @@ from bloscpack.exceptions import (NoSuchCodec,
 from bloscpack.constants import MAX_FORMAT_VERSION
 from bloscpack.serializers import SERIALIZERS
 from bloscpack.pretty import reverse_pretty
-
-
-def test_decode_blosc_header():
-    array_ = np.linspace(0, 100, 2e4).tostring()
-    # basic test case
-    blosc_args = DEFAULT_BLOSC_ARGS
-    compressed = blosc.compress(array_, **blosc_args)
-    header = decode_blosc_header(compressed)
-    expected = {'versionlz': 1,
-                'blocksize': 131072,
-                'ctbytes': len(compressed),
-                'version': 2,
-                'flags': 1,
-                'nbytes': len(array_),
-                'typesize': blosc_args['typesize']}
-    nt.assert_equal(expected, header)
-    # deactivate shuffle
-    blosc_args['shuffle'] = False
-    compressed = blosc.compress(array_, **blosc_args)
-    header = decode_blosc_header(compressed)
-    expected = {'versionlz': 1,
-                'blocksize': 131072,
-                'ctbytes': len(compressed),
-                'version': 2,
-                'flags': 0, # no shuffle flag
-                'nbytes': len(array_),
-                'typesize': blosc_args['typesize']}
-    nt.assert_equal(expected, header)
-    # uncompressible data
-    array_ = np.asarray(np.random.randn(23),
-            dtype=np.float32).tostring()
-    blosc_args['shuffle'] = True
-    compressed = blosc.compress(array_, **blosc_args)
-    header = decode_blosc_header(compressed)
-    expected = {'versionlz': 1,
-                'blocksize': 88,
-                'ctbytes': len(array_) + 16,  # original + 16 header bytes
-                'version': 2,
-                'flags': 3,  # 1 for shuffle 2 for non-compressed
-                'nbytes': len(array_),
-                'typesize': blosc_args['typesize']}
-    nt.assert_equal(expected, header)
-
 
 
 def create_array(repeats, in_file, progress=False):

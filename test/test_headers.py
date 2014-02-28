@@ -8,8 +8,11 @@ import struct
 
 import nose.tools as nt
 import blosc
+import numpy as np
 
 
+from bloscpack.args import (DEFAULT_BLOSC_ARGS,
+                            )
 from bloscpack.constants import (MAGIC,
                                  FORMAT_VERSION,
                                  MAX_FORMAT_VERSION,
@@ -28,6 +31,7 @@ from bloscpack.headers import (BloscPackHeader,
                                create_metadata_header,
                                decode_metadata_header,
                                check_range,
+                               decode_blosc_header,
                                )
 
 
@@ -105,6 +109,48 @@ def test_decode_metadata_options():
     nt.assert_raises(ValueError, decode_metadata_options, '00000001')
     nt.assert_raises(ValueError, decode_metadata_options, '00001111')
     nt.assert_raises(ValueError, decode_metadata_options, '11111111')
+
+
+def test_decode_blosc_header():
+    array_ = np.linspace(0, 100, 2e4).tostring()
+    # basic test case
+    blosc_args = DEFAULT_BLOSC_ARGS
+    compressed = blosc.compress(array_, **blosc_args)
+    header = decode_blosc_header(compressed)
+    expected = {'versionlz': 1,
+                'blocksize': 131072,
+                'ctbytes': len(compressed),
+                'version': 2,
+                'flags': 1,
+                'nbytes': len(array_),
+                'typesize': blosc_args['typesize']}
+    nt.assert_equal(expected, header)
+    # deactivate shuffle
+    blosc_args['shuffle'] = False
+    compressed = blosc.compress(array_, **blosc_args)
+    header = decode_blosc_header(compressed)
+    expected = {'versionlz': 1,
+                'blocksize': 131072,
+                'ctbytes': len(compressed),
+                'version': 2,
+                'flags': 0, # no shuffle flag
+                'nbytes': len(array_),
+                'typesize': blosc_args['typesize']}
+    nt.assert_equal(expected, header)
+    # uncompressible data
+    array_ = np.asarray(np.random.randn(23),
+            dtype=np.float32).tostring()
+    blosc_args['shuffle'] = True
+    compressed = blosc.compress(array_, **blosc_args)
+    header = decode_blosc_header(compressed)
+    expected = {'versionlz': 1,
+                'blocksize': 88,
+                'ctbytes': len(array_) + 16,  # original + 16 header bytes
+                'version': 2,
+                'flags': 3,  # 1 for shuffle 2 for non-compressed
+                'nbytes': len(array_),
+                'typesize': blosc_args['typesize']}
+    nt.assert_equal(expected, header)
 
 
 def test_BloscPackHeader_constructor():

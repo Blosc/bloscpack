@@ -5,21 +5,20 @@
 
 from .args import (_check_metadata_arguments,
                    METADATA_ARGS,
+                   DEFAULT_META_CODEC,
+                   DEFAULT_META_LEVEL,
                    )
-from .codecs import (CODECS_AVAIL,
-                     CODECS_LOOKUP,
-                     )
-from .contents import (METADATA_HEADER_LENGTH,
-                       BLOSCPACK_HEADER_LENGTH,
-                       BLOSC_HEADER_LENGTH,
-                       FORMAT_VERSION,
-                       )
+from .metacodecs import (CODECS_AVAIL,
+                         CODECS_LOOKUP,
+                         )
+from .constants import (METADATA_HEADER_LENGTH,
+                        BLOSCPACK_HEADER_LENGTH,
+                        BLOSC_HEADER_LENGTH,
+                        FORMAT_VERSION,
+                        )
 from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
                         )
-from .defaults import (DEFAULT_META_CODEC,
-                       DEFAULT_META_LEVEL,
-                       )
 from .exceptions import (MetadataSectionTooSmall,
                          FormatVersionMismatch,
                          ChecksumMismatch,

@@ -20,18 +20,34 @@ import blosc
 from nose_parameterized import parameterized
 
 
-import bloscpack
-from bloscpack.defaults import (DEFAULT_CHUNK_SIZE,
-                                )
+from bloscpack.api import (pack,
+                           pack_file,
+                           )
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             DEFAULT_BLOSCPACK_ARGS,
+                            calculate_nchunks,
                             )
+from bloscpack.constants import (MAX_FORMAT_VERSION,
+                                 BLOSCPACK_HEADER_LENGTH,
+                                 BLOSC_HEADER_LENGTH,
+                                 )
+from bloscpack.defaults import (DEFAULT_CHUNK_SIZE,
+                                )
 from bloscpack.exceptions import (NoSuchCodec,
                                   NoSuchSerializer,
                                   )
-from bloscpack.constants import MAX_FORMAT_VERSION
-from bloscpack.serializers import SERIALIZERS
+from bloscpack.fileio import (_read_bloscpack_header,
+                              _read_offsets,
+                              )
+from bloscpack.headers import (decode_blosc_header,
+                               )
 from bloscpack.pretty import reverse_pretty
+from bloscpack.serializers import SERIALIZERS
+from bloscpack.sourensink import (PlainFPSource,
+                                  PlainFPSink,
+                                  CompressedFPSource,
+                                  CompressedFPSink,
+                                  )
 
 
 def create_array(repeats, in_file, progress=False):
@@ -80,12 +96,12 @@ def create_tmp_files():
 def test_offsets():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        bloscpack.pack_file(in_file, out_file, chunk_size='2M')
+        pack_file(in_file, out_file, chunk_size='2M')
         with open(out_file, 'r+b') as input_fp:
-            bloscpack_header = bloscpack._read_bloscpack_header(input_fp)
+            bloscpack_header =_read_bloscpack_header(input_fp)
             total_entries = bloscpack_header.nchunks + \
                     bloscpack_header.max_app_chunks
-            offsets = bloscpack._read_offsets(input_fp, bloscpack_header)
+            offsets = _read_offsets(input_fp, bloscpack_header)
             # First chunks should start after header and offsets
             first = BLOSCPACK_HEADER_LENGTH + 8 * total_entries
             # We assume that the others are correct
@@ -116,14 +132,14 @@ def test_offsets():
     bloscpack_args['max_app_chunks'] = 0
     source = PlainFPSource(input_fp)
     sink = CompressedFPSink(output_fp)
-    bloscpack.pack(source, sink,
-            nchunks, chunk_size, last_chunk_size,
-            bloscpack_args=bloscpack_args
-            )
+    pack(source, sink,
+         nchunks, chunk_size, last_chunk_size,
+         bloscpack_args=bloscpack_args
+         )
     output_fp.seek(0, 0)
-    bloscpack_header = bloscpack._read_bloscpack_header(output_fp)
+    bloscpack_header = _read_bloscpack_header(output_fp)
     nt.assert_equal(0, bloscpack_header.max_app_chunks)
-    offsets = bloscpack._read_offsets(output_fp, bloscpack_header)
+    offsets = _read_offsets(output_fp, bloscpack_header)
     nt.assert_equal([96, 417938, 736230, 1049687,
         1362724, 1660126, 1958578, 2257063],
             offsets)
@@ -543,9 +559,9 @@ def prep_array_for_append(blosc_args=DEFAULT_BLOSC_ARGS,
     chunking = calculate_nchunks(new_size)
     source = PlainFPSource(new)
     sink = CompressedFPSink(orig)
-    bloscpack.pack(source, sink, *chunking,
-            blosc_args=blosc_args,
-            bloscpack_args=bloscpack_args)
+    pack(source, sink, *chunking,
+         blosc_args=blosc_args,
+         bloscpack_args=bloscpack_args)
     orig.reset()
     new.reset()
     return orig, new, new_size, dcmp

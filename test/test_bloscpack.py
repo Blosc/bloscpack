@@ -45,15 +45,18 @@ from bloscpack.exceptions import (NoSuchCodec,
                                   NoSuchSerializer,
                                   NotEnoughSpace,
                                   FormatVersionMismatch,
+                                  ChecksumLengthMismatch,
                                   )
 from bloscpack.fileio import (_read_bloscpack_header,
                               _read_offsets,
                               _read_beginning,
                               _read_compressed_chunk_fp,
                               _write_metadata,
+                              _recreate_metadata,
                               )
 from bloscpack.headers import (decode_blosc_header,
                                create_metadata_header,
+                               decode_metadata_header,
                                )
 from bloscpack.pretty import reverse_pretty
 from bloscpack.serializers import SERIALIZERS

@@ -10,6 +10,7 @@ from .args import (_check_metadata_arguments,
                    )
 from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
+                         check_valid_codec,
                          )
 from .constants import (METADATA_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
@@ -18,12 +19,14 @@ from .constants import (METADATA_HEADER_LENGTH,
                         )
 from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
+                        check_valid_checksum,
                         )
 from .exceptions import (MetadataSectionTooSmall,
                          FormatVersionMismatch,
                          ChecksumMismatch,
                          NoMetadataFound,
                          NoChangeInMetadata,
+                         ChecksumLengthMismatch,
                          )
 from .headers import (create_metadata_header,
                       decode_metadata_header,

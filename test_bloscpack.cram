@@ -133,6 +133,11 @@ Help for the subcommands:
   optional arguments:
     -h, --help  show this help message and exit
 
+Check the version output is sane.
+
+  $ blpk --version
+  bloscpack: '.*' python-blosc: '.*' blosc: '.*' (re)
+
 Create a test datafile.
 
   $ python -c "import numpy; a = numpy.linspace(0, 100, 2e7); f = open('data.dat', 'w');  f.write(a.tostring()) "

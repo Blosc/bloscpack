@@ -132,17 +132,17 @@ def test_offsets():
         create_array(1, in_file)
         pack_file(in_file, out_file, chunk_size='2M')
         with open(out_file, 'r+b') as input_fp:
-            bloscpack_header =_read_bloscpack_header(input_fp)
+            bloscpack_header = _read_bloscpack_header(input_fp)
             total_entries = bloscpack_header.nchunks + \
-                    bloscpack_header.max_app_chunks
+                            bloscpack_header.max_app_chunks
             offsets = _read_offsets(input_fp, bloscpack_header)
             # First chunks should start after header and offsets
             first = BLOSCPACK_HEADER_LENGTH + 8 * total_entries
             # We assume that the others are correct
             nt.assert_equal(offsets[0], first)
             nt.assert_equal([736, 418578, 736870, 1050327,
-                1363364, 1660766, 1959218, 2257703],
-                    offsets)
+                             1363364, 1660766, 1959218, 2257703],
+                            offsets)
             # try to read the second header
             input_fp.seek(offsets[1], 0)
             blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
@@ -175,8 +175,8 @@ def test_offsets():
     nt.assert_equal(0, bloscpack_header.max_app_chunks)
     offsets = _read_offsets(output_fp, bloscpack_header)
     nt.assert_equal([96, 417938, 736230, 1049687,
-        1362724, 1660126, 1958578, 2257063],
-            offsets)
+                     1362724, 1660126, 1958578, 2257063],
+                    offsets)
 
 
 def test_metadata():

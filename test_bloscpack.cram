@@ -366,8 +366,6 @@ Add metadata to the file:
   blpk: 'offsets':
   blpk: [14112,169284,311607,472209,628846,...]
   $ blpk decompress data.dat.blp data.dat.dcmp
-  blpk: Metadata is:
-  blpk: '{u'dtype': u'float64', u'shape': [20000000], u'container': u'numpy'}'
 
 Test basic append:
 

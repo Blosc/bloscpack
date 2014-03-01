@@ -16,6 +16,7 @@ from .constants import (METADATA_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
                         BLOSC_HEADER_LENGTH,
                         FORMAT_VERSION,
+                        MAX_CLEVEL,
                         )
 from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
@@ -34,6 +35,7 @@ from .headers import (create_metadata_header,
                       BloscPackHeader,
                       decode_int64,
                       encode_int64,
+                      check_range,
                       )
 from .pretty import (double_pretty_size,
                      )

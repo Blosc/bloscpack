@@ -332,6 +332,7 @@ Get more information using --verbose:
   blpk: input file size: 152.59M (160000000B)
   blpk: nchunks: 153
   blpk: chunk_size: 1.0M (1048576B)
+  blpk: last_chunk_size: 602.0K (616448B)
   blpk: output file size: 16.2M (16984384B)
   blpk: compression ratio: 0.106152
   blpk: done

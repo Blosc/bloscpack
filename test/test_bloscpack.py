@@ -49,6 +49,7 @@ from bloscpack.exceptions import (NoSuchCodec,
                                   ChecksumLengthMismatch,
                                   NoChangeInMetadata,
                                   MetadataSectionTooSmall,
+                                  ChecksumMismatch,
                                   )
 from bloscpack.fileio import (_read_bloscpack_header,
                               _read_offsets,

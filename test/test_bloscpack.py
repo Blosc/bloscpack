@@ -29,6 +29,7 @@ from bloscpack.api import (pack,
                            pack_ndarray_str,
                            unpack_ndarray_str,
                            unpack,
+                           append,
                            append_fp,
                            )
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,

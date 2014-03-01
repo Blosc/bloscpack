@@ -23,6 +23,8 @@ from .args import (DEFAULT_BLOSCPACK_ARGS,
 from .constants import (BLOSCPACK_HEADER_LENGTH,
                         METADATA_HEADER_LENGTH,
                         )
+from .checksums import (CHECKSUMS_LOOKUP,
+                        )
 from .defaults import (DEFAULT_CLEVEL,
                        DEFAULT_SHUFFLE,
                        DEFAULT_CNAME,

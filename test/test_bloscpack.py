@@ -18,15 +18,19 @@ import numpy.testing as npt
 import nose.tools as nt
 import blosc
 from nose_parameterized import parameterized
+from mock import patch
 
 
 from bloscpack.api import (pack,
                            pack_file,
+                           unpack_file,
+                           pack_ndarray,
                            unpack,
                            append_fp,
                            )
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             DEFAULT_BLOSCPACK_ARGS,
+                            DEFAULT_METADATA_ARGS,
                             calculate_nchunks,
                             )
 from bloscpack.checksums import (CHECKSUMS_LOOKUP,
@@ -40,13 +44,16 @@ from bloscpack.defaults import (DEFAULT_CHUNK_SIZE,
 from bloscpack.exceptions import (NoSuchCodec,
                                   NoSuchSerializer,
                                   NotEnoughSpace,
+                                  FormatVersionMismatch,
                                   )
 from bloscpack.fileio import (_read_bloscpack_header,
                               _read_offsets,
                               _read_beginning,
                               _read_compressed_chunk_fp,
+                              _write_metadata,
                               )
 from bloscpack.headers import (decode_blosc_header,
+                               create_metadata_header,
                                )
 from bloscpack.pretty import reverse_pretty
 from bloscpack.serializers import SERIALIZERS
@@ -54,6 +61,8 @@ from bloscpack.sourcensink import (PlainFPSource,
                                    PlainFPSink,
                                    CompressedFPSource,
                                    CompressedFPSink,
+                                   CompressedMemorySource,
+                                   CompressedMemorySink,
                                    )
 
 
@@ -307,15 +316,14 @@ def test_disable_offsets():
     nt.assert_true(len(offsets) == 0)
 
 
+# this will cause a bug if we ever reach 255 format versions
+@patch('bloscpack.fileio.FORMAT_VERSION', MAX_FORMAT_VERSION)
 def test_invalid_format():
-    # this will cause a bug if we ever reach 255 format versions
-    FORMAT_VERSION = MAX_FORMAT_VERSION
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
         pack_file(in_file, out_file, blosc_args=blosc_args)
         nt.assert_raises(FormatVersionMismatch, unpack_file, out_file, dcmp_file)
-    FORMAT_VERSION = FORMAT_VERSION
 
 def test_file_corruption():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):

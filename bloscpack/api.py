@@ -42,7 +42,7 @@ from .pretty import (double_pretty_size,
 import log
 from .util import (open_two_file,
                    )
-from .sourensink import (PlainFPSource,
+from .sourcensink import (PlainFPSource,
                           PlainFPSink,
                           CompressedFPSource,
                           CompressedFPSink,

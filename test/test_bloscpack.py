@@ -50,11 +50,11 @@ from bloscpack.headers import (decode_blosc_header,
                                )
 from bloscpack.pretty import reverse_pretty
 from bloscpack.serializers import SERIALIZERS
-from bloscpack.sourensink import (PlainFPSource,
-                                  PlainFPSink,
-                                  CompressedFPSource,
-                                  CompressedFPSink,
-                                  )
+from bloscpack.sourcensink import (PlainFPSource,
+                                   PlainFPSink,
+                                   CompressedFPSource,
+                                   CompressedFPSink,
+                                   )
 
 
 def create_array(repeats, in_file, progress=False):

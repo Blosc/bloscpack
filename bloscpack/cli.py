@@ -12,26 +12,42 @@ import pprint
 import blosc
 
 
-import log
-from .checksums import CHECKSUMS_AVAIL
-from .defaults import (DEFAULT_TYPESIZE,
-                        DEFAULT_CLEVEL,
-                        DEFAULT_SHUFFLE,
-                        DEFAULT_CNAME,
-                        DEFAULT_CHUNK_SIZE,
-                        DEFAULT_CHECKSUM,
-                        DEFAULT_OFFSETS,
+from .args import (BLOSC_ARGS,
+                   DEFAULT_BLOSCPACK_ARGS,
+                   DEFAULT_METADATA_ARGS,
+                   )
+from .api import (pack_file,
+                  unpack_file,
+                  append,
+                  )
+from .checksums import (CHECKSUMS_AVAIL,
                         )
 from .constants import (SUFFIXES,
                         CNAME_AVAIL,
-                        MAX_CLEVEL,
                         EXTENSION,
                         )
-from .exceptions import FileNotFound
+from .defaults import (DEFAULT_TYPESIZE,
+                       DEFAULT_CLEVEL,
+                       DEFAULT_SHUFFLE,
+                       DEFAULT_CNAME,
+                       DEFAULT_CHUNK_SIZE,
+                       DEFAULT_CHECKSUM,
+                       DEFAULT_OFFSETS,
+                       )
+from .exceptions import (FileNotFound,
+                         ChunkingException,
+                         FormatVersionMismatch,
+                         ChecksumMismatch,
+                         )
+from .fileio import (_seek_to_metadata,
+                     _rewrite_metadata_fp,
+                     _read_beginning,
+                     )
 from .pretty import (reverse_pretty,
                      join_with_eol,
                      )
 from .version import __version__
+import log
 
 
 def check_files(in_file, out_file, args):
@@ -117,7 +133,7 @@ def process_decompression_args(args):
             out_file = args.out_file or in_file[:-len(EXTENSION)]
         else:
             log.error("input file '%s' does not end with '%s'" %
-                    (in_file, EXTENSION))
+                      (in_file, EXTENSION))
     return in_file, out_file
 
 
@@ -126,7 +142,7 @@ def process_append_args(args):
     new_file = args.new_file
     if not args.no_check_extension and not original_file.endswith(EXTENSION):
         log.error("original file '%s' does not end with '%s'" %
-                    (original_file, EXTENSION))
+                  (original_file, EXTENSION))
 
     return original_file, new_file
 
@@ -145,7 +161,7 @@ def process_nthread_arg(args):
     if args.nthreads != blosc.ncores:
         blosc.set_nthreads(args.nthreads)
     log.verbose('using %d thread%s' %
-            (args.nthreads, 's' if args.nthreads > 1 else ''))
+                (args.nthreads, 's' if args.nthreads > 1 else ''))
 
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
@@ -460,7 +476,7 @@ def main():
         try:
             if not path.exists(args.file_):
                 raise FileNotFound("file '%s' does not exist!" %
-                        args.file_)
+                                   args.file_)
         except FileNotFound as fnf:
             log.error(str(fnf))
         try:

@@ -76,6 +76,8 @@ from bloscpack.sourcensink import (PlainFPSource,
                                    CompressedMemorySource,
                                    CompressedMemorySink,
                                    )
+from bloscpack.util import (open_two_file,
+                            )
 
 
 def create_array(repeats, in_file, progress=False):

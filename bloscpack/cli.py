@@ -190,29 +190,29 @@ class BloscPackCustomFormatter(argparse.HelpFormatter):
 def _inject_blosc_group(parser):
     blosc_group = parser.add_argument_group(title='blosc settings')
     blosc_group.add_argument('-t', '--typesize',
-            metavar='<size>',
-            default=DEFAULT_TYPESIZE,
-            type=int,
-            help='typesize for blosc')
+                             metavar='<size>',
+                             default=DEFAULT_TYPESIZE,
+                             type=int,
+                             help='typesize for blosc')
     blosc_group.add_argument('-l', '--clevel',
-            default=DEFAULT_CLEVEL,
-            choices=range(10),
-            metavar='[0, 9]',
-            type=int,
-            help='compression level')
+                             default=DEFAULT_CLEVEL,
+                             choices=range(10),
+                             metavar='[0, 9]',
+                             type=int,
+                             help='compression level')
     blosc_group.add_argument('-s', '--no-shuffle',
-            action='store_false',
-            default=DEFAULT_SHUFFLE,
-            dest='shuffle',
-            help='deactivate shuffle')
+                             action='store_false',
+                             default=DEFAULT_SHUFFLE,
+                             dest='shuffle',
+                             help='deactivate shuffle')
     blosc_group.add_argument('-c', '--codec',
-            metavar='<codec>',
-            type=str,
-            choices=CNAME_AVAIL,
-            default=DEFAULT_CNAME,
-            dest='cname',
-            help="codec to be used by Blosc: \n%s"
-                    % join_with_eol(CNAME_AVAIL))
+                             metavar='<codec>',
+                             type=str,
+                             choices=CNAME_AVAIL,
+                             default=DEFAULT_CNAME,
+                             dest='cname',
+                             help="codec to be used by Blosc: \n%s"
+                                  % join_with_eol(CNAME_AVAIL))
 
 
 def create_parser():
@@ -223,43 +223,45 @@ def create_parser():
             description='command line de/compression with blosc',
             formatter_class=BloscPackCustomFormatter)
     ## print version of bloscpack, python-blosc and blosc itself
-    parser.add_argument('--version',
-            action='version',
-            version='bloscpack:\t' + ("'%s'\n" % __version__) +
-                    "python-blosc:\t'%s'\n"   % blosc.version.__version__ +
-                    "blosc:\t\t'%s'\n"        % blosc.BLOSC_VERSION_STRING)
+    version_str = "bloscpack:\t'%s' " % __version__ + \
+                  "python-blosc:\t'%s' " % blosc.version.__version__ + \
+                  "blosc:\t\t'%s' " % blosc.BLOSC_VERSION_STRING
+    parser.add_argument('--version', action='version', version=version_str)
     output_group = parser.add_mutually_exclusive_group()
     output_group.add_argument('-v', '--verbose',
-            action='store_true',
-            default=False,
-            help='be verbose about actions')
+                              action='store_true',
+                              default=False,
+                              help='be verbose about actions')
     output_group.add_argument('-d', '--debug',
-            action='store_true',
-            default=False,
-            help='print debugging output too')
+                              action='store_true',
+                              default=False,
+                              help='print debugging output too')
     global_group = parser.add_argument_group(title='global options')
     global_group.add_argument('-f', '--force',
-            action='store_true',
-            default=False,
-            help='disable overwrite checks for existing files\n' +
-            '(use with caution)')
+                              action='store_true',
+                              default=False,
+                              help='disable overwrite checks for existing files\n' +
+                              '(use with caution)')
+
     class CheckThreadOption(argparse.Action):
         def __call__(self, parser, namespace, value, option_string=None):
             if not 1 <= value <= blosc.BLOSC_MAX_THREADS:
                 log.error('%s must be 1 <= n <= %d'
-                        % (option_string, blosc.BLOSC_MAX_THREADS))
+                          % (option_string, blosc.BLOSC_MAX_THREADS))
             setattr(namespace, self.dest, value)
+
     global_group.add_argument('-n', '--nthreads',
-            metavar='[1, %d]' % blosc.BLOSC_MAX_THREADS,
-            action=CheckThreadOption,
-            default=blosc.ncores,
-            type=int,
-            dest='nthreads',
-            help='set number of threads, (default: %(default)s (ncores))')
+                              metavar='[1, %d]' % blosc.BLOSC_MAX_THREADS,
+                              action=CheckThreadOption,
+                              default=blosc.ncores,
+                              type=int,
+                              dest='nthreads',
+                              help='set number of threads, ' +
+                                   '(default: %(default)s (ncores))')
 
     subparsers = parser.add_subparsers(title='subcommands',
-            metavar='', dest='subcommand')
-
+                                       metavar='',
+                                       dest='subcommand')
     compress_parser = subparsers.add_parser('compress',
             formatter_class=BloscPackCustomFormatter,
             help='perform compression on file')
@@ -281,7 +283,7 @@ def create_parser():
                         value = int(value)
                 except ValueError as ve:
                     log.error('%s error: %s' % (option_string, str(ve) +
-                        " or 'max'"))
+                              " or 'max'"))
                 if value < 0:
                     log.error('%s must be > 0 ' % option_string)
             setattr(namespace, self.dest, value)
@@ -289,34 +291,34 @@ def create_parser():
         _inject_blosc_group(p)
         bloscpack_chunking_group = p.add_mutually_exclusive_group()
         bloscpack_chunking_group.add_argument('-z', '--chunk-size',
-                metavar='<size>',
-                action=CheckChunkSizeOption,
-                type=str,
-                default=DEFAULT_CHUNK_SIZE,
-                dest='chunk_size',
-                help="set desired chunk size or 'max'")
+                                              metavar='<size>',
+                                              action=CheckChunkSizeOption,
+                                              type=str,
+                                              default=DEFAULT_CHUNK_SIZE,
+                                              dest='chunk_size',
+                                              help="set desired chunk size or 'max'")
         bloscpack_group = p.add_argument_group(title='bloscpack settings')
         checksum_format = join_with_eol(CHECKSUMS_AVAIL[0:3]) + \
-                join_with_eol(CHECKSUMS_AVAIL[3:6]) + \
-                join_with_eol(CHECKSUMS_AVAIL[6:])
+                                        join_with_eol(CHECKSUMS_AVAIL[3:6]) + \
+                                        join_with_eol(CHECKSUMS_AVAIL[6:])
         checksum_help = 'set desired checksum:\n' + checksum_format
         bloscpack_group.add_argument('-k', '--checksum',
-                metavar='<checksum>',
-                type=str,
-                choices=CHECKSUMS_AVAIL,
-                default=DEFAULT_CHECKSUM,
-                dest='checksum',
-                help=checksum_help)
+                                     metavar='<checksum>',
+                                     type=str,
+                                     choices=CHECKSUMS_AVAIL,
+                                     default=DEFAULT_CHECKSUM,
+                                     dest='checksum',
+                                     help=checksum_help)
         bloscpack_group.add_argument('-o', '--no-offsets',
-                action='store_false',
-                default=DEFAULT_OFFSETS,
-                dest='offsets',
-                help='deactivate offsets')
+                                     action='store_false',
+                                     default=DEFAULT_OFFSETS,
+                                     dest='offsets',
+                                     help='deactivate offsets')
         bloscpack_group.add_argument('-m', '--metadata',
-                metavar='<metadata>',
-                type=str,
-                dest='metadata',
-                help="file containing the metadata, must contain valid JSON")
+                                     metavar='<metadata>',
+                                     type=str,
+                                     dest='metadata',
+                                     help="file containing the metadata, must contain valid JSON")
 
 
     decompress_parser = subparsers.add_parser('decompress',
@@ -329,32 +331,36 @@ def create_parser():
 
     for p in [decompress_parser, d_parser]:
         p.add_argument('-e', '--no-check-extension',
-                action='store_true',
-                default=False,
-                dest='no_check_extension',
-                help='disable checking input file for extension (*.blp)\n' +
-                '(requires use of <out_file>)')
+                       action='store_true',
+                       default=False,
+                       dest='no_check_extension',
+                       help='disable checking input file for extension (*.blp)\n' +
+                       '(requires use of <out_file>)')
 
     for p, help_in, help_out in [(compress_parser,
-            'file to be compressed', 'file to compress to'),
+                                  'file to be compressed',
+                                  'file to compress to'),
                                  (c_parser,
-            'file to be compressed', 'file to compress to'),
+                                  'file to be compressed',
+                                  'file to compress to'),
                                  (decompress_parser,
-            'file to be decompressed', 'file to decompress to'),
+                                  'file to be decompressed',
+                                  'file to decompress to'),
                                  (d_parser,
-            'file to be decompressed', 'file to decompress to'),
-                                  ]:
+                                  'file to be decompressed',
+                                  'file to decompress to'),
+                                 ]:
         p.add_argument('in_file',
-                metavar='<in_file>',
-                type=str,
-                default=None,
-                help=help_in)
+                       metavar='<in_file>',
+                       type=str,
+                       default=None,
+                       help=help_in)
         p.add_argument('out_file',
-                metavar='<out_file>',
-                type=str,
-                nargs='?',
-                default=None,
-                help=help_out)
+                       metavar='<out_file>',
+                       type=str,
+                       nargs='?',
+                       default=None,
+                       help=help_out)
 
     append_parser = subparsers.add_parser('append',
             formatter_class=BloscPackCustomFormatter,
@@ -367,23 +373,23 @@ def create_parser():
     for p in (append_parser, a_parser):
         _inject_blosc_group(p)
         p.add_argument('original_file',
-                metavar='<original_file>',
-                type=str,
-                help="file to append to")
+                       metavar='<original_file>',
+                       type=str,
+                       help="file to append to")
         p.add_argument('new_file',
-                metavar='<new_file>',
-                type=str,
-                help="file to append from")
+                       metavar='<new_file>',
+                       type=str,
+                       help="file to append from")
         p.add_argument('-e', '--no-check-extension',
-                action='store_true',
-                default=False,
-                dest='no_check_extension',
-                help='disable checking original file for extension (*.blp)\n')
+                       action='store_true',
+                       default=False,
+                       dest='no_check_extension',
+                       help='disable checking original file for extension (*.blp)\n')
         p.add_argument('-m', '--metadata',
-                metavar='<metadata>',
-                type=str,
-                dest='metadata',
-                help="file containing the metadata, must contain valid JSON")
+                       metavar='<metadata>',
+                       type=str,
+                       dest='metadata',
+                       help="file containing the metadata, must contain valid JSON")
 
 
     info_parser = subparsers.add_parser('info',
@@ -396,11 +402,12 @@ def create_parser():
 
     for p in (info_parser, i_parser):
         p.add_argument('file_',
-                metavar='<file>',
-                type=str,
-                default=None,
-                help="file to show info for")
+                       metavar='<file>',
+                       type=str,
+                       default=None,
+                       help="file to show info for")
     return parser
+
 
 def main():
     parser = create_parser()
@@ -430,10 +437,10 @@ def main():
         bloscpack_args['checksum'] = args.checksum
         try:
             pack_file(in_file, out_file, chunk_size=args.chunk_size,
-                    metadata=metadata,
-                    blosc_args=blosc_args,
-                    bloscpack_args=bloscpack_args,
-                    metadata_args=DEFAULT_METADATA_ARGS)
+                      metadata=metadata,
+                      blosc_args=blosc_args,
+                      bloscpack_args=bloscpack_args,
+                      metadata_args=DEFAULT_METADATA_ARGS)
         except ChunkingException as ce:
             log.error(str(ce))
     elif args.subcommand in ['decompress', 'd']:
@@ -457,10 +464,10 @@ def main():
         try:
             if not path.exists(original_file):
                 raise FileNotFound("original file '%s' does not exist!" %
-                        original_file)
+                                   original_file)
             if not path.exists(new_file):
                 raise FileNotFound("new file '%s' does not exist!" %
-                        new_file)
+                                   new_file)
         except FileNotFound as fnf:
             log.error(str(fnf))
         log.verbose("original file is: '%s'" % original_file)
@@ -482,10 +489,10 @@ def main():
         try:
             with open(args.file_) as fp:
                 bloscpack_header, metadata, metadata_header, offsets = \
-                        _read_beginning(fp)
+                    _read_beginning(fp)
         except ValueError as ve:
             log.error(str(ve) + "\n" +
-            "This might not be a bloscpack compressed file.")
+                      "This might not be a bloscpack compressed file.")
         log.normal(bloscpack_header.pformat())
         if metadata is not None:
             log.normal("'metadata':")

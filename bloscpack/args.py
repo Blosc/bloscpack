@@ -21,7 +21,7 @@ from .exceptions import(ChunkingException,
                         )
 from .headers import (MAX_CHUNKS,
                       )
-from .pretty import ( double_pretty_size,
+from .pretty import (double_pretty_size,
                      reverse_pretty,
                      )
 from bloscpack import log

@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
+
 import hashlib
 import struct
 import zlib
 
-from .exceptions import NoSuchChecksum
+
+from .exceptions import (NoSuchChecksum,
+                         )
 
 
 class Hash(object):

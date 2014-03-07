@@ -183,7 +183,7 @@ Compression with different chunksizes:
   $ rm data.dat.blp
 
   $ blpk compress --chunk-size -1 data.dat
-  blpk: error: --chunk-size must be > 0 
+  blpk: error: --chunk-size must be > 0
   [1]
 
   $ blpk compress --chunk-size NO_SUCH_VALUE data.dat

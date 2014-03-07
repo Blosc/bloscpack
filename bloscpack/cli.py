@@ -285,7 +285,7 @@ def create_parser():
                     log.error('%s error: %s' % (option_string, str(ve) +
                               " or 'max'"))
                 if value < 0:
-                    log.error('%s must be > 0 ' % option_string)
+                    log.error('%s must be > 0' % option_string)
             setattr(namespace, self.dest, value)
     for p in [compress_parser, c_parser]:
         _inject_blosc_group(p)

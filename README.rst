@@ -963,6 +963,10 @@ TODO
 Changelog
 ---------
 
+* v0.5.2     - Fri Mar 07 2014
+
+  * Fix project url in setup.py
+
 * v0.5.1     - Sat Feb 22 2014
 
   * Documentation fixes and improvements

@@ -1,20 +1,30 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim :set ft=py:
+
 
 from __future__ import print_function
-import json
-import test_bloscpack as tb
 
-print('create the test data', end='')
+
+import json
+import sys
+
+
+import bloscpack.testutil as bt
+
+
 def progress(i):
     if i % 10 == 0:
         print('.', end='')
     sys.stdout.flush()
-tb.create_array(100, 'data.dat', progress=progress)
+
+print('create the test data', end='')
+bt.create_array(100, 'data.dat', progress=progress)
 print('')
 print('create the test metadata')
 test_metadata = {'dtype': 'float64',
                  'shape': (200000000,),
                  'container': 'numpy',
-                }
+                 }
 with open('meta.json', 'w') as f:
     json.dump(test_metadata, f)

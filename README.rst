@@ -963,6 +963,14 @@ TODO
 Changelog
 ---------
 
+* v0.5.2     - Fri Mar 07 2014
+
+  * Fix project url in setup.py
+
+* v0.5.1     - Sat Feb 22 2014
+
+  * Documentation fixes and improvements
+
 * v0.5.0     - Sun Feb 02 2014
 
   * Moved project to the `Blosc organization on Github <https://github.com/Blosc>`_

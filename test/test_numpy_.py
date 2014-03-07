@@ -11,6 +11,7 @@ import numpy.testing as npt
 import nose.tools as nt
 from nose_parameterized import parameterized
 
+
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             )
 from bloscpack.headers import (decode_blosc_header,
@@ -122,13 +123,12 @@ def huge_arrays():
         roundtrip_ndarray(a)
 
 
-@parameterized([
-        ('blosclz', 0),
-        ('lz4', 1),
-        ('lz4hc', 1),
-        ('snappy', 2),
-        ('zlib', 3),
-    ])
+@parameterized([('blosclz', 0),
+                ('lz4', 1),
+                ('lz4hc', 1),
+                ('snappy', 2),
+                ('zlib', 3),
+                ])
 def test_alternate_cname(cname, int_id):
     blosc_args = DEFAULT_BLOSC_ARGS.copy()
     blosc_args['cname'] = cname

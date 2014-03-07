@@ -8,14 +8,12 @@ import itertools
 
 
 import blosc
-import numpy as np
 
 from .constants import (BLOSCPACK_HEADER_LENGTH,
                         )
 from .headers import (encode_int64,
                       )
 from .exceptions import (ChecksumMismatch,
-                         NotANumpyArray,
                          )
 from .fileio import (_write_offsets,
                      _read_beginning,
@@ -29,11 +27,6 @@ import log
 
 def _compress_chunk_str(chunk, blosc_args):
     return blosc.compress(chunk, **blosc_args)
-
-
-def _compress_chunk_ptr(chunk, blosc_args):
-    ptr, size = chunk
-    return blosc.compress_ptr(ptr, size, **blosc_args)
 
 
 def _write_compressed_chunk(output_fp, compressed, digest):
@@ -142,42 +135,6 @@ class CompressedMemorySource(CompressedSource):
                             "expected: '%s', received: '%s'" %
                             (repr(expected_digest), repr(received_digest)))
             yield compressed
-
-
-class PlainNumpySource(PlainSource):
-
-    def __init__(self, ndarray):
-
-        # Reagrding the dtype, quote from numpy/lib/format.py:dtype_to_descr
-        #
-        # The .descr attribute of a dtype object cannot be round-tripped
-        # through the dtype() constructor. Simple types, like dtype('float32'),
-        # have a descr which looks like a record array with one field with ''
-        # as a name. The dtype() constructor interprets this as a request to
-        # give a default name.  Instead, we construct descriptor that can be
-        # passed to dtype().
-        self.metadata = {'dtype': ndarray.dtype.descr
-                         if ndarray.dtype.names is not None
-                         else ndarray.dtype.str,
-                         'shape': ndarray.shape,
-                         'order': 'F' if np.isfortran(ndarray) else 'C',
-                         'container': 'numpy',
-                         }
-        self.size = ndarray.size * ndarray.itemsize
-        self.ndarray = np.ascontiguousarray(ndarray)
-        self.ptr = ndarray.__array_interface__['data'][0]
-
-    @property
-    def compress_func(self):
-        return _compress_chunk_ptr
-
-    def __call__(self):
-        self.nitems = int(self.chunk_size / self.ndarray.itemsize)
-        offset = self.ptr
-        for i in xrange(self.nchunks - 1):
-            yield offset, self.nitems
-            offset += self.chunk_size
-        yield offset, int(self.last_chunk / self.ndarray.itemsize)
 
 
 class PlainSink(object):
@@ -338,19 +295,3 @@ class CompressedMemorySink(CompressedSink):
         self.chunks[i] = compressed
         if self.checksum:
             self.checksums[i] = self.do_checksum(compressed)
-
-
-class PlainNumpySink(PlainSink):
-
-    def __init__(self, metadata):
-        self.metadata = metadata
-        if metadata is None or metadata['container'] != 'numpy':
-            raise NotANumpyArray
-        self.ndarray = np.empty(metadata['shape'],
-                                dtype=np.dtype(metadata['dtype']),
-                                order=metadata['order'])
-        self.ptr = self.ndarray.__array_interface__['data'][0]
-
-    def put(self, compressed):
-        bwritten = blosc.decompress_ptr(compressed, self.ptr)
-        self.ptr += bwritten

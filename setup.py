@@ -19,7 +19,7 @@ setup(
     long_description=long_description,
     license = "MIT",
     keywords = ('compression', 'applied information theory'),
-    url = "https://github.com/esc/bloscpack",
+    url = "https://github.com/blosc/bloscpack",
     classifiers = ['Development Status :: 3 - Alpha',
                    'Environment :: Console',
                    'License :: OSI Approved :: MIT License',

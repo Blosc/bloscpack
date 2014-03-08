@@ -56,7 +56,7 @@ from bloscpack.headers import (decode_blosc_header,
                                )
 from bloscpack.pretty import reverse_pretty
 from bloscpack.serializers import SERIALIZERS
-from bloscpack.sourcensink import (PlainMemorySource,
+from bloscpack.abstract_io import (PlainMemorySource,
                                    CompressedMemorySource,
                                    PlainMemorySink,
                                    CompressedMemorySink,

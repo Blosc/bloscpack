@@ -38,7 +38,7 @@ from .file_io import (PlainFPSource,
                       )
 from .pretty import (double_pretty_size,
                      )
-from .sourcensink import (_compress_chunk_str,
+from .abstract_io import (_compress_chunk_str,
                           )
 from .util import (open_two_file,
                    )

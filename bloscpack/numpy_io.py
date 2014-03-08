@@ -21,7 +21,7 @@ from .args import (DEFAULT_BLOSCPACK_ARGS,
                    )
 from .defaults import (DEFAULT_CHUNK_SIZE,
                        )
-from .sourcensink import (PlainSource,
+from .abstract_io import (PlainSource,
                           PlainSink,
                           )
 from .exceptions import (NotANumpyArray,

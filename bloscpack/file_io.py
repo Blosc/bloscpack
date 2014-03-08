@@ -64,7 +64,7 @@ from .serializers import (SERIALIZERS_LOOKUP,
                           )
 from .util import (open_two_file,
                    )
-from .sourcensink import (PlainSource,
+from .abstract_io import (PlainSource,
                           PlainSink,
                           CompressedSource,
                           CompressedSink,

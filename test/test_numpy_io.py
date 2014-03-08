@@ -24,7 +24,7 @@ from bloscpack.numpy_io import (pack_ndarray,
                                 pack_ndarray_str,
                                 unpack_ndarray_str,
                                 )
-from bloscpack.sourcensink import (CompressedMemorySink,
+from bloscpack.abstract_io import (CompressedMemorySink,
                                    CompressedMemorySource,
                                    )
 

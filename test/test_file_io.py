@@ -9,8 +9,8 @@ from __future__ import print_function
 from cStringIO import StringIO
 
 
-import nose.tools as nt
 import blosc
+import nose.tools as nt
 from mock import patch
 
 
@@ -52,7 +52,11 @@ from bloscpack.headers import (decode_blosc_header,
                                create_metadata_header,
                                decode_metadata_header,
                                )
-from bloscpack.memory_io import PlainMemorySource, CompressedMemorySource, PlainMemorySink, CompressedMemorySink
+from bloscpack.memory_io import (PlainMemorySource,
+                                 CompressedMemorySource,
+                                 PlainMemorySink,
+                                 CompressedMemorySink
+                                 )
 from bloscpack.pretty import reverse_pretty
 from bloscpack.serializers import SERIALIZERS
 from bloscpack.abstract_io import (pack, unpack)
@@ -393,6 +397,7 @@ def test_pack_unpack_mem():
     pack_unpack_mem(1, chunk_size=reverse_pretty('4M'), metadata=metadata)
     pack_unpack_mem(1, chunk_size=reverse_pretty('8M'), metadata=metadata)
 
+
 def pack_unpack_hard():
     """ Test on somewhat larger arrays, but be nice to memory. """
     # Array is apprx. 1.5 GB large
@@ -405,5 +410,3 @@ def pack_unpack_extreme():
     # this will create a huge array, and then use the
     # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
     pack_unpack(300, chunk_size=blosc.BLOSC_MAX_BUFFERSIZE, progress=True)
-
-

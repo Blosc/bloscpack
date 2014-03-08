@@ -5,13 +5,10 @@
 
 from __future__ import division
 
-
 import itertools
 import os.path as path
 
-
 import blosc
-
 
 from .args import (DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_BLOSC_ARGS,
@@ -21,10 +18,8 @@ from .args import (DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_META_LEVEL,
                    calculate_nchunks,
                    _check_metadata_arguments,
-                   _check_blosc_args,
-                   _check_bloscpack_args,
-                   _handle_max_apps,
-                   )
+)
+from bloscpack.abstract_io import pack, unpack
 from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
                          check_valid_codec,
@@ -581,55 +576,6 @@ class CompressedFPSink(CompressedSink):
         return offset, compressed, digest
 
 
-def pack(source, sink,
-         nchunks, chunk_size, last_chunk,
-         metadata=None,
-         blosc_args=DEFAULT_BLOSC_ARGS,
-         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
-         metadata_args=DEFAULT_METADATA_ARGS):
-    """ Core packing function.  """
-    _check_blosc_args(blosc_args)
-    log.debug('blosc args are:')
-    for arg, value in blosc_args.iteritems():
-        log.debug('\t%s: %s' % (arg, value))
-    _check_bloscpack_args(bloscpack_args)
-    log.debug('bloscpack args are:')
-    for arg, value in bloscpack_args.iteritems():
-        log.debug('\t%s: %s' % (arg, value))
-    max_app_chunks = _handle_max_apps(bloscpack_args['offsets'],
-            nchunks,
-            bloscpack_args['max_app_chunks'])
-    # create the bloscpack header
-    bloscpack_header = BloscPackHeader(
-            offsets=bloscpack_args['offsets'],
-            metadata=metadata is not None,
-            checksum=bloscpack_args['checksum'],
-            typesize=blosc_args['typesize'],
-            chunk_size=chunk_size,
-            last_chunk=last_chunk,
-            nchunks=nchunks,
-            max_app_chunks=max_app_chunks
-            )
-    source.configure(chunk_size, last_chunk, nchunks)
-    sink.configure(blosc_args, bloscpack_header)
-    sink.write_bloscpack_header()
-    # deal with metadata
-    if metadata is not None:
-        sink.write_metadata(metadata, metadata_args)
-    elif metadata_args is not None:
-        log.debug('metadata_args will be silently ignored')
-    sink.init_offsets()
-
-    compress_func = source.compress_func
-    # read-compress-write loop
-    for i, chunk in enumerate(source()):
-        log.debug("Handle chunk '%d' %s" %
-                  (i, '(last)' if i == nchunks - 1 else ''))
-        compressed = compress_func(chunk, blosc_args)
-        sink.put(i, compressed)
-
-    sink.finalize()
-
 
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
               blosc_args=DEFAULT_BLOSC_ARGS,
@@ -681,13 +627,6 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
     out_file_size = path.getsize(out_file)
     log.verbose('output file size: %s' % double_pretty_size(out_file_size))
     log.verbose('compression ratio: %f' % (out_file_size/in_file_size))
-
-
-def unpack(source, sink):
-    # read, decompress, write loop
-    for compressed in iter(source):
-        sink.put(compressed)
-    return source.metadata
 
 
 def unpack_file(in_file, out_file):

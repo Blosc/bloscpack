@@ -8,7 +8,7 @@ from cStringIO import StringIO
 
 import blosc
 import nose.tools as nt
-
+from bloscpack.abstract_io import pack, unpack
 
 from bloscpack.append import (append,
                               append_fp,
@@ -25,9 +25,7 @@ from bloscpack.file_io import (PlainFPSource,
                                PlainFPSink,
                                CompressedFPSource,
                                CompressedFPSink,
-                               pack,
                                pack_file,
-                               unpack,
                                unpack_file,
                                _read_beginning,
                                _read_compressed_chunk_fp,

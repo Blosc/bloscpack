@@ -8,10 +8,9 @@ import cStringIO
 
 import blosc
 import numpy
+from bloscpack.abstract_io import pack
 
-
-from .file_io import (pack,
-                      CompressedFPSource,
+from .file_io import (CompressedFPSource,
                       CompressedFPSink,
                       )
 from .args import (DEFAULT_BLOSCPACK_ARGS,

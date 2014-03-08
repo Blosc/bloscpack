@@ -17,10 +17,10 @@ from .args import (BLOSC_ARGS,
                    calculate_nchunks,
                    _check_blosc_args,
                    )
+from .checksums import (CHECKSUMS_LOOKUP,
+                        )
 from .constants import (BLOSCPACK_HEADER_LENGTH,
                         METADATA_HEADER_LENGTH,
-                        )
-from .checksums import (CHECKSUMS_LOOKUP,
                         )
 from .defaults import (DEFAULT_CLEVEL,
                        DEFAULT_SHUFFLE,
@@ -38,11 +38,11 @@ from .file_io import (PlainFPSource,
                       )
 from .pretty import (double_pretty_size,
                      )
-import log
-from .util import (open_two_file,
-                   )
 from .sourcensink import (_compress_chunk_str,
                           )
+from .util import (open_two_file,
+                   )
+import log
 
 
 def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):

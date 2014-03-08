@@ -15,7 +15,7 @@ from .headers import (encode_int64,
                       )
 from .exceptions import (ChecksumMismatch,
                          )
-from .fileio import (_write_offsets,
+from .file_io import (_write_offsets,
                      _read_beginning,
                      _read_compressed_chunk_fp,
                      _write_metadata,

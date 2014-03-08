@@ -39,7 +39,7 @@ from .exceptions import (FileNotFound,
                          FormatVersionMismatch,
                          ChecksumMismatch,
                          )
-from .fileio import (_seek_to_metadata,
+from .file_io import (_seek_to_metadata,
                      _rewrite_metadata_fp,
                      _read_beginning,
                      )

@@ -34,7 +34,7 @@ from .defaults import (DEFAULT_CLEVEL,
                        )
 from .exceptions import (NotEnoughSpace,
                          )
-from .fileio import (_read_beginning,
+from .file_io import (_read_beginning,
                      _read_compressed_chunk_fp,
                      _write_offsets,
                      )

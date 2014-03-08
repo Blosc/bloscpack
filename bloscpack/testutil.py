@@ -15,6 +15,15 @@ import tempfile
 
 
 import numpy as np
+import nose.tools as nt
+
+
+from .defaults import (DEFAULT_CHUNK_SIZE,
+                       )
+from .util import (open_two_file,
+                   )
+from pretty import (reverse_pretty
+                    )
 
 
 def create_array(repeats, in_file, progress=False):
@@ -58,3 +67,21 @@ def create_tmp_files():
     yield tdir, in_file, out_file, dcmp_file
     # context manager remover
     shutil.rmtree(tdir)
+
+
+def cmp(file1, file2):
+    """ File comparison utility with a small chunksize """
+    with open_two_file(open(file1, 'rb'), open(file2, 'rb')) as \
+            (fp1, fp2):
+        cmp_fp(fp1, fp2)
+
+
+def cmp_fp(fp1, fp2):
+    chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
+    while True:
+        a = fp1.read(chunk_size)
+        b = fp2.read(chunk_size)
+        if a == '' and b == '':
+            return True
+        else:
+            nt.assert_equal(a, b)

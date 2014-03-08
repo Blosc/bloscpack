@@ -582,11 +582,11 @@ class CompressedFPSink(CompressedSink):
 
 
 def pack(source, sink,
-        nchunks, chunk_size, last_chunk,
-        metadata=None,
-        blosc_args=DEFAULT_BLOSC_ARGS,
-        bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
-        metadata_args=DEFAULT_METADATA_ARGS):
+         nchunks, chunk_size, last_chunk,
+         metadata=None,
+         blosc_args=DEFAULT_BLOSC_ARGS,
+         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+         metadata_args=DEFAULT_METADATA_ARGS):
     """ Core packing function.  """
     _check_blosc_args(blosc_args)
     log.debug('blosc args are:')

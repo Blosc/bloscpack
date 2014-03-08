@@ -4,10 +4,10 @@
 
 
 import abc
-import itertools
 
 
 import blosc
+
 
 from .exceptions import (ChecksumMismatch,
                          )

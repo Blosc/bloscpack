@@ -9,30 +9,13 @@ import itertools
 
 import blosc
 
-from .constants import (BLOSCPACK_HEADER_LENGTH,
-                        )
-from .headers import (encode_int64,
-                      )
 from .exceptions import (ChecksumMismatch,
                          )
-from .file_io import (_write_offsets,
-                     _read_beginning,
-                     _read_compressed_chunk_fp,
-                     _write_metadata,
-                     )
-from .pretty import (pretty_size,
-                     )
 import log
 
 
 def _compress_chunk_str(chunk, blosc_args):
     return blosc.compress(chunk, **blosc_args)
-
-
-def _write_compressed_chunk(output_fp, compressed, digest):
-    output_fp.write(compressed)
-    if len(digest) > 0:
-        output_fp.write(digest)
 
 
 class PlainSource(object):
@@ -66,35 +49,6 @@ class CompressedSource(object):
     @abc.abstractmethod
     def __call__(self):
         pass
-
-
-class PlainFPSource(PlainSource):
-
-    def __init__(self, input_fp):
-        self.input_fp = input_fp
-
-    def __call__(self):
-        # if nchunks == 1 the last_chunk_size is the size of the single chunk
-        for num_bytes in ([self.chunk_size] *
-                          (self.nchunks - 1) +
-                          [self.last_chunk]):
-            yield self.input_fp.read(num_bytes)
-
-
-class CompressedFPSource(CompressedSource):
-
-    def __init__(self, input_fp):
-
-        self.input_fp = input_fp
-        self.bloscpack_header, self.metadata, self.metadata_header, \
-                self.offsets = _read_beginning(input_fp)
-        self.checksum_impl = self.bloscpack_header.checksum_impl
-        self.nchunks = self.bloscpack_header.nchunks
-
-    def __call__(self):
-        for i in xrange(self.nchunks):
-            compressed, header = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
-            yield compressed
 
 
 class PlainMemorySource(PlainSource):
@@ -186,62 +140,6 @@ class CompressedSink(object):
             digest = ''
             log.debug('no checksum')
         return digest
-
-
-class PlainFPSink(PlainSink):
-
-    def __init__(self, output_fp, nchunks=None):
-        self.output_fp = output_fp
-        self.nchunks = nchunks
-        self.i = 0
-
-    def put(self, compressed):
-        log.debug("decompressing chunk '%d'%s" %
-                  (self.i, ' (last)' if self.nchunks is not None
-                   and self.i == self.nchunks - 1 else ''))
-        decompressed = blosc.decompress(compressed)
-        log.debug("chunk handled, in: %s out: %s" %
-                  (pretty_size(len(compressed)),
-                   pretty_size(len(decompressed))))
-        self.output_fp.write(decompressed)
-        self.i += 1
-
-
-class CompressedFPSink(CompressedSink):
-
-    def __init__(self, output_fp):
-        self.output_fp = output_fp
-        self.meta_total = 0
-
-    def write_bloscpack_header(self):
-        raw_bloscpack_header = self.bloscpack_header.encode()
-        self.output_fp.write(raw_bloscpack_header)
-
-    def write_metadata(self, metadata, metadata_args):
-        self.meta_total += _write_metadata(self.output_fp,
-                                           metadata,
-                                           metadata_args)
-
-    def init_offsets(self):
-        if self.offsets:
-            total_entries = self.bloscpack_header.nchunks + \
-                    self.bloscpack_header.max_app_chunks
-            self.offset_storage = list(itertools.repeat(-1,
-                                       self.bloscpack_header.nchunks))
-            self.output_fp.write(encode_int64(-1) * total_entries)
-
-    def finalize(self):
-        if self.offsets:
-            self.output_fp.seek(BLOSCPACK_HEADER_LENGTH + self.meta_total, 0)
-            _write_offsets(self.output_fp, self.offset_storage)
-
-    def put(self, i, compressed):
-        offset = self.output_fp.tell()
-        digest = self.do_checksum(compressed)
-        _write_compressed_chunk(self.output_fp, compressed, digest)
-        if self.offsets:
-            self.offset_storage[i] = offset
-        return offset, compressed, digest
 
 
 class PlainMemorySink(PlainSink):

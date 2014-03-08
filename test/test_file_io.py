@@ -14,11 +14,7 @@ import blosc
 from mock import patch
 
 
-from bloscpack.api import (pack,
-                           pack_file,
-                           unpack_file,
-                           unpack,
-                           append,
+from bloscpack.api import (append,
                            append_fp,
                            )
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
@@ -44,15 +40,23 @@ from bloscpack.exceptions import (NoSuchCodec,
                                   MetadataSectionTooSmall,
                                   ChecksumMismatch,
                                   )
-from bloscpack.file_io import (_read_bloscpack_header,
-                              _read_offsets,
-                              _read_beginning,
-                              _read_compressed_chunk_fp,
-                              _read_metadata,
-                              _write_metadata,
-                              _recreate_metadata,
-                              _rewrite_metadata_fp,
-                              )
+from bloscpack.file_io import (PlainFPSource,
+                               PlainFPSink,
+                               CompressedFPSource,
+                               CompressedFPSink,
+                               pack,
+                               pack_file,
+                               unpack,
+                               unpack_file,
+                               _read_bloscpack_header,
+                               _read_offsets,
+                               _read_beginning,
+                               _read_compressed_chunk_fp,
+                               _read_metadata,
+                               _write_metadata,
+                               _recreate_metadata,
+                               _rewrite_metadata_fp,
+                               )
 from bloscpack.headers import (decode_blosc_header,
                                create_metadata_header,
                                decode_metadata_header,
@@ -60,11 +64,7 @@ from bloscpack.headers import (decode_blosc_header,
                                )
 from bloscpack.pretty import reverse_pretty
 from bloscpack.serializers import SERIALIZERS
-from bloscpack.sourcensink import (PlainFPSource,
-                                   PlainFPSink,
-                                   CompressedFPSource,
-                                   CompressedFPSink,
-                                   PlainMemorySource,
+from bloscpack.sourcensink import (PlainMemorySource,
                                    CompressedMemorySource,
                                    PlainMemorySink,
                                    CompressedMemorySink,
@@ -268,7 +268,7 @@ def test_disable_offsets():
 
 
 # this will cause a bug if we ever reach 255 format versions
-@patch('bloscpack.fileio.FORMAT_VERSION', MAX_FORMAT_VERSION)
+@patch('bloscpack.file_io.FORMAT_VERSION', MAX_FORMAT_VERSION)
 def test_invalid_format():
     blosc_args = DEFAULT_BLOSC_ARGS
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):

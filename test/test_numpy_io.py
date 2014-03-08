@@ -14,16 +14,17 @@ from nose_parameterized import parameterized
 
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             )
+from bloscpack.file_io import (CompressedFPSource,
+                               CompressedFPSink,
+                               )
 from bloscpack.headers import (decode_blosc_header,
                                )
 from bloscpack.numpy_io import (pack_ndarray,
-                              unpack_ndarray,
-                              pack_ndarray_str,
-                              unpack_ndarray_str,
-                              )
-from bloscpack.sourcensink import (CompressedFPSource,
-                                   CompressedFPSink,
-                                   CompressedMemorySink,
+                                unpack_ndarray,
+                                pack_ndarray_str,
+                                unpack_ndarray_str,
+                                )
+from bloscpack.sourcensink import (CompressedMemorySink,
                                    CompressedMemorySource,
                                    )
 

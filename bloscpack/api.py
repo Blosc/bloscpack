@@ -13,14 +13,9 @@ import itertools
 import blosc
 
 
-from .args import (DEFAULT_BLOSCPACK_ARGS,
-                   DEFAULT_BLOSC_ARGS,
-                   DEFAULT_METADATA_ARGS,
-                   BLOSC_ARGS,
+from .args import (BLOSC_ARGS,
                    calculate_nchunks,
                    _check_blosc_args,
-                   _check_bloscpack_args,
-                   _handle_max_apps,
                    )
 from .constants import (BLOSCPACK_HEADER_LENGTH,
                         METADATA_HEADER_LENGTH,
@@ -30,174 +25,24 @@ from .checksums import (CHECKSUMS_LOOKUP,
 from .defaults import (DEFAULT_CLEVEL,
                        DEFAULT_SHUFFLE,
                        DEFAULT_CNAME,
-                       DEFAULT_CHUNK_SIZE,
                        )
 from .exceptions import (NotEnoughSpace,
+                         NonUniformTypesize,
                          )
-from .file_io import (_read_beginning,
-                     _read_compressed_chunk_fp,
-                     _write_offsets,
-                     )
-from .headers import (BloscPackHeader,
+from .file_io import (PlainFPSource,
+                      CompressedFPSink,
+                      _read_beginning,
+                      _read_compressed_chunk_fp,
+                      _write_offsets,
+                      _write_compressed_chunk,
                       )
 from .pretty import (double_pretty_size,
-                     pretty_size,
                      )
 import log
 from .util import (open_two_file,
                    )
-from .sourcensink import (PlainFPSource,
-                          PlainFPSink,
-                          CompressedFPSource,
-                          CompressedFPSink,
-                          _compress_chunk_str,
-                          _write_compressed_chunk,
+from .sourcensink import (_compress_chunk_str,
                           )
-
-
-def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
-              blosc_args=DEFAULT_BLOSC_ARGS,
-              bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
-              metadata_args=DEFAULT_METADATA_ARGS):
-    """ Main function for compressing a file.
-
-    Parameters
-    ----------
-    in_file : str
-        the name of the input file
-    out_file : str
-        the name of the output file
-    chunk_size : int
-        the desired chunk size in bytes
-    metadata : dict
-        the metadata dict
-    blosc_args : dict
-        blosc keyword args
-    bloscpack_args : dict
-        bloscpack keyword args
-    metadata_args : dict
-        metadata keyword args
-
-    Raises
-    ------
-
-    ChunkingException
-        if there was a problem caculating the chunks
-
-    # TODO document which arguments are silently ignored
-
-    """
-    in_file_size = path.getsize(in_file)
-    log.verbose('input file size: %s' % double_pretty_size(in_file_size))
-    # calculate chunk sizes
-    nchunks, chunk_size, last_chunk_size = \
-            calculate_nchunks(in_file_size, chunk_size)
-    with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
-            (input_fp, output_fp):
-        source = PlainFPSource(input_fp)
-        sink = CompressedFPSink(output_fp)
-        pack(source, sink,
-                nchunks, chunk_size, last_chunk_size,
-                metadata=metadata,
-                blosc_args=blosc_args,
-                bloscpack_args=bloscpack_args,
-                metadata_args=metadata_args)
-    out_file_size = path.getsize(out_file)
-    log.verbose('output file size: %s' % double_pretty_size(out_file_size))
-    log.verbose('compression ratio: %f' % (out_file_size/in_file_size))
-
-
-def pack(source, sink,
-        nchunks, chunk_size, last_chunk,
-        metadata=None,
-        blosc_args=DEFAULT_BLOSC_ARGS,
-        bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
-        metadata_args=DEFAULT_METADATA_ARGS):
-    """ Core packing function.  """
-    _check_blosc_args(blosc_args)
-    log.debug('blosc args are:')
-    for arg, value in blosc_args.iteritems():
-        log.debug('\t%s: %s' % (arg, value))
-    _check_bloscpack_args(bloscpack_args)
-    log.debug('bloscpack args are:')
-    for arg, value in bloscpack_args.iteritems():
-        log.debug('\t%s: %s' % (arg, value))
-    max_app_chunks = _handle_max_apps(bloscpack_args['offsets'],
-            nchunks,
-            bloscpack_args['max_app_chunks'])
-    # create the bloscpack header
-    bloscpack_header = BloscPackHeader(
-            offsets=bloscpack_args['offsets'],
-            metadata=metadata is not None,
-            checksum=bloscpack_args['checksum'],
-            typesize=blosc_args['typesize'],
-            chunk_size=chunk_size,
-            last_chunk=last_chunk,
-            nchunks=nchunks,
-            max_app_chunks=max_app_chunks
-            )
-    source.configure(chunk_size, last_chunk, nchunks)
-    sink.configure(blosc_args, bloscpack_header)
-    sink.write_bloscpack_header()
-    # deal with metadata
-    if metadata is not None:
-        sink.write_metadata(metadata, metadata_args)
-    elif metadata_args is not None:
-        log.debug('metadata_args will be silently ignored')
-    sink.init_offsets()
-
-    compress_func = source.compress_func
-    # read-compress-write loop
-    for i, chunk in enumerate(source()):
-        log.debug("Handle chunk '%d' %s" %
-                    (i,'(last)' if i == nchunks -1 else ''))
-        compressed = compress_func(chunk, blosc_args)
-        sink.put(i, compressed)
-
-    sink.finalize()
-
-
-def unpack(source, sink):
-    # read, decompress, write loop
-    for compressed in iter(source):
-        sink.put(compressed)
-    return source.metadata
-
-
-def unpack_file(in_file, out_file):
-    """ Main function for decompressing a file.
-
-    Parameters
-    ----------
-    in_file : str
-        the name of the input file
-    out_file : str
-        the name of the output file
-
-    Returns
-    -------
-    metadata : str
-        the metadata contained in the file if present
-
-    Raises
-    ------
-
-    FormatVersionMismatch
-        if the file has an unmatching format version number
-    ChecksumMismatch
-        if any of the chunks fail to produce the correct checksum
-    """
-    in_file_size = path.getsize(in_file)
-    log.verbose('input file size: %s' % pretty_size(in_file_size))
-    with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
-            (input_fp, output_fp):
-        source = CompressedFPSource(input_fp)
-        sink = PlainFPSink(output_fp, source.nchunks)
-        metadata = unpack(source, sink)
-    out_file_size = path.getsize(out_file)
-    log.verbose('output file size: %s' % pretty_size(out_file_size))
-    log.verbose('decompression ratio: %f' % (out_file_size / in_file_size))
-    return metadata
 
 
 def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):

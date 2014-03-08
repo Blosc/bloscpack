@@ -6,7 +6,7 @@
 
 from .version import __version__  # pragma: no cover
 
-from .api import (pack_file,
+from .file_io import (pack_file,
                   unpack_file,
                   )
 from .numpy_io import (pack_ndarray_file,

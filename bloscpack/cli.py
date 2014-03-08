@@ -16,9 +16,7 @@ from .args import (BLOSC_ARGS,
                    DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_METADATA_ARGS,
                    )
-from .api import (pack_file,
-                  unpack_file,
-                  append,
+from .api import (append,
                   )
 from .checksums import (CHECKSUMS_AVAIL,
                         )
@@ -39,10 +37,12 @@ from .exceptions import (FileNotFound,
                          FormatVersionMismatch,
                          ChecksumMismatch,
                          )
-from .file_io import (_seek_to_metadata,
-                     _rewrite_metadata_fp,
-                     _read_beginning,
-                     )
+from .file_io import (pack_file,
+                      unpack_file,
+                      _seek_to_metadata,
+                      _rewrite_metadata_fp,
+                      _read_beginning,
+                      )
 from .pretty import (reverse_pretty,
                      join_with_eol,
                      )

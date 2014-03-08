@@ -10,8 +10,10 @@ import blosc
 import numpy
 
 
-from .api import (pack,
-                  )
+from .file_io import (pack,
+                      CompressedFPSource,
+                      CompressedFPSink,
+                      )
 from .args import (DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_BLOSC_ARGS,
                    DEFAULT_METADATA_ARGS,
@@ -19,9 +21,7 @@ from .args import (DEFAULT_BLOSCPACK_ARGS,
                    )
 from .defaults import (DEFAULT_CHUNK_SIZE,
                        )
-from .sourcensink import (CompressedFPSource,
-                          CompressedFPSink,
-                          PlainSource,
+from .sourcensink import (PlainSource,
                           PlainSink,
                           )
 from .exceptions import (NotANumpyArray,

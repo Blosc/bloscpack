@@ -3,10 +3,27 @@
 # vim :set ft=py:
 
 
-from .args import (_check_metadata_arguments,
+from __future__ import division
+
+
+import itertools
+import os.path as path
+
+
+import blosc
+
+
+from .args import (DEFAULT_BLOSCPACK_ARGS,
+                   DEFAULT_BLOSC_ARGS,
+                   DEFAULT_METADATA_ARGS,
                    METADATA_ARGS,
                    DEFAULT_META_CODEC,
                    DEFAULT_META_LEVEL,
+                   calculate_nchunks,
+                   _check_metadata_arguments,
+                   _check_blosc_args,
+                   _check_bloscpack_args,
+                   _handle_max_apps,
                    )
 from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
@@ -22,6 +39,8 @@ from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
                         check_valid_checksum,
                         )
+from .defaults import (DEFAULT_CHUNK_SIZE,
+                       )
 from .exceptions import (MetadataSectionTooSmall,
                          FormatVersionMismatch,
                          ChecksumMismatch,
@@ -38,9 +57,17 @@ from .headers import (create_metadata_header,
                       check_range,
                       )
 from .pretty import (double_pretty_size,
+                     pretty_size,
                      )
 from .serializers import (SERIALIZERS_LOOKUP,
                           check_valid_serializer,
+                          )
+from .util import (open_two_file,
+                   )
+from .sourcensink import (PlainSource,
+                          PlainSink,
+                          CompressedSource,
+                          CompressedSink,
                           )
 import log
 
@@ -87,9 +114,9 @@ def _write_metadata(output_fp, metadata, metadata_args):
         # be opportunistic, avoid compression if not beneficial
         if meta_size < meta_comp_size:
             log.debug('metadata compression requested, but it was not '
-                    'beneficial, deactivating '
-                    "(raw: '%s' vs. compressed: '%s') " %
-                    (meta_size, meta_comp_size))
+                      'beneficial, deactivating '
+                      "(raw: '%s' vs. compressed: '%s') " %
+                      (meta_size, meta_comp_size))
             meta_comp_size = meta_size
         else:
             codec = codec_impl.name
@@ -98,14 +125,14 @@ def _write_metadata(output_fp, metadata, metadata_args):
         meta_size = len(metadata)
         meta_comp_size = meta_size
     log.debug("Raw %s metadata of size '%s': %s" %
-            ('compressed' if metadata_args['meta_codec'] != 'None' else
-                'uncompressed', meta_comp_size, repr(metadata)))
+              ('compressed' if metadata_args['meta_codec'] != 'None' else
+               'uncompressed', meta_comp_size, repr(metadata)))
     if hasattr(metadata_args['max_meta_size'], '__call__'):
         max_meta_size = metadata_args['max_meta_size'](meta_size)
     elif isinstance(metadata_args['max_meta_size'], int):
         max_meta_size = metadata_args['max_meta_size']
     log.debug('max meta size is deemed to be: %d' %
-            max_meta_size)
+              max_meta_size)
     if meta_comp_size > max_meta_size:
         raise MetadataSectionTooSmall(
                 'metadata section is too small to contain the metadata '
@@ -461,3 +488,239 @@ def _recreate_metadata(old_metadata_header, new_metadata,
         check_range('meta_level', level, 0, MAX_CLEVEL)
         metadata_args['meta_level'] = level
     return metadata_args
+
+
+def _write_compressed_chunk(output_fp, compressed, digest):
+    output_fp.write(compressed)
+    if len(digest) > 0:
+        output_fp.write(digest)
+
+
+class PlainFPSource(PlainSource):
+
+    def __init__(self, input_fp):
+        self.input_fp = input_fp
+
+    def __call__(self):
+        # if nchunks == 1 the last_chunk_size is the size of the single chunk
+        for num_bytes in ([self.chunk_size] *
+                          (self.nchunks - 1) +
+                          [self.last_chunk]):
+            yield self.input_fp.read(num_bytes)
+
+
+class CompressedFPSource(CompressedSource):
+
+    def __init__(self, input_fp):
+
+        self.input_fp = input_fp
+        self.bloscpack_header, self.metadata, self.metadata_header, \
+                self.offsets = _read_beginning(input_fp)
+        self.checksum_impl = self.bloscpack_header.checksum_impl
+        self.nchunks = self.bloscpack_header.nchunks
+
+    def __call__(self):
+        for i in xrange(self.nchunks):
+            compressed, header = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
+            yield compressed
+
+
+class PlainFPSink(PlainSink):
+
+    def __init__(self, output_fp, nchunks=None):
+        self.output_fp = output_fp
+        self.nchunks = nchunks
+        self.i = 0
+
+    def put(self, compressed):
+        log.debug("decompressing chunk '%d'%s" %
+                  (self.i, ' (last)' if self.nchunks is not None
+                   and self.i == self.nchunks - 1 else ''))
+        decompressed = blosc.decompress(compressed)
+        log.debug("chunk handled, in: %s out: %s" %
+                  (pretty_size(len(compressed)),
+                   pretty_size(len(decompressed))))
+        self.output_fp.write(decompressed)
+        self.i += 1
+
+
+class CompressedFPSink(CompressedSink):
+
+    def __init__(self, output_fp):
+        self.output_fp = output_fp
+        self.meta_total = 0
+
+    def write_bloscpack_header(self):
+        raw_bloscpack_header = self.bloscpack_header.encode()
+        self.output_fp.write(raw_bloscpack_header)
+
+    def write_metadata(self, metadata, metadata_args):
+        self.meta_total += _write_metadata(self.output_fp,
+                                           metadata,
+                                           metadata_args)
+
+    def init_offsets(self):
+        if self.offsets:
+            total_entries = self.bloscpack_header.nchunks + \
+                    self.bloscpack_header.max_app_chunks
+            self.offset_storage = list(itertools.repeat(-1,
+                                       self.bloscpack_header.nchunks))
+            self.output_fp.write(encode_int64(-1) * total_entries)
+
+    def finalize(self):
+        if self.offsets:
+            self.output_fp.seek(BLOSCPACK_HEADER_LENGTH + self.meta_total, 0)
+            _write_offsets(self.output_fp, self.offset_storage)
+
+    def put(self, i, compressed):
+        offset = self.output_fp.tell()
+        digest = self.do_checksum(compressed)
+        _write_compressed_chunk(self.output_fp, compressed, digest)
+        if self.offsets:
+            self.offset_storage[i] = offset
+        return offset, compressed, digest
+
+
+def pack(source, sink,
+        nchunks, chunk_size, last_chunk,
+        metadata=None,
+        blosc_args=DEFAULT_BLOSC_ARGS,
+        bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+        metadata_args=DEFAULT_METADATA_ARGS):
+    """ Core packing function.  """
+    _check_blosc_args(blosc_args)
+    log.debug('blosc args are:')
+    for arg, value in blosc_args.iteritems():
+        log.debug('\t%s: %s' % (arg, value))
+    _check_bloscpack_args(bloscpack_args)
+    log.debug('bloscpack args are:')
+    for arg, value in bloscpack_args.iteritems():
+        log.debug('\t%s: %s' % (arg, value))
+    max_app_chunks = _handle_max_apps(bloscpack_args['offsets'],
+            nchunks,
+            bloscpack_args['max_app_chunks'])
+    # create the bloscpack header
+    bloscpack_header = BloscPackHeader(
+            offsets=bloscpack_args['offsets'],
+            metadata=metadata is not None,
+            checksum=bloscpack_args['checksum'],
+            typesize=blosc_args['typesize'],
+            chunk_size=chunk_size,
+            last_chunk=last_chunk,
+            nchunks=nchunks,
+            max_app_chunks=max_app_chunks
+            )
+    source.configure(chunk_size, last_chunk, nchunks)
+    sink.configure(blosc_args, bloscpack_header)
+    sink.write_bloscpack_header()
+    # deal with metadata
+    if metadata is not None:
+        sink.write_metadata(metadata, metadata_args)
+    elif metadata_args is not None:
+        log.debug('metadata_args will be silently ignored')
+    sink.init_offsets()
+
+    compress_func = source.compress_func
+    # read-compress-write loop
+    for i, chunk in enumerate(source()):
+        log.debug("Handle chunk '%d' %s" %
+                  (i, '(last)' if i == nchunks - 1 else ''))
+        compressed = compress_func(chunk, blosc_args)
+        sink.put(i, compressed)
+
+    sink.finalize()
+
+
+def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
+              blosc_args=DEFAULT_BLOSC_ARGS,
+              bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+              metadata_args=DEFAULT_METADATA_ARGS):
+    """ Main function for compressing a file.
+
+    Parameters
+    ----------
+    in_file : str
+        the name of the input file
+    out_file : str
+        the name of the output file
+    chunk_size : int
+        the desired chunk size in bytes
+    metadata : dict
+        the metadata dict
+    blosc_args : dict
+        blosc keyword args
+    bloscpack_args : dict
+        bloscpack keyword args
+    metadata_args : dict
+        metadata keyword args
+
+    Raises
+    ------
+
+    ChunkingException
+        if there was a problem caculating the chunks
+
+    # TODO document which arguments are silently ignored
+
+    """
+    in_file_size = path.getsize(in_file)
+    log.verbose('input file size: %s' % double_pretty_size(in_file_size))
+    # calculate chunk sizes
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(in_file_size, chunk_size)
+    with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
+            (input_fp, output_fp):
+        source = PlainFPSource(input_fp)
+        sink = CompressedFPSink(output_fp)
+        pack(source, sink,
+                nchunks, chunk_size, last_chunk_size,
+                metadata=metadata,
+                blosc_args=blosc_args,
+                bloscpack_args=bloscpack_args,
+                metadata_args=metadata_args)
+    out_file_size = path.getsize(out_file)
+    log.verbose('output file size: %s' % double_pretty_size(out_file_size))
+    log.verbose('compression ratio: %f' % (out_file_size/in_file_size))
+
+
+def unpack(source, sink):
+    # read, decompress, write loop
+    for compressed in iter(source):
+        sink.put(compressed)
+    return source.metadata
+
+
+def unpack_file(in_file, out_file):
+    """ Main function for decompressing a file.
+
+    Parameters
+    ----------
+    in_file : str
+        the name of the input file
+    out_file : str
+        the name of the output file
+
+    Returns
+    -------
+    metadata : str
+        the metadata contained in the file if present
+
+    Raises
+    ------
+
+    FormatVersionMismatch
+        if the file has an unmatching format version number
+    ChecksumMismatch
+        if any of the chunks fail to produce the correct checksum
+    """
+    in_file_size = path.getsize(in_file)
+    log.verbose('input file size: %s' % pretty_size(in_file_size))
+    with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
+            (input_fp, output_fp):
+        source = CompressedFPSource(input_fp)
+        sink = PlainFPSink(output_fp, source.nchunks)
+        metadata = unpack(source, sink)
+    out_file_size = path.getsize(out_file)
+    log.verbose('output file size: %s' % pretty_size(out_file_size))
+    log.verbose('decompression ratio: %f' % (out_file_size / in_file_size))
+    return metadata

@@ -10,7 +10,8 @@ import blosc
 import numpy
 
 
-from .abstract_io import(pack
+from .abstract_io import(pack,
+                         unpack,
                          )
 from .file_io import (CompressedFPSource,
                       CompressedFPSink,
@@ -178,8 +179,7 @@ def unpack_ndarray(source):
     """
 
     sink = PlainNumpySink(source.metadata)
-    for compressed in iter(source):
-        sink.put(compressed)
+    unpack(source, sink)
     return sink.ndarray
 
 
@@ -190,9 +190,7 @@ def unpack_ndarray_file(filename):
 
 def unpack_ndarray_str(str_):
     sio = cStringIO.StringIO(str_)
-
     source = CompressedFPSource(sio)
     sink = PlainNumpySink(source.metadata)
-    for compressed in iter(source):
-        sink.put(compressed)
+    unpack(source, sink)
     return sink.ndarray

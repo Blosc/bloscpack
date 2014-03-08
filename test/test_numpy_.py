@@ -16,7 +16,7 @@ from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             )
 from bloscpack.headers import (decode_blosc_header,
                                )
-from bloscpack.numpy_ import (pack_ndarray,
+from bloscpack.numpy_io import (pack_ndarray,
                               unpack_ndarray,
                               pack_ndarray_str,
                               unpack_ndarray_str,

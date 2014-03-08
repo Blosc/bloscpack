@@ -19,14 +19,12 @@ from bloscpack.file_io import (CompressedFPSource,
                                )
 from bloscpack.headers import (decode_blosc_header,
                                )
+from bloscpack.memory_io import CompressedMemorySource, CompressedMemorySink
 from bloscpack.numpy_io import (pack_ndarray,
                                 unpack_ndarray,
                                 pack_ndarray_str,
                                 unpack_ndarray_str,
                                 )
-from bloscpack.abstract_io import (CompressedMemorySink,
-                                   CompressedMemorySource,
-                                   )
 
 
 def test_roundtrip_numpy():

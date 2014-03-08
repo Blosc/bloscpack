@@ -52,13 +52,10 @@ from bloscpack.headers import (decode_blosc_header,
                                create_metadata_header,
                                decode_metadata_header,
                                )
+from bloscpack.memory_io import PlainMemorySource, CompressedMemorySource, PlainMemorySink, CompressedMemorySink
 from bloscpack.pretty import reverse_pretty
 from bloscpack.serializers import SERIALIZERS
-from bloscpack.abstract_io import (PlainMemorySource,
-                                   CompressedMemorySource,
-                                   PlainMemorySink,
-                                   CompressedMemorySink,
-                                   pack, unpack)
+from bloscpack.abstract_io import (pack, unpack)
 from bloscpack.testutil import (create_array,
                                 create_array_fp,
                                 create_tmp_files,

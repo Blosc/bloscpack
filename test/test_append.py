@@ -70,7 +70,6 @@ def reset_read_beginning(input_fp):
     """ like ``_read_beginning`` but with ``reset()`` on the file pointer. """
     ans = _read_beginning(input_fp)
     input_fp.reset()
-    print(ans)
     return ans
 
 

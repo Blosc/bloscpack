@@ -10,9 +10,9 @@ import nose.tools as nt
 import blosc
 
 
-from bloscpack.api import (append,
-                           append_fp,
-                           )
+from bloscpack.append import (append,
+                              append_fp,
+                              )
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             DEFAULT_BLOSCPACK_ARGS,
                             calculate_nchunks,

@@ -16,7 +16,7 @@ from .args import (BLOSC_ARGS,
                    DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_METADATA_ARGS,
                    )
-from .api import (append,
+from .append import (append,
                   )
 from .checksums import (CHECKSUMS_AVAIL,
                         )

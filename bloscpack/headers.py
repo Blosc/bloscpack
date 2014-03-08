@@ -12,10 +12,10 @@ import struct
 import blosc
 
 
-from checksums import (CHECKSUMS_AVAIL,
-                       CHECKSUMS_LOOKUP,
-                       check_valid_checksum,
-                       )
+from .checksums import (CHECKSUMS_AVAIL,
+                        CHECKSUMS_LOOKUP,
+                        check_valid_checksum,
+                        )
 from .constants import (MAGIC,
                         FORMAT_VERSION,
                         MAX_FORMAT_VERSION,

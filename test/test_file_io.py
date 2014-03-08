@@ -329,12 +329,11 @@ def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
         print("Decompressing")
     source = CompressedFPSource(out_fp)
     sink = PlainFPSink(dcmp_fp)
-    metadata = unpack(source, sink)
+    unpack(source, sink)
     if progress:
         print("Verifying")
     cmp_fp(in_fp, dcmp_fp)
-    if metadata:
-        return metadata
+    return source.metadata
 
 
 def pack_unpack_mem(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
@@ -355,19 +354,18 @@ def pack_unpack_mem(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
     pack(source, sink, nchunks, chunk_size, last_chunk_size, metadata=metadata)
     source = CompressedMemorySource(sink)
     sink = PlainMemorySink()
-    received_metadata = unpack(source, sink)
-    nt.assert_equal(metadata, received_metadata)
+    unpack(source, sink)
+    nt.assert_equal(metadata, source.metadata)
     source = PlainMemorySource(sink.chunks)
     sink = CompressedFPSink(out_fp)
     pack(source, sink, nchunks, chunk_size, last_chunk_size, metadata=metadata)
     out_fp.seek(0)
     source = CompressedFPSource(out_fp)
     sink = PlainFPSink(dcmp_fp)
-    received_metadata = unpack(source, sink)
-    nt.assert_equal(metadata, received_metadata)
+    unpack(source, sink)
+    nt.assert_equal(metadata, source.metadata)
     cmp_fp(in_fp, dcmp_fp)
-    if metadata:
-        return metadata
+    return source.metadata
 
 
 def test_pack_unpack():

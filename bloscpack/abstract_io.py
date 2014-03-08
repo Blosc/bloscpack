@@ -161,4 +161,3 @@ def unpack(source, sink):
     # read, decompress, write loop
     for compressed in iter(source):
         sink.put(compressed)
-    return source.metadata

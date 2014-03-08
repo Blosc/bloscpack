@@ -660,8 +660,8 @@ def unpack_file(in_file, out_file):
             (input_fp, output_fp):
         source = CompressedFPSource(input_fp)
         sink = PlainFPSink(output_fp, source.nchunks)
-        metadata = unpack(source, sink)
+        unpack(source, sink)
     out_file_size = path.getsize(out_file)
     log.verbose('output file size: %s' % pretty_size(out_file_size))
     log.verbose('decompression ratio: %f' % (out_file_size / in_file_size))
-    return metadata
+    return source.metadata

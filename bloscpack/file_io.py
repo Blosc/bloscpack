@@ -18,8 +18,10 @@ from .args import (DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_META_LEVEL,
                    calculate_nchunks,
                    _check_metadata_arguments,
-)
-from bloscpack.abstract_io import pack, unpack
+                   )
+from .abstract_io import (pack,
+                          unpack,
+                          )
 from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
                          check_valid_codec,

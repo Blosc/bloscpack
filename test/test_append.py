@@ -368,6 +368,3 @@ def test_append_mix_shuffle():
     nt.assert_equal(blosc_header_zero['flags'], 1)
     # last chunk doesn't
     nt.assert_equal(blosc_header_last['flags'], 0)
-
-
-

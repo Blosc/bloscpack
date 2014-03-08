@@ -14,7 +14,7 @@ from .args import (DEFAULT_BLOSC_ARGS,
                    _check_bloscpack_args,
                    _handle_max_apps
                    )
-from .headers import (BloscPackHeader
+from .headers import (BloscPackHeader,
                       )
 import log
 

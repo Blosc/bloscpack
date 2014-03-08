@@ -6,8 +6,8 @@
 from cStringIO import StringIO
 
 
-import nose.tools as nt
 import blosc
+import nose.tools as nt
 
 
 from bloscpack.append import (append,

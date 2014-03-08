@@ -15,7 +15,6 @@ import tempfile
 
 
 import numpy as np
-import nose.tools as nt
 
 
 from .defaults import (DEFAULT_CHUNK_SIZE,
@@ -77,6 +76,7 @@ def cmp(file1, file2):
 
 
 def cmp_fp(fp1, fp2):
+    import nose.tools as nt  # nose is a testing dependency
     chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
     while True:
         a = fp1.read(chunk_size)

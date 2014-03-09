@@ -578,7 +578,6 @@ class CompressedFPSink(CompressedSink):
         return offset, compressed, digest
 
 
-
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
               blosc_args=DEFAULT_BLOSC_ARGS,
               bloscpack_args=DEFAULT_BLOSCPACK_ARGS,

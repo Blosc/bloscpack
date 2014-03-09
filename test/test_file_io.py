@@ -14,6 +14,9 @@ import nose.tools as nt
 from mock import patch
 
 
+from bloscpack.append import (_rewrite_metadata_fp,
+                              _recreate_metadata,
+                              )
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             DEFAULT_BLOSCPACK_ARGS,
                             DEFAULT_METADATA_ARGS,
@@ -45,8 +48,6 @@ from bloscpack.file_io import (PlainFPSource,
                                _read_beginning,
                                _read_metadata,
                                _write_metadata,
-                               _recreate_metadata,
-                               _rewrite_metadata_fp,
                                )
 from bloscpack.headers import (decode_blosc_header,
                                create_metadata_header,

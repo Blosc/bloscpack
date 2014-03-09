@@ -13,9 +13,6 @@ import blosc
 from .args import (DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_BLOSC_ARGS,
                    DEFAULT_METADATA_ARGS,
-                   METADATA_ARGS,
-                   DEFAULT_META_CODEC,
-                   DEFAULT_META_LEVEL,
                    calculate_nchunks,
                    _check_metadata_arguments,
                    )
@@ -24,41 +21,33 @@ from .abstract_io import (pack,
                           )
 from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
-                         check_valid_codec,
-                         )
+)
 from .constants import (METADATA_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
                         BLOSC_HEADER_LENGTH,
                         FORMAT_VERSION,
-                        MAX_CLEVEL,
-                        )
+)
 from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
-                        check_valid_checksum,
-                        )
+)
 from .defaults import (DEFAULT_CHUNK_SIZE,
                        )
 from .exceptions import (MetadataSectionTooSmall,
                          FormatVersionMismatch,
                          ChecksumMismatch,
-                         NoMetadataFound,
-                         NoChangeInMetadata,
-                         ChecksumLengthMismatch,
-                         )
+)
 from .headers import (create_metadata_header,
                       decode_metadata_header,
                       decode_blosc_header,
                       BloscPackHeader,
                       decode_int64,
                       encode_int64,
-                      check_range,
-                      )
+)
 from .pretty import (double_pretty_size,
                      pretty_size,
                      )
 from .serializers import (SERIALIZERS_LOOKUP,
-                          check_valid_serializer,
-                          )
+)
 from .util import (open_two_file,
                    )
 from .abstract_io import (PlainSource,
@@ -360,130 +349,6 @@ def _read_compressed_chunk_fp(input_fp, checksum_impl):
             log.debug('checksum OK (%s): %s ' %
                       (checksum_impl.name, repr(received_digest)))
     return compressed, blosc_header
-
-
-def _seek_to_metadata(target_fp):
-    """ Given a target file pointer, seek to the metadata section.
-
-    Parameters
-    ----------
-
-    target_fp : file like
-        the target file pointer
-
-    Returns
-    -------
-    metadata_position : int
-
-    Raises
-    ------
-    NoMetadataFound
-        if there is no metadata section in this file
-
-    """
-    bloscpack_header = _read_bloscpack_header(target_fp)
-    if not bloscpack_header.metadata:
-        raise NoMetadataFound("unable to seek to metadata if it does not exist")
-    else:
-        return target_fp.tell()
-
-
-def _rewrite_metadata_fp(target_fp, new_metadata,
-                         magic_format=None, checksum=None,
-                         codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
-    """ Rewrite the metadata section in a file pointer.
-
-    Parameters
-    ----------
-    target_fp : file like
-        the target file pointer to rewrite in
-    new_metadata: dict
-        the new metadata to save
-
-    See the notes in ``_recreate_metadata`` for a description of the keyword
-    arguments.
-
-    """
-    # cache the current position
-    current_pos = target_fp.tell()
-    # read the metadata section
-    old_metadata, old_metadata_header = _read_metadata(target_fp)
-    if old_metadata == new_metadata:
-        raise NoChangeInMetadata(
-                'you requested to update metadata, but this has not changed')
-    new_metadata_args = _recreate_metadata(old_metadata_header, new_metadata,
-            magic_format=magic_format, checksum=checksum,
-            codec=codec, level=level)
-    # seek back to where the metadata begins...
-    target_fp.seek(current_pos, 0)
-    # and re-write it
-    _write_metadata(target_fp, new_metadata, new_metadata_args)
-
-
-def _recreate_metadata(old_metadata_header, new_metadata,
-                       magic_format=None, checksum=None,
-                       codec=DEFAULT_META_CODEC, level=DEFAULT_META_LEVEL):
-    """ Update the metadata section.
-
-    Parameters
-    ----------
-    old_metadata_header: dict
-        the header of the old metadata
-    new_metadata: dict
-        the new metadata to save
-
-    See the notes below for a description of the keyword arguments.
-
-    Returns
-    -------
-    new_metadata_args: dict
-        the new arguments for ``_write_metadata``
-
-    Raises
-    ------
-    ChecksumLengthMismatch
-        if the new checksum has a different length than the old one
-    NoChangeInMetadata
-        if the metadata has not changed
-
-    Notes
-    -----
-    This create new ``metadata_args`` based on an old metadata_header, Since
-    the space has already been allocated, only certain metadata arguments can
-    be overridden. The keyword arguments specify which ones these are. If a
-    keyword argument value is 'None' the existing argument which is obtained
-    from the header is used.  Otherwise the value from the keyword argument
-    takes precedence. Due to a policy of opportunistic compression, the 'codec'
-    and 'level' arguments are not 'None' by default, to ensure that previously
-    uncompressed metadata, which might be favourably compressible as a result
-    of the enlargement process, will actually be compressed. As for the
-    'checksum' only a checksum with the same digest size can be used.
-
-    The ``metadata_args`` returned by this function are suitable to be passed
-    on to ``_write_metadata``.
-
-    """
-    # get the settings from the metadata header
-    metadata_args = dict((k, old_metadata_header[k]) for k in METADATA_ARGS)
-    # handle and check validity of overrides
-    if magic_format is not None:
-        check_valid_serializer(magic_format)
-        metadata_args['magic_format'] = magic_format
-    if checksum is not None:
-        check_valid_checksum(checksum)
-        old_impl = CHECKSUMS_LOOKUP[old_metadata_header['meta_checksum']]
-        new_impl = CHECKSUMS_LOOKUP[checksum]
-        if old_impl.size != new_impl.size:
-            raise ChecksumLengthMismatch(
-                    'checksums have a size mismatch')
-        metadata_args['meta_checksum'] = checksum
-    if codec is not None:
-        check_valid_codec(codec)
-        metadata_args['meta_codec'] = codec
-    if level is not None:
-        check_range('meta_level', level, 0, MAX_CLEVEL)
-        metadata_args['meta_level'] = level
-    return metadata_args
 
 
 def _write_compressed_chunk(output_fp, compressed, digest):

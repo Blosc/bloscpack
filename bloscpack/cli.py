@@ -17,7 +17,9 @@ from .args import (BLOSC_ARGS,
                    DEFAULT_METADATA_ARGS,
                    )
 from .append import (append,
-                  )
+                     _seek_to_metadata,
+                     _rewrite_metadata_fp
+                     )
 from .checksums import (CHECKSUMS_AVAIL,
                         )
 from .constants import (SUFFIXES,
@@ -39,8 +41,6 @@ from .exceptions import (FileNotFound,
                          )
 from .file_io import (pack_file,
                       unpack_file,
-                      _seek_to_metadata,
-                      _rewrite_metadata_fp,
                       _read_beginning,
                       )
 from .pretty import (reverse_pretty,

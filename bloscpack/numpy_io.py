@@ -191,6 +191,4 @@ def unpack_ndarray_file(filename):
 def unpack_ndarray_str(str_):
     sio = cStringIO.StringIO(str_)
     source = CompressedFPSource(sio)
-    sink = PlainNumpySink(source.metadata)
-    unpack(source, sink)
-    return sink.ndarray
+    return unpack_ndarray(source)

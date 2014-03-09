@@ -153,7 +153,7 @@ def test_decode_blosc_header():
     nt.assert_equal(expected, header)
 
 
-def test_BloscPackHeader_constructor():
+def test_BloscPackHeader_constructor_exceptions():
     # uses nose test generators
 
     def check(error_type, args_dict):
@@ -184,12 +184,34 @@ def test_BloscPackHeader_constructor():
             # sum of nchunks and max_app_chunks
             (ValueError, {'nchunks': MAX_CHUNKS/2+1,
                           'max_app_chunks': MAX_CHUNKS/2+1}),
+            # check that max_app_chunks is zero
+            (ValueError, {'nchunks': -1,
+                          'max_app_chunks': 1}),
             # check constraint on last chunk, must be equal to or smaller than
             # chunk_size
             (ValueError, {'chunk_size': 1,
                           'last_chunk': 2}),
             ]:
         yield check, error_type, args_dict
+
+
+def test_BloscPackHeader_total_prospective_entries():
+    # uses nose test generators
+    def check(expected, nchunks, max_app_chunks):
+        header = BloscPackHeader(nchunks=nchunks,
+                                 max_app_chunks=max_app_chunks)
+        nt.assert_equal(expected, header.total_prospective_chunks)
+    for expected, (nchunks, max_app_chunks) in [
+            (0, (0, 0)),
+            (1, (1, 0)),
+            (1, (0, 1)),
+            (None, (-1, 0)),
+            (65, (42, 23)),
+            (MAX_CHUNKS-1, (MAX_CHUNKS/2, MAX_CHUNKS/2)),
+            (MAX_CHUNKS, (MAX_CHUNKS-1, 1)),
+            (MAX_CHUNKS, (1, MAX_CHUNKS-1)),
+            ]:
+        yield check, expected, nchunks, max_app_chunks
 
 
 def test_BloscPackHeader_encode():

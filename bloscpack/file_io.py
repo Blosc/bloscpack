@@ -274,8 +274,7 @@ def _read_offsets(input_fp, bloscpack_header):
 
     """
     if bloscpack_header.offsets:
-        total_entries = bloscpack_header.nchunks + \
-                bloscpack_header.max_app_chunks
+        total_entries = bloscpack_header.total_prospective_chunks
         offsets_raw = input_fp.read(8 * total_entries)
         log.debug('Read raw offsets: %s' % repr(offsets_raw))
         offsets = [decode_int64(offsets_raw[j - 8:j]) for j in
@@ -558,8 +557,7 @@ class CompressedFPSink(CompressedSink):
 
     def init_offsets(self):
         if self.offsets:
-            total_entries = self.bloscpack_header.nchunks + \
-                    self.bloscpack_header.max_app_chunks
+            total_entries = self.bloscpack_header.total_prospective_chunks
             self.offset_storage = list(itertools.repeat(-1,
                                        self.bloscpack_header.nchunks))
             self.output_fp.write(encode_int64(-1) * total_entries)

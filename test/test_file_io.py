@@ -73,8 +73,7 @@ def test_offsets():
         pack_file(in_file, out_file, chunk_size='2M')
         with open(out_file, 'r+b') as input_fp:
             bloscpack_header = _read_bloscpack_header(input_fp)
-            total_entries = bloscpack_header.nchunks + \
-                            bloscpack_header.max_app_chunks
+            total_entries = bloscpack_header.total_prospective_chunks
             offsets = _read_offsets(input_fp, bloscpack_header)
             # First chunks should start after header and offsets
             first = BLOSCPACK_HEADER_LENGTH + 8 * total_entries

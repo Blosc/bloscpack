@@ -337,6 +337,11 @@ class BloscPackHeader(collections.MutableMapping):
     def checksum_impl(self):
         return CHECKSUMS_LOOKUP[self.checksum]
 
+    @property
+    def total_prospective_chunks(self):
+        return self.nchunks + self.max_app_chunks \
+            if self.nchunks >= 0 else None
+
     def encode(self):
         """ Encode the Bloscpack header.
 

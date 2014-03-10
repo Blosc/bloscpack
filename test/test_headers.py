@@ -42,17 +42,19 @@ def test_check_range():
 
 
 def test_create_options():
-    nt.assert_equal('00000001', create_options())
-    nt.assert_equal('00000001', create_options(offsets=True))
-    nt.assert_equal('00000000', create_options(offsets=False))
 
-    nt.assert_equal('00000001', create_options(metadata=False))
-    nt.assert_equal('00000011', create_options(metadata=True))
-
-    nt.assert_equal('00000000', create_options(offsets=False, metadata=False))
-    nt.assert_equal('00000010', create_options(offsets=False, metadata=True))
-    nt.assert_equal('00000001', create_options(offsets=True, metadata=False))
-    nt.assert_equal('00000011', create_options(offsets=True, metadata=True))
+    for expected_options, kwargs in [
+            ('00000001', {}),
+            ('00000001', {'offsets': True}),
+            ('00000000', {'offsets': False}),
+            ('00000001', {'metadata': False}),
+            ('00000011', {'metadata': True}),
+            ('00000000', {'offsets': False, 'metadata': False}),
+            ('00000010', {'offsets': False, 'metadata': True}),
+            ('00000001', {'offsets': True, 'metadata': False}),
+            ('00000011', {'offsets': True, 'metadata': True}),
+            ]:
+        yield nt.assert_equal, expected_options, create_options(**kwargs)
 
 
 def test_decode_options():

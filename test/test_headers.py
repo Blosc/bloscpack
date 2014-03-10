@@ -109,14 +109,20 @@ def test_create_metadata_options():
 
 def test_decode_metadata_options():
     nt.assert_equal({}, decode_metadata_options('00000000'))
-    nt.assert_raises(ValueError, decode_metadata_options, '0000000')
-    nt.assert_raises(ValueError, decode_metadata_options, '000000000')
-    nt.assert_raises(ValueError, decode_metadata_options, '0000000a')
-    nt.assert_raises(ValueError, decode_metadata_options, 'abc')
 
-    nt.assert_raises(ValueError, decode_metadata_options, '00000001')
-    nt.assert_raises(ValueError, decode_metadata_options, '00001111')
-    nt.assert_raises(ValueError, decode_metadata_options, '11111111')
+
+def test_decode_metadata_options_exceptions():
+
+    for broken_input in [
+            '0000000',
+            '000000000',
+            '0000000a',
+            'abc',
+            '00000001',
+            '00001111',
+            '11111111',
+            ]:
+        yield nt.assert_raises, ValueError, decode_metadata_options, broken_input
 
 
 def test_decode_blosc_header():

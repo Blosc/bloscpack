@@ -9,6 +9,7 @@ Bloscpack
 :Ohloh: https://www.ohloh.net/p/bloscpack
 :Version: |version|
 :Travis CI: |travis|
+:drone.io: |drone|
 :Coveralls: |coveralls|
 :Downloads: |downloads|
 :License: |license|
@@ -19,6 +20,9 @@ Bloscpack
 
 .. |travis| image:: https://travis-ci.org/Blosc/bloscpack.png?branch=master
         :target: https://travis-ci.org/Blosc/bloscpack
+
+.. |drone| image:: https://drone.io/github.com/Blosc/bloscpack/status.png
+        :target: https://drone.io/github.com/Blosc/bloscpack
 
 .. |coveralls| image:: https://coveralls.io/repos/Blosc/bloscpack/badge.png
         :target: https://coveralls.io/r/Blosc/bloscpack

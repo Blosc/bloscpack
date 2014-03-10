@@ -854,7 +854,7 @@ Coding Conventions
 * Debug messages: as close to where the data was generated
 * Single quotes around ambiguities in messages ``overwriting existing file: 'testfile'``
 * Exceptions instead of exit
-* nose-parametrized for parameterized tests
+* nose test generators parameterized tests
 
 Maintainers Notes on Cutting a Release
 --------------------------------------

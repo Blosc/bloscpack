@@ -71,14 +71,19 @@ def test_decode_options():
                      'metadata': True},
                     decode_options('00000011'))
 
-    nt.assert_raises(ValueError, decode_options, '0000000')
-    nt.assert_raises(ValueError, decode_options, '000000000')
-    nt.assert_raises(ValueError, decode_options, '0000000a')
-    nt.assert_raises(ValueError, decode_options, 'abc')
 
-    nt.assert_raises(ValueError, decode_options, '00000100')
-    nt.assert_raises(ValueError, decode_options, '00001100')
-    nt.assert_raises(ValueError, decode_options, '11111100')
+def test_decode_options_exceptions():
+
+    for broken_input in [
+            '00000000',
+            '000000000',
+            '0000000a',
+            'abc',
+            '00000100',
+            '00001100',
+            '11111100',
+            ]:
+        yield nt.assert_raises, ValueError, decode_options, broken_input
 
 
 def test_check_options():

@@ -8,5 +8,5 @@ omit =
     */site-packages/ordereddict.py
     */site-packages/nose/*
     */unittest2/*
-    test_bloscpack.py
+    test/*
     setup.py

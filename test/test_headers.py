@@ -75,7 +75,7 @@ def test_decode_options():
 def test_decode_options_exceptions():
 
     for broken_input in [
-            '00000000',
+            '0000000',
             '000000000',
             '0000000a',
             'abc',

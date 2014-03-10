@@ -86,20 +86,26 @@ def test_decode_options_exceptions():
         yield nt.assert_raises, ValueError, decode_options, broken_input
 
 
-def test_check_options():
+def test_check_options_exceptions():
     # check for non-string
-    nt.assert_raises(TypeError, check_options, 0)
-    nt.assert_raises(TypeError, check_options, 1)
-    # check for lengths too small and too large
-    nt.assert_raises(ValueError, check_options, '0')
-    nt.assert_raises(ValueError, check_options, '1')
-    nt.assert_raises(ValueError, check_options, '0000000')
-    nt.assert_raises(ValueError, check_options, '000000000')
-    nt.assert_raises(ValueError, check_options, '1111111')
-    nt.assert_raises(ValueError, check_options, '111111111')
-    # check for non zeros and ones
-    nt.assert_raises(ValueError, check_options, '0000000a')
-    nt.assert_raises(ValueError, check_options, 'aaaaaaaa')
+    for broken_input in [
+            0,
+            1,
+            ]:
+        yield nt.assert_raises, TypeError, check_options, broken_input
+    for broken_input in [
+            # check for lengths too small and too large
+            '0',
+            '1',
+            '0000000',
+            '000000000',
+            '1111111',
+            '111111111',
+            # check for non zeros and ones
+            '0000000a',
+            'aaaaaaaa',
+            ]:
+        yield nt.assert_raises, ValueError, check_options, broken_input
 
 
 def test_create_metadata_options():

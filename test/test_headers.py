@@ -207,7 +207,7 @@ def test_BloscPackHeader_total_prospective_entries():
             (1, (0, 1)),
             (None, (-1, 0)),
             (65, (42, 23)),
-            (MAX_CHUNKS-1, (MAX_CHUNKS/2, MAX_CHUNKS/2)),
+            (MAX_CHUNKS-1, (MAX_CHUNKS//2, MAX_CHUNKS//2)),
             (MAX_CHUNKS, (MAX_CHUNKS-1, 1)),
             (MAX_CHUNKS, (1, MAX_CHUNKS-1)),
             ]:

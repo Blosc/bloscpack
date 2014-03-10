@@ -24,11 +24,15 @@ from .constants import (MAGIC,
                         BLOSCPACK_HEADER_LENGTH,
                         MAX_META_SIZE,
                         )
-from .defaults import DEFAULT_OFFSETS
+from .defaults import (DEFAULT_OFFSETS,
+                       )
 from .metacodecs import (CODECS_AVAIL,
                          check_valid_codec,
                          )
-from .pretty import double_pretty_size
+from .pretty import (double_pretty_size,
+                     )
+from .util import (memoryview,
+                   )
 import log
 
 

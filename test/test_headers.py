@@ -59,10 +59,10 @@ def test_create_options():
 
 def test_decode_options():
     for expected, input in [
-            ({'offsets': False, 'metadata': False}, '00000000'),
-            ({'offsets': False, 'metadata': True}, '00000010'),
-            ({'offsets': True, 'metadata': False}, '00000001'),
-            ({'offsets': True, 'metadata': True}, '00000011'),
+            ({'metadata': False, 'offsets': False}, '00000000'),
+            ({'metadata': False, 'offsets': True}, '00000001'),
+            ({'metadata': True, 'offsets': False}, '00000010'),
+            ({'metadata': True, 'offsets': True}, '00000011'),
             ]:
         yield nt.assert_equal, expected, decode_options(input)
 
@@ -82,8 +82,8 @@ def test_decode_options_exceptions():
 
 
 def test_check_options_exceptions():
-    # check for non-string
     for broken_input in [
+            # check for non-string
             0,
             1,
             ]:

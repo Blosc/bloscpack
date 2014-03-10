@@ -133,13 +133,13 @@ def test_decode_blosc_header():
                 'blocksize': 131072,
                 'ctbytes': len(compressed),
                 'version': 2,
-                'flags': 0, # no shuffle flag
+                'flags': 0,  # no shuffle flag
                 'nbytes': len(array_),
                 'typesize': blosc_args['typesize']}
     nt.assert_equal(expected, header)
     # uncompressible data
     array_ = np.asarray(np.random.randn(23),
-            dtype=np.float32).tostring()
+                        dtype=np.float32).tostring()
     blosc_args['shuffle'] = True
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)

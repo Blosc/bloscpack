@@ -9,7 +9,7 @@ install:
   - "pip install coveralls --use-mirrors"
 script:
   - ./test.sh
-  - nosetests test_bloscpack.py:pack_unpack_hard
+  - nosetests test/test_file_io.py:pack_unpack_hard
 after_success:
   - "if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then coveralls ; fi"
 notifications:

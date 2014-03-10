@@ -508,5 +508,3 @@ def test_decode_metadata_header():
 
     nt.assert_equal(copy_and_set_return('user_codec', 'sesame'),
             decode_metadata_header(copy_and_set_input(24, 'sesame')))
-
-

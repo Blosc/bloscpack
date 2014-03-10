@@ -210,11 +210,7 @@ def test_BloscPackHeader_constructor_exceptions():
 
 
 def test_BloscPackHeader_total_prospective_entries():
-    # uses nose test generators
-    def check(expected, nchunks, max_app_chunks):
-        header = BloscPackHeader(nchunks=nchunks,
-                                 max_app_chunks=max_app_chunks)
-        nt.assert_equal(expected, header.total_prospective_chunks)
+
     for expected, (nchunks, max_app_chunks) in [
             (0, (0, 0)),
             (1, (1, 0)),
@@ -225,7 +221,9 @@ def test_BloscPackHeader_total_prospective_entries():
             (MAX_CHUNKS, (MAX_CHUNKS-1, 1)),
             (MAX_CHUNKS, (1, MAX_CHUNKS-1)),
             ]:
-        yield check, expected, nchunks, max_app_chunks
+        header = BloscPackHeader(nchunks=nchunks,
+                                 max_app_chunks=max_app_chunks)
+        yield nt.assert_equal, expected, header.total_prospective_chunks
 
 
 def test_BloscPackHeader_encode():

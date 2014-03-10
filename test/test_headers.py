@@ -58,18 +58,13 @@ def test_create_options():
 
 
 def test_decode_options():
-    nt.assert_equal({'offsets': False,
-                     'metadata': False},
-                    decode_options('00000000'))
-    nt.assert_equal({'offsets': False,
-                     'metadata': True},
-                    decode_options('00000010'))
-    nt.assert_equal({'offsets': True,
-                     'metadata': False},
-                    decode_options('00000001'))
-    nt.assert_equal({'offsets': True,
-                     'metadata': True},
-                    decode_options('00000011'))
+    for expected, input in [
+            ({'offsets': False, 'metadata': False}, '00000000'),
+            ({'offsets': False, 'metadata': True}, '00000010'),
+            ({'offsets': True, 'metadata': False}, '00000001'),
+            ({'offsets': True, 'metadata': True}, '00000011'),
+            ]:
+        yield nt.assert_equal, expected, decode_options(input)
 
 
 def test_decode_options_exceptions():

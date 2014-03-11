@@ -466,6 +466,3 @@ def decode_metadata_header(buffer_):
             'meta_comp_size':      decode_uint32(buffer_[20:24]),
             'user_codec':          decode_magic_string(buffer_[24:32])
             }
-
-
-

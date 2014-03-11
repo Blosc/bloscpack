@@ -288,101 +288,82 @@ def test_BloscPackHeader_encode():
 
 
 def test_decode_bloscpack_header():
-    bloscpack_header = BloscPackHeader()
-
-    def copy_and_set_return(key, value):
-        copy_ = bloscpack_header.copy()
-        setattr(copy_, key, value)
-        return copy_
 
     format_version = struct.pack('<B', FORMAT_VERSION)
-    no_arg_input = MAGIC + format_version + \
+    raw = MAGIC + format_version + \
         '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
 
-    def copy_and_set_input(offset, value):
-        return no_arg_input[0:offset] + value + \
-            no_arg_input[offset+len(value):]
+    def mod_raw(offset, replacement):
+        return raw[0:offset] + replacement + \
+            raw[offset+len(replacement):]
 
     # check with no args
-    nt.assert_equal(bloscpack_header, BloscPackHeader.decode(no_arg_input))
-    # check with format_version
-    format_version_set = copy_and_set_input(4, '\x17')
-    format_version_set_return = copy_and_set_return('format_version', 23)
-    nt.assert_equal(format_version_set_return,
-            BloscPackHeader.decode(format_version_set))
-    # check with options
-    nt.assert_equal(copy_and_set_return('offsets', True),
-            BloscPackHeader.decode(copy_and_set_input(5, '\x01')))
-    nt.assert_equal(copy_and_set_return('metadata', True),
-            BloscPackHeader.decode(copy_and_set_input(5, '\x02')))
-    expected = copy_and_set_return('metadata', True)
-    expected['offsets'] = True
-    nt.assert_equal(expected,
-            BloscPackHeader.decode(copy_and_set_input(5, '\x03')))
-    # check with checksum
-    nt.assert_equal(copy_and_set_return('checksum', 'adler32'),
-            BloscPackHeader.decode(copy_and_set_input(6, '\x01')))
-    nt.assert_equal(copy_and_set_return('checksum', 'sha384'),
-            BloscPackHeader.decode(copy_and_set_input(6, '\x07')))
-    # check with typesize
-    nt.assert_equal(copy_and_set_return('typesize', 1),
-            BloscPackHeader.decode(copy_and_set_input(7, '\x01')))
-    nt.assert_equal(copy_and_set_return('typesize', 2),
-            BloscPackHeader.decode(copy_and_set_input(7, '\x02')))
-    nt.assert_equal(copy_and_set_return('typesize', 4),
-            BloscPackHeader.decode(copy_and_set_input(7, '\x04')))
-    nt.assert_equal(copy_and_set_return('typesize', 8),
-            BloscPackHeader.decode(copy_and_set_input(7, '\x08')))
-    nt.assert_equal(copy_and_set_return('typesize', blosc.BLOSC_MAX_TYPESIZE),
-            BloscPackHeader.decode(copy_and_set_input(7, '\xff')))
-    # check with chunk_size
-    nt.assert_equal(copy_and_set_return('chunk_size', 1),
-            BloscPackHeader.decode(copy_and_set_input(8, '\x01\x00\x00\x00')))
-    nt.assert_equal(copy_and_set_return('chunk_size', reverse_pretty('1M')),
-            BloscPackHeader.decode(copy_and_set_input(8, '\x00\x00\x10\x00')))
-    nt.assert_equal(
-            copy_and_set_return('chunk_size', blosc.BLOSC_MAX_BUFFERSIZE),
-            BloscPackHeader.decode(copy_and_set_input(8, '\xef\xff\xff\x7f')))
-    # check with last_chunk
-    nt.assert_equal(copy_and_set_return('last_chunk', 1),
-            BloscPackHeader.decode(copy_and_set_input(12, '\x01\x00\x00\x00')))
-    nt.assert_equal(copy_and_set_return('last_chunk', reverse_pretty('1M')),
-            BloscPackHeader.decode(copy_and_set_input(12, '\x00\x00\x10\x00')))
-    nt.assert_equal(
-            copy_and_set_return('last_chunk', blosc.BLOSC_MAX_BUFFERSIZE),
-            BloscPackHeader.decode(copy_and_set_input(12, '\xef\xff\xff\x7f')))
-    # check with nchunks
-    nt.assert_equal(copy_and_set_return('nchunks', 1),
-            BloscPackHeader.decode(copy_and_set_input(16,
-                '\x01\x00\x00\x00\x00\x00\x00\x00')))
-    nt.assert_equal(copy_and_set_return('nchunks', reverse_pretty('1M')),
-            BloscPackHeader.decode(copy_and_set_input(16,
-                '\x00\x00\x10\x00\x00\x00\x00\x00')))
-    nt.assert_equal(
-            copy_and_set_return('nchunks', MAX_CHUNKS),
-            BloscPackHeader.decode(copy_and_set_input(16,
-                '\xff\xff\xff\xff\xff\xff\xff\x7f')))
+    yield nt.assert_equal, BloscPackHeader(), BloscPackHeader.decode(raw)
+
+    for kwargs, offset, replacement in [
+            # check with format_version
+            ({'format_version': 23}, 4, '\x17'),
+            # check with options
+            ({'offsets': True}, 5, '\x01'),
+            ({'metadata': True}, 5, '\x02'),
+            ({'metadata': True, 'offsets': True}, 5, '\x03'),
+            # check with checksum
+            ({'checksum': 'adler32'}, 6, '\x01'),
+            ({'checksum': 'sha384'}, 6, '\x07'),
+            # check with typesize
+            ({'typesize': 1}, 7, '\x01'),
+            ({'typesize': 2}, 7, '\x02'),
+            ({'typesize': 4}, 7, '\x04'),
+            ({'typesize': 8}, 7, '\x08'),
+            ({'typesize': blosc.BLOSC_MAX_TYPESIZE}, 7, '\xff'),
+            # check with chunk_size
+            ({'chunk_size': 1}, 
+                8, '\x01\x00\x00\x00'),
+            ({'chunk_size': reverse_pretty('1M')},
+                8, '\x00\x00\x10\x00'),
+            ({'chunk_size': blosc.BLOSC_MAX_BUFFERSIZE},
+                8, '\xef\xff\xff\x7f'),
+            # check with last_chunk
+            ({'last_chunk': 1},
+                12, '\x01\x00\x00\x00'),
+            ({'last_chunk': reverse_pretty('1M')},
+                12, '\x00\x00\x10\x00'),
+            ({'last_chunk': blosc.BLOSC_MAX_BUFFERSIZE},
+                12, '\xef\xff\xff\x7f'),
+            # check with nchunks
+            ({'nchunks': 1},
+                16, '\x01\x00\x00\x00\x00\x00\x00\x00'),
+            ({'nchunks': reverse_pretty('1M')},
+                16, '\x00\x00\x10\x00\x00\x00\x00\x00'),
+            ({'nchunks': MAX_CHUNKS},
+                16, '\xff\xff\xff\xff\xff\xff\xff\x7f'),
+            ]:
+        yield (nt.assert_equal,
+               BloscPackHeader(**kwargs),
+               BloscPackHeader.decode(mod_raw(offset, replacement)))
 
     # check with max_app_chunks
-    # set nchunks to be 1 in header and raw
-    bloscpack_header.nchunks = 1
-    no_arg_input = MAGIC + format_version + \
+    # set nchunks to be 1 in raw
+    raw = MAGIC + format_version + \
         '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
         '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
-    nt.assert_equal(copy_and_set_return('max_app_chunks', 1),
-            BloscPackHeader.decode(copy_and_set_input(24,
-                '\x01\x00\x00\x00\x00\x00\x00\x00')))
-    nt.assert_equal(copy_and_set_return('max_app_chunks',
-        reverse_pretty('1M')),
-            BloscPackHeader.decode(copy_and_set_input(24,
-                '\x00\x00\x10\x00\x00\x00\x00\x00')))
-    # Maximum value is MAX_CHUNKS - 1 since nchunks is already 1
-    nt.assert_equal(
-            copy_and_set_return('max_app_chunks', MAX_CHUNKS-1),
-            BloscPackHeader.decode(copy_and_set_input(24,
-                '\xfe\xff\xff\xff\xff\xff\xff\x7f')))
+    for kwargs, offset, replacement in [
+            ({'max_app_chunks': 1},
+                24, '\x01\x00\x00\x00\x00\x00\x00\x00'),
+            ({'max_app_chunks': reverse_pretty('1M')},
+                24, '\x00\x00\x10\x00\x00\x00\x00\x00'),
+            # Maximum value is MAX_CHUNKS - 1 since nchunks is already 1
+            ({'max_app_chunks': MAX_CHUNKS-1},
+                24, '\xfe\xff\xff\xff\xff\xff\xff\x7f'),
+            ]:
+        # set nchunks to be 1 in header
+        kwargs['nchunks'] = 1
+        yield (nt.assert_equal,
+               BloscPackHeader(**kwargs),
+               BloscPackHeader.decode(mod_raw(offset, replacement)))
+
 
 
 def test_create_metadata_header():

@@ -229,7 +229,8 @@ def test_BloscPackHeader_total_prospective_entries():
 def test_BloscPackHeader_encode():
 
     # the raw encoded header as produces w/o any kwargs
-    raw = MAGIC + struct.pack('<B', FORMAT_VERSION) + \
+    format_version = struct.pack('<B', FORMAT_VERSION)
+    raw = MAGIC + format_version + \
         '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
         '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
 

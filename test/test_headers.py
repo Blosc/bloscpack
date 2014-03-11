@@ -280,6 +280,7 @@ def test_BloscPackHeader_encode():
                 {'nchunks': 1, 'max_app_chunks': 1}),
             (16, '\x01\x00\x00\x00\x00\x00\x00\x00\x7f\x00\x00\x00\x00\x00\x00\x00',
                 {'nchunks': 1, 'max_app_chunks': 127}),
+            # Maximum value is MAX_CHUNKS - 1 since nchunks is already 1
             (16, '\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f',
                 {'nchunks': 1, 'max_app_chunks': MAX_CHUNKS-1}),
             ]:
@@ -338,32 +339,20 @@ def test_decode_bloscpack_header():
                 16, '\x00\x00\x10\x00\x00\x00\x00\x00'),
             ({'nchunks': MAX_CHUNKS},
                 16, '\xff\xff\xff\xff\xff\xff\xff\x7f'),
-            ]:
-        yield (nt.assert_equal,
-               BloscPackHeader(**kwargs),
-               BloscPackHeader.decode(mod_raw(offset, replacement)))
-
-    # check with max_app_chunks
-    # set nchunks to be 1 in raw
-    raw = MAGIC + format_version + \
-        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
-        '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-
-    for kwargs, offset, replacement in [
-            ({'max_app_chunks': 1},
-                24, '\x01\x00\x00\x00\x00\x00\x00\x00'),
-            ({'max_app_chunks': reverse_pretty('1M')},
-                24, '\x00\x00\x10\x00\x00\x00\x00\x00'),
+            # check with max_app_chunks
+            ({'nchunks': 1, 'max_app_chunks': 0},
+                16, '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'),
+            ({'nchunks': 1, 'max_app_chunks': 1},
+                16, '\x01\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00'),
+            ({'nchunks': 1, 'max_app_chunks': reverse_pretty('1M')},
+                16, '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00'),
             # Maximum value is MAX_CHUNKS - 1 since nchunks is already 1
-            ({'max_app_chunks': MAX_CHUNKS-1},
-                24, '\xfe\xff\xff\xff\xff\xff\xff\x7f'),
+            ({'nchunks': 1, 'max_app_chunks': MAX_CHUNKS-1},
+                16, '\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f'),
             ]:
-        # set nchunks to be 1 in header
-        kwargs['nchunks'] = 1
         yield (nt.assert_equal,
                BloscPackHeader(**kwargs),
                BloscPackHeader.decode(mod_raw(offset, replacement)))
-
 
 
 def test_create_metadata_header():

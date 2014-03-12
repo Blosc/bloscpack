@@ -9,14 +9,16 @@ import os
 import sys
 import time
 import subprocess
-import bloscpack
-import test_bloscpack as tb
+
+import bloscpack.pretty as bpp
+import bloscpack.testutil as bpt
+from bloscpack import pack_file
 
 DROP_CACHES = False
 
 
 def get_fs(file_name):
-    return bloscpack.pretty_size(path.getsize(file_name))
+    return bpp.pretty_size(path.getsize(file_name))
 
 
 def get_ratio(file1, file2):
@@ -40,7 +42,7 @@ if len(sys.argv) == 2 and sys.argv[1] in ('-d', '--drop-caches'):
         print('error: need uid 0 (root) to drop caches')
         sys.exit(1)
 
-with tb.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
+with bpt.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
     gz_out_file = path.join(tdir, 'file.gz')
 
     print('create the test data', end='')
@@ -49,7 +51,7 @@ with tb.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         if i % 10 == 0:
             print('.', end='')
         sys.stdout.flush()
-    tb.create_array(100, in_file, progress=progress)
+    bpt.create_array(100, in_file, progress=progress)
     print('')
 
     print("Input file size: %s" % get_fs(in_file))
@@ -57,7 +59,7 @@ with tb.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
 
     print("Will now run bloscpack... ")
     tic = time.time()
-    bloscpack.pack_file(in_file, out_file)
+    pack_file(in_file, out_file)
     toc = time.time()
     print("Time: %.2f seconds" % (toc - tic))
     print("Output file size: %s" % get_fs(out_file))

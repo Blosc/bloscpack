@@ -111,7 +111,7 @@ def test_metadata():
 def test_metadata_opportunisitic_compression():
     # make up some metadata that can be compressed with benefit
     test_metadata = ("{'dtype': 'float64', 'shape': [1024], 'others': [],"
-            "'original_container': 'carray'}")
+                     "'original_container': 'carray'}")
     target_fp = StringIO()
     _write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
     target_fp.seek(0, 0)
@@ -139,8 +139,8 @@ def test_disable_offsets():
     source = PlainFPSource(in_fp)
     sink = CompressedFPSink(out_fp)
     pack(source, sink,
-            *calculate_nchunks(in_fp_size),
-            bloscpack_args=bloscpack_args)
+         *calculate_nchunks(in_fp_size),
+         bloscpack_args=bloscpack_args)
     out_fp.seek(0)
     bloscpack_header, metadata, metadata_header, offsets = \
             _read_beginning(out_fp)
@@ -154,7 +154,9 @@ def test_invalid_format():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
         pack_file(in_file, out_file, blosc_args=blosc_args)
-        nt.assert_raises(FormatVersionMismatch, unpack_file, out_file, dcmp_file)
+        nt.assert_raises(FormatVersionMismatch,
+                         unpack_file, out_file, dcmp_file)
+
 
 def test_file_corruption():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
@@ -164,7 +166,7 @@ def test_file_corruption():
         with open(out_file, 'r+b') as input_fp:
             # read offsets and header
             _read_offsets(input_fp,
-                    _read_bloscpack_header(input_fp))
+                          _read_bloscpack_header(input_fp))
             # read the blosc header of the first chunk
             input_fp.read(BLOSC_HEADER_LENGTH)
             # read four bytes
@@ -198,7 +200,7 @@ def pack_unpack(repeats, chunk_size=None, progress=False):
 
 
 def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
-        progress=False, metadata=None):
+                   progress=False, metadata=None):
     in_fp, out_fp, dcmp_fp = StringIO(), StringIO(), StringIO()
     if progress:
         print("Creating test array")
@@ -212,8 +214,8 @@ def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
     source = PlainFPSource(in_fp)
     sink = CompressedFPSink(out_fp)
     pack(source, sink,
-            nchunks, chunk_size, last_chunk_size,
-            metadata=metadata)
+         nchunks, chunk_size, last_chunk_size,
+         metadata=metadata)
     out_fp.seek(0)
     if progress:
         print("Decompressing")
@@ -224,9 +226,6 @@ def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
         print("Verifying")
     cmp_fp(in_fp, dcmp_fp)
     return source.metadata
-
-
-
 
 
 def test_pack_unpack():
@@ -241,7 +240,6 @@ def test_pack_unpack_fp():
     pack_unpack_fp(1, chunk_size=reverse_pretty('2M'))
     pack_unpack_fp(1, chunk_size=reverse_pretty('4M'))
     pack_unpack_fp(1, chunk_size=reverse_pretty('8M'))
-
 
 
 def pack_unpack_hard():

@@ -8,18 +8,31 @@ from cStringIO import StringIO
 
 import blosc
 import nose.tools as nt
-from bloscpack.abstract_io import pack, unpack
 
+
+from bloscpack.abstract_io import (pack,
+                                   unpack,
+                                   )
 from bloscpack.append import (append,
                               append_fp,
+                              _recreate_metadata,
+                              _rewrite_metadata_fp,
                               )
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             DEFAULT_BLOSCPACK_ARGS,
                             calculate_nchunks,
+                            DEFAULT_METADATA_ARGS,
                             )
 from bloscpack.checksums import (CHECKSUMS_LOOKUP,
                                  )
+from bloscpack.constants import (METADATA_HEADER_LENGTH,
+                                 )
 from bloscpack.exceptions import (NotEnoughSpace,
+                                  NoSuchSerializer,
+                                  NoSuchCodec,
+                                  ChecksumLengthMismatch,
+                                  NoChangeInMetadata,
+                                  MetadataSectionTooSmall,
                                   )
 from bloscpack.file_io import (PlainFPSource,
                                PlainFPSink,
@@ -29,9 +42,15 @@ from bloscpack.file_io import (PlainFPSource,
                                unpack_file,
                                _read_beginning,
                                _read_compressed_chunk_fp,
+                               _write_metadata,
+                               _read_metadata,
                                )
 from bloscpack.headers import (BloscPackHeader,
+                               create_metadata_header,
+                               decode_metadata_header,
                                )
+from bloscpack.serializers import (SERIALIZERS,
+                                   )
 from bloscpack.testutil import (create_array,
                                 create_array_fp,
                                 create_tmp_files,
@@ -366,3 +385,93 @@ def test_append_mix_shuffle():
     nt.assert_equal(blosc_header_zero['flags'], 1)
     # last chunk doesn't
     nt.assert_equal(blosc_header_last['flags'], 0)
+
+
+def test_recreate_metadata():
+    old_meta_header = create_metadata_header(magic_format='',
+        options="00000000",
+        meta_checksum='None',
+        meta_codec='None',
+        meta_level=0,
+        meta_size=0,
+        max_meta_size=0,
+        meta_comp_size=0,
+        user_codec='',
+        )
+    header_dict = decode_metadata_header(old_meta_header)
+    nt.assert_raises(NoSuchSerializer,
+                     _recreate_metadata,
+                     header_dict,
+                     '',
+                     magic_format='NOSUCHSERIALIZER')
+    nt.assert_raises(NoSuchCodec,
+                     _recreate_metadata,
+                     header_dict,
+                     '',
+                     codec='NOSUCHCODEC')
+    nt.assert_raises(ChecksumLengthMismatch,
+                     _recreate_metadata,
+                     header_dict,
+                     '',
+                     checksum='adler32')
+
+
+def test_rewrite_metadata():
+    test_metadata = {'dtype': 'float64',
+                     'shape': [1024],
+                     'others': [],
+                     }
+    # assemble the metadata args from the default
+    metadata_args = DEFAULT_METADATA_ARGS.copy()
+    # avoid checksum and codec
+    metadata_args['meta_checksum'] = 'None'
+    metadata_args['meta_codec'] = 'None'
+    # preallocate a fixed size
+    metadata_args['max_meta_size'] = 1000  # fixed preallocation
+    target_fp = StringIO()
+    # write the metadata section
+    _write_metadata(target_fp, test_metadata, metadata_args)
+    # check that the length is correct
+    nt.assert_equal(METADATA_HEADER_LENGTH + metadata_args['max_meta_size'],
+                    len(target_fp.getvalue()))
+
+    # now add stuff to the metadata
+    test_metadata['container'] = 'numpy'
+    test_metadata['data_origin'] = 'LHC'
+    # compute the new length
+    new_metadata_length = len(SERIALIZERS[0].dumps(test_metadata))
+    # jam the new metadata into the cStringIO
+    target_fp.seek(0, 0)
+    _rewrite_metadata_fp(target_fp, test_metadata,
+                         codec=None, level=None)
+    # now seek back, read the metadata and make sure it has been updated
+    # correctly
+    target_fp.seek(0, 0)
+    result_metadata, result_header = _read_metadata(target_fp)
+    nt.assert_equal(test_metadata, result_metadata)
+    nt.assert_equal(new_metadata_length, result_header['meta_comp_size'])
+
+    # make sure that NoChangeInMetadata is raised
+    target_fp.seek(0, 0)
+    nt.assert_raises(NoChangeInMetadata, _rewrite_metadata_fp,
+                     target_fp, test_metadata, codec=None, level=None)
+
+    # make sure that ChecksumLengthMismatch is raised, needs modified metadata
+    target_fp.seek(0, 0)
+    test_metadata['fluxcompensator'] = 'back to the future'
+    nt.assert_raises(ChecksumLengthMismatch, _rewrite_metadata_fp,
+                     target_fp, test_metadata,
+                     codec=None, level=None, checksum='sha512')
+
+    # make sure if level is not None, this works
+    target_fp.seek(0, 0)
+    test_metadata['hoverboard'] = 'back to the future 2'
+    _rewrite_metadata_fp(target_fp, test_metadata,
+                         codec=None)
+
+    # len of metadata when dumped to json should be around 1105
+    for i in range(100):
+        test_metadata[str(i)] = str(i)
+    target_fp.seek(0, 0)
+    nt.assert_raises(MetadataSectionTooSmall, _rewrite_metadata_fp,
+                     target_fp, test_metadata, codec=None, level=None)

@@ -35,6 +35,16 @@ def _compress_chunk_ptr(chunk, blosc_args):
     return blosc.compress_ptr(ptr, size, **blosc_args)
 
 
+def _ndarray_meta(ndarray):
+    return {'dtype': ndarray.dtype.descr
+            if ndarray.dtype.names is not None
+            else ndarray.dtype.str,
+            'shape': ndarray.shape,
+            'order': 'F' if numpy.isfortran(ndarray) else 'C',
+            'container': 'numpy',
+            }
+
+
 class PlainNumpySource(PlainSource):
 
     def __init__(self, ndarray):
@@ -47,13 +57,7 @@ class PlainNumpySource(PlainSource):
         # as a name. The dtype() constructor interprets this as a request to
         # give a default name.  Instead, we construct descriptor that can be
         # passed to dtype().
-        self.metadata = {'dtype': ndarray.dtype.descr
-                         if ndarray.dtype.names is not None
-                         else ndarray.dtype.str,
-                         'shape': ndarray.shape,
-                         'order': 'F' if numpy.isfortran(ndarray) else 'C',
-                         'container': 'numpy',
-                         }
+        self.metadata = _ndarray_meta(ndarray)
         self.size = ndarray.size * ndarray.itemsize
         self.ndarray = numpy.ascontiguousarray(ndarray)
         self.ptr = ndarray.__array_interface__['data'][0]

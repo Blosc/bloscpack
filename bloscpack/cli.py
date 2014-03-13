@@ -230,9 +230,9 @@ def create_parser():
             "  %(prog)s 'subcommand' [ -h | --help ]")
 
     ## print version of bloscpack, python-blosc and blosc itself
-    version_str = "bloscpack:\t'%s' " % __version__ + \
-                  "python-blosc:\t'%s' " % blosc.version.__version__ + \
-                  "blosc:\t\t'%s' " % blosc.BLOSC_VERSION_STRING
+    version_str = "bloscpack: '%s' " % __version__ + \
+                  "python-blosc: '%s' " % blosc.version.__version__ + \
+                  "blosc: '%s' " % blosc.BLOSC_VERSION_STRING
     parser.add_argument('--version', action='version', version=version_str)
     output_group = parser.add_mutually_exclusive_group()
     output_group.add_argument('-v', '--verbose',

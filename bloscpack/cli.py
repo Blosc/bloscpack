@@ -289,15 +289,14 @@ def create_parser():
             setattr(namespace, self.dest, value)
     for p in [compress_parser, c_parser]:
         _inject_blosc_group(p)
-        bloscpack_chunking_group = p.add_mutually_exclusive_group()
-        bloscpack_chunking_group.add_argument('-z', '--chunk-size',
-                                              metavar='<size>',
-                                              action=CheckChunkSizeOption,
-                                              type=str,
-                                              default=DEFAULT_CHUNK_SIZE,
-                                              dest='chunk_size',
-                                              help="set desired chunk size or 'max'")
         bloscpack_group = p.add_argument_group(title='bloscpack settings')
+        bloscpack_group.add_argument('-z', '--chunk-size',
+                                     metavar='<size>',
+                                     action=CheckChunkSizeOption,
+                                     type=str,
+                                     default=DEFAULT_CHUNK_SIZE,
+                                     dest='chunk_size',
+                                     help="set desired chunk size or 'max'")
         checksum_format = join_with_eol(CHECKSUMS_AVAIL[0:3]) + \
                                         join_with_eol(CHECKSUMS_AVAIL[3:6]) + \
                                         join_with_eol(CHECKSUMS_AVAIL[6:])

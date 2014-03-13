@@ -136,6 +136,11 @@ Help for the subcommands:
   optional arguments:
     -h, --help  show this help message and exit
 
+Check the version output is sane.
+
+  $ blpk --version
+  bloscpack: '.*' python-blosc: '.*' blosc: '.*' (re)
+
 Create a test datafile.
 
   $ python -c "import numpy; a = numpy.linspace(0, 100, 2e7); f = open('data.dat', 'w');  f.write(a.tostring()) "
@@ -181,7 +186,7 @@ Compression with different chunksizes:
   $ rm data.dat.blp
 
   $ blpk compress --chunk-size -1 data.dat
-  blpk: error: --chunk-size must be > 0 
+  blpk: error: --chunk-size must be > 0
   [1]
 
   $ blpk compress --chunk-size NO_SUCH_VALUE data.dat
@@ -330,6 +335,7 @@ Get more information using --verbose:
   blpk: input file size: 152.59M (160000000B)
   blpk: nchunks: 153
   blpk: chunk_size: 1.0M (1048576B)
+  blpk: last_chunk_size: 602.0K (616448B)
   blpk: output file size: 16.2M (16984384B)
   blpk: compression ratio: 0.106152
   blpk: done
@@ -364,8 +370,6 @@ Add metadata to the file:
   blpk: 'offsets':
   blpk: [14112,169284,311607,472209,628846,...]
   $ blpk decompress data.dat.blp data.dat.dcmp
-  blpk: Metadata is:
-  blpk: '{u'dtype': u'float64', u'shape': [20000000], u'container': u'numpy'}'
 
 Test basic append:
 

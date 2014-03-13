@@ -54,7 +54,7 @@ Dependencies
 * Python 2.6 (requires ``ordereddict`` and ``argparse``) or Python 2.7
 * `python-blosc  <https://github.com/Blosc/python-blosc>`_ (provides Blosc)
 * `Numpy <http://www.numpy.org/>`_
-* The Python packages ``nose``, ``nose-parameterized`` and ``cram`` for testing
+* The Python packages ``nose``, ``nose-parameterized``, ``cram`` and ``mock`` for testing
 
 Check the files ``requirements.txt`` and ``test_requirements.txt`` for
 up-to-date version numbers.
@@ -902,7 +902,7 @@ Coding Conventions
 * Debug messages: as close to where the data was generated
 * Single quotes around ambiguities in messages ``overwriting existing file: 'testfile'``
 * Exceptions instead of exit
-* nose-parametrized for parameterized tests
+* nose test generators parameterized tests
 
 Maintainers Notes on Cutting a Release
 --------------------------------------

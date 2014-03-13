@@ -1,3 +1,5 @@
 nose
 nose-parameterized
 cram>=0.6
+mock
+coverage

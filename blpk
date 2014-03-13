@@ -1,1 +1,7 @@
-bloscpack.py
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim :set ft=py:
+
+from bloscpack.cli import main
+
+main()

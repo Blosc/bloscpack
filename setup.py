@@ -3,14 +3,17 @@
 # flake8: noqa
 
 from distutils.core import setup
-import bloscpack as bp
 
 with open('README.rst') as fp:
     long_description = fp.read()
 
+with open('bloscpack/version.py') as fp:
+    version = fp.read()
+    exec(version)
+
 setup(
     name = "bloscpack",
-    version = bp.__version__,
+    version = __version__,
     py_modules = ['bloscpack'],
     scripts = ['blpk'],
     author = "Valentin Haenel",

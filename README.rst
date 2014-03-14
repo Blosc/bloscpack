@@ -95,14 +95,6 @@ the standard ``setup.py``:
 All of the above may or may not -- depending on the incantation used -- require
 superuser privileges.
 
-Alternatively, if you just need the command line interface, add the ``blpk``
-file to your ``$PATH`` somehow. For example by copying using dereferencing
-(``-L``), since ``blpk`` is a sym-link to ``bloscpack.py``:
-
-.. code-block:: console
-
-    $ cp -L blpk ~/bin
-
 Usage
 -----
 

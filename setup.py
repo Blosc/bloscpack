@@ -4,12 +4,9 @@
 
 from distutils.core import setup
 
-with open('README.rst') as fp:
-    long_description = fp.read()
+long_description = open('README.rst').read()
 
-with open('bloscpack/version.py') as fp:
-    version = fp.read()
-    exec(version)
+exec(open('bloscpack/version.py').read())
 
 setup(
     name = "bloscpack",

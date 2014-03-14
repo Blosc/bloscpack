@@ -9,7 +9,6 @@ from cStringIO import StringIO
 import numpy as np
 import numpy.testing as npt
 import nose.tools as nt
-from nose_parameterized import parameterized
 
 
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
@@ -122,17 +121,18 @@ def huge_arrays():
         roundtrip_ndarray(a)
 
 
-@parameterized([('blosclz', 0),
-                ('lz4', 1),
-                ('lz4hc', 1),
-                ('snappy', 2),
-                ('zlib', 3),
-                ])
-def test_alternate_cname(cname, int_id):
-    blosc_args = DEFAULT_BLOSC_ARGS.copy()
-    blosc_args['cname'] = cname
-    array_ = np.linspace(0, 1, 2e6)
-    sink = CompressedMemorySink()
-    pack_ndarray(array_, sink, blosc_args=blosc_args)
-    blosc_header = decode_blosc_header(sink.chunks[0])
-    nt.assert_equal(blosc_header['flags'] >> 5, int_id)
+def test_alternate_cname():
+    for cname, int_id in [
+            ('blosclz', 0),
+            ('lz4', 1),
+            ('lz4hc', 1),
+            ('snappy', 2),
+            ('zlib', 3),
+            ]:
+        blosc_args = DEFAULT_BLOSC_ARGS.copy()
+        blosc_args['cname'] = cname
+        array_ = np.linspace(0, 1, 2e6)
+        sink = CompressedMemorySink()
+        pack_ndarray(array_, sink, blosc_args=blosc_args)
+        blosc_header = decode_blosc_header(sink.chunks[0])
+        yield nt.assert_equal, blosc_header['flags'] >> 5, int_id

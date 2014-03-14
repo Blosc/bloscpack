@@ -488,15 +488,9 @@ Basic tests, runs quickly:
 
 .. code-block:: console
 
-    $ nosetests test_bloscpack.py
+    $ nosetests
     [...]
 
-Or, alternatively:
-
-.. code-block:: console
-
-    $ ./test_bloscpack.py
-    [...]
 
 Heavier Tests
 ~~~~~~~~~~~~~
@@ -506,7 +500,7 @@ memory:
 
 .. code-block:: console
 
-    $ nosetests test_bloscpack.py:pack_unpack_hard
+    $ nosetests test/test_file_io.py:pack_unpack_hard
     [...]
 
 Extended tests using a huge file. This one take forever and needs loads (5G-6G)
@@ -514,7 +508,7 @@ of memory and loads of disk-space (10G). Use ``-s`` to print progress:
 
 .. code-block:: console
 
-    $ nosetests -s test_bloscpack.py:pack_unpack_extreme
+    $ nosetests -s test/test_file_io.py:pack_unpack_extreme
     [...]
 
 Note that, some compression/decompression tests create temporary files (on
@@ -537,16 +531,6 @@ The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
    $ ./test_bloscpack.cram
    [...]
 
-Test Runner
-~~~~~~~~~~~
-
-To run the command line interface tests and the unit tests and analyse
-coverage, use the convenience ``test`` runner:
-
-.. code-block:: console
-
-   $ ./test
-   [...]
 
 Coverage
 ~~~~~~~~
@@ -558,8 +542,19 @@ the unit tests:
 
     $ COVERAGE=1 ./test_bloscpack.cram
     [...]
-    $nosetests test_bloscpack.py --with-coverage --cover-package=bloscpack
+    $nosetests --with-coverage --cover-package=bloscpack
     [...]
+
+Test Runner
+~~~~~~~~~~~
+
+To run the command line interface tests and the unit tests and analyse
+coverage, use the convenience ``test.sh`` runner:
+
+.. code-block:: console
+
+   $ ./test.sh
+   [...]
 
 Benchmark
 ---------

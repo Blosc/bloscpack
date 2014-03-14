@@ -552,7 +552,7 @@ coverage, use the convenience ``test`` runner:
 Coverage
 ~~~~~~~~
 
-To determine coverage you can pool togeher the coverage from the cram tests and
+To determine coverage you can pool together the coverage from the cram tests and
 the unit tests:
 
 .. code-block:: console

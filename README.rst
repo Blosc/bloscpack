@@ -51,13 +51,12 @@ Also comes with natve support for serializing and deserializing numpy arrays.
 Dependencies
 ------------
 
-* Python 2.6 (requires ``ordereddict`` and ``argparse``) or Python 2.7
-* `python-blosc  <https://github.com/Blosc/python-blosc>`_ (provides Blosc)
-* `Numpy <http://www.numpy.org/>`_
-* The Python packages ``nose``, ``nose-parameterized``, ``cram`` and ``mock`` for testing
-
-Check the files ``requirements.txt`` and ``test_requirements.txt`` for
-up-to-date version numbers.
+* Python 2.6 (requires packages listed in ``2.6_requirements.txt``) or Python
+  2.7
+* `python-blosc  <https://github.com/Blosc/python-blosc>`_ (provides Blosc) and
+  `Numpy <http://www.numpy.org/>`_ (as listed in ``requirements.txt`` for
+  running the code
+* The Python packages listed in ``test_requirements.txt`` for testing
 
 Stability of File Format
 ------------------------

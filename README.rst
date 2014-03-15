@@ -957,6 +957,13 @@ TODO
 Changelog
 ---------
 
+* v0.6.0     - XXX XXX XX XXXX
+
+  * Complete refactor of Bloscpack codebase to support modularization
+  * Support for `drone.io <https://drone.io/>`_ CI service
+  * Improved dependency specifcation for Python 2.6
+  * Improved installation instructions
+
 * v0.5.2     - Fri Mar 07 2014
 
   * Fix project url in setup.py

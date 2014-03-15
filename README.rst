@@ -351,45 +351,57 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
 
     $ ./blpk --debug compress --chunk-size 0.5G data.dat
     blpk: command line argument parsing complete
-    blpk: command line arguments are:
-    blpk:   nchunks: None
-    blpk:   force: False
-    blpk:   verbose: False
-    blpk:   offsets: True
-    blpk:   checksum: adler32
-    blpk:   subcommand: compress
-    blpk:   out_file: None
-    blpk:   in_file: data.dat
-    blpk:   chunk_size: 512.0M (536870912B)
-    blpk:   debug: True
-    blpk:   shuffle: True
-    blpk:   typesize: 8
-    blpk:   clevel: 7
-    blpk:   nthreads: 8
+    blpk: command line arguments are: 
+    blpk: 	force: True
+    blpk: 	verbose: False
+    blpk: 	offsets: True
+    blpk: 	checksum: adler32
+    blpk: 	subcommand: compress
+    blpk: 	out_file: None
+    blpk: 	metadata: None
+    blpk: 	cname: blosclz
+    blpk: 	in_file: data.dat
+    blpk: 	chunk_size: 536870912
+    blpk: 	debug: True
+    blpk: 	shuffle: True
+    blpk: 	typesize: 8
+    blpk: 	clevel: 7
+    blpk: 	nthreads: 4
+    blpk: using 4 threads
     blpk: getting ready for compression
-    blpk: blosc args are:
-    blpk:   typesize: 8
-    blpk:   shuffle: True
-    blpk:   clevel: 7
-    blpk: input file is: data.dat
-    blpk: output file is: data.dat.blp
-    blpk: using 8 threads
+    blpk: overwriting existing file: 'data.dat.blp'
+    blpk: input file is: 'data.dat'
+    blpk: output file is: 'data.dat.blp'
     blpk: input file size: 1.49G (1600000000B)
-    blpk: 'chunk_size' proposed
     blpk: nchunks: 3
     blpk: chunk_size: 512.0M (536870912B)
     blpk: last_chunk_size: 501.88M (526258176B)
-    blpk: raw_bloscpack_header: 'blpk\x02\x01\x01\x08\x00\x00\x00 \x00\x10^\x1f\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-    blpk: chunk '0' written, in: 512.0M (536870912B) out: 55.69M (58399001B)
-    blpk: checksum (adler32): '\xf7\xaa\xa3\xdf' offset: '56'
-    blpk: chunk '1' written, in: 512.0M (536870912B) out: 53.85M (56463343B)
-    blpk: checksum (adler32): '\xafo\xfe\xfd' offset: '58399061'
-    blpk: chunk '2' (last) written, in: 501.88M (526258176B) out: 52.35M (54897406B)
-    blpk: checksum (adler32): '\x91v\x07\\' offset: '114862408'
-    blpk: Writing '3' offsets: '[56, 58399061, 114862408]'
-    blpk: Raw offsets: '8\x00\x00\x00\x00\x00\x00\x00U\x19{\x03\x00\x00\x00\x00H\xa9\xd8\x06\x00\x00\x00\x00'
-    blpk: output file size: 161.9M (169759818B)
-    blpk: compression ratio: 0.106100
+    blpk: blosc args are:
+    blpk: 	typesize: 8
+    blpk: 	shuffle: True
+    blpk: 	clevel: 7
+    blpk: 	cname: blosclz
+    blpk: bloscpack args are:
+    blpk: 	checksum: adler32
+    blpk: 	max_app_chunks: <function <lambda> at 0x7f651e8e4aa0>
+    blpk: 	offsets: True
+    blpk: max_app_chunks is a callable
+    blpk: max_app_chunks was set to: 30
+    blpk: raw_bloscpack_header: 'blpk\x03\x01\x01\x08\x00\x00\x00 \x00\x10^\x1f\x03\x00\x00\x00\x00\x00\x00\x00\x1e\x00\x00\x00\x00\x00\x00\x00'
+    blpk: metadata_args will be silently ignored
+    blpk: Handle chunk '0' 
+    blpk: checksum (adler32): '\xca\xf7\xc4\x8a' 
+    blpk: chunk handled, in: 512.0M (536870912B) out: 74.46M (78074017B)
+    blpk: Handle chunk '1' 
+    blpk: checksum (adler32): '\xa0*E\xd7' 
+    blpk: chunk handled, in: 512.0M (536870912B) out: 59.8M (62708295B)
+    blpk: Handle chunk '2' (last)
+    blpk: checksum (adler32): '\xd6$\x1e\xdd' 
+    blpk: chunk handled, in: 501.88M (526258176B) out: 64.13M (67245997B)
+    blpk: Writing '3' offsets: '[296, 78074317, 140782616]'
+    blpk: Raw offsets: '(\x01\x00\x00\x00\x00\x00\x00\xcdQ\xa7\x04\x00\x00\x00\x00\x18,d\x08\x00\x00\x00\x00'
+    blpk: output file size: 198.39M (208028617B)
+    blpk: compression ratio: 0.130018
     blpk: done
 
 Python API

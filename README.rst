@@ -90,6 +90,9 @@ the standard ``setup.py``:
 
 .. code-block:: console
 
+    $ git clone https://github.com/Blosc/bloscpack
+    $ cd bloscpack
+    $ pip install dependencies
     $ python setup.py install
 
 All of the above may or may not -- depending on the incantation used -- require

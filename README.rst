@@ -988,7 +988,7 @@ Packaging and Infrastructure
 Changelog
 ---------
 
-* v0.6.0     - XXX XXX XX XXXX
+* v0.6.0-rc1  - XXX XXX XX XXXX
 
   * Complete refactor of Bloscpack codebase to support modularization
   * Support for `drone.io <https://drone.io/>`_ CI service

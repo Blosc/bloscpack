@@ -984,7 +984,7 @@ Changelog
 
   * Complete refactor of Bloscpack codebase to support modularization
   * Support for `drone.io <https://drone.io/>`_ CI service
-  * Improved dependency specifcation for Python 2.6
+  * Improved dependency specification for Python 2.6
   * Improved installation instructions
 
 * v0.5.2     - Fri Mar 07 2014

@@ -459,7 +459,7 @@ def main():
         try:
             metadata = unpack_file(in_file, out_file)
             if metadata:
-                log.verbose("Metadata is:\n'%s'" % metadata)
+                log.normal("Metadata is:\n'%s'" % metadata)
         except FormatVersionMismatch as fvm:
             log.error(fvm.message)
         except ChecksumMismatch as csm:

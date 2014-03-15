@@ -939,6 +939,8 @@ Profiling and Optimization
 * Memory profiler, might be able to reduce memory used by reusing the buffer
   during compression and decompression
 * Benchmark different codecs
+* Use line profiler to check code
+* Select different defaults for Numpy arrays, no offsets? no pre-alloc?
 
 Library Features
 ~~~~~~~~~~~~~~~~
@@ -950,6 +952,8 @@ Library Features
   * BloscHeader
   * MetadataHeader
   * Offsets (maybe)
+  * BloscArgs
+  * BloscpackArgs
 
 * partial decompression?
 * since we now have potentially small chunks, the progressbar becomes relevant
@@ -962,6 +966,9 @@ Library Features
   during every read to avoid allocating deallocating strings the whole time.
 * The keyword arguments to many functions are global dicts, this is a bad idea,
   Make the immutable with a forzendict.
+* Check that the checksum is really being checked for all PlainSinks
+* Bunch of NetworkSource/Sinks
+* HTTPSource/Sink
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -973,8 +980,9 @@ Packaging and Infrastructure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Debian packages (for python-blosc and bloscpack)
+* Conda recipes (for python-blosc and bloscpack)
 * Use tox for testing multiple python versions
-
+* Build on travis and drone.io using pre-compiled
 
 
 Changelog

@@ -11,7 +11,7 @@ exec(open('bloscpack/version.py').read())
 setup(
     name = "bloscpack",
     version = __version__,
-    py_modules = ['bloscpack'],
+    packages = ['bloscpack'],
     scripts = ['blpk'],
     author = "Valentin Haenel",
     author_email = "valentin@haenel.co",

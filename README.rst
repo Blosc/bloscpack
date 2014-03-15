@@ -911,12 +911,39 @@ Maintainers Notes on Cutting a Release
 TODO
 ----
 
-* list prior art
-* quiet verbosity level
-* possibly provide a BloscPackFile abstraction, like GzipFile
+Documentation
+~~~~~~~~~~~~~
+
+* list prior art, xz format, png format
 * document library usage
+* make a note in the README that the chunk-size benchmark can be used to tune
+* Announcement RST
+
+Command Line
+~~~~~~~~~~~~
+
+* quiet verbosity level
 * Expose the ability to set 'max_app_chunks' from the command line
 * Allow to save metadata to a file during decompression
+* subcommand e or estimate to estimate the size of the uncompressed data.
+* subcommand v or verify to verify the integrity of the data
+* add --raw-input and --raw-output switches to allow stuff like:
+  cat file | blpk --raw-input --raw-output compress > file.blp
+* Establish and document proper exit codes
+* Document the metadata saved during Numpy serialization
+
+Profiling and Optimization
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Use the faster version of struct where you have a single string
+* Memory profiler, might be able to reduce memory used by reusing the buffer
+  during compression and decompression
+* Benchmark different codecs
+
+Library Features
+~~~~~~~~~~~~~~~~
+
+* possibly provide a BloscPackFile abstraction, like GzipFile
 * Allow to not-prealloc additional space for metadata
 * Refactor certain collections of functions that operate on data into objects
 
@@ -924,34 +951,30 @@ TODO
   * MetadataHeader
   * Offsets (maybe)
 
-* subcommand e or estimate to estimate the size of the uncompressed data.
-* subcommand v or verify to verify the integrity of the data
 * partial decompression?
-* add --raw-input and --raw-output switches to allow stuff like:
-  cat file | blpk --raw-input --raw-output compress > file.blp
 * since we now have potentially small chunks, the progressbar becomes relevant
   again
 * configuration file to store commonly used options on a given machine
-* check Python 3.x compatibility
-* make a note in the README that the chunk-size benchmark can be used to tune
 * print the compression time, either as verbose or debug
-* Announcement RST
-* Announce on scipy/numpy lists, comp.compression, freshmeat, ohloh ...
-* Debian packages (for python-blosc and bloscpack)
-* Establish and document proper exit codes
-* Use tox for testing multiple python versions
 * Investigate if we can use a StringIO object that returns memoryviews on read.
 * Implement a memoryview Compressed/PlainSource
 * Use a bytearray to read chunks from a file. Then re-use that bytearray
   during every read to avoid allocating deallocating strings the whole time.
-* Document the metadata saved during Numpy serialization
 * The keyword arguments to many functions are global dicts, this is a bad idea,
   Make the immutable with a forzendict.
-* Check that source and sink are of the correct type
-* Use the faster version of struct where you have a single string
-* Memory profiler, might be able to reduce memory used by reusing the buffer
-  during compression and decompression
-* Benchmark different codecs
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* check Python 3.x compatibility
+* Announce on scipy/numpy lists, comp.compression, freshmeat, ohloh ...
+
+Packaging and Infrastructure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Debian packages (for python-blosc and bloscpack)
+* Use tox for testing multiple python versions
+
 
 
 Changelog

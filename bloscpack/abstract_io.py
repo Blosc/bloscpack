@@ -18,6 +18,8 @@ from .args import (DEFAULT_BLOSC_ARGS,
                    )
 from .headers import (BloscPackHeader,
                       )
+from .pretty import (double_pretty_size,
+                     )
 import log
 
 
@@ -155,6 +157,10 @@ def pack(source, sink,
                   (i, '(last)' if i == nchunks - 1 else ''))
         compressed = compress_func(chunk, blosc_args)
         sink.put(i, compressed)
+        log.debug("chunk handled, in: %s out: %s" %
+                  (double_pretty_size(len(chunk)),
+                   double_pretty_size(len(compressed))))
+
 
     sink.finalize()
 

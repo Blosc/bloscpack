@@ -245,19 +245,19 @@ If you just need some info on how the file was compressed ``[i | info]``:
 
 .. code-block:: console
 
-   $ ./blpk info testfile.blp
-   blpk: 'bloscpack_header':
-   blpk: {   'checksum': 'adler32',
-   blpk:     'chunk_size': 1048576,
-   blpk:     'format_version': 3,
-   blpk:     'last_chunk': 921600,
-   blpk:     'max_app_chunks': 15260,
-   blpk:     'metadata': False,
-   blpk:     'nchunks': 1526,
-   blpk:     'offsets': True,
-   blpk:     'typesize': 8}
+   $ ./blpk info data.dat
+   blpk: bloscpack header: 
+   blpk:     format_version=3,
+   blpk:     offsets=True,
+   blpk:     metadata=False,
+   blpk:     checksum='adler32',
+   blpk:     typesize=8,
+   blpk:     chunk_size=512.0M (536870912B),
+   blpk:     last_chunk=501.88M (526258176B),
+   blpk:     nchunks=3,
+   blpk:     max_app_chunks=30
    blpk: 'offsets':
-   blpk: [134320,354002,552182,709597,870494,...]
+   blpk: [296,78074317,140782616,...]
 
 Adding Metdata
 ~~~~~~~~~~~~~~
@@ -270,16 +270,16 @@ Using the ``[-m | --metadata]`` option you can include JSON from a file:
    {"dtype": "float64", "shape": [200000000], "container": "numpy"}
    $ ./blpk compress --metadata meta.json data.dat
    $ ./blpk info data.dat.blp
-   blpk: 'bloscpack_header':
-   blpk: {   'checksum': 'adler32',
-   blpk:     'chunk_size': 1048576,
-   blpk:     'format_version': 3,
-   blpk:     'last_chunk': 921600,
-   blpk:     'max_app_chunks': 15260,
-   blpk:     'metadata': True,
-   blpk:     'nchunks': 1526,
-   blpk:     'offsets': True,
-   blpk:     'typesize': 8}
+   blpk: bloscpack header: 
+   blpk:     format_version=3,
+   blpk:     offsets=True,
+   blpk:     metadata=True,
+   blpk:     checksum='adler32',
+   blpk:     typesize=8,
+   blpk:     chunk_size=1.0M (1048576B),
+   blpk:     last_chunk=900.0K (921600B),
+   blpk:     nchunks=1526,
+   blpk:     max_app_chunks=15260
    blpk: 'metadata':
    blpk: {   u'container': u'numpy', u'dtype': u'float64', u'shape': [200000000]}
    blpk: 'metadata_header':

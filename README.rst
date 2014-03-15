@@ -75,6 +75,7 @@ dependencies and bloscpack itself:
 
 .. code-block:: console
 
+    $ wget https://raw.github.com/Blosc/bloscpack/master/requirements.txt
     $ pip install -r requirements.txt
     $ pip install bloscpack
 

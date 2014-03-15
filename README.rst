@@ -299,7 +299,7 @@ It will be printed when decompressing:
 
 .. code-block:: console
 
-    $ ./blpk d data.dat.blp
+    $ ./blpk decompress data.dat.blp
     blpk: Metadata is:
     blpk: '{u'dtype': u'float64', u'shape': [200000000], u'container': u'numpy'}'
 

@@ -103,7 +103,7 @@ class CompressedSink(object):
         if self.checksum_impl.size > 0:
             # compute the checksum on the compressed data
             digest = self.checksum_impl(compressed)
-            log.debug('checksum (%s): %s ' %
+            log.debug('checksum (%s): %s' %
                      (self.checksum_impl.name, repr(digest)))
         else:
             digest = ''

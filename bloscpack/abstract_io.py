@@ -160,8 +160,6 @@ def pack(source, sink,
         log.debug("chunk handled, in: %s out: %s" %
                   (double_pretty_size(len(chunk)),
                    double_pretty_size(len(compressed))))
-
-
     sink.finalize()
 
 

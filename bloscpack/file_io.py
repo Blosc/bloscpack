@@ -346,7 +346,7 @@ def _read_compressed_chunk_fp(input_fp, checksum_impl):
                     "expected: '%s', received: '%s'" %
                     (repr(expected_digest), repr(received_digest)))
         else:
-            log.debug('checksum OK (%s): %s ' %
+            log.debug('checksum OK (%s): %s' %
                       (checksum_impl.name, repr(received_digest)))
     return compressed, blosc_header
 

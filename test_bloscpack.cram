@@ -399,7 +399,47 @@ Try using --debug
   blpk: output file size: 16.18M (16968292B)
   blpk: compression ratio: 0.106052
   blpk: done
-  $ rm data.dat.blp
+  $ blpk --debug decompress data.dat.blp data.dat.dcmp
+  blpk: command line argument parsing complete
+  blpk: command line arguments are: 
+  blpk: \tforce: False (esc)
+  blpk: \tverbose: False (esc)
+  blpk: \tout_file: data.dat.dcmp (esc)
+  blpk: \tsubcommand: decompress (esc)
+  blpk: \tno_check_extension: False (esc)
+  blpk: \tin_file: data.dat.blp (esc)
+  blpk: \tdebug: True (esc)
+  blpk: \tnthreads: 4 (esc)
+  blpk: using 4 threads
+  blpk: getting ready for decompression
+  blpk: input file is: 'data.dat.blp'
+  blpk: output file is: 'data.dat.dcmp'
+  blpk: input file size: 16.18M
+  blpk: reading bloscpack header
+  blpk: bloscpack_header_raw: 'blpk\x03\x01\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
+  blpk: bloscpack header: BloscPackHeader(format_version=3, offsets=True, metadata=False, checksum='adler32', typesize=8, chunk_size=52428800, last_chunk=2713600, nchunks=4, max_app_chunks=40)
+  blpk: Read raw offsets: '\x80\x01\x00\x00\x00\x00\x00\x00\x17\xfbj\x00\x00\x00\x00\x00\x1d\xc9\xba\x00\x00\x00\x00\x00\xf6X\xff\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
+  blpk: Offsets: [384, 7011095, 12241181, 16734454]
+  blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 7010707, 'version': 2, 'flags': 1, 'nbytes': 52428800, 'typesize': 8}
+  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: decompressing chunk '0'
+  blpk: chunk handled, in: 6.69M out: 50.0M
+  blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 5230082, 'version': 2, 'flags': 1, 'nbytes': 52428800, 'typesize': 8}
+  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: decompressing chunk '1'
+  blpk: chunk handled, in: 4.99M out: 50.0M
+  blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 4493269, 'version': 2, 'flags': 1, 'nbytes': 52428800, 'typesize': 8}
+  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: decompressing chunk '2'
+  blpk: chunk handled, in: 4.29M out: 50.0M
+  blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 233834, 'version': 2, 'flags': 1, 'nbytes': 2713600, 'typesize': 8}
+  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: decompressing chunk '3' (last)
+  blpk: chunk handled, in: 228.35K out: 2.59M
+  blpk: output file size: 152.59M
+  blpk: decompression ratio: 9.429352
+  blpk: done
+  $ rm data.dat.blp data.dat.dcmp
 
 Add metadata to the file:
 

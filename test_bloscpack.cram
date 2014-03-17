@@ -346,21 +346,21 @@ Try using --debug
   $ blpk --debug compress --chunk-size 50M data.dat
   blpk: command line argument parsing complete
   blpk: command line arguments are: 
-  blpk: \tforce: False (esc)
-  blpk: \tverbose: False (esc)
-  blpk: \toffsets: True (esc)
-  blpk: \tchecksum: adler32 (esc)
-  blpk: \tsubcommand: compress (esc)
-  blpk: \tout_file: None (esc)
-  blpk: \tmetadata: None (esc)
-  blpk: \tcname: blosclz (esc)
-  blpk: \tin_file: data.dat (esc)
-  blpk: \tchunk_size: 52428800 (esc)
-  blpk: \tdebug: True (esc)
-  blpk: \tshuffle: True (esc)
-  blpk: \ttypesize: 8 (esc)
-  blpk: \tclevel: 7 (esc)
-  blpk: \tnthreads: 4 (esc)
+  blpk:     force: False
+  blpk:     verbose: False
+  blpk:     offsets: True
+  blpk:     checksum: adler32
+  blpk:     subcommand: compress
+  blpk:     out_file: None
+  blpk:     metadata: None
+  blpk:     cname: blosclz
+  blpk:     in_file: data.dat
+  blpk:     chunk_size: 52428800
+  blpk:     debug: True
+  blpk:     shuffle: True
+  blpk:     typesize: 8
+  blpk:     clevel: 7
+  blpk:     nthreads: 4
   blpk: using 4 threads
   blpk: getting ready for compression
   blpk: input file is: 'data.dat'
@@ -370,14 +370,14 @@ Try using --debug
   blpk: chunk_size: 50.0M (52428800B)
   blpk: last_chunk_size: 2.59M (2713600B)
   blpk: blosc args are:
-  blpk: \ttypesize: 8 (esc)
-  blpk: \tshuffle: True (esc)
-  blpk: \tclevel: 7 (esc)
-  blpk: \tcname: blosclz (esc)
+  blpk:     typesize: 8
+  blpk:     shuffle: True
+  blpk:     clevel: 7
+  blpk:     cname: blosclz
   blpk: bloscpack args are:
-  blpk: \tchecksum: adler32 (esc)
+  blpk:     checksum: adler32
   .* (re)
-  blpk: \toffsets: True (esc)
+  blpk:     offsets: True
   blpk: max_app_chunks is a callable
   blpk: max_app_chunks was set to: 40
   blpk: raw_bloscpack_header: 'blpk\x03\x01\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
@@ -402,14 +402,14 @@ Try using --debug
   $ blpk --debug decompress data.dat.blp data.dat.dcmp
   blpk: command line argument parsing complete
   blpk: command line arguments are: 
-  blpk: \tforce: False (esc)
-  blpk: \tverbose: False (esc)
-  blpk: \tout_file: data.dat.dcmp (esc)
-  blpk: \tsubcommand: decompress (esc)
-  blpk: \tno_check_extension: False (esc)
-  blpk: \tin_file: data.dat.blp (esc)
-  blpk: \tdebug: True (esc)
-  blpk: \tnthreads: 4 (esc)
+  blpk:     force: False
+  blpk:     verbose: False
+  blpk:     out_file: data.dat.dcmp
+  blpk:     subcommand: decompress
+  blpk:     no_check_extension: False
+  blpk:     in_file: data.dat.blp
+  blpk:     debug: True
+  blpk:     nthreads: 4
   blpk: using 4 threads
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'

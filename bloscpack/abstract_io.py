@@ -121,11 +121,11 @@ def pack(source, sink,
     _check_blosc_args(blosc_args)
     log.debug('blosc args are:')
     for arg, value in blosc_args.iteritems():
-        log.debug('\t%s: %s' % (arg, value))
+        log.debug('    %s: %s' % (arg, value))
     _check_bloscpack_args(bloscpack_args)
     log.debug('bloscpack args are:')
     for arg, value in bloscpack_args.iteritems():
-        log.debug('\t%s: %s' % (arg, value))
+        log.debug('    %s: %s' % (arg, value))
     max_app_chunks = _handle_max_apps(bloscpack_args['offsets'],
             nchunks,
             bloscpack_args['max_app_chunks'])

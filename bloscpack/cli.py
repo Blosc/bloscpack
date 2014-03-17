@@ -426,7 +426,7 @@ def main():
     log.debug('command line argument parsing complete')
     log.debug('command line arguments are: ')
     for arg, val in vars(args).iteritems():
-        log.debug('\t%s: %s' % (arg, str(val)))
+        log.debug('    %s: %s' % (arg, str(val)))
     process_nthread_arg(args)
 
     # compression and decompression handled via subparsers

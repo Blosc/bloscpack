@@ -382,13 +382,13 @@ Try using --debug
   blpk: max_app_chunks was set to: 40
   blpk: raw_bloscpack_header: 'blpk\x03\x01\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
   blpk: metadata_args will be silently ignored
-  blpk: Handle chunk '0' 
+  blpk: Handle chunk '0'
   blpk: checksum \(adler32\)\: '.*' (re)
   blpk: chunk handled, in: 50.0M (52428800B) out: 6.69M (7010707B)
-  blpk: Handle chunk '1' 
+  blpk: Handle chunk '1'
   blpk: checksum \(adler32\)\: '.*' (re)
   blpk: chunk handled, in: 50.0M (52428800B) out: 4.99M (5230082B)
-  blpk: Handle chunk '2' 
+  blpk: Handle chunk '2'
   blpk: checksum \(adler32\)\: '.*' (re)
   blpk: chunk handled, in: 50.0M (52428800B) out: 4.29M (4493269B)
   blpk: Handle chunk '3' (last)

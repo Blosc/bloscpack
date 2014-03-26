@@ -388,10 +388,10 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: max_app_chunks was set to: 30
     blpk: raw_bloscpack_header: 'blpk\x03\x01\x01\x08\x00\x00\x00 \x00\x10^\x1f\x03\x00\x00\x00\x00\x00\x00\x00\x1e\x00\x00\x00\x00\x00\x00\x00'
     blpk: metadata_args will be silently ignored
-    blpk: Handle chunk '0' 
+    blpk: Handle chunk '0'
     blpk: checksum (adler32): 'k\xe9\xdc\x92'
     blpk: chunk handled, in: 512.0M (536870912B) out: 74.46M (78074017B)
-    blpk: Handle chunk '1' 
+    blpk: Handle chunk '1'
     blpk: checksum (adler32): '\xa9(\xb5\xd8'
     blpk: chunk handled, in: 512.0M (536870912B) out: 59.8M (62708295B)
     blpk: Handle chunk '2' (last)

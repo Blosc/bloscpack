@@ -153,8 +153,8 @@ def pack(source, sink,
     compress_func = source.compress_func
     # read-compress-write loop
     for i, chunk in enumerate(source()):
-        log.debug("Handle chunk '%d' %s" %
-                  (i, '(last)' if i == nchunks - 1 else ''))
+        log.debug("Handle chunk '%d'%s" %
+                  (i, ' (last)' if i == nchunks - 1 else ''))
         compressed = compress_func(chunk, blosc_args)
         sink.put(i, compressed)
         log.debug("chunk handled, in: %s out: %s" %

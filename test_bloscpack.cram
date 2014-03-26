@@ -360,8 +360,8 @@ Try using --debug
   blpk:     shuffle: True
   blpk:     typesize: 8
   blpk:     clevel: 7
-  blpk:     nthreads: 4
-  blpk: using 4 threads
+  blpk:     nthreads: .* (re)
+  blpk: using .* threads (re)
   blpk: getting ready for compression
   blpk: input file is: 'data.dat'
   blpk: output file is: 'data.dat.blp'
@@ -409,8 +409,8 @@ Try using --debug
   blpk:     no_check_extension: False
   blpk:     in_file: data.dat.blp
   blpk:     debug: True
-  blpk:     nthreads: 4
-  blpk: using 4 threads
+  blpk:     nthreads: .* (re)
+  blpk: using .* threads (re)
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'

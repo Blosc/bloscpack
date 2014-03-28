@@ -70,6 +70,14 @@ in the licence at the end of this file.
 Installation
 ------------
 
+Disclaimer: There are a myriad ways of installing Python packages (and their
+dependencies) these days and it is a futile endeavour to explain the procedures
+in great detail again and again. Below are three methods that are known to
+work. Depending on the method you choose and the system your are using you may
+require any or all of: super user privileges, a C++ compiler and/or a virtual
+environment. If you do run into problems or are unsure, it's best to send an
+email to the aforementioned mailing list asking for help.
+
 The package is available on PyPi, so you may use pip to install the
 dependencies and bloscpack itself:
 
@@ -92,11 +100,8 @@ the standard ``setup.py``:
 
     $ git clone https://github.com/Blosc/bloscpack
     $ cd bloscpack
-    $ pip install dependencies
+    $ pip install requirements.txt
     $ python setup.py install
-
-All of the above may or may not -- depending on the incantation used -- require
-superuser privileges.
 
 Usage
 -----

@@ -1,0 +1,134 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+In case of no arguments, show a usage message:
+
+  $ blpk
+  usage: blpk [-h] [--version] [-v | -d] [-f] [-n [1, 256]]  ...
+  blpk: error: too few arguments
+  [2]
+
+Help for global options and subcommands:
+
+  $ blpk --help
+  usage: blpk [-h] [--version] [-v | -d] [-f] [-n [1, 256]]  ...
+  
+  command line de/compression with blosc
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    --version             .* (re)
+    -v, --verbose         be verbose about actions
+    -d, --debug           print debugging output too
+  
+  global options:
+    -f, --force           disable overwrite checks for existing files
+                          (use with caution)
+    -n [1, 256], --nthreads [1, 256]
+                          set number of threads, (default: * (ncores)) (glob)
+  
+  subcommands:
+    
+      compress            perform compression on file
+      c                   alias for 'compress'
+      decompress          perform decompression on file
+      d                   alias for 'decompress'
+      append              append data to a compressed file
+      a                   alias for 'append'
+      info                print information about a compressed file
+      i                   alias for 'info'
+  
+  Additional help for subcommands is available:
+    blpk 'subcommand' [ -h | --help ]
+
+Help for the subcommands:
+
+  $ blpk compress --help
+  usage: blpk compress [-h] [-t <size>] [-l [0, 9]] [-s] [-c <codec>]
+                       [-z <size>] [-k <checksum>] [-o] [-m <metadata>]
+                       <in_file> [<out_file>]
+  
+  positional arguments:
+    <in_file>             file to be compressed
+    <out_file>            file to compress to
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+  
+  blosc settings:
+    -t <size>, --typesize <size>
+                          typesize for blosc (default: 8)
+    -l [0, 9], --clevel [0, 9]
+                          compression level (default: 7)
+    -s, --no-shuffle      deactivate shuffle
+    -c <codec>, --codec <codec>
+                          codec to be used by Blosc: 
+                          blosclz, lz4, lz4hc, snappy, zlib
+                           (default: blosclz)
+  
+  bloscpack settings:
+    -z <size>, --chunk-size <size>
+                          set desired chunk size or 'max' (default: 1M)
+    -k <checksum>, --checksum <checksum>
+                          set desired checksum:
+                          None, adler32, crc32
+                          md5, sha1, sha224
+                          sha256, sha384, sha512
+                           (default: adler32)
+    -o, --no-offsets      deactivate offsets
+    -m <metadata>, --metadata <metadata>
+                          file containing the metadata, must contain valid JSON
+  $ blpk decompress --help
+  usage: blpk decompress [-h] [-e] <in_file> [<out_file>]
+  
+  positional arguments:
+    <in_file>             file to be decompressed
+    <out_file>            file to decompress to
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    -e, --no-check-extension
+                          disable checking input file for extension (*.blp)
+                          (requires use of <out_file>)
+  $ blpk append --help
+  usage: blpk append [-h] [-t <size>] [-l [0, 9]] [-s] [-c <codec>] [-e]
+                     [-m <metadata>]
+                     <original_file> <new_file>
+  
+  positional arguments:
+    <original_file>       file to append to
+    <new_file>            file to append from
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    -e, --no-check-extension
+                          disable checking original file for extension (*.blp)
+    -m <metadata>, --metadata <metadata>
+                          file containing the metadata, must contain valid JSON
+  
+  blosc settings:
+    -t <size>, --typesize <size>
+                          typesize for blosc (default: 8)
+    -l [0, 9], --clevel [0, 9]
+                          compression level (default: 7)
+    -s, --no-shuffle      deactivate shuffle
+    -c <codec>, --codec <codec>
+                          codec to be used by Blosc: 
+                          blosclz, lz4, lz4hc, snappy, zlib
+                           (default: blosclz)
+
+  $ blpk info --help
+  usage: blpk info [-h] <file>
+  
+  positional arguments:
+    <file>      file to show info for
+  
+  optional arguments:
+    -h, --help  show this help message and exit
+
+Check the version output is sane.
+
+  $ blpk --version
+  bloscpack: '.*' python-blosc: '.*' blosc: '.*' (re)

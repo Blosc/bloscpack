@@ -549,7 +549,7 @@ The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
 
 .. code-block:: console
 
-   $ ./test_bloscpack.cram
+   $ cram --verbose test_cmdline/*.cram
    [...]
 
 
@@ -561,7 +561,7 @@ the unit tests:
 
 .. code-block:: console
 
-    $ COVERAGE=1 ./test_bloscpack.cram
+    $ COVERAGE=1 cram --verbose test_cmdline/*.cram
     [...]
     $nosetests --with-coverage --cover-package=bloscpack
     [...]

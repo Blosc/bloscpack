@@ -1,15 +1,7 @@
 #!/usr/bin/env cram
 # vim: set syntax=cram :
 
-Cram (http://pypi.python.org/pypi/cram) tests for bloscpack
-
-Run with coverage.
-
-  $ if [ -n "$COVERAGE" ]; then
-  >   alias blpk="COVERAGE_FILE=$TESTDIR/.coverage `which coverage` run --timid -a $TESTDIR/blpk"
-  > else
-  >   alias blpk="$TESTDIR/blpk"
-  > fi
+  $ . $TESTDIR/test_cmdline/cram_strap.sh
 
 In case of no arguments, show a usage message:
 

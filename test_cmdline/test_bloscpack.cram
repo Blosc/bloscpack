@@ -1,7 +1,7 @@
 #!/usr/bin/env cram
 # vim: set syntax=cram :
 
-  $ . $TESTDIR/test_cmdline/cram_strap.sh
+  $ . $TESTDIR/cram_strap.sh
 
 In case of no arguments, show a usage message:
 

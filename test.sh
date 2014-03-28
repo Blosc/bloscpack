@@ -1,6 +1,6 @@
 #!/bin/sh
 echo "Testing command line interface with cram"
-COVERAGE=1 ./test_bloscpack.cram
+COVERAGE=1 cram test_cmdline/*.cram
 cram_exit=$?
 echo "Executing unit tests with nosetests"
 nosetests --with-coverage --cover-package=bloscpack test

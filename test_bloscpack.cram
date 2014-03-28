@@ -27,7 +27,7 @@ Help for global options and subcommands:
   
   optional arguments:
     -h, --help            show this help message and exit
-    --version             show program's version number and exit
+    --version             .* (re)
     -v, --verbose         be verbose about actions
     -d, --debug           print debugging output too
   

@@ -909,10 +909,14 @@ Coding Conventions
 Maintainers Notes on Cutting a Release
 --------------------------------------
 
+#. Set the version as environment variable ``VERSION=vX.X.X``
 #. Update the changelog
-#. Set the version number in ``bloscpack.py``
-#. Commit with git commit -m ``"$VERSION"``
+#. Commit using ``git commit -m "$VERSION changelog"``
+#. Set the version number in ``bloscpack/version.py``
+#. Commit with ``git commit -m "$VERSION"``
 #. Make the tag using ``git tag -s -m "Bloscpack $VERSION" $VERSION``
+#. Push commits to Blosc github ``git push blosc master``
+#. Push commits to own github ``git push esc master``
 #. Push the tag to Blosc github ``git push blosc $VERSION``
 #. Push the tag to own github ``git push esc $VERSION``
 #. Upload tp PyPi using ``python setup.py sdist upload``

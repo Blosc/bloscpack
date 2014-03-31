@@ -19,7 +19,7 @@ Help for global options and subcommands:
   
   optional arguments:
     -h, --help            show this help message and exit
-    --version             .* (re)
+    .* (re)
     -v, --verbose         be verbose about actions
     -d, --debug           print debugging output too
   

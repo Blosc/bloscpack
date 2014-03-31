@@ -316,22 +316,25 @@ Add metadata to the file:
   blpk:     nchunks=153,
   blpk:     max_app_chunks=1530
   blpk: 'metadata':
-  blpk: {   u'container': u'numpy', u'dtype': u'float64', u'shape': [20000000]}
+  blpk: {   u'container': u'numpy',
+  blpk:     u'dtype': u'<f8',
+  blpk:     u'order': u'C',
+  blpk:     u'shape': [20000000]}
   blpk: 'metadata_header':
   blpk: {   'magic_format': 'JSON',
-  blpk:     'max_meta_size': 580,
+  blpk:     'max_meta_size': 660,
   blpk:     'meta_checksum': 'adler32',
   blpk:     'meta_codec': 'zlib',
-  blpk:     'meta_comp_size': 58,
+  blpk:     'meta_comp_size': 62,
   blpk:     'meta_level': 6,
   blpk:     'meta_options': '00000000',
-  blpk:     'meta_size': 58,
+  blpk:     'meta_size': 66,
   blpk:     'user_codec': ''}
   blpk: 'offsets':
-  blpk: [14112,169284,311607,472209,628846,...]
+  blpk: [14192,169364,311687,472289,628926,...]
   $ blpk decompress data.dat.blp data.dat.dcmp
   blpk: Metadata is:
-  blpk: '{u'dtype': u'float64', u'shape': [20000000], u'container': u'numpy'}'
+  blpk: '{u'dtype': u'<f8', u'shape': [20000000], u'container': u'numpy', u'order': u'C'}'
 
 Test basic append:
 

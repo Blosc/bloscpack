@@ -5,11 +5,9 @@
 
 Create a test datafile.
 
-  $ python -c "import numpy; a = numpy.linspace(0, 100, 2e7); f = open('data.dat', 'w');  f.write(a.tostring()) "
-  $ ls data.dat
+  $ PYTHONPATH=$TESTDIR/../  python $TESTDIR/mktestarray.py
+  $ ls
   data.dat
-  $ echo '{"dtype": "float64", "shape": [20000000], "container": "numpy"}' > meta.json
-  $ ls meta.json
   meta.json
 
 Basic compression:

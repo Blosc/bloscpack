@@ -12,42 +12,65 @@ Create a test datafile.
 
 Basic compression:
 
+  $ ls
+  data.dat
+  meta.json
   $ blpk compress data.dat
-  $ ls data.dat.blp
+  $ ls
+  data.dat
   data.dat.blp
+  meta.json
   $ rm data.dat.blp
+  $ ls
+  data.dat
+  meta.json
   $ blpk c data.dat
-  $ ls data.dat.blp
+  $ ls
+  data.dat
   data.dat.blp
-  $ rm data.dat.blp
+  meta.json
 
 Compression to a file:
 
   $ blpk compress data.dat packed.blp
-  $ ls packed.blp
+  $ ls
+  data.dat
+  data.dat.blp
+  meta.json
   packed.blp
   $ rm packed.blp
 
 Basic decompression:
 
-  $ blpk compress data.dat
   $ rm data.dat
+  $ ls
+  data.dat.blp
+  meta.json
   $ blpk decompress data.dat.blp
-  $ ls data.dat
+  $ ls
   data.dat
-  $ rm data.dat.blp
-  $ blpk compress data.dat
+  data.dat.blp
+  meta.json
   $ rm data.dat
   $ blpk d data.dat.blp
-  $ rm data.dat.blp
-  $ ls data.dat
+  $ ls
   data.dat
+  data.dat.blp
+  meta.json
 
 Decompression to a file:
 
-  $ blpk compress data.dat
   $ blpk decompress data.dat.blp data.dat.dcmp
-  $ ls data.dat.dcmp
+  $ ls
+  data.dat
+  data.dat.blp
   data.dat.dcmp
+  meta.json
   $ rm data.dat.dcmp
+  $ rm data.dat.blp
 
+Check that directory is clean.
+
+  $ ls
+  data.dat
+  meta.json

@@ -1,0 +1,58 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+Create a test datafile.
+
+  $ PYTHONPATH=$TESTDIR/../  python $TESTDIR/mktestarray.py
+  $ ls
+  data.dat
+  meta.json
+
+Compress a file:
+
+  $ blpk compress data.dat
+
+Get some info on the file:
+
+  $ blpk info data.dat.blp
+  blpk: bloscpack header: 
+  blpk:     format_version=3,
+  blpk:     offsets=True,
+  blpk:     metadata=False,
+  blpk:     checksum='adler32',
+  blpk:     typesize=8,
+  blpk:     chunk_size=1.0M (1048576B),
+  blpk:     last_chunk=602.0K (616448B),
+  blpk:     nchunks=153,
+  blpk:     max_app_chunks=1530
+  blpk: 'offsets':
+  blpk: [13496,168668,310991,471593,628230,...]
+  $ blpk i data.dat.blp
+  blpk: bloscpack header: 
+  blpk:     format_version=3,
+  blpk:     offsets=True,
+  blpk:     metadata=False,
+  blpk:     checksum='adler32',
+  blpk:     typesize=8,
+  blpk:     chunk_size=1.0M (1048576B),
+  blpk:     last_chunk=602.0K (616448B),
+  blpk:     nchunks=153,
+  blpk:     max_app_chunks=1530
+  blpk: 'offsets':
+  blpk: [13496,168668,310991,471593,628230,...]
+  $ rm data.dat.blp
+  $ blpk info data.dat.blp
+  blpk: error: file 'data.dat.blp' does not exist!
+  [1]
+  $ blpk i data.dat
+  blpk: error: the magic marker 'blpk' is missing from the bloscpack header, instead we found: '\x00\x00\x00\x00'
+  blpk: error: This might not be a bloscpack compressed file.
+  [1]
+
+Check that directory is clean.
+
+  $ ls
+  data.dat
+  meta.json

@@ -1,0 +1,103 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+Create a test datafile.
+
+  $ PYTHONPATH=$TESTDIR/../  python $TESTDIR/mktestarray.py
+  $ ls
+  data.dat
+  meta.json
+
+Basic compression:
+
+  $ ls
+  data.dat
+  meta.json
+  $ blpk compress data.dat
+  $ ls
+  data.dat
+  data.dat.blp
+  meta.json
+  $ rm data.dat.blp
+  $ ls
+  data.dat
+  meta.json
+  $ blpk c data.dat
+  $ ls
+  data.dat
+  data.dat.blp
+  meta.json
+
+Compression to a file:
+
+  $ blpk compress data.dat packed.blp
+  $ ls
+  data.dat
+  data.dat.blp
+  meta.json
+  packed.blp
+  $ rm packed.blp
+
+Basic decompression:
+
+  $ rm data.dat
+  $ ls
+  data.dat.blp
+  meta.json
+  $ blpk decompress data.dat.blp
+  $ ls
+  data.dat
+  data.dat.blp
+  meta.json
+  $ rm data.dat
+  $ blpk d data.dat.blp
+  $ ls
+  data.dat
+  data.dat.blp
+  meta.json
+
+Decompression to a file:
+
+  $ blpk decompress data.dat.blp data.dat.dcmp
+  $ ls
+  data.dat
+  data.dat.blp
+  data.dat.dcmp
+  meta.json
+  $ rm data.dat.dcmp
+  $ rm data.dat.blp
+
+Try using an alternative codec ('lz4' should be available):
+
+  $ blpk compress --codec lz4 data.dat
+  $ blpk info data.dat.blp
+  blpk: bloscpack header: 
+  blpk:     format_version=3,
+  blpk:     offsets=True,
+  blpk:     metadata=False,
+  blpk:     checksum='adler32',
+  blpk:     typesize=8,
+  blpk:     chunk_size=1.0M (1048576B),
+  blpk:     last_chunk=602.0K (616448B),
+  blpk:     nchunks=153,
+  blpk:     max_app_chunks=1530
+  blpk: 'offsets':
+  blpk: [13496,173720,305178,438821,571575,...]
+  $ rm data.dat.blp
+
+Try using an  codec that is not available:
+
+  $ blpk compress --codec NO_SUCH_CODEC data.dat
+  usage: blpk compress [-h] [-t <size>] [-l [0, 9]] [-s] [-c <codec>]
+                       [-z <size>] [-k <checksum>] [-o] [-m <metadata>]
+                       <in_file> [<out_file>]
+  blpk compress: error: argument -c/--codec: invalid choice: 'NO_SUCH_CODEC' (choose from 'blosclz', 'lz4', 'lz4hc', 'snappy', 'zlib')
+  [2]
+
+Check that directory is clean.
+
+  $ ls
+  data.dat
+  meta.json

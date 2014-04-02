@@ -1,0 +1,23 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+Create a test datafile.
+
+  $ PYTHONPATH=$TESTDIR/../  python $TESTDIR/mktestarray.py
+  $ ls
+  data.dat
+  meta.json
+
+Use an invalid number of threads:
+
+  $ blpk -n 257
+  blpk: error: -n must be 1 <= n <= 256
+  [1]
+
+Check that directory is clean.
+
+  $ ls
+  data.dat
+  meta.json

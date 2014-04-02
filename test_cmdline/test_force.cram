@@ -1,0 +1,40 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+Create a test datafile.
+
+  $ PYTHONPATH=$TESTDIR/../  python $TESTDIR/mktestarray.py
+  $ ls
+  data.dat
+  meta.json
+
+Use the force, Luke:
+
+  $ blpk compress data.dat
+  $ blpk compress data.dat
+  blpk: error: output file 'data.dat.blp' exists!
+  [1]
+  $ blpk --force compress data.dat
+  $ blpk decompress data.dat.blp
+  blpk: error: output file 'data.dat' exists!
+  [1]
+  $ blpk --force decompress data.dat.blp
+
+Check disable check extension
+
+  $ mv data.dat.blp data.dat.bla
+  $ blpk decompress data.dat.bla data.dat.dcmp
+  blpk: error: input file 'data.dat.bla' does not end with '.blp'
+  [1]
+  $ blpk decompress --no-check-extension data.dat.bla data.dat.dcmp
+  $ rm data.dat.dcmp
+  $ blpk decompress -e data.dat.bla data.dat.dcmp
+  $ rm data.dat.bla data.dat.dcmp
+
+Check that directory is clean.
+
+  $ ls
+  data.dat
+  meta.json

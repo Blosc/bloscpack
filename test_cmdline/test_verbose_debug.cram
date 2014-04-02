@@ -1,0 +1,133 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+Create a test datafile.
+
+  $ PYTHONPATH=$TESTDIR/../  python $TESTDIR/mktestarray.py
+  $ ls
+  data.dat
+  meta.json
+
+Get more information using --verbose:
+
+  $ blpk --verbose compress data.dat
+  blpk: using [0-9]+ threads (re)
+  blpk: getting ready for compression
+  blpk: input file is: 'data.dat'
+  blpk: output file is: 'data.dat.blp'
+  blpk: input file size: 152.59M (160000000B)
+  blpk: nchunks: 153
+  blpk: chunk_size: 1.0M (1048576B)
+  blpk: last_chunk_size: 602.0K (616448B)
+  blpk: output file size: 16.2M (16984384B)
+  blpk: compression ratio: 0.106152
+  blpk: done
+  $ rm data.dat.blp
+
+Try using --debug
+
+  $ blpk --debug compress --chunk-size 50M data.dat
+  blpk: command line argument parsing complete
+  blpk: command line arguments are: 
+  blpk:     force: False
+  blpk:     verbose: False
+  blpk:     offsets: True
+  blpk:     checksum: adler32
+  blpk:     subcommand: compress
+  blpk:     out_file: None
+  blpk:     metadata: None
+  blpk:     cname: blosclz
+  blpk:     in_file: data.dat
+  blpk:     chunk_size: 52428800
+  blpk:     debug: True
+  blpk:     shuffle: True
+  blpk:     typesize: 8
+  blpk:     clevel: 7
+  blpk:     nthreads: .* (re)
+  blpk: using .* threads (re)
+  blpk: getting ready for compression
+  blpk: input file is: 'data.dat'
+  blpk: output file is: 'data.dat.blp'
+  blpk: input file size: 152.59M (160000000B)
+  blpk: nchunks: 4
+  blpk: chunk_size: 50.0M (52428800B)
+  blpk: last_chunk_size: 2.59M (2713600B)
+  blpk: blosc args are:
+  blpk:     typesize: 8
+  blpk:     shuffle: True
+  blpk:     clevel: 7
+  blpk:     cname: blosclz
+  blpk: bloscpack args are:
+  blpk:     checksum: adler32
+  .* (re)
+  blpk:     offsets: True
+  blpk: max_app_chunks is a callable
+  blpk: max_app_chunks was set to: 40
+  blpk: raw_bloscpack_header: 'blpk\x03\x01\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
+  blpk: metadata_args will be silently ignored
+  blpk: Handle chunk '0'
+  blpk: checksum \(adler32\)\: '.*' (re)
+  blpk: chunk handled, in: 50.0M (52428800B) out: 6.69M (7010707B)
+  blpk: Handle chunk '1'
+  blpk: checksum \(adler32\)\: '.*' (re)
+  blpk: chunk handled, in: 50.0M (52428800B) out: 4.99M (5230082B)
+  blpk: Handle chunk '2'
+  blpk: checksum \(adler32\)\: '.*' (re)
+  blpk: chunk handled, in: 50.0M (52428800B) out: 4.29M (4493269B)
+  blpk: Handle chunk '3' (last)
+  blpk: checksum \(adler32\)\: '.*' (re)
+  blpk: chunk handled, in: 2.59M (2713600B) out: 228.35K (233834B)
+  blpk: Writing '4' offsets: '[384, 7011095, 12241181, 16734454]'
+  blpk: Raw offsets: '\x80\x01\x00\x00\x00\x00\x00\x00\x17\xfbj\x00\x00\x00\x00\x00\x1d\xc9\xba\x00\x00\x00\x00\x00\xf6X\xff\x00\x00\x00\x00\x00'
+  blpk: output file size: 16.18M (16968292B)
+  blpk: compression ratio: 0.106052
+  blpk: done
+  $ blpk --debug decompress data.dat.blp data.dat.dcmp
+  blpk: command line argument parsing complete
+  blpk: command line arguments are: 
+  blpk:     force: False
+  blpk:     verbose: False
+  blpk:     out_file: data.dat.dcmp
+  blpk:     subcommand: decompress
+  blpk:     no_check_extension: False
+  blpk:     in_file: data.dat.blp
+  blpk:     debug: True
+  blpk:     nthreads: .* (re)
+  blpk: using .* threads (re)
+  blpk: getting ready for decompression
+  blpk: input file is: 'data.dat.blp'
+  blpk: output file is: 'data.dat.dcmp'
+  blpk: input file size: 16.18M
+  blpk: reading bloscpack header
+  blpk: bloscpack_header_raw: 'blpk\x03\x01\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
+  blpk: bloscpack header: BloscPackHeader(format_version=3, offsets=True, metadata=False, checksum='adler32', typesize=8, chunk_size=52428800, last_chunk=2713600, nchunks=4, max_app_chunks=40)
+  blpk: Read raw offsets: '\x80\x01\x00\x00\x00\x00\x00\x00\x17\xfbj\x00\x00\x00\x00\x00\x1d\xc9\xba\x00\x00\x00\x00\x00\xf6X\xff\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
+  blpk: Offsets: [384, 7011095, 12241181, 16734454]
+  blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 7010707, 'version': 2, 'flags': 1, 'nbytes': 52428800, 'typesize': 8}
+  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: decompressing chunk '0'
+  blpk: chunk handled, in: 6.69M out: 50.0M
+  blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 5230082, 'version': 2, 'flags': 1, 'nbytes': 52428800, 'typesize': 8}
+  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: decompressing chunk '1'
+  blpk: chunk handled, in: 4.99M out: 50.0M
+  blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 4493269, 'version': 2, 'flags': 1, 'nbytes': 52428800, 'typesize': 8}
+  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: decompressing chunk '2'
+  blpk: chunk handled, in: 4.29M out: 50.0M
+  blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 233834, 'version': 2, 'flags': 1, 'nbytes': 2713600, 'typesize': 8}
+  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: decompressing chunk '3' (last)
+  blpk: chunk handled, in: 228.35K out: 2.59M
+  blpk: output file size: 152.59M
+  blpk: decompression ratio: 9.429352
+  blpk: done
+  $ rm data.dat.blp data.dat.dcmp
+
+Check that directory is clean.
+
+  $ ls
+  data.dat
+  meta.json

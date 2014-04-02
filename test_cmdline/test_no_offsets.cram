@@ -1,0 +1,24 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+Create a test datafile.
+
+  $ PYTHONPATH=$TESTDIR/../  python $TESTDIR/mktestarray.py
+  $ ls
+  data.dat
+  meta.json
+
+Try using no offsets:
+
+  $ blpk compress --no-offsets data.dat
+  $ blpk info data.dat.blp | grep offsets
+  blpk:     offsets=False,
+  $ rm data.dat.blp
+
+Check that directory is clean.
+
+  $ ls
+  data.dat
+  meta.json

@@ -11,16 +11,6 @@ Create a test datafile.
   meta.json
 
 
-Use the force, Luke:
-
-  $ blpk compress data.dat
-  blpk: error: output file 'data.dat.blp' exists!
-  [1]
-  $ blpk --force compress data.dat
-  $ blpk d data.dat.blp
-  blpk: error: output file 'data.dat' exists!
-  [1]
-  $ blpk --force decompress data.dat.blp
 
 Get some info on the file:
 

@@ -7,9 +7,6 @@ from .abstract_io import (PlainSource,
                           PlainSink,
                           CompressedSink,
                           )
-from bloscpack.exceptions import (ChecksumMismatch,
-                                  )
-
 
 class PlainMemorySource(PlainSource):
 

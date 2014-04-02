@@ -165,5 +165,8 @@ def pack(source, sink,
 
 def unpack(source, sink):
     # read, decompress, write loop
-    for compressed in iter(source):
+    for i, compressed in enumerate(iter(source)):
+        log.debug("decompressing chunk '%d'%s" %
+                  (i, ' (last)' if source.nchunks is not None
+                   and i == source.nchunks - 1 else ''))
         sink.put(compressed)

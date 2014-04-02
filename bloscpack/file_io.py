@@ -391,18 +391,13 @@ class PlainFPSink(PlainSink):
     def __init__(self, output_fp, nchunks=None):
         self.output_fp = output_fp
         self.nchunks = nchunks
-        self.i = 0
 
     def put(self, compressed):
-        log.debug("decompressing chunk '%d'%s" %
-                  (self.i, ' (last)' if self.nchunks is not None
-                   and self.i == self.nchunks - 1 else ''))
         decompressed = blosc.decompress(compressed)
         log.debug("chunk handled, in: %s out: %s" %
                   (pretty_size(len(compressed)),
                    pretty_size(len(decompressed))))
         self.output_fp.write(decompressed)
-        self.i += 1
 
 
 class CompressedFPSink(CompressedSink):

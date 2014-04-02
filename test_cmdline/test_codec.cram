@@ -1,0 +1,53 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+Create a test datafile.
+
+  $ PYTHONPATH=$TESTDIR/../  python $TESTDIR/mktestarray.py
+  $ ls
+  data.dat
+  meta.json
+
+Basic compression:
+
+  $ blpk compress data.dat
+  $ ls data.dat.blp
+  data.dat.blp
+  $ rm data.dat.blp
+  $ blpk c data.dat
+  $ ls data.dat.blp
+  data.dat.blp
+  $ rm data.dat.blp
+
+Compression to a file:
+
+  $ blpk compress data.dat packed.blp
+  $ ls packed.blp
+  packed.blp
+  $ rm packed.blp
+
+Basic decompression:
+
+  $ blpk compress data.dat
+  $ rm data.dat
+  $ blpk decompress data.dat.blp
+  $ ls data.dat
+  data.dat
+  $ rm data.dat.blp
+  $ blpk compress data.dat
+  $ rm data.dat
+  $ blpk d data.dat.blp
+  $ rm data.dat.blp
+  $ ls data.dat
+  data.dat
+
+Decompression to a file:
+
+  $ blpk compress data.dat
+  $ blpk decompress data.dat.blp data.dat.dcmp
+  $ ls data.dat.dcmp
+  data.dat.dcmp
+  $ rm data.dat.dcmp
+

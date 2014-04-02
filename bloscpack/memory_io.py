@@ -8,6 +8,7 @@ from .abstract_io import (PlainSource,
                           CompressedSink,
                           )
 
+
 class PlainMemorySource(PlainSource):
 
     def __init__(self, chunks):

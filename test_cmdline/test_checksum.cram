@@ -1,0 +1,32 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+Create a test datafile.
+
+  $ PYTHONPATH=$TESTDIR/../  python $TESTDIR/mktestarray.py
+  $ ls
+  data.dat
+  meta.json
+
+Try using alternative checksum:
+
+  $ blpk compress --checksum sha512 data.dat
+  $ blpk info data.dat.blp | grep checksum
+  blpk:     checksum='sha512',
+  $ rm data.dat.blp
+
+  $ blpk compress --checksum NO_SUCH_CHECKSUM data.dat
+  usage: blpk compress [-h] [-t <size>] [-l [0, 9]] [-s] [-c <codec>]
+                       [-z <size>] [-k <checksum>] [-o] [-m <metadata>]
+                       <in_file> [<out_file>]
+  blpk compress: error: argument -k/--checksum: invalid choice: 'NO_SUCH_CHECKSUM' (choose from 'None', 'adler32', 'crc32', 'md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512')
+  [2]
+
+
+Check that directory is clean.
+
+  $ ls
+  data.dat
+  meta.json

@@ -1,0 +1,30 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+Create a test datafile.
+
+  $ PYTHONPATH=$TESTDIR/../  python $TESTDIR/mktestarray.py
+  $ ls
+  data.dat
+  meta.json
+
+Test basic append:
+
+  $ blpk compress data.dat
+  $ ls -lah  data.dat.blp
+  .* 1 .* .* 17M .* .* .* data.dat.blp (re)
+  $ blpk append data.dat.blp data.dat
+  $ ls -lah  data.dat.blp
+  .* 1 .* .* 33M .* .* .* data.dat.blp (re)
+
+Cleanup.
+
+  $ rm data.dat.blp
+
+Check that directory is clean.
+
+  $ ls
+  data.dat
+  meta.json

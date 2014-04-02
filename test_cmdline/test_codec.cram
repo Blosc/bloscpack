@@ -69,6 +69,33 @@ Decompression to a file:
   $ rm data.dat.dcmp
   $ rm data.dat.blp
 
+Try using an alternative codec ('lz4' should be available):
+
+  $ blpk compress --codec lz4 data.dat
+  $ blpk info data.dat.blp
+  blpk: bloscpack header: 
+  blpk:     format_version=3,
+  blpk:     offsets=True,
+  blpk:     metadata=False,
+  blpk:     checksum='adler32',
+  blpk:     typesize=8,
+  blpk:     chunk_size=1.0M (1048576B),
+  blpk:     last_chunk=602.0K (616448B),
+  blpk:     nchunks=153,
+  blpk:     max_app_chunks=1530
+  blpk: 'offsets':
+  blpk: [13496,173720,305178,438821,571575,...]
+  $ rm data.dat.blp
+
+Try using an  codec that is not available:
+
+  $ blpk compress --codec NO_SUCH_CODEC data.dat
+  usage: blpk compress [-h] [-t <size>] [-l [0, 9]] [-s] [-c <codec>]
+                       [-z <size>] [-k <checksum>] [-o] [-m <metadata>]
+                       <in_file> [<out_file>]
+  blpk compress: error: argument -c/--codec: invalid choice: 'NO_SUCH_CODEC' (choose from 'blosclz', 'lz4', 'lz4hc', 'snappy', 'zlib')
+  [2]
+
 Check that directory is clean.
 
   $ ls

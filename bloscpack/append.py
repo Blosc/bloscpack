@@ -116,8 +116,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     # seek to the final offset
     original_fp.seek(offsets[-1], 0)
     # decompress the last chunk
-    compressed, blosc_header = _read_compressed_chunk_fp(original_fp,
+    compressed, blosc_header, digest = _read_compressed_chunk_fp(original_fp,
                                                          checksum_impl)
+    # TODO check digest
     decompressed = blosc.decompress(compressed)
     # figure out how many bytes we need to read to rebuild the last chunk
     ultimo_length = len(decompressed)

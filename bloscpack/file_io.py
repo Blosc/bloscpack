@@ -336,19 +336,9 @@ def _read_compressed_chunk_fp(input_fp, checksum_impl):
     input_fp.seek(-BLOSC_HEADER_LENGTH, 1)
     # read chunk
     compressed = input_fp.read(ctbytes)
-    if checksum_impl.size > 0:
-        # do checksum
-        expected_digest = input_fp.read(checksum_impl.size)
-        received_digest = checksum_impl(compressed)
-        if received_digest != expected_digest:
-            raise ChecksumMismatch(
-                    "Checksum mismatch detected in chunk, "
-                    "expected: '%s', received: '%s'" %
-                    (repr(expected_digest), repr(received_digest)))
-        else:
-            log.debug('checksum OK (%s): %s' %
-                      (checksum_impl.name, repr(received_digest)))
-    return compressed, blosc_header
+    digest = input_fp.read(checksum_impl.size) \
+        if checksum_impl.size > 0 else None
+    return compressed, blosc_header, digest
 
 
 def _write_compressed_chunk(output_fp, compressed, digest):
@@ -382,8 +372,8 @@ class CompressedFPSource(CompressedSource):
 
     def __call__(self):
         for i in xrange(self.nchunks):
-            compressed, header = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
-            yield compressed
+            compressed, header, digest = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
+            yield compressed, digest
 
 
 class PlainFPSink(PlainSink):

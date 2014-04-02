@@ -40,15 +40,8 @@ class CompressedMemorySource(CompressedSource):
     def __call__(self):
         for i in xrange(self.nchunks):
             compressed = self.chunks[i]
-            if self.checksum:
-                expected_digest = self.checksums[i]
-                received_digest = self.checksum_impl(compressed)
-                if received_digest != expected_digest:
-                    raise ChecksumMismatch(
-                            "Checksum mismatch detected in chunk, "
-                            "expected: '%s', received: '%s'" %
-                            (repr(expected_digest), repr(received_digest)))
-            yield compressed
+            digest = self.checksums[i] if self.checksum else None
+            yield compressed, digest
 
 
 class PlainMemorySink(PlainSink):

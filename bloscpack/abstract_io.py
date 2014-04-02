@@ -18,6 +18,8 @@ from .args import (DEFAULT_BLOSC_ARGS,
                    )
 from .headers import (BloscPackHeader,
                       )
+from .exceptions import (ChecksumMismatch,
+                         )
 from .pretty import (double_pretty_size,
                      )
 import log
@@ -165,8 +167,19 @@ def pack(source, sink,
 
 def unpack(source, sink):
     # read, decompress, write loop
-    for i, compressed in enumerate(iter(source)):
+    for i, (compressed, digest) in enumerate(iter(source)):
         log.debug("decompressing chunk '%d'%s" %
                   (i, ' (last)' if source.nchunks is not None
                    and i == source.nchunks - 1 else ''))
+        if digest:
+            computed_digest = source.checksum_impl(compressed)
+            if digest != computed_digest:
+                raise ChecksumMismatch(
+                        "Checksum mismatch detected in chunk, "
+                        "expected: '%s', received: '%s'" %
+                        (repr(digest), repr(computed_digest)))
+        else:
+            log.debug('checksum OK (%s): %s' %
+                      (source.checksum_impl.name, repr(digest)))
+
         sink.put(compressed)

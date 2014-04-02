@@ -61,6 +61,7 @@ class PlainMemorySink(PlainSink):
             self.i += 1
         else:
             self.chunks.append(chunk)
+        return len(chunk)
 
 
 class CompressedMemorySink(CompressedSink):

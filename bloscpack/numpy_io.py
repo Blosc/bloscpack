@@ -89,6 +89,7 @@ class PlainNumpySink(PlainSink):
     def put(self, compressed):
         bwritten = blosc.decompress_ptr(compressed, self.ptr)
         self.ptr += bwritten
+        return bwritten
 
 
 def pack_ndarray(ndarray, sink,

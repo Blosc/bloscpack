@@ -182,4 +182,8 @@ def unpack(source, sink):
                 log.debug('checksum OK (%s): %s' %
                         (source.checksum_impl.name, repr(digest)))
 
-        sink.put(compressed)
+        len_decompressed = sink.put(compressed)
+        log.debug("chunk handled, in: %s out: %s" %
+                  (double_pretty_size(len(compressed)),
+                   double_pretty_size(len_decompressed)))
+

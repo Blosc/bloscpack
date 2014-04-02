@@ -384,10 +384,8 @@ class PlainFPSink(PlainSink):
 
     def put(self, compressed):
         decompressed = blosc.decompress(compressed)
-        log.debug("chunk handled, in: %s out: %s" %
-                  (pretty_size(len(compressed)),
-                   pretty_size(len(decompressed))))
         self.output_fp.write(decompressed)
+        return len(decompressed)
 
 
 class CompressedFPSink(CompressedSink):

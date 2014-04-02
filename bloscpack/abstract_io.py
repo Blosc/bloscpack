@@ -178,8 +178,8 @@ def unpack(source, sink):
                         "Checksum mismatch detected in chunk, "
                         "expected: '%s', received: '%s'" %
                         (repr(digest), repr(computed_digest)))
-        else:
-            log.debug('checksum OK (%s): %s' %
-                      (source.checksum_impl.name, repr(digest)))
+            else:
+                log.debug('checksum OK (%s): %s' %
+                        (source.checksum_impl.name, repr(digest)))
 
         sink.put(compressed)

@@ -15,17 +15,50 @@ Compression with different chunksizes:
   $ blpk compress --chunk-size 64K data.dat
   $ ls data.dat.blp
   data.dat.blp
-  $ rm data.dat.blp
+  $ blpk info data.dat.blp | grep chunk_size
+  blpk:     chunk_size=64.0K (65536B),
+  $ blpk decompress data.dat.blp data.dat.dcmp
+  $ ls
+  data.dat
+  data.dat.blp
+  data.dat.dcmp
+  meta.json
+  $ rm data.dat.blp data.dat.dcmp
+  $ ls
+  data.dat
+  meta.json
 
   $ blpk compress --chunk-size 65536 data.dat
   $ ls data.dat.blp
   data.dat.blp
-  $ rm data.dat.blp
+  $ blpk info data.dat.blp | grep chunk_size
+  blpk:     chunk_size=64.0K (65536B),
+  $ blpk decompress data.dat.blp data.dat.dcmp
+  $ ls
+  data.dat
+  data.dat.blp
+  data.dat.dcmp
+  meta.json
+  $ rm data.dat.blp data.dat.dcmp
+  $ ls
+  data.dat
+  meta.json
 
   $ blpk compress --chunk-size max data.dat
   $ ls data.dat.blp
   data.dat.blp
-  $ rm data.dat.blp
+  $ blpk info data.dat.blp | grep chunk_size
+  blpk:     chunk_size=152.59M (160000000B),
+  $ blpk decompress data.dat.blp data.dat.dcmp
+  $ ls
+  data.dat
+  data.dat.blp
+  data.dat.dcmp
+  meta.json
+  $ rm data.dat.blp data.dat.dcmp
+  $ ls
+  data.dat
+  meta.json
 
   $ blpk compress --chunk-size -1 data.dat
   blpk: error: --chunk-size must be > 0
@@ -34,3 +67,9 @@ Compression with different chunksizes:
   $ blpk compress --chunk-size NO_SUCH_VALUE data.dat
   blpk: error: --chunk-size error: invalid literal for int() with base 10: 'NO_SUCH_VALUE' or 'max'
   [1]
+
+Check that directory is clean.
+
+  $ ls
+  data.dat
+  meta.json

@@ -36,6 +36,14 @@ def _compress_chunk_ptr(chunk, blosc_args):
 
 
 def _ndarray_meta(ndarray):
+    # Reagrding the dtype, quote from numpy/lib/format.py:dtype_to_descr
+    #
+    # The .descr attribute of a dtype object cannot be round-tripped
+    # through the dtype() constructor. Simple types, like dtype('float32'),
+    # have a descr which looks like a record array with one field with ''
+    # as a name. The dtype() constructor interprets this as a request to
+    # give a default name.  Instead, we construct descriptor that can be
+    # passed to dtype().
     return {'dtype': ndarray.dtype.descr
             if ndarray.dtype.names is not None
             else ndarray.dtype.str,
@@ -49,14 +57,6 @@ class PlainNumpySource(PlainSource):
 
     def __init__(self, ndarray):
 
-        # Reagrding the dtype, quote from numpy/lib/format.py:dtype_to_descr
-        #
-        # The .descr attribute of a dtype object cannot be round-tripped
-        # through the dtype() constructor. Simple types, like dtype('float32'),
-        # have a descr which looks like a record array with one field with ''
-        # as a name. The dtype() constructor interprets this as a request to
-        # give a default name.  Instead, we construct descriptor that can be
-        # passed to dtype().
         self.metadata = _ndarray_meta(ndarray)
         self.size = ndarray.size * ndarray.itemsize
         self.ndarray = numpy.ascontiguousarray(ndarray)

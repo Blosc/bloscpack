@@ -28,6 +28,9 @@ Check disable check extension
   $ blpk decompress data.dat.bla data.dat.dcmp
   blpk: error: input file 'data.dat.bla' does not end with '.blp'
   [1]
+  $ blpk decompress --no-check-extension data.dat.bla
+  blpk: error: --no-check-extension requires use of <out_file>
+  [1]
   $ blpk decompress --no-check-extension data.dat.bla data.dat.dcmp
   $ rm data.dat.dcmp
   $ blpk decompress -e data.dat.bla data.dat.dcmp

@@ -65,7 +65,7 @@ Compression with different chunksizes:
   [1]
 
   $ blpk compress --chunk-size NO_SUCH_VALUE data.dat
-  blpk: error: --chunk-size error: invalid literal for int() with base 10: 'NO_SUCH_VALUE' or 'max'
+  blpk: error: --chunk-size error: invalid literal for int() with base 10: 'NO_SUCH_VALUE'
   [1]
 
 Check that directory is clean.

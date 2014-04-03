@@ -289,8 +289,7 @@ def create_parser():
                     else:
                         value = int(value)
                 except ValueError as ve:
-                    log.error('%s error: %s' % (option_string, str(ve) +
-                              " or 'max'"))
+                    log.error('%s error: %s' % (option_string, str(ve)))
                 if value < 0:
                     log.error('%s must be > 0' % option_string)
             setattr(namespace, self.dest, value)

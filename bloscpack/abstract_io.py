@@ -158,7 +158,7 @@ def pack(source, sink,
 
     compress_func = source.compress_func
     # read-compress-write loop
-    for i, chunk in enumerate(source()):
+    for i, chunk in enumerate(source):
         log.debug("Handle chunk '%d'%s" %
                   (i, ' (last)' if i == nchunks - 1 else ''))
         compressed = compress_func(chunk, blosc_args)
@@ -175,7 +175,7 @@ def unpack(source, sink):
     if not isinstance(sink, PlainSink):
         raise TypeError
     # read, decompress, write loop
-    for i, (compressed, digest) in enumerate(iter(source)):
+    for i, (compressed, digest) in enumerate(source):
         log.debug("decompressing chunk '%d'%s" %
                   (i, ' (last)' if source.nchunks is not None
                    and i == source.nchunks - 1 else ''))

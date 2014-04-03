@@ -911,6 +911,39 @@ Coding Conventions
 * Exceptions instead of exit
 * nose test generators parameterized tests
 
+Prior Art
+---------
+
+The following is a  list of important resources that were read during the
+conception and initial stages of Bloscpack.
+
+* The `6pack utility included with FastLZ
+  <https://github.com/ariya/FastLZ/blob/master/6pack.c>`_ (the codec that
+  BloscLZ was derived from) was the initial inspiration for writing a command
+  line interface to Blosc.
+
+* The `Wikipedia article on the PNG format
+  <http://en.wikipedia.org/wiki/Portable_Network_Graphics>`_ contains some
+  interesting details about the PNG header and file headers in general.
+
+* The `XZ File Format Specification
+  <http://tukaani.org/xz/xz-file-format.txt>`_ gave rise to some ideas and
+  techniques about writing file format specifications and using checksums for
+  data integrity. Although the format and the document itself was a bit to
+  heavyweight for my tastes.
+
+* The `Snappy framing format
+  <http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt>`_
+  and the `file container format for LZ4
+  <http://fastcompression.blogspot.de/2012/04/file-container-format-for-lz4.html>`_
+  were also consulted, but I can't remember if and what inspiration they gave
+  rise to.
+
+* The homepages of `zlib <http://www.zlib.net/>`_ and `gzip
+  <http://www.gzip.org/>`_ were also consulted at some point. The command line
+  interface of `gzip/gunzip` was deemed to be from a different era and as a
+  result git-style subcommands are used in Bloscpack.
+
 Maintainers Notes on Cutting a Release
 --------------------------------------
 
@@ -935,7 +968,6 @@ TODO
 Documentation
 ~~~~~~~~~~~~~
 
-* list prior art, xz format, png format
 * document library usage
 * make a note in the README that the chunk-size benchmark can be used to tune
 * Announcement RST

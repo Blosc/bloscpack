@@ -4,6 +4,7 @@
 
 
 from cStringIO import StringIO
+from unittest import TestCase
 
 
 import numpy as np
@@ -36,35 +37,37 @@ from bloscpack.testutil import (create_tmp_files,
                                 )
 
 
-def test_roundtrip_numpy():
-    # first try with the standard StringIO
-    a = np.arange(50)
-    sio = StringIO()
-    sink = CompressedFPSink(sio)
-    pack_ndarray(a, sink)
-    sio.seek(0)
-    source = CompressedFPSource(sio)
-    b = unpack_ndarray(source)
-    npt.assert_array_equal(a, b)
+class RoundTripNumpy(TestCase):
 
-    # now use ths shiny CompressedMemorySink/Source combo
-    a = np.arange(50)
-    sink = CompressedMemorySink()
-    pack_ndarray(a, sink)
-    source = CompressedMemorySource(sink)
-    b = unpack_ndarray(source)
-    npt.assert_array_equal(a, b)
+    def setUp(self):
+        self.a = np.arange(50)
 
-    # try the pack_*_str
-    s = pack_ndarray_str(a)
-    b = unpack_ndarray_str(s)
-    npt.assert_array_equal(a, b)
+    def test_roundtrip_numpy_file_pointers(self):
+        sio = StringIO()
+        sink = CompressedFPSink(sio)
+        pack_ndarray(self.a, sink)
+        sio.seek(0)
+        source = CompressedFPSource(sio)
+        b = unpack_ndarray(source)
+        npt.assert_array_equal(self.a, b)
 
-    # and the file ones too
-    with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
-        pack_ndarray_file(a, out_file)
-        b = unpack_ndarray_file(out_file)
-        npt.assert_array_equal(a, b)
+    def test_roundtrip_numpy_memory(self):
+        sink = CompressedMemorySink()
+        pack_ndarray(self.a, sink)
+        source = CompressedMemorySource(sink)
+        b = unpack_ndarray(source)
+        npt.assert_array_equal(self.a, b)
+
+    def test_roundtrip_numpy_str(self):
+        s = pack_ndarray_str(self.a)
+        b = unpack_ndarray_str(s)
+        npt.assert_array_equal(self.a, b)
+
+    def test_roundtrip_numpy_file(self):
+        with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
+            pack_ndarray_file(self.a, out_file)
+            b = unpack_ndarray_file(out_file)
+            npt.assert_array_equal(self.a, b)
 
 
 def test_unpack_exception():

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
+import blosc
+
 from .abstract_io import (PlainSource,
                           CompressedSource,
                           PlainSink,
@@ -53,7 +55,8 @@ class PlainMemorySink(PlainSink):
             self.have_chunks = False
             self.chunks = []
 
-    def put(self, chunk):
+    def put(self, compressed):
+        chunk = blosc.decompress(compressed)
         if self.have_chunks:
             self.chunks[self.i] = chunk
             self.i += 1

@@ -11,9 +11,15 @@ import numpy.testing as npt
 import nose.tools as nt
 
 
+from bloscpack.abstract_io import (pack,
+                                   )
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
+                            calculate_nchunks,
                             )
-from bloscpack.file_io import (CompressedFPSource,
+from bloscpack.exceptions import (NotANumpyArray,
+                                  )
+from bloscpack.file_io import (PlainFPSource,
+                               CompressedFPSource,
                                CompressedFPSink,
                                )
 from bloscpack.headers import (decode_blosc_header,
@@ -23,6 +29,10 @@ from bloscpack.numpy_io import (pack_ndarray,
                                 unpack_ndarray,
                                 pack_ndarray_str,
                                 unpack_ndarray_str,
+                                pack_ndarray_file,
+                                unpack_ndarray_file,
+                                )
+from bloscpack.testutil import (create_tmp_files,
                                 )
 
 
@@ -45,10 +55,26 @@ def test_roundtrip_numpy():
     b = unpack_ndarray(source)
     npt.assert_array_equal(a, b)
 
-    # and lastly try the pack_*_str
+    # try the pack_*_str
     s = pack_ndarray_str(a)
     b = unpack_ndarray_str(s)
     npt.assert_array_equal(a, b)
+
+    # and the file ones too
+    with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
+        pack_ndarray_file(a, out_file)
+        b = unpack_ndarray_file(out_file)
+        npt.assert_array_equal(a, b)
+
+
+def test_unpack_exception():
+    a = np.arange(50)
+    sio = StringIO()
+    a_str = a.tostring()
+    source = PlainFPSource(StringIO(a_str))
+    sink = CompressedFPSink(sio)
+    pack(source, sink, *calculate_nchunks(len(a_str)))
+    nt.assert_raises(NotANumpyArray, unpack_ndarray_str, sio.getvalue())
 
 
 def roundtrip_ndarray(ndarray):

@@ -61,6 +61,8 @@ def pack_unpack_mem(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
     sink = PlainFPSink(dcmp_fp)
     unpack(source, sink)
     nt.assert_equal(metadata, source.metadata)
+    in_fp.seek(0)
+    dcmp_fp.seek(0)
     cmp_fp(in_fp, dcmp_fp)
     return source.metadata
 

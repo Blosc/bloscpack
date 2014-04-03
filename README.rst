@@ -911,6 +911,36 @@ Coding Conventions
 * Exceptions instead of exit
 * nose test generators parameterized tests
 
+Comparison to HDF5/PyTables
+---------------------------
+
+Since Blosc has already been supported for use in HDF5 files from within
+PyTables, one might be tempted to question why yet another file format has to
+be invented. This section aims to differentiate between HDF5/PyTables and
+effectively argues that they are not competitors.
+
+* Lightweight vs. Heavyweight. Bloscpack is a lightweight format. The format
+  specification can easily be digested within a day and the dependencies are
+  minimal. PyTables is a complex piece of software and the HDF5 file format
+  specification is a large document.
+
+* Persistence vs. Database. Bloscpack is designed to allow for fast
+  serialization and deserialization of in-memory data. PyTables is more of a
+  database which for example allows complex queries to be computed on the
+  data.
+
+Additionally there are two network uses cases which Bloscpack is suited for
+(but does not have support for as of yet):
+
+#. Streaming: Since bloscpack without offsets can be written in a single
+   pass it is ideally suited for streaming over a network, where you can
+   compress send and decompress individual chunks in a streaming fashion.
+
+#. Expose a file over HTTP and do partial reads from it, for example when
+   storing a compressed file in S3. You can easily just store a file on a
+   web server and then use the header information to read and decompress
+   individual chunks.
+
 Prior Art
 ---------
 

@@ -66,7 +66,7 @@ class PlainNumpySource(PlainSource):
     def compress_func(self):
         return _compress_chunk_ptr
 
-    def __call__(self):
+    def __iter__(self):
         self.nitems = int(self.chunk_size / self.ndarray.itemsize)
         offset = self.ptr
         for i in xrange(self.nchunks - 1):

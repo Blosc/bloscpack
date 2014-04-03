@@ -16,7 +16,7 @@ class PlainMemorySource(PlainSource):
     def __init__(self, chunks):
         self.chunks = chunks
 
-    def __call__(self):
+    def __iter__(self):
         for c in self.chunks:
             yield c
 
@@ -37,7 +37,7 @@ class CompressedMemorySource(CompressedSource):
         if self.checksum:
             self.checksums = compressed_memory_sink.checksums
 
-    def __call__(self):
+    def __iter__(self):
         for i in xrange(self.nchunks):
             compressed = self.chunks[i]
             digest = self.checksums[i] if self.checksum else None

@@ -352,7 +352,7 @@ class PlainFPSource(PlainSource):
     def __init__(self, input_fp):
         self.input_fp = input_fp
 
-    def __call__(self):
+    def __iter__(self):
         # if nchunks == 1 the last_chunk_size is the size of the single chunk
         for num_bytes in ([self.chunk_size] *
                           (self.nchunks - 1) +
@@ -370,7 +370,7 @@ class CompressedFPSource(CompressedSource):
         self.checksum_impl = self.bloscpack_header.checksum_impl
         self.nchunks = self.bloscpack_header.nchunks
 
-    def __call__(self):
+    def __iter__(self):
         for i in xrange(self.nchunks):
             compressed, header, digest = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
             yield compressed, digest

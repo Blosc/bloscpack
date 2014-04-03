@@ -170,7 +170,7 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
     source = PlainFPSource(new_content_fp)
     source.configure(chunk_size, last_chunk_size, nchunks)
     # read, compress, write loop
-    for i, chunk in enumerate(source()):
+    for i, chunk in enumerate(source):
         log.debug("Handle chunk '%d' %s" % (i,'(last)' if i == nchunks -1
             else ''))
 

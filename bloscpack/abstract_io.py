@@ -42,11 +42,8 @@ class PlainSource(object):
     def compress_func(self):
         return _compress_chunk_str
 
-    def __iter__(self):
-        return self()
-
     @abc.abstractmethod
-    def __call__(self):
+    def __iter__(self):
         pass
 
 
@@ -54,11 +51,8 @@ class CompressedSource(object):
 
     _metaclass__ = abc.ABCMeta
 
-    def __iter__(self):
-        return self()
-
     @abc.abstractmethod
-    def __call__(self):
+    def __iter__(self):
         pass
 
 

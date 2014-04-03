@@ -1012,6 +1012,7 @@ Changelog
 * v0.7.0     - XXX XXX XX XXXX
 
   * Modularize cram tests, even has something akin to a harness
+  * Refactored, tweaked and simplified Source/Sink code and semantics
 
 * v0.6.0     - Fri Mar 28 2014
 

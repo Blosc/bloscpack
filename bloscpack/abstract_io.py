@@ -120,6 +120,10 @@ def pack(source, sink,
          bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
          metadata_args=DEFAULT_METADATA_ARGS):
     """ Core packing function.  """
+    if not isinstance(source, PlainSource):
+        raise TypeError
+    if not isinstance(sink, CompressedSink):
+        raise TypeError
     _check_blosc_args(blosc_args)
     log.debug('blosc args are:')
     for arg, value in blosc_args.iteritems():
@@ -166,6 +170,10 @@ def pack(source, sink,
 
 
 def unpack(source, sink):
+    if not isinstance(source, CompressedSource):
+        raise TypeError
+    if not isinstance(sink, PlainSink):
+        raise TypeError
     # read, decompress, write loop
     for i, (compressed, digest) in enumerate(iter(source)):
         log.debug("decompressing chunk '%d'%s" %

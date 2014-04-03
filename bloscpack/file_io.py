@@ -336,19 +336,9 @@ def _read_compressed_chunk_fp(input_fp, checksum_impl):
     input_fp.seek(-BLOSC_HEADER_LENGTH, 1)
     # read chunk
     compressed = input_fp.read(ctbytes)
-    if checksum_impl.size > 0:
-        # do checksum
-        expected_digest = input_fp.read(checksum_impl.size)
-        received_digest = checksum_impl(compressed)
-        if received_digest != expected_digest:
-            raise ChecksumMismatch(
-                    "Checksum mismatch detected in chunk, "
-                    "expected: '%s', received: '%s'" %
-                    (repr(expected_digest), repr(received_digest)))
-        else:
-            log.debug('checksum OK (%s): %s' %
-                      (checksum_impl.name, repr(received_digest)))
-    return compressed, blosc_header
+    digest = input_fp.read(checksum_impl.size) \
+        if checksum_impl.size > 0 else None
+    return compressed, blosc_header, digest
 
 
 def _write_compressed_chunk(output_fp, compressed, digest):
@@ -362,7 +352,7 @@ class PlainFPSource(PlainSource):
     def __init__(self, input_fp):
         self.input_fp = input_fp
 
-    def __call__(self):
+    def __iter__(self):
         # if nchunks == 1 the last_chunk_size is the size of the single chunk
         for num_bytes in ([self.chunk_size] *
                           (self.nchunks - 1) +
@@ -380,10 +370,10 @@ class CompressedFPSource(CompressedSource):
         self.checksum_impl = self.bloscpack_header.checksum_impl
         self.nchunks = self.bloscpack_header.nchunks
 
-    def __call__(self):
+    def __iter__(self):
         for i in xrange(self.nchunks):
-            compressed, header = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
-            yield compressed
+            compressed, header, digest = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
+            yield compressed, digest
 
 
 class PlainFPSink(PlainSink):
@@ -391,18 +381,11 @@ class PlainFPSink(PlainSink):
     def __init__(self, output_fp, nchunks=None):
         self.output_fp = output_fp
         self.nchunks = nchunks
-        self.i = 0
 
     def put(self, compressed):
-        log.debug("decompressing chunk '%d'%s" %
-                  (self.i, ' (last)' if self.nchunks is not None
-                   and self.i == self.nchunks - 1 else ''))
         decompressed = blosc.decompress(compressed)
-        log.debug("chunk handled, in: %s out: %s" %
-                  (pretty_size(len(compressed)),
-                   pretty_size(len(decompressed))))
         self.output_fp.write(decompressed)
-        self.i += 1
+        return len(decompressed)
 
 
 class CompressedFPSink(CompressedSink):

@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
+import blosc
+
 from .abstract_io import (PlainSource,
                           CompressedSource,
                           PlainSink,
                           CompressedSink,
                           )
-from bloscpack.exceptions import (ChecksumMismatch,
-                                  )
 
 
 class PlainMemorySource(PlainSource):
@@ -16,7 +16,7 @@ class PlainMemorySource(PlainSource):
     def __init__(self, chunks):
         self.chunks = chunks
 
-    def __call__(self):
+    def __iter__(self):
         for c in self.chunks:
             yield c
 
@@ -37,18 +37,11 @@ class CompressedMemorySource(CompressedSource):
         if self.checksum:
             self.checksums = compressed_memory_sink.checksums
 
-    def __call__(self):
+    def __iter__(self):
         for i in xrange(self.nchunks):
             compressed = self.chunks[i]
-            if self.checksum:
-                expected_digest = self.checksums[i]
-                received_digest = self.checksum_impl(compressed)
-                if received_digest != expected_digest:
-                    raise ChecksumMismatch(
-                            "Checksum mismatch detected in chunk, "
-                            "expected: '%s', received: '%s'" %
-                            (repr(expected_digest), repr(received_digest)))
-            yield compressed
+            digest = self.checksums[i] if self.checksum else None
+            yield compressed, digest
 
 
 class PlainMemorySink(PlainSink):
@@ -62,12 +55,14 @@ class PlainMemorySink(PlainSink):
             self.have_chunks = False
             self.chunks = []
 
-    def put(self, chunk):
+    def put(self, compressed):
+        chunk = blosc.decompress(compressed)
         if self.have_chunks:
             self.chunks[self.i] = chunk
             self.i += 1
         else:
             self.chunks.append(chunk)
+        return len(chunk)
 
 
 class CompressedMemorySink(CompressedSink):

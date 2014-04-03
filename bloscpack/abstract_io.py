@@ -18,6 +18,8 @@ from .args import (DEFAULT_BLOSC_ARGS,
                    )
 from .headers import (BloscPackHeader,
                       )
+from .exceptions import (ChecksumMismatch,
+                         )
 from .pretty import (double_pretty_size,
                      )
 import log
@@ -40,11 +42,8 @@ class PlainSource(object):
     def compress_func(self):
         return _compress_chunk_str
 
-    def __iter__(self):
-        return self()
-
     @abc.abstractmethod
-    def __call__(self):
+    def __iter__(self):
         pass
 
 
@@ -52,11 +51,8 @@ class CompressedSource(object):
 
     _metaclass__ = abc.ABCMeta
 
-    def __iter__(self):
-        return self()
-
     @abc.abstractmethod
-    def __call__(self):
+    def __iter__(self):
         pass
 
 
@@ -118,6 +114,10 @@ def pack(source, sink,
          bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
          metadata_args=DEFAULT_METADATA_ARGS):
     """ Core packing function.  """
+    if not isinstance(source, PlainSource):
+        raise TypeError
+    if not isinstance(sink, CompressedSink):
+        raise TypeError
     _check_blosc_args(blosc_args)
     log.debug('blosc args are:')
     for arg, value in blosc_args.iteritems():
@@ -152,7 +152,7 @@ def pack(source, sink,
 
     compress_func = source.compress_func
     # read-compress-write loop
-    for i, chunk in enumerate(source()):
+    for i, chunk in enumerate(source):
         log.debug("Handle chunk '%d'%s" %
                   (i, ' (last)' if i == nchunks - 1 else ''))
         compressed = compress_func(chunk, blosc_args)
@@ -164,6 +164,28 @@ def pack(source, sink,
 
 
 def unpack(source, sink):
+    if not isinstance(source, CompressedSource):
+        raise TypeError
+    if not isinstance(sink, PlainSink):
+        raise TypeError
     # read, decompress, write loop
-    for compressed in iter(source):
-        sink.put(compressed)
+    for i, (compressed, digest) in enumerate(source):
+        log.debug("decompressing chunk '%d'%s" %
+                  (i, ' (last)' if source.nchunks is not None
+                   and i == source.nchunks - 1 else ''))
+        if digest:
+            computed_digest = source.checksum_impl(compressed)
+            if digest != computed_digest:
+                raise ChecksumMismatch(
+                        "Checksum mismatch detected in chunk, "
+                        "expected: '%s', received: '%s'" %
+                        (repr(digest), repr(computed_digest)))
+            else:
+                log.debug('checksum OK (%s): %s' %
+                        (source.checksum_impl.name, repr(digest)))
+
+        len_decompressed = sink.put(compressed)
+        log.debug("chunk handled, in: %s out: %s" %
+                  (double_pretty_size(len(compressed)),
+                   double_pretty_size(len_decompressed)))
+

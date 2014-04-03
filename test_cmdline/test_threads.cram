@@ -12,6 +12,8 @@ Create a test datafile.
 
 Use an invalid number of threads:
 
+  $ blpk -n 1 compress data.dat
+  $ rm data.dat.blp
   $ blpk -n 257
   blpk: error: -n must be 1 <= n <= 256
   [1]

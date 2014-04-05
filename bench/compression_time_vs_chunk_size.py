@@ -15,6 +15,7 @@ import numpy
 import bloscpack.testutil as bpt
 from bloscpack.args import DEFAULT_BLOSC_ARGS
 from bloscpack import pack_file, unpack_file
+from bloscpack.pretty import pretty_size
 
 blosc_args = DEFAULT_BLOSC_ARGS
 
@@ -35,9 +36,9 @@ with bpt.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
             unpack_file(out_file, dcmp_file)
             toc = time.time()
             dcmp_times.append(toc-tic)
-        ratio = path.getsize(out_file)/path.getsize(in_file)
-        print ("%d\t\t%f\t\t%f\t\t%f" %
-               (chunk_size,
+        ratio = path.getsize(in_file)/path.getsize(out_file)
+        print ("%s\t\t%f\t\t%f\t\t%f" %
+               (pretty_size(chunk_size),
                 sum(cmp_times)/repeats,
                 sum(dcmp_times)/repeats,
                 ratio,

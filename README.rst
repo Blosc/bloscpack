@@ -1027,6 +1027,7 @@ TODO
 Documentation
 ~~~~~~~~~~~~~
 
+* Refactor monolithic readme into Sphinx and publish
 * document library usage
 * Announcement RST
 

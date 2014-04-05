@@ -24,13 +24,7 @@ blosc_args = DEFAULT_BLOSC_ARGS
 with bpt.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
 
     print('create the test data', end='')
-
-    def progress(i):
-        if i % 10 == 0:
-            print('.', end='')
-        sys.stdout.flush()
-
-    bpt.create_array(100, in_file, progress=progress)
+    bpt.create_array(100, in_file, progress=bpt.simple_progress)
     repeats = 3
     print ("%s\t%s\t\t%s\t\t%s" %
            ("chunk_size", "comp-time", "decomp-time", "ratio"))

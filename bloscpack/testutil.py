@@ -25,6 +25,12 @@ from pretty import (reverse_pretty
                     )
 
 
+def simple_progress(i):
+    if i % 10 == 0:
+        print('.', end='')
+    sys.stdout.flush()
+
+
 def create_array(repeats, in_file, progress=False):
     with open(in_file, 'w') as in_fp:
         create_array_fp(repeats, in_fp, progress=progress)

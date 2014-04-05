@@ -58,7 +58,7 @@ def atexit_tmpremover(dirname):
 
 @contextlib.contextmanager
 def create_tmp_files():
-    tdir = tempfile.mkdtemp(prefix='blpk')
+    tdir = tempfile.mkdtemp(prefix='bloscpack-')
     in_file = path.join(tdir, 'file')
     out_file = path.join(tdir, 'file.blp')
     dcmp_file = path.join(tdir, 'file.dcmp')

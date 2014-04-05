@@ -21,8 +21,8 @@ from .defaults import (DEFAULT_CHUNK_SIZE,
                        )
 from .util import (open_two_file,
                    )
-from pretty import (reverse_pretty
-                    )
+from .pretty import (reverse_pretty
+                     )
 
 
 def simple_progress(i):

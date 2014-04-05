@@ -625,6 +625,33 @@ since dropping the caches requires root privileges:
     Output file size: 924.05M
     Ratio: 1.65
 
+Optimizing Chunk Size
+---------------------
+
+You can use the provided ``bench/compression_time_vs_chunk_size.py`` file
+to optimize the chunk-size for a given machine. For example:
+
+.. code-block:: console
+
+    $ sudo env PATH=$PATH PYTHONPATH=.  bench/compression_time_vs_chunk_size.py
+    create the test data..........done
+    chunk_size    comp-time       decomp-time      ratio
+    512.0K        8.106235        10.243908        7.679094
+    724.08K       4.424007        12.284307        7.092846
+    1.0M          6.243544        11.978932        7.685173
+    1.41M         4.715511        10.780901        7.596981
+    2.0M          4.548568        10.676304        7.688216
+    2.83M         4.851359        11.668394        7.572480
+    4.0M          4.557665        10.127647        7.689736
+    5.66M         4.589349        9.579627         7.667467
+    8.0M          5.290080        10.525652        7.690499
+
+Running the script requires super user privileges, since you need to
+synchronize disk writes and drop the file system caches for less noisy results.
+Also, you should probably run this script a couple of times and inspect the
+variability of the results.
+
+
 Bloscpack Format
 ----------------
 
@@ -1001,7 +1028,6 @@ Documentation
 ~~~~~~~~~~~~~
 
 * document library usage
-* make a note in the README that the chunk-size benchmark can be used to tune
 * Announcement RST
 
 Command Line

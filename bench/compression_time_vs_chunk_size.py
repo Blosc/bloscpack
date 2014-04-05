@@ -37,17 +37,17 @@ with bpt.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
     for chunk_size in (int(2**i) for i in numpy.arange(19, 23.5, 0.5)):
         cmp_times, dcmp_times = [], []
         for _ in range(repeats):
-            sync()
             drop_caches()
             tic = time.time()
             pack_file(in_file, out_file, chunk_size=chunk_size,
                       blosc_args=blosc_args)
+            sync()
             toc = time.time()
             cmp_times.append(toc-tic)
-            sync()
             drop_caches()
             tic = time.time()
             unpack_file(out_file, dcmp_file)
+            sync()
             toc = time.time()
             dcmp_times.append(toc-tic)
         ratio = path.getsize(in_file)/path.getsize(out_file)

@@ -910,6 +910,8 @@ Coding Conventions
 * Single quotes around ambiguities in messages ``overwriting existing file: 'testfile'``
 * Exceptions instead of exit
 * nose test generators parameterized tests
+* Use the Wikipedia definition of compression ratio:
+  http://en.wikipedia.org/wiki/Data_compression_ratio
 
 Comparison to HDF5/PyTables
 ---------------------------

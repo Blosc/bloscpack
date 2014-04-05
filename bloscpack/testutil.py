@@ -21,8 +21,14 @@ from .defaults import (DEFAULT_CHUNK_SIZE,
                        )
 from .util import (open_two_file,
                    )
-from pretty import (reverse_pretty
-                    )
+from .pretty import (reverse_pretty
+                     )
+
+
+def simple_progress(i):
+    if i % 10 == 0:
+        print('.', end='')
+    sys.stdout.flush()
 
 
 def create_array(repeats, in_file, progress=False):
@@ -31,11 +37,6 @@ def create_array(repeats, in_file, progress=False):
 
 
 def create_array_fp(repeats, in_fp, progress=False):
-    if progress:
-        def progress(i):
-            if i % 10 == 0:
-                print('.', end='')
-            sys.stdout.flush()
     for i in range(repeats):
         array_ = np.linspace(i, i+1, 2e6)
         in_fp.write(array_.tostring())
@@ -57,7 +58,7 @@ def atexit_tmpremover(dirname):
 
 @contextlib.contextmanager
 def create_tmp_files():
-    tdir = tempfile.mkdtemp(prefix='blpk')
+    tdir = tempfile.mkdtemp(prefix='bloscpack-')
     in_file = path.join(tdir, 'file')
     out_file = path.join(tdir, 'file.blp')
     dcmp_file = path.join(tdir, 'file.dcmp')

@@ -46,12 +46,7 @@ with bpt.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
     gz_out_file = path.join(tdir, 'file.gz')
 
     print('create the test data', end='')
-
-    def progress(i):
-        if i % 10 == 0:
-            print('.', end='')
-        sys.stdout.flush()
-    bpt.create_array(100, in_file, progress=progress)
+    bpt.create_array(100, in_file, progress=bpt.simple_progress)
     print('')
 
     print("Input file size: %s" % get_fs(in_file))

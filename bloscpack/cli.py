@@ -25,6 +25,8 @@ from .checksums import (CHECKSUMS_AVAIL,
 from .constants import (SUFFIXES,
                         CNAME_AVAIL,
                         EXTENSION,
+                        MIN_CLEVEL,
+                        MAX_CLEVEL,
                         )
 from .defaults import (DEFAULT_TYPESIZE,
                        DEFAULT_CLEVEL,
@@ -200,7 +202,7 @@ def _inject_blosc_group(parser):
                              help='typesize for blosc')
     blosc_group.add_argument('-l', '--clevel',
                              default=DEFAULT_CLEVEL,
-                             choices=range(10),
+                             choices=range(MIN_CLEVEL, MAX_CLEVEL+1),
                              metavar='[0, 9]',
                              type=int,
                              help='compression level')

@@ -1,13 +1,27 @@
+#!/usr/bin/env nosetests
+# -*- coding: utf-8 -*-
+# vim :set ft=py:
+
+
+from unittest import TestCase
+
+
 import nose.tools as nt
+
 
 from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             DEFAULT_BLOSCPACK_ARGS,
                             DEFAULT_METADATA_ARGS,
+                            DEFAULT_TYPESIZE,
+                            DEFAULT_CLEVEL,
+                            DEFAULT_SHUFFLE,
+                            DEFAULT_CNAME,
                             calculate_nchunks,
                             _handle_max_apps,
                             _check_blosc_args,
                             _check_bloscpack_args,
                             _check_metadata_arguments,
+                            BloscArgs
                             )
 from bloscpack.exceptions import ChunkingException
 from bloscpack.headers import MAX_CHUNKS
@@ -99,3 +113,15 @@ def test_handle_max_apps():
                      True, 10, lambda x: -1)
     nt.assert_raises(ValueError, _handle_max_apps,
                      True, 10, lambda x: 1.0)
+
+class TestBloscArgs(TestCase):
+
+    def test_init(self):
+        blosc_args = BloscArgs()
+        self.assertEqual(DEFAULT_TYPESIZE, blosc_args.typesize)
+        self.assertEqual(DEFAULT_CLEVEL, blosc_args.clevel)
+        self.assertEqual(DEFAULT_SHUFFLE, blosc_args.shuffle)
+        self.assertEqual(DEFAULT_CNAME, blosc_args.cname)
+
+
+

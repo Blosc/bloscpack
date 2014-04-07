@@ -284,3 +284,14 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     return max_app_chunks
 
 
+class BloscArgs(object):
+
+    def __init__(self,
+                 typesize=DEFAULT_TYPESIZE,
+                 clevel=DEFAULT_CLEVEL,
+                 shuffle=DEFAULT_SHUFFLE,
+                 cname=DEFAULT_CNAME):
+        self.typesize = typesize
+        self.clevel = clevel
+        self.shuffle = shuffle
+        self.cname = cname

@@ -122,6 +122,3 @@ class TestBloscArgs(TestCase):
         self.assertEqual(DEFAULT_CLEVEL, blosc_args.clevel)
         self.assertEqual(DEFAULT_SHUFFLE, blosc_args.shuffle)
         self.assertEqual(DEFAULT_CNAME, blosc_args.cname)
-
-
-

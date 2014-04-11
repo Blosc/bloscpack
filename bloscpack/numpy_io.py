@@ -105,7 +105,7 @@ def pack_ndarray(ndarray, sink,
         the numpy array to serialize
     sink : CompressedSink
         the sink to serialize to
-    blosc_args : dict
+    blosc_args : BloscArgs
         the args for blosc
     bloscpack_args : dict
         the args for bloscpack

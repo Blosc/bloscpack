@@ -439,8 +439,8 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
         the desired chunk size in bytes
     metadata : dict
         the metadata dict
-    blosc_args : dict
-        blosc keyword args
+    blosc_args : BloscArgs
+        blosc args
     bloscpack_args : dict
         bloscpack keyword args
     metadata_args : dict

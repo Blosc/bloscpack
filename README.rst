@@ -1062,7 +1062,6 @@ Library Features
   * BloscHeader
   * MetadataHeader
   * Offsets (maybe)
-  * BloscArgs
   * BloscpackArgs
 
 * partial decompression?

@@ -21,33 +21,33 @@ from .abstract_io import (pack,
                           )
 from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
-)
+                         )
 from .constants import (METADATA_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
                         BLOSC_HEADER_LENGTH,
                         FORMAT_VERSION,
-)
+                        )
 from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
-)
+                        )
 from .defaults import (DEFAULT_CHUNK_SIZE,
                        )
 from .exceptions import (MetadataSectionTooSmall,
                          FormatVersionMismatch,
                          ChecksumMismatch,
-)
+                         )
 from .headers import (create_metadata_header,
                       decode_metadata_header,
                       decode_blosc_header,
                       BloscPackHeader,
                       decode_int64,
                       encode_int64,
-)
+                      )
 from .pretty import (double_pretty_size,
                      pretty_size,
                      )
 from .serializers import (SERIALIZERS_LOOKUP,
-)
+                          )
 from .util import (open_two_file,
                    )
 from .abstract_io import (PlainSource,

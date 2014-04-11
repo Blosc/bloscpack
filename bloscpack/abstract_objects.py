@@ -54,9 +54,8 @@ class MutableMappaingObject(collections.MutableMapping):
         return pprint.pformat(dict(self))
 
     def __repr__(self):
-        return "%s(%s)" % (self._class_name,
-                          ", ".join((("%s=%s" % (arg, repr(value)))
-                          for arg, value in self.iteritems())))
+        args = (("%s=%s" % (arg, repr(value))) for arg, value in self.iteritems())
+        return "%s(%s)" % (self._class_name, ", ".join(args))
 
     def pformat(self, indent=4):
         indent = " " * indent

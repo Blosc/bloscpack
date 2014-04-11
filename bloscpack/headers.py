@@ -3,8 +3,6 @@
 # vim :set ft=py:
 
 
-import copy
-import pprint
 import struct
 
 
@@ -29,8 +27,6 @@ from .defaults import (DEFAULT_OFFSETS,
 from .metacodecs import (CODECS_AVAIL,
                          check_valid_codec,
                          )
-from .pretty import (double_pretty_size,
-                     )
 from .util import (memoryview,
                    )
 import log
@@ -298,24 +294,13 @@ class BloscPackHeader(MutableMappaingObject):
         self.nchunks         = nchunks
         self.max_app_chunks  = max_app_chunks
 
+    @property
+    def attributes(self):
+        return self._attrs
 
-    def __str__(self):
-        return pprint.pformat(dict(self))
-
-    def __repr__(self):
-        return "BloscPackHeader(%s)" % ", ".join((("%s=%s" % (arg, repr(value)))
-                          for arg, value in self.iteritems()))
-
-    def pformat(self, indent=4):
-        indent = " " * indent
-        # don't ask, was feeling functional
-        return "bloscpack header: \n%s%s" % (indent, (",\n%s" % indent).join((("%s=%s" % 
-            (key, (repr(value) if (key not in self._bytes_attrs or value == -1)
-                         else double_pretty_size(value)))
-             for key, value in self.iteritems()))))
-
-    def copy(self):
-        return copy.copy(self)
+    @property
+    def bytes_attributes(self):
+        return self._bytes_attrs
 
     @property
     def checksum_impl(self):

@@ -304,11 +304,10 @@ class BloscArgs(MutableMappaingObject):
                        'cname',
                        ]
 
-    def __iter__(self):
-        return iter(self._attrs)
+    @property
+    def attributes(self):
+        return self._attrs
 
-    def pformat(self, indent=4):
-        indent = " " * indent
-        # don't ask, was feeling functional
-        return "blosc args: \n%s%s" % (indent, (",\n%s" % indent).join((("%s=%s" %
-               (key, (repr(value))) for key, value in self.iteritems()))))
+    @property
+    def bytes_attributes(self):
+        return []

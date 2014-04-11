@@ -11,7 +11,7 @@ import blosc
 import nose.tools as nt
 from mock import patch
 
-from bloscpack.args import (DEFAULT_BLOSC_ARGS,
+from bloscpack.args import (BloscArgs,
                             DEFAULT_BLOSCPACK_ARGS,
                             DEFAULT_METADATA_ARGS,
                             calculate_nchunks,
@@ -151,7 +151,7 @@ def test_disable_offsets():
 # this will cause a bug if we ever reach 255 format versions
 @patch('bloscpack.file_io.FORMAT_VERSION', MAX_FORMAT_VERSION)
 def test_invalid_format():
-    blosc_args = DEFAULT_BLOSC_ARGS
+    blosc_args = BloscArgs()
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
         pack_file(in_file, out_file, blosc_args=blosc_args)

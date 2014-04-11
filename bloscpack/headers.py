@@ -212,7 +212,31 @@ def decode_blosc_header(buffer_):
             'ctbytes':   decode_uint32(buffer_[12:16])}
 
 
-class BloscPackHeader(collections.MutableMapping):
+class MutableMappaingObject(collections.MutableMapping):
+
+    def __getitem__(self, key):
+        if key not in self._attrs:
+            raise KeyError('%s not in %s' % (key, type(self).__name__))
+        return getattr(self, key)
+
+    def __setitem__(self, key, value):
+        if key not in self._attrs:
+            raise KeyError('%s not in %s' % (key, type(self).__name__))
+        setattr(self, key, value)
+
+    def __delitem__(self, key):
+        raise NotImplementedError(
+            '%s does not support __delitem__ or derivatives'
+            % type(self).__name__)
+
+    def __len__(self):
+        return self._len
+
+    def __iter__(self):
+        return iter(self._attrs)
+
+
+class BloscPackHeader(MutableMappaingObject):
     """ The Bloscpack header.
 
     Parameters
@@ -299,25 +323,6 @@ class BloscPackHeader(collections.MutableMapping):
         self.nchunks         = nchunks
         self.max_app_chunks  = max_app_chunks
 
-    def __getitem__(self, key):
-        if key not in self._attrs:
-            raise KeyError('%s not in BloscPackHeader' % key)
-        return getattr(self, key)
-
-    def __setitem__(self, key, value):
-        if key not in self._attrs:
-            raise KeyError('%s not in BloscPackHeader' % key)
-        setattr(self, key, value)
-
-    def __delitem__(self, key):
-        raise NotImplementedError(
-            'BloscPackHeader does not support __delitem__ or derivatives')
-
-    def __len__(self):
-        return self._len
-
-    def __iter__(self):
-        return iter(self._attrs)
 
     def __str__(self):
         return pprint.pformat(dict(self))

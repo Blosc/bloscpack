@@ -12,7 +12,6 @@ import blosc
 from .args import (BloscArgs,
                    DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_METADATA_ARGS,
-                   _check_blosc_args,
                    _check_bloscpack_args,
                    _handle_max_apps
                    )

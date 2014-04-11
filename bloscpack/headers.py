@@ -3,7 +3,6 @@
 # vim :set ft=py:
 
 
-import collections
 import copy
 import pprint
 import struct
@@ -11,7 +10,8 @@ import struct
 
 import blosc
 
-
+from .abstract_objects import (MutableMappaingObject,
+                               )
 from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
                         check_valid_checksum,
@@ -210,30 +210,6 @@ def decode_blosc_header(buffer_):
             'nbytes':    decode_uint32(buffer_[4:8]),
             'blocksize': decode_uint32(buffer_[8:12]),
             'ctbytes':   decode_uint32(buffer_[12:16])}
-
-
-class MutableMappaingObject(collections.MutableMapping):
-
-    def __getitem__(self, key):
-        if key not in self._attrs:
-            raise KeyError('%s not in %s' % (key, type(self).__name__))
-        return getattr(self, key)
-
-    def __setitem__(self, key, value):
-        if key not in self._attrs:
-            raise KeyError('%s not in %s' % (key, type(self).__name__))
-        setattr(self, key, value)
-
-    def __delitem__(self, key):
-        raise NotImplementedError(
-            '%s does not support __delitem__ or derivatives'
-            % type(self).__name__)
-
-    def __len__(self):
-        return len(self._attrs)
-
-    def __iter__(self):
-        return iter(self._attrs)
 
 
 class BloscPackHeader(MutableMappaingObject):

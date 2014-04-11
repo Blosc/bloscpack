@@ -6,6 +6,8 @@
 import blosc
 
 
+from .abstract_objects import (MutableMappaingObject,
+                               )
 from .headers import (check_range,
                       )
 from .defaults import (DEFAULT_TYPESIZE,
@@ -20,7 +22,6 @@ from .defaults import (DEFAULT_TYPESIZE,
 from .exceptions import(ChunkingException,
                         )
 from .headers import (MAX_CHUNKS,
-                      MutableMappaingObject,
                       )
 from .pretty import (double_pretty_size,
                      reverse_pretty,

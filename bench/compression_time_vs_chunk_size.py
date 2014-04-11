@@ -15,11 +15,11 @@ import numpy
 
 import bloscpack.testutil as bpt
 from bloscpack.sysutil import drop_caches, sync
-from bloscpack.args import DEFAULT_BLOSC_ARGS
+from bloscpack.args import BloscArgs
 from bloscpack import pack_file, unpack_file
 from bloscpack.pretty import pretty_size
 
-blosc_args = DEFAULT_BLOSC_ARGS
+blosc_args = BloscArgs()
 
 with bpt.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
 

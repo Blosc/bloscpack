@@ -11,7 +11,6 @@ import os.path as path
 import blosc
 
 from .args import (DEFAULT_BLOSCPACK_ARGS,
-                   DEFAULT_BLOSC_ARGS,
                    DEFAULT_METADATA_ARGS,
                    calculate_nchunks,
                    _check_metadata_arguments,
@@ -21,33 +20,33 @@ from .abstract_io import (pack,
                           )
 from .metacodecs import (CODECS_AVAIL,
                          CODECS_LOOKUP,
-)
+                         )
 from .constants import (METADATA_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
                         BLOSC_HEADER_LENGTH,
                         FORMAT_VERSION,
-)
+                        )
 from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
-)
+                        )
 from .defaults import (DEFAULT_CHUNK_SIZE,
                        )
 from .exceptions import (MetadataSectionTooSmall,
                          FormatVersionMismatch,
                          ChecksumMismatch,
-)
+                         )
 from .headers import (create_metadata_header,
                       decode_metadata_header,
                       decode_blosc_header,
                       BloscPackHeader,
                       decode_int64,
                       encode_int64,
-)
+                      )
 from .pretty import (double_pretty_size,
                      pretty_size,
                      )
 from .serializers import (SERIALIZERS_LOOKUP,
-)
+                          )
 from .util import (open_two_file,
                    )
 from .abstract_io import (PlainSource,
@@ -425,7 +424,7 @@ class CompressedFPSink(CompressedSink):
 
 
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
-              blosc_args=DEFAULT_BLOSC_ARGS,
+              blosc_args=None,
               bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
               metadata_args=DEFAULT_METADATA_ARGS):
     """ Main function for compressing a file.
@@ -440,8 +439,8 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
         the desired chunk size in bytes
     metadata : dict
         the metadata dict
-    blosc_args : dict
-        blosc keyword args
+    blosc_args : BloscArgs
+        blosc args
     bloscpack_args : dict
         bloscpack keyword args
     metadata_args : dict

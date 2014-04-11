@@ -11,7 +11,7 @@ import blosc
 import numpy as np
 
 
-from bloscpack.args import (DEFAULT_BLOSC_ARGS,
+from bloscpack.args import (BloscArgs,
                             )
 from bloscpack.constants import (MAGIC,
                                  FORMAT_VERSION,
@@ -128,7 +128,7 @@ def test_decode_metadata_options_exceptions():
 def test_decode_blosc_header():
     array_ = np.linspace(0, 100, 2e4).tostring()
     # basic test case
-    blosc_args = DEFAULT_BLOSC_ARGS
+    blosc_args = BloscArgs()
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
@@ -137,10 +137,10 @@ def test_decode_blosc_header():
                 'version': 2,
                 'flags': 1,
                 'nbytes': len(array_),
-                'typesize': blosc_args['typesize']}
+                'typesize': blosc_args.typesize}
     nt.assert_equal(expected, header)
     # deactivate shuffle
-    blosc_args['shuffle'] = False
+    blosc_args.shuffle = False
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
@@ -149,12 +149,12 @@ def test_decode_blosc_header():
                 'version': 2,
                 'flags': 0,  # no shuffle flag
                 'nbytes': len(array_),
-                'typesize': blosc_args['typesize']}
+                'typesize': blosc_args.typesize}
     nt.assert_equal(expected, header)
     # uncompressible data
     array_ = np.asarray(np.random.randn(23),
                         dtype=np.float32).tostring()
-    blosc_args['shuffle'] = True
+    blosc_args.shuffle = True
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
@@ -163,7 +163,7 @@ def test_decode_blosc_header():
                 'version': 2,
                 'flags': 3,  # 1 for shuffle 2 for non-compressed
                 'nbytes': len(array_),
-                'typesize': blosc_args['typesize']}
+                'typesize': blosc_args.typesize}
     nt.assert_equal(expected, header)
 
 
@@ -355,6 +355,23 @@ def test_decode_bloscpack_header():
                BloscPackHeader.decode(mod_raw(offset, replacement)))
 
 
+def test_BloscPackHeader_accessor_exceptions():
+
+    bloscpack_header = BloscPackHeader()
+    nt.assert_raises_regexp(KeyError,
+                            'foo not in BloscPackHeader',
+                            bloscpack_header.__getitem__,
+                            'foo')
+    nt.assert_raises_regexp(KeyError,
+                            'foo not in BloscPackHeader',
+                            bloscpack_header.__setitem__,
+                            'foo', 'bar')
+    nt.assert_raises_regexp(NotImplementedError,
+                            'BloscPackHeader does not support __delitem__ or derivatives',
+                            bloscpack_header.__delitem__,
+                            'foo',)
+
+
 def test_create_metadata_header():
     raw = '\x00\x00\x00\x00\x00\x00\x00\x00'\
           '\x00\x00\x00\x00\x00\x00\x00\x00'\
@@ -395,6 +412,7 @@ def test_create_metadata_header():
 
     nt.assert_equal(mod_raw(24, 'sesame'),
             create_metadata_header(user_codec='sesame'))
+
 
 def test_decode_metadata_header():
     no_arg_return = {

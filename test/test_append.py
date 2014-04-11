@@ -18,7 +18,7 @@ from bloscpack.append import (append,
                               _recreate_metadata,
                               _rewrite_metadata_fp,
                               )
-from bloscpack.args import (DEFAULT_BLOSC_ARGS,
+from bloscpack.args import (BloscArgs,
                             DEFAULT_BLOSCPACK_ARGS,
                             calculate_nchunks,
                             DEFAULT_METADATA_ARGS,
@@ -57,7 +57,7 @@ from bloscpack.testutil import (create_array,
                                 )
 
 
-def prep_array_for_append(blosc_args=DEFAULT_BLOSC_ARGS,
+def prep_array_for_append(blosc_args=BloscArgs(),
                           bloscpack_args=DEFAULT_BLOSCPACK_ARGS):
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, new)
@@ -299,8 +299,7 @@ def test_append_fp_not_enough_space():
 
 def test_mixing_clevel():
     # the first set of chunks has max compression
-    blosc_args = DEFAULT_BLOSC_ARGS.copy()
-    blosc_args['clevel'] = 9
+    blosc_args = BloscArgs(clevel=9)
     orig, new, new_size, dcmp = prep_array_for_append()
     # get the original size
     orig.seek(0, 2)
@@ -313,11 +312,9 @@ def test_mixing_clevel():
     last_chunk_compressed_size = orig_size - offsets[-1]
 
     # do append
-    blosc_args = DEFAULT_BLOSC_ARGS.copy()
-    # use the typesize from the file
-    blosc_args['typesize'] = None
+    # use the typesize from the file and
     # make the second set of chunks have no compression
-    blosc_args['clevel'] = 0
+    blosc_args = BloscArgs(typesize=None, clevel=0)
     nchunks = append_fp(orig, new, new_size, blosc_args=blosc_args)
 
     # get the final size
@@ -349,14 +346,11 @@ def test_mixing_clevel():
 
 def test_append_mix_shuffle():
     orig, new, new_size, dcmp = prep_array_for_append()
-    blosc_args = DEFAULT_BLOSC_ARGS.copy()
     # use the typesize from the file
-    blosc_args['typesize'] = None
     # deactivate shuffle
-    blosc_args['shuffle'] = False
     # crank up the clevel to ensure compression happens, otherwise the flags
     # will be screwed later on
-    blosc_args['clevel'] = 9
+    blosc_args = BloscArgs(typesize=None, shuffle=False, clevel=9)
     reset_append_fp(orig, new, new_size, blosc_args=blosc_args)
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)

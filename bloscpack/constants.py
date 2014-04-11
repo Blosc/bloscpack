@@ -21,10 +21,11 @@ BLOSC_HEADER_LENGTH = 16
 BLOSCPACK_HEADER_LENGTH = 32
 METADATA_HEADER_LENGTH = 32
 
-# maximum values
+# maximum/minimum values
 MAX_FORMAT_VERSION = 255
 MAX_CHUNKS = (2**63)-1
 MAX_META_SIZE = (2**32-1)  # uint32 max val
+MIN_CLEVEL = 0
 MAX_CLEVEL = 9
 
 # lookup table for human readable sizes

@@ -16,8 +16,8 @@ from .abstract_io import(pack,
 from .file_io import (CompressedFPSource,
                       CompressedFPSink,
                       )
-from .args import (DEFAULT_BLOSCPACK_ARGS,
-                   DEFAULT_BLOSC_ARGS,
+from .args import (BloscArgs,
+                   DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_METADATA_ARGS,
                    calculate_nchunks,
                    )
@@ -94,7 +94,7 @@ class PlainNumpySink(PlainSink):
 
 def pack_ndarray(ndarray, sink,
                  chunk_size=DEFAULT_CHUNK_SIZE,
-                 blosc_args=DEFAULT_BLOSC_ARGS,
+                 blosc_args=None,
                  bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
                  metadata_args=DEFAULT_METADATA_ARGS):
     """ Serialialize a Numpy array.
@@ -105,7 +105,7 @@ def pack_ndarray(ndarray, sink,
         the numpy array to serialize
     sink : CompressedSink
         the sink to serialize to
-    blosc_args : dict
+    blosc_args : BloscArgs
         the args for blosc
     bloscpack_args : dict
         the args for bloscpack
@@ -119,8 +119,8 @@ def pack_ndarray(ndarray, sink,
     with the itemsize of the Numpy array's dtype.
     """
 
-    blosc_args = blosc_args.copy()
-    blosc_args['typesize'] = ndarray.dtype.itemsize
+    blosc_args = blosc_args or BloscArgs()
+    blosc_args.typesize = ndarray.dtype.itemsize
     source = PlainNumpySource(ndarray)
     nchunks, chunk_size, last_chunk_size = \
         calculate_nchunks(source.size, chunk_size)
@@ -137,7 +137,7 @@ def pack_ndarray(ndarray, sink,
 
 def pack_ndarray_file(ndarray, filename,
                       chunk_size=DEFAULT_CHUNK_SIZE,
-                      blosc_args=DEFAULT_BLOSC_ARGS,
+                      blosc_args=None,
                       bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
                       metadata_args=DEFAULT_METADATA_ARGS):
     with open(filename, 'wb') as fp:
@@ -151,7 +151,7 @@ def pack_ndarray_file(ndarray, filename,
 
 def pack_ndarray_str(ndarray,
                      chunk_size=DEFAULT_CHUNK_SIZE,
-                     blosc_args=DEFAULT_BLOSC_ARGS,
+                     blosc_args=None,
                      bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
                      metadata_args=DEFAULT_METADATA_ARGS):
     sio = cStringIO.StringIO()

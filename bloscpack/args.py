@@ -6,6 +6,8 @@
 import blosc
 
 
+from .abstract_objects import (MutableMappaingObject,
+                               )
 from .headers import (check_range,
                       )
 from .defaults import (DEFAULT_TYPESIZE,
@@ -284,3 +286,28 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     return max_app_chunks
 
 
+class BloscArgs(MutableMappaingObject):
+
+    def __init__(self,
+                 typesize=DEFAULT_TYPESIZE,
+                 clevel=DEFAULT_CLEVEL,
+                 shuffle=DEFAULT_SHUFFLE,
+                 cname=DEFAULT_CNAME):
+        self.typesize = typesize
+        self.clevel = clevel
+        self.shuffle = shuffle
+        self.cname = cname
+
+        self._attrs = ['typesize',
+                       'clevel',
+                       'shuffle',
+                       'cname',
+                       ]
+
+    @property
+    def attributes(self):
+        return self._attrs
+
+    @property
+    def bytes_attributes(self):
+        return []

@@ -14,7 +14,7 @@ import nose.tools as nt
 
 from bloscpack.abstract_io import (pack,
                                    )
-from bloscpack.args import (DEFAULT_BLOSC_ARGS,
+from bloscpack.args import (BloscArgs,
                             calculate_nchunks,
                             )
 from bloscpack.exceptions import (NotANumpyArray,
@@ -158,8 +158,7 @@ def test_alternate_cname():
             ('snappy', 2),
             ('zlib', 3),
             ]:
-        blosc_args = DEFAULT_BLOSC_ARGS.copy()
-        blosc_args['cname'] = cname
+        blosc_args = BloscArgs(cname=cname)
         array_ = np.linspace(0, 1, 2e6)
         sink = CompressedMemorySink()
         pack_ndarray(array_, sink, blosc_args=blosc_args)

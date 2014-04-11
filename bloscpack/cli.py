@@ -12,7 +12,7 @@ import pprint
 import blosc
 
 
-from .args import (BLOSC_ARGS,
+from .args import (BloscArgs,
                    DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_METADATA_ARGS,
                    )
@@ -25,6 +25,8 @@ from .checksums import (CHECKSUMS_AVAIL,
 from .constants import (SUFFIXES,
                         CNAME_AVAIL,
                         EXTENSION,
+                        MIN_CLEVEL,
+                        MAX_CLEVEL,
                         )
 from .defaults import (DEFAULT_TYPESIZE,
                        DEFAULT_CLEVEL,
@@ -80,7 +82,11 @@ def check_files(in_file, out_file, args):
 
 
 def _blosc_args_from_args(args):
-    return dict((arg, args.__getattribute__(arg)) for arg in BLOSC_ARGS)
+    return BloscArgs(typesize=args.typesize,
+                     clevel=args.clevel,
+                     shuffle=args.shuffle,
+                     cname=args.cname,
+                     )
 
 
 def process_compression_args(args):
@@ -200,7 +206,7 @@ def _inject_blosc_group(parser):
                              help='typesize for blosc')
     blosc_group.add_argument('-l', '--clevel',
                              default=DEFAULT_CLEVEL,
-                             choices=range(10),
+                             choices=range(MIN_CLEVEL, MAX_CLEVEL+1),
                              metavar='[0, 9]',
                              type=int,
                              help='compression level')

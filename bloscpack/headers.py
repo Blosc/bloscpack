@@ -3,15 +3,13 @@
 # vim :set ft=py:
 
 
-import collections
-import copy
-import pprint
 import struct
 
 
 import blosc
 
-
+from .abstract_objects import (MutableMappaingObject,
+                               )
 from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
                         check_valid_checksum,
@@ -29,8 +27,6 @@ from .defaults import (DEFAULT_OFFSETS,
 from .metacodecs import (CODECS_AVAIL,
                          check_valid_codec,
                          )
-from .pretty import (double_pretty_size,
-                     )
 from .util import (memoryview,
                    )
 import log
@@ -212,7 +208,7 @@ def decode_blosc_header(buffer_):
             'ctbytes':   decode_uint32(buffer_[12:16])}
 
 
-class BloscPackHeader(collections.MutableMapping):
+class BloscPackHeader(MutableMappaingObject):
     """ The Bloscpack header.
 
     Parameters
@@ -285,7 +281,6 @@ class BloscPackHeader(collections.MutableMapping):
                        'last_chunk',
                        'nchunks',
                        'max_app_chunks']
-        self._len = len(self._attrs)
         self._bytes_attrs = ['chunk_size',
                              'last_chunk']
 
@@ -299,43 +294,13 @@ class BloscPackHeader(collections.MutableMapping):
         self.nchunks         = nchunks
         self.max_app_chunks  = max_app_chunks
 
-    def __getitem__(self, key):
-        if key not in self._attrs:
-            raise KeyError('%s not in BloscPackHeader' % key)
-        return getattr(self, key)
+    @property
+    def attributes(self):
+        return self._attrs
 
-    def __setitem__(self, key, value):
-        if key not in self._attrs:
-            raise KeyError('%s not in BloscPackHeader' % key)
-        setattr(self, key, value)
-
-    def __delitem__(self, key):
-        raise NotImplementedError(
-            'BloscPackHeader does not support __delitem__ or derivatives')
-
-    def __len__(self):
-        return self._len
-
-    def __iter__(self):
-        return iter(self._attrs)
-
-    def __str__(self):
-        return pprint.pformat(dict(self))
-
-    def __repr__(self):
-        return "BloscPackHeader(%s)" % ", ".join((("%s=%s" % (arg, repr(value)))
-                          for arg, value in self.iteritems()))
-
-    def pformat(self, indent=4):
-        indent = " " * indent
-        # don't ask, was feeling functional
-        return "bloscpack header: \n%s%s" % (indent, (",\n%s" % indent).join((("%s=%s" % 
-            (key, (repr(value) if (key not in self._bytes_attrs or value == -1)
-                         else double_pretty_size(value)))
-             for key, value in self.iteritems()))))
-
-    def copy(self):
-        return copy.copy(self)
+    @property
+    def bytes_attributes(self):
+        return self._bytes_attrs
 
     @property
     def checksum_impl(self):

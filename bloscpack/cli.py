@@ -12,7 +12,7 @@ import pprint
 import blosc
 
 
-from .args import (BLOSC_ARGS,
+from .args import (BloscArgs,
                    DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_METADATA_ARGS,
                    )
@@ -82,7 +82,11 @@ def check_files(in_file, out_file, args):
 
 
 def _blosc_args_from_args(args):
-    return dict((arg, args.__getattribute__(arg)) for arg in BLOSC_ARGS)
+    return BloscArgs(typesize=args.typesize,
+                     clevel=args.clevel,
+                     shuffle=args.shuffle,
+                     cname=args.cname,
+                     )
 
 
 def process_compression_args(args):

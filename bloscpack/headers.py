@@ -230,7 +230,7 @@ class MutableMappaingObject(collections.MutableMapping):
             % type(self).__name__)
 
     def __len__(self):
-        return self._len
+        return len(self._attrs)
 
     def __iter__(self):
         return iter(self._attrs)
@@ -309,7 +309,6 @@ class BloscPackHeader(MutableMappaingObject):
                        'last_chunk',
                        'nchunks',
                        'max_app_chunks']
-        self._len = len(self._attrs)
         self._bytes_attrs = ['chunk_size',
                              'last_chunk']
 

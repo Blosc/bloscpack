@@ -20,6 +20,7 @@ from .defaults import (DEFAULT_TYPESIZE,
 from .exceptions import(ChunkingException,
                         )
 from .headers import (MAX_CHUNKS,
+                      MutableMappaingObject,
                       )
 from .pretty import (double_pretty_size,
                      reverse_pretty,
@@ -284,7 +285,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     return max_app_chunks
 
 
-class BloscArgs(object):
+class BloscArgs(MutableMappaingObject):
 
     def __init__(self,
                  typesize=DEFAULT_TYPESIZE,
@@ -295,3 +296,18 @@ class BloscArgs(object):
         self.clevel = clevel
         self.shuffle = shuffle
         self.cname = cname
+
+        self._attrs = ['typesize',
+                       'clevel',
+                       'shuffle',
+                       'cname',
+                       ]
+
+    def __iter__(self):
+        return iter(self._attrs)
+
+    def pformat(self, indent=4):
+        indent = " " * indent
+        # don't ask, was feeling functional
+        return "blosc args: \n%s%s" % (indent, (",\n%s" % indent).join((("%s=%s" %
+               (key, (repr(value))) for key, value in self.iteritems()))))

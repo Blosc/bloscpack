@@ -9,7 +9,7 @@ import abc
 import blosc
 
 
-from .args import (DEFAULT_BLOSC_ARGS,
+from .args import (BloscArgs,
                    DEFAULT_BLOSCPACK_ARGS,
                    DEFAULT_METADATA_ARGS,
                    _check_blosc_args,
@@ -110,7 +110,7 @@ class CompressedSink(object):
 def pack(source, sink,
          nchunks, chunk_size, last_chunk,
          metadata=None,
-         blosc_args=DEFAULT_BLOSC_ARGS,
+         blosc_args=None,
          bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
          metadata_args=DEFAULT_METADATA_ARGS):
     """ Core packing function.  """
@@ -118,10 +118,8 @@ def pack(source, sink,
         raise TypeError
     if not isinstance(sink, CompressedSink):
         raise TypeError
-    _check_blosc_args(blosc_args)
-    log.debug('blosc args are:')
-    for arg, value in blosc_args.iteritems():
-        log.debug('    %s: %s' % (arg, value))
+    blosc_args = blosc_args or BloscArgs()
+    log.debug(blosc_args.pformat())
     _check_bloscpack_args(bloscpack_args)
     log.debug('bloscpack args are:')
     for arg, value in bloscpack_args.iteritems():

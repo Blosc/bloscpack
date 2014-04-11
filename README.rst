@@ -479,10 +479,8 @@ Or use alternate compressors:
 
 .. code-block:: pycon
 
-    >>> blosc_args = DEFAULT_BLOSC_ARGS
-    >>> blosc_args['cname'] = 'lz4'
     >>> a = np.linspace(0, 1, 3e8)
-    >>> c = pack_ndarray_str(a, blosc_args=blosc_args)
+    >>> c = pack_ndarray_str(a, blosc_args=BloscArgs(cname='lz4'))
     >>> b = unpack_ndarray_str(c)
     >>> (a == b).all()
     True

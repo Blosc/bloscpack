@@ -355,6 +355,23 @@ def test_decode_bloscpack_header():
                BloscPackHeader.decode(mod_raw(offset, replacement)))
 
 
+def test_BloscPackHeader_accessor_exceptions():
+
+    bloscpack_header = BloscPackHeader()
+    nt.assert_raises_regexp(KeyError,
+                            'foo not in BloscPackHeader',
+                            bloscpack_header.__getitem__,
+                            'foo')
+    nt.assert_raises_regexp(KeyError,
+                            'foo not in BloscPackHeader',
+                            bloscpack_header.__setitem__,
+                            'foo', 'bar')
+    nt.assert_raises_regexp(NotImplementedError,
+                            'BloscPackHeader does not support __delitem__ or derivatives',
+                            bloscpack_header.__delitem__,
+                            'foo',)
+
+
 def test_create_metadata_header():
     raw = '\x00\x00\x00\x00\x00\x00\x00\x00'\
           '\x00\x00\x00\x00\x00\x00\x00\x00'\
@@ -395,6 +412,7 @@ def test_create_metadata_header():
 
     nt.assert_equal(mod_raw(24, 'sesame'),
             create_metadata_header(user_codec='sesame'))
+
 
 def test_decode_metadata_header():
     no_arg_return = {

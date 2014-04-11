@@ -57,8 +57,8 @@ class MutableMappaingObject(collections.MutableMapping):
     def pformat(self, indent=4):
         indent = " " * indent
         # don't ask, was feeling functional
-        return "bloscpack header: \n%s%s" % (indent, (",\n%s" % indent).join((("%s=%s" % 
-            (key, (repr(value) if (key not in self._bytes_attrs or value == -1)
+        return "%s: \n%s%s" % (type(self).__name__, indent, (",\n%s" % indent).join((("%s=%s" % 
+            (key, (repr(value) if (key not in self.bytes_attributes or value == -1)
                          else double_pretty_size(value)))
              for key, value in self.iteritems()))))
 

@@ -18,28 +18,28 @@ Get some info on the file:
 
   $ blpk info data.dat.blp
   blpk: BloscPackHeader: 
-  blpk:     format_version=3,
-  blpk:     offsets=True,
-  blpk:     metadata=False,
-  blpk:     checksum='adler32',
-  blpk:     typesize=8,
-  blpk:     chunk_size=1.0M (1048576B),
-  blpk:     last_chunk=602.0K (616448B),
-  blpk:     nchunks=153,
-  blpk:     max_app_chunks=1530
+  blpk:     format_version: 3,
+  blpk:     offsets: True,
+  blpk:     metadata: False,
+  blpk:     checksum: 'adler32',
+  blpk:     typesize: 8,
+  blpk:     chunk_size: 1.0M (1048576B),
+  blpk:     last_chunk: 602.0K (616448B),
+  blpk:     nchunks: 153,
+  blpk:     max_app_chunks: 1530
   blpk: 'offsets':
   blpk: [13496,168668,310991,471593,628230,...]
   $ blpk i data.dat.blp
   blpk: BloscPackHeader: 
-  blpk:     format_version=3,
-  blpk:     offsets=True,
-  blpk:     metadata=False,
-  blpk:     checksum='adler32',
-  blpk:     typesize=8,
-  blpk:     chunk_size=1.0M (1048576B),
-  blpk:     last_chunk=602.0K (616448B),
-  blpk:     nchunks=153,
-  blpk:     max_app_chunks=1530
+  blpk:     format_version: 3,
+  blpk:     offsets: True,
+  blpk:     metadata: False,
+  blpk:     checksum: 'adler32',
+  blpk:     typesize: 8,
+  blpk:     chunk_size: 1.0M (1048576B),
+  blpk:     last_chunk: 602.0K (616448B),
+  blpk:     nchunks: 153,
+  blpk:     max_app_chunks: 1530
   blpk: 'offsets':
   blpk: [13496,168668,310991,471593,628230,...]
   $ rm data.dat.blp

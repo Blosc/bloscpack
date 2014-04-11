@@ -138,6 +138,7 @@ def pack(source, sink,
             nchunks=nchunks,
             max_app_chunks=max_app_chunks
             )
+    log.debug(bloscpack_header.pformat())
     source.configure(chunk_size, last_chunk, nchunks)
     sink.configure(blosc_args, bloscpack_header)
     sink.write_bloscpack_header()

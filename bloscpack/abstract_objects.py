@@ -67,4 +67,3 @@ class MutableMappaingObject(collections.MutableMapping):
 
     def copy(self):
         return copy.copy(self)
-

@@ -1102,6 +1102,7 @@ Changelog
 
   * Modularize cram tests, even has something akin to a harness
   * Refactored, tweaked and simplified Source/Sink code and semantics
+  * Introduce a BloscArgs object for saner handling of the BloscArgs
 
 * v0.6.0     - Fri Mar 28 2014
 

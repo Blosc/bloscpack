@@ -25,20 +25,24 @@ class MutableMappaingObject(collections.MutableMapping):
     def bytes_attributes(self):
         pass
 
+    @property
+    def _class_name(self):
+        return type(self).__name__
+
     def __getitem__(self, key):
         if key not in self.attributes:
-            raise KeyError('%s not in %s' % (key, type(self).__name__))
+            raise KeyError('%s not in %s' % (key, self._class_name))
         return getattr(self, key)
 
     def __setitem__(self, key, value):
         if key not in self.attributes:
-            raise KeyError('%s not in %s' % (key, type(self).__name__))
+            raise KeyError('%s not in %s' % (key, self._class_name))
         setattr(self, key, value)
 
     def __delitem__(self, key):
         raise NotImplementedError(
             '%s does not support __delitem__ or derivatives'
-            % type(self).__name__)
+            % self._class_name)
 
     def __len__(self):
         return len(self.attributes)
@@ -50,14 +54,14 @@ class MutableMappaingObject(collections.MutableMapping):
         return pprint.pformat(dict(self))
 
     def __repr__(self):
-        return "%s(%s)" % (type(self).__name__,
+        return "%s(%s)" % (self._class_name,
                           ", ".join((("%s=%s" % (arg, repr(value)))
                           for arg, value in self.iteritems())))
 
     def pformat(self, indent=4):
         indent = " " * indent
         # don't ask, was feeling functional
-        return "%s: \n%s%s" % (type(self).__name__, indent, (",\n%s" % indent).join((("%s: %s" % 
+        return "%s: \n%s%s" % (self._class_name, indent, (",\n%s" % indent).join((("%s: %s" %
             (key, (repr(value) if (key not in self.bytes_attributes or value == -1)
                                else double_pretty_size(value)))
              for key, value in self.iteritems()))))

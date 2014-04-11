@@ -73,7 +73,7 @@ Try using an alternative codec ('lz4' should be available):
 
   $ blpk compress --codec lz4 data.dat
   $ blpk info data.dat.blp
-  blpk: bloscpack header: 
+  blpk: BloscPackHeader: 
   blpk:     format_version=3,
   blpk:     offsets=True,
   blpk:     metadata=False,

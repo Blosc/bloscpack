@@ -17,7 +17,7 @@ Compress a file:
 Get some info on the file:
 
   $ blpk info data.dat.blp
-  blpk: bloscpack header: 
+  blpk: BloscPackHeader: 
   blpk:     format_version=3,
   blpk:     offsets=True,
   blpk:     metadata=False,
@@ -30,7 +30,7 @@ Get some info on the file:
   blpk: 'offsets':
   blpk: [13496,168668,310991,471593,628230,...]
   $ blpk i data.dat.blp
-  blpk: bloscpack header: 
+  blpk: BloscPackHeader: 
   blpk:     format_version=3,
   blpk:     offsets=True,
   blpk:     metadata=False,

@@ -186,4 +186,3 @@ def unpack(source, sink):
         log.debug("chunk handled, in: %s out: %s" %
                   (double_pretty_size(len(compressed)),
                    double_pretty_size(len_decompressed)))
-

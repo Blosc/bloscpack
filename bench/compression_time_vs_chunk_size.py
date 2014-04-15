@@ -15,11 +15,9 @@ import numpy
 
 import bloscpack.testutil as bpt
 from bloscpack.sysutil import drop_caches, sync
-from bloscpack.args import BloscArgs
 from bloscpack import pack_file, unpack_file
 from bloscpack.pretty import pretty_size
 
-blosc_args = BloscArgs()
 
 with bpt.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
 
@@ -33,8 +31,7 @@ with bpt.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         for _ in range(repeats):
             drop_caches()
             tic = time.time()
-            pack_file(in_file, out_file, chunk_size=chunk_size,
-                      blosc_args=blosc_args)
+            pack_file(in_file, out_file, chunk_size=chunk_size)
             sync()
             toc = time.time()
             cmp_times.append(toc-tic)

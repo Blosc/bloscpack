@@ -10,7 +10,7 @@ import blosc
 
 
 from .args import (BloscArgs,
-                   DEFAULT_BLOSCPACK_ARGS,
+                   BloscpackArgs,
                    DEFAULT_METADATA_ARGS,
                    _check_bloscpack_args,
                    _handle_max_apps
@@ -110,7 +110,7 @@ def pack(source, sink,
          nchunks, chunk_size, last_chunk,
          metadata=None,
          blosc_args=None,
-         bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+         bloscpack_args=None,
          metadata_args=DEFAULT_METADATA_ARGS):
     """ Core packing function.  """
     if not isinstance(source, PlainSource):
@@ -119,19 +119,17 @@ def pack(source, sink,
         raise TypeError
     blosc_args = blosc_args or BloscArgs()
     log.debug(blosc_args.pformat())
-    _check_bloscpack_args(bloscpack_args)
-    log.debug('bloscpack args are:')
-    for arg, value in bloscpack_args.iteritems():
-        log.debug('    %s: %s' % (arg, value))
-    max_app_chunks = _handle_max_apps(bloscpack_args['offsets'],
+    bloscpack_args = bloscpack_args or BloscpackArgs()
+    log.debug(bloscpack_args.pformat())
+    max_app_chunks = _handle_max_apps(bloscpack_args.offsets,
             nchunks,
-            bloscpack_args['max_app_chunks'])
+            bloscpack_args.max_app_chunks)
     # create the bloscpack header
     bloscpack_header = BloscPackHeader(
-            offsets=bloscpack_args['offsets'],
+            offsets=bloscpack_args.offsets,
             metadata=metadata is not None,
-            checksum=bloscpack_args['checksum'],
-            typesize=blosc_args['typesize'],
+            checksum=bloscpack_args.checksum,
+            typesize=blosc_args.typesize,
             chunk_size=chunk_size,
             last_chunk=last_chunk,
             nchunks=nchunks,

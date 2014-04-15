@@ -10,8 +10,7 @@ import os.path as path
 
 import blosc
 
-from .args import (DEFAULT_BLOSCPACK_ARGS,
-                   DEFAULT_METADATA_ARGS,
+from .args import (DEFAULT_METADATA_ARGS,
                    calculate_nchunks,
                    _check_metadata_arguments,
                    )

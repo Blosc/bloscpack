@@ -54,18 +54,18 @@ Try using --debug
   blpk: nchunks: 4
   blpk: chunk_size: 50.0M (52428800B)
   blpk: last_chunk_size: 2.59M (2713600B)
-  blpk: BloscArgs: 
+  blpk: BloscArgs:
   blpk:     typesize: 8,
   blpk:     clevel: 7,
   blpk:     shuffle: True,
   blpk:     cname: 'blosclz'
-  blpk: BloscpackArgs: 
+  blpk: BloscpackArgs:
   blpk:     offsets: True,
   blpk:     checksum: 'adler32',
   .* (re)
   blpk: max_app_chunks is a callable
   blpk: max_app_chunks was set to: 40
-  blpk: BloscPackHeader: 
+  blpk: BloscPackHeader:
   blpk:     format_version: 3,
   blpk:     offsets: True,
   blpk:     metadata: False,

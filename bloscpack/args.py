@@ -311,3 +311,25 @@ class BloscArgs(MutableMappaingObject):
     @property
     def bytes_attributes(self):
         return []
+
+
+class BloscpackArgs(MutableMappaingObject):
+
+    def __init__(self,
+                 offsets,
+                 checksum,
+                 max_app_chunks):
+
+        self._attrs = [
+                'offsets',
+                'checksum',
+                'max_app_chunks',
+                ]
+
+    @property
+    def attributes(self):
+        return self._attrs
+
+    @property
+    def bytes_attributes(self):
+        return []

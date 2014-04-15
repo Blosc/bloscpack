@@ -17,3 +17,7 @@ def test_verbose():
 def test_error(exit_mock):
     log.error('error')
     exit_mock.assert_called_once_with(1)
+
+
+def test_set_level_exception():
+    nt.assert_raises(ValueError, log.set_level, 'NO_SUCH_LEVEL')

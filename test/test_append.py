@@ -19,7 +19,7 @@ from bloscpack.append import (append,
                               _rewrite_metadata_fp,
                               )
 from bloscpack.args import (BloscArgs,
-                            DEFAULT_BLOSCPACK_ARGS,
+                            BloscpackArgs,
                             calculate_nchunks,
                             DEFAULT_METADATA_ARGS,
                             )
@@ -58,7 +58,7 @@ from bloscpack.testutil import (create_array,
 
 
 def prep_array_for_append(blosc_args=BloscArgs(),
-                          bloscpack_args=DEFAULT_BLOSCPACK_ARGS):
+                          bloscpack_args=BloscpackArgs()):
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, new)
     new_size = new.tell()
@@ -284,15 +284,13 @@ def test_append_metadata():
 
 
 def test_append_fp_no_offsets():
-    bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
-    bloscpack_args['offsets'] = False
+    bloscpack_args = BloscpackArgs(offsets=False)
     orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
     nt.assert_raises(RuntimeError, append_fp, orig, new, new_size)
 
 
 def test_append_fp_not_enough_space():
-    bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
-    bloscpack_args['max_app_chunks'] = 0
+    bloscpack_args = BloscpackArgs(max_app_chunks=0)
     orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
     nt.assert_raises(NotEnoughSpace, append_fp, orig, new, new_size)
 

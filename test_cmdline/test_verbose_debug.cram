@@ -54,26 +54,26 @@ Try using --debug
   blpk: nchunks: 4
   blpk: chunk_size: 50.0M (52428800B)
   blpk: last_chunk_size: 2.59M (2713600B)
-  blpk: BloscArgs: 
-  blpk:     typesize: 8,
-  blpk:     clevel: 7,
-  blpk:     shuffle: True,
+  blpk: BloscArgs:
+  blpk:     typesize: 8
+  blpk:     clevel: 7
+  blpk:     shuffle: True
   blpk:     cname: 'blosclz'
-  blpk: bloscpack args are:
-  blpk:     checksum: adler32
-  .* (re)
+  blpk: BloscpackArgs:
   blpk:     offsets: True
+  blpk:     checksum: 'adler32'
+  .* (re)
   blpk: max_app_chunks is a callable
   blpk: max_app_chunks was set to: 40
-  blpk: BloscPackHeader: 
-  blpk:     format_version: 3,
-  blpk:     offsets: True,
-  blpk:     metadata: False,
-  blpk:     checksum: 'adler32',
-  blpk:     typesize: 8,
-  blpk:     chunk_size: 50.0M (52428800B),
-  blpk:     last_chunk: 2.59M (2713600B),
-  blpk:     nchunks: 4,
+  blpk: BloscPackHeader:
+  blpk:     format_version: 3
+  blpk:     offsets: True
+  blpk:     metadata: False
+  blpk:     checksum: 'adler32'
+  blpk:     typesize: 8
+  blpk:     chunk_size: 50.0M (52428800B)
+  blpk:     last_chunk: 2.59M (2713600B)
+  blpk:     nchunks: 4
   blpk:     max_app_chunks: 40
   blpk: raw_bloscpack_header: 'blpk\x03\x01\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
   blpk: metadata_args will be silently ignored

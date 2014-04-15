@@ -17,7 +17,7 @@ from .file_io import (CompressedFPSource,
                       CompressedFPSink,
                       )
 from .args import (BloscArgs,
-                   DEFAULT_BLOSCPACK_ARGS,
+                   BloscpackArgs,
                    DEFAULT_METADATA_ARGS,
                    calculate_nchunks,
                    )
@@ -95,7 +95,7 @@ class PlainNumpySink(PlainSink):
 def pack_ndarray(ndarray, sink,
                  chunk_size=DEFAULT_CHUNK_SIZE,
                  blosc_args=None,
-                 bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+                 bloscpack_args=None,
                  metadata_args=DEFAULT_METADATA_ARGS):
     """ Serialialize a Numpy array.
 
@@ -138,7 +138,7 @@ def pack_ndarray(ndarray, sink,
 def pack_ndarray_file(ndarray, filename,
                       chunk_size=DEFAULT_CHUNK_SIZE,
                       blosc_args=None,
-                      bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+                      bloscpack_args=None,
                       metadata_args=DEFAULT_METADATA_ARGS):
     with open(filename, 'wb') as fp:
         sink = CompressedFPSink(fp)
@@ -152,7 +152,7 @@ def pack_ndarray_file(ndarray, filename,
 def pack_ndarray_str(ndarray,
                      chunk_size=DEFAULT_CHUNK_SIZE,
                      blosc_args=None,
-                     bloscpack_args=DEFAULT_BLOSCPACK_ARGS,
+                     bloscpack_args=None,
                      metadata_args=DEFAULT_METADATA_ARGS):
     sio = cStringIO.StringIO()
     sink = CompressedFPSink(sio)

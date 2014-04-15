@@ -60,7 +60,7 @@ class MutableMappaingObject(collections.MutableMapping):
     def pformat(self, indent=4):
         indent = " " * indent
         # don't ask, was feeling functional
-        return "%s: \n%s%s" % (self._class_name, indent, (",\n%s" % indent).join((("%s: %s" %
+        return "%s:\n%s%s" % (self._class_name, indent, ("\n%s" % indent).join((("%s: %s" %
             (key, (repr(value) if (key not in self.bytes_attributes or value == -1)
                                else double_pretty_size(value)))
              for key, value in self.iteritems()))))

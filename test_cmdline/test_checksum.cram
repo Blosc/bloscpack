@@ -14,7 +14,7 @@ Try using alternative checksum:
 
   $ blpk compress --checksum sha512 data.dat
   $ blpk info data.dat.blp | grep checksum
-  blpk:     checksum: 'sha512',
+  blpk:     checksum: 'sha512'
   $ rm data.dat.blp
 
   $ blpk compress --checksum NO_SUCH_CHECKSUM data.dat

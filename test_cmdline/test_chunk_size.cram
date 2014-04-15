@@ -16,7 +16,7 @@ Compression with different chunksizes:
   $ ls data.dat.blp
   data.dat.blp
   $ blpk info data.dat.blp | grep chunk_size
-  blpk:     chunk_size: 64.0K (65536B),
+  blpk:     chunk_size: 64.0K (65536B)
   $ blpk decompress data.dat.blp data.dat.dcmp
   $ ls
   data.dat
@@ -32,7 +32,7 @@ Compression with different chunksizes:
   $ ls data.dat.blp
   data.dat.blp
   $ blpk info data.dat.blp | grep chunk_size
-  blpk:     chunk_size: 64.0K (65536B),
+  blpk:     chunk_size: 64.0K (65536B)
   $ blpk decompress data.dat.blp data.dat.dcmp
   $ ls
   data.dat
@@ -48,7 +48,7 @@ Compression with different chunksizes:
   $ ls data.dat.blp
   data.dat.blp
   $ blpk info data.dat.blp | grep chunk_size
-  blpk:     chunk_size: 152.59M (160000000B),
+  blpk:     chunk_size: 152.59M (160000000B)
   $ blpk decompress data.dat.blp data.dat.dcmp
   $ ls
   data.dat

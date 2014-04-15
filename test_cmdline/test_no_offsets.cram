@@ -14,7 +14,7 @@ Try using no offsets:
 
   $ blpk compress --no-offsets data.dat
   $ blpk info data.dat.blp | grep offsets
-  blpk:     offsets: False,
+  blpk:     offsets: False
   $ rm data.dat.blp
 
 Check that directory is clean.

@@ -12,7 +12,7 @@ import nose.tools as nt
 from mock import patch
 
 from bloscpack.args import (BloscArgs,
-                            DEFAULT_BLOSCPACK_ARGS,
+                            BloscpackArgs,
                             DEFAULT_METADATA_ARGS,
                             calculate_nchunks,
                             )
@@ -83,8 +83,7 @@ def test_offsets():
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(input_fp.tell(), chunk_size='2M')
     input_fp.seek(0, 0)
-    bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
-    bloscpack_args['max_app_chunks'] = 0
+    bloscpack_args = BloscpackArgs(max_app_chunks=0)
     source = PlainFPSource(input_fp)
     sink = CompressedFPSink(output_fp)
     pack(source, sink,
@@ -135,8 +134,7 @@ def test_disable_offsets():
     create_array_fp(1, in_fp)
     in_fp_size = in_fp.tell()
     in_fp.seek(0)
-    bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
-    bloscpack_args['offsets'] = False
+    bloscpack_args = BloscpackArgs(offsets=False)
     source = PlainFPSource(in_fp)
     sink = CompressedFPSink(out_fp)
     pack(source, sink,

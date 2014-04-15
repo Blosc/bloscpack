@@ -15,14 +15,14 @@ Add metadata to the file:
   $ blpk compress --metadata meta.json data.dat
   $ blpk info data.dat.blp
   blpk: BloscPackHeader:
-  blpk:     format_version: 3,
-  blpk:     offsets: True,
-  blpk:     metadata: True,
-  blpk:     checksum: 'adler32',
-  blpk:     typesize: 8,
-  blpk:     chunk_size: 1.0M (1048576B),
-  blpk:     last_chunk: 602.0K (616448B),
-  blpk:     nchunks: 153,
+  blpk:     format_version: 3
+  blpk:     offsets: True
+  blpk:     metadata: True
+  blpk:     checksum: 'adler32'
+  blpk:     typesize: 8
+  blpk:     chunk_size: 1.0M (1048576B)
+  blpk:     last_chunk: 602.0K (616448B)
+  blpk:     nchunks: 153
   blpk:     max_app_chunks: 1530
   blpk: 'metadata':
   blpk: {   u'container': u'numpy',

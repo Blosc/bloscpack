@@ -45,7 +45,7 @@ Command line interface to and serialization format for `Blosc
 <http://blosc.org/>`_, a high performance, multi-threaded, blocking and
 shuffling compressor. Uses `python-blosc
 <https://github.com/Blosc/python-blosc>`_ bindings to interface with Blosc.
-Also comes with natve support for serializing and deserializing numpy arrays.
+Also comes with native support for serializing and deserializing numpy arrays.
 
 
 Dependencies
@@ -198,7 +198,7 @@ Settings
 ~~~~~~~~
 
 By default, the number of threads that Blosc uses during compression and
-decompressoion is determined by the number of cores detected on your system.
+decompression is determined by the number of cores detected on your system.
 You can change this using the ``[-n | --nthreads]`` option:
 
 .. code-block:: console
@@ -683,7 +683,7 @@ design goals of the header format are to contain as much information as
 possible to achieve interesting things in the future and to be as general as
 possible such that the persistence layer of tools such as `CArray
 <https://github.com/FrancescAlted/carray>`_ and `Blaze
-<https://github.com/ContinuumIO/blaze>`_ can be implemented without modifcation
+<https://github.com/ContinuumIO/blaze>`_ can be implemented without modification
 of the header format.
 
 The following ASCII representation shows the layout of the header::
@@ -1014,7 +1014,7 @@ Maintainers Notes on Cutting a Release
 #. Push commits to own github ``git push esc master``
 #. Push the tag to Blosc github ``git push blosc $VERSION``
 #. Push the tag to own github ``git push esc $VERSION``
-#. Upload tp PyPi using ``python setup.py sdist upload``
+#. Upload to PyPi using ``python setup.py sdist upload``
 #. Bump version number to next dev version
 #. Announce release on the Blosc list
 #. Announce release via Twitter

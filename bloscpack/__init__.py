@@ -7,6 +7,7 @@
 from .version import __version__  # pragma: no cover
 
 from .args import (BloscArgs,
+                   BloscpackArgs,
                    )
 from .file_io import (pack_file,
                       unpack_file,

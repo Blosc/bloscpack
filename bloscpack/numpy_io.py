@@ -119,8 +119,7 @@ def pack_ndarray(ndarray, sink,
     with the itemsize of the Numpy array's dtype.
     """
 
-    blosc_args = blosc_args or BloscArgs()
-    blosc_args.typesize = ndarray.dtype.itemsize
+    blosc_args = blosc_args or BloscArgs(typesize=ndarray.dtype.itemsize)
     source = PlainNumpySource(ndarray)
     nchunks, chunk_size, last_chunk_size = \
         calculate_nchunks(source.size, chunk_size)

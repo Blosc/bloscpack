@@ -1062,7 +1062,6 @@ Library Features
   * BloscHeader
   * MetadataHeader
   * Offsets (maybe)
-  * BloscpackArgs
 
 * partial decompression?
 * since we now have potentially small chunks, the progressbar becomes relevant

@@ -59,10 +59,10 @@ Try using --debug
   blpk:     clevel: 7,
   blpk:     shuffle: True,
   blpk:     cname: 'blosclz'
-  blpk: bloscpack args are:
-  blpk:     checksum: adler32
+  blpk: BloscpackArgs: 
+  blpk:     offsets: True,
+  blpk:     checksum: 'adler32',
   .* (re)
-  blpk:     offsets: True
   blpk: max_app_chunks is a callable
   blpk: max_app_chunks was set to: 40
   blpk: BloscPackHeader: 

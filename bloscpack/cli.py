@@ -13,7 +13,7 @@ import blosc
 
 
 from .args import (BloscArgs,
-                   DEFAULT_BLOSCPACK_ARGS,
+                   BloscpackArgs,
                    DEFAULT_METADATA_ARGS,
                    )
 from .append import (append,
@@ -442,9 +442,8 @@ def main():
         except FileNotFound as fnf:
             log.error(str(fnf))
         metadata = process_metadata_args(args)
-        bloscpack_args = DEFAULT_BLOSCPACK_ARGS.copy()
-        bloscpack_args['offsets'] = args.offsets
-        bloscpack_args['checksum'] = args.checksum
+        bloscpack_args = BloscpackArgs(offsets=args.offsets,
+                                       checksum=args.checksum)
         try:
             pack_file(in_file, out_file, chunk_size=args.chunk_size,
                       metadata=metadata,

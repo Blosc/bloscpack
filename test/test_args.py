@@ -16,12 +16,16 @@ from bloscpack.args import (DEFAULT_BLOSC_ARGS,
                             DEFAULT_CLEVEL,
                             DEFAULT_SHUFFLE,
                             DEFAULT_CNAME,
+                            DEFAULT_OFFSETS,
+                            DEFAULT_CHECKSUM,
+                            DEFAULT_MAX_APP_CHUNKS,
                             calculate_nchunks,
                             _handle_max_apps,
                             _check_blosc_args,
                             _check_bloscpack_args,
                             _check_metadata_arguments,
-                            BloscArgs
+                            BloscArgs,
+                            BloscpackArgs,
                             )
 from bloscpack.exceptions import ChunkingException
 from bloscpack.headers import MAX_CHUNKS
@@ -122,3 +126,12 @@ class TestBloscArgs(TestCase):
         self.assertEqual(DEFAULT_CLEVEL, blosc_args.clevel)
         self.assertEqual(DEFAULT_SHUFFLE, blosc_args.shuffle)
         self.assertEqual(DEFAULT_CNAME, blosc_args.cname)
+
+
+class TestBloscpackArgs(TestCase):
+
+    def test_init(self):
+        bloscpack_args = BloscpackArgs()
+        self.assertEqual(DEFAULT_OFFSETS, bloscpack_args.offsets)
+        self.assertEqual(DEFAULT_CHECKSUM, bloscpack_args.checksum)
+        self.assertEqual(DEFAULT_MAX_APP_CHUNKS, bloscpack_args.max_app_chunks)

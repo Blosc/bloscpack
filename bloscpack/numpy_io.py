@@ -106,9 +106,9 @@ def pack_ndarray(ndarray, sink,
     sink : CompressedSink
         the sink to serialize to
     blosc_args : BloscArgs
-        the args for blosc
-    bloscpack_args : dict
-        the args for bloscpack
+        blosc args
+    bloscpack_args : BloscpackArgs
+        bloscpack args
     metadata_args : dict
         the args for the metadata
 

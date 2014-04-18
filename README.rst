@@ -681,10 +681,10 @@ Description of the header
 The following 32 bit header is used for Bloscpack as of version ``0.3.0``.  The
 design goals of the header format are to contain as much information as
 possible to achieve interesting things in the future and to be as general as
-possible such that the persistence layer of tools such as `CArray
-<https://github.com/FrancescAlted/carray>`_ and `Blaze
-<https://github.com/ContinuumIO/blaze>`_ can be implemented without modification
-of the header format.
+possible such that the persistence layer of `Blaze
+<https://github.com/ContinuumIO/blaze>`_/`BLZ
+<https://github.com/ContinuumIO/blz/tree/master>`_ can be implemented without
+modification of the header format.
 
 The following ASCII representation shows the layout of the header::
 

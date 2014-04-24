@@ -23,12 +23,12 @@ from bloscpack.pretty import reverse_pretty
 from bloscpack import checksums
 from bloscpack import exceptions
 from bloscpack.headers import (BloscPackHeader,
+                               MetadataHeader,
                                create_options,
                                decode_options,
                                check_options,
                                create_metadata_options,
                                decode_metadata_options,
-                               create_metadata_header,
                                decode_metadata_header,
                                check_range,
                                decode_blosc_header,
@@ -377,11 +377,14 @@ def test_create_metadata_header():
           '\x00\x00\x00\x00\x00\x00\x00\x00'\
           '\x00\x00\x00\x00\x00\x00\x00\x00'\
           '\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(raw, create_metadata_header())
+    nt.assert_equal(raw, MetadataHeader().encode())
 
     def mod_raw(offset, value):
         return raw[0:offset] + value + \
             raw[offset+len(value):]
+
+    def create_metadata_header(**kwargs):
+        return MetadataHeader(**kwargs).encode()
 
     nt.assert_equal(mod_raw(0, 'JSON'),
             create_metadata_header(magic_format='JSON'))

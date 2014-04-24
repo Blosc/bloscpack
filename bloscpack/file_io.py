@@ -34,10 +34,10 @@ from .exceptions import (MetadataSectionTooSmall,
                          FormatVersionMismatch,
                          ChecksumMismatch,
                          )
-from .headers import (create_metadata_header,
-                      decode_metadata_header,
+from .headers import (decode_metadata_header,
                       decode_blosc_header,
                       BloscPackHeader,
+                      MetadataHeader,
                       decode_int64,
                       encode_int64,
                       )
@@ -124,14 +124,14 @@ def _write_metadata(output_fp, metadata, metadata_args):
                 (meta_comp_size, max_meta_size))
     metadata_total += meta_comp_size
     # create metadata header
-    raw_metadata_header = create_metadata_header(
+    raw_metadata_header = MetadataHeader(
             magic_format=metadata_args['magic_format'],
             meta_checksum=metadata_args['meta_checksum'],
             meta_codec=codec,
             meta_level=metadata_args['meta_level'],
             meta_size=meta_size,
             max_meta_size=max_meta_size,
-            meta_comp_size=meta_comp_size)
+            meta_comp_size=meta_comp_size).encode()
     log.debug('raw_metadata_header: %s' % repr(raw_metadata_header))
     output_fp.write(raw_metadata_header)
     output_fp.write(metadata)

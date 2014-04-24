@@ -377,45 +377,27 @@ def test_create_metadata_header():
           '\x00\x00\x00\x00\x00\x00\x00\x00'\
           '\x00\x00\x00\x00\x00\x00\x00\x00'\
           '\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(raw, MetadataHeader().encode())
+    yield nt.assert_equal, raw, MetadataHeader().encode()
 
     def mod_raw(offset, value):
         return raw[0:offset] + value + \
             raw[offset+len(value):]
 
-    def create_metadata_header(**kwargs):
-        return MetadataHeader(**kwargs).encode()
-
-    nt.assert_equal(mod_raw(0, 'JSON'),
-            create_metadata_header(magic_format='JSON'))
-
-    nt.assert_equal(mod_raw(9, '\x01'),
-            create_metadata_header(meta_checksum='adler32'))
-
-    nt.assert_equal(mod_raw(10, '\x01'),
-            create_metadata_header(meta_codec='zlib'))
-
-    nt.assert_equal(mod_raw(11, '\x01'),
-            create_metadata_header(meta_level=1))
-
-    nt.assert_equal(mod_raw(12, '\x01'),
-            create_metadata_header(meta_size=1))
-    nt.assert_equal(mod_raw(12, '\xff\xff\xff\xff'),
-            create_metadata_header(meta_size=MAX_META_SIZE))
-
-    nt.assert_equal(mod_raw(16, '\x01'),
-            create_metadata_header(max_meta_size=1))
-    nt.assert_equal(mod_raw(16, '\xff\xff\xff\xff'),
-            create_metadata_header(max_meta_size=MAX_META_SIZE))
-
-    nt.assert_equal(mod_raw(20, '\x01'),
-            create_metadata_header(meta_comp_size=1))
-    nt.assert_equal(mod_raw(20, '\xff\xff\xff\xff'),
-            create_metadata_header(meta_comp_size=MAX_META_SIZE))
-
-    nt.assert_equal(mod_raw(24, 'sesame'),
-            create_metadata_header(user_codec='sesame'))
-
+    for offset, replacement, kwargs in [
+            (0, 'JSON', {'magic_format': 'JSON'}),
+            (9, '\x01', {'meta_checksum': 'adler32'}),
+            (10, '\x01', {'meta_codec': 'zlib'}),
+            (11, '\x01', {'meta_level': 1}),
+            (12, '\x01', {'meta_size': 1}),
+            (12, '\xff\xff\xff\xff', {'meta_size': MAX_META_SIZE}),
+            (16, '\x01', {'max_meta_size': 1}),
+            (16, '\xff\xff\xff\xff', {'max_meta_size': MAX_META_SIZE}),
+            (20, '\x01', {'meta_comp_size': 1}),
+            (20, '\xff\xff\xff\xff', {'meta_comp_size': MAX_META_SIZE}),
+            (24, 'sesame', {'user_codec': 'sesame'}),
+            ]:
+        yield nt.assert_equal, mod_raw(offset, replacement), \
+            MetadataHeader(**kwargs).encode()
 
 def test_decode_metadata_header():
     no_arg_return = {

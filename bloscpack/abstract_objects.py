@@ -54,7 +54,7 @@ class MutableMappaingObject(collections.MutableMapping):
         return pprint.pformat(dict(self))
 
     def __repr__(self):
-        args = (("%s=%s" % (arg, repr(value))) for arg, value in self.iteritems())
+        args = (("%s=%s" % (arg, repr(value))) for arg, value in self.items())
         return "%s(%s)" % (self._class_name, ", ".join(args))
 
     def pformat(self, indent=4):
@@ -63,7 +63,7 @@ class MutableMappaingObject(collections.MutableMapping):
         return "%s:\n%s%s" % (self._class_name, indent, ("\n%s" % indent).join((("%s: %s" %
             (key, (repr(value) if (key not in self.bytes_attributes or value == -1)
                                else double_pretty_size(value)))
-             for key, value in self.iteritems()))))
+             for key, value in self.items()))))
 
     def copy(self):
         return copy.copy(self)

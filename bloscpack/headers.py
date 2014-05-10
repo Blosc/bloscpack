@@ -34,7 +34,7 @@ from .metacodecs import (CODECS_AVAIL,
                          )
 from .util import (memoryview,
                    )
-import log
+from . import log
 
 
 def check_range(name, value, min_, max_):

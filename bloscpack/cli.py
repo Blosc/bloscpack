@@ -49,7 +49,7 @@ from .pretty import (reverse_pretty,
                      join_with_eol,
                      )
 from .version import __version__
-import log
+from . import log
 
 
 def check_files(in_file, out_file, args):

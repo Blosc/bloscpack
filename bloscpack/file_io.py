@@ -52,7 +52,7 @@ from .abstract_io import (PlainSource,
                           CompressedSource,
                           CompressedSink,
                           )
-import log
+from . import log
 
 
 def _write_metadata(output_fp, metadata, metadata_args):

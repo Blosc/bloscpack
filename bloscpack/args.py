@@ -29,7 +29,7 @@ from .metacodecs import (CODECS_AVAIL,
 from .pretty import (double_pretty_size,
                      reverse_pretty,
                      )
-from bloscpack import log
+from . import log
 
 # Bloscpack args
 BLOSCPACK_ARGS = ('offsets', 'checksum', 'max_app_chunks')

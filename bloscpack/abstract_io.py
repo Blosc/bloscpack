@@ -21,7 +21,7 @@ from .exceptions import (ChecksumMismatch,
                          )
 from .pretty import (double_pretty_size,
                      )
-import log
+from . import log
 
 
 def _compress_chunk_str(chunk, blosc_args):

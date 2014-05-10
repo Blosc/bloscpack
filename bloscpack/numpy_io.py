@@ -3,9 +3,6 @@
 # vim :set ft=py:
 
 
-import cStringIO
-
-
 import blosc
 import numpy
 from six.moves import xrange
@@ -14,6 +11,7 @@ from six.moves import xrange
 from .abstract_io import(pack,
                          unpack,
                          )
+from .compat_util import StringIO
 from .file_io import (CompressedFPSource,
                       CompressedFPSink,
                       )
@@ -199,7 +197,7 @@ def pack_ndarray_str(ndarray,
                      blosc_args=None,
                      bloscpack_args=None,
                      metadata_args=None):
-    sio = cStringIO.StringIO()
+    sio = StringIO()
     sink = CompressedFPSink(sio)
     pack_ndarray(ndarray, sink,
                  chunk_size=chunk_size,
@@ -239,6 +237,6 @@ def unpack_ndarray_file(filename):
 
 
 def unpack_ndarray_str(str_):
-    sio = cStringIO.StringIO(str_)
+    sio = StringIO(str_)
     source = CompressedFPSource(sio)
     return unpack_ndarray(source)

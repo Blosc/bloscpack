@@ -3,9 +3,6 @@
 # vim :set ft=py:
 
 
-from cStringIO import StringIO
-
-
 import blosc
 import nose.tools as nt
 
@@ -25,6 +22,7 @@ from bloscpack.args import (BloscArgs,
                             )
 from bloscpack.checksums import (CHECKSUMS_LOOKUP,
                                  )
+from bloscpack.compat_util import StringIO
 from bloscpack.constants import (METADATA_HEADER_LENGTH,
                                  )
 from bloscpack.exceptions import (NotEnoughSpace,
@@ -466,7 +464,7 @@ def test_rewrite_metadata():
     test_metadata['data_origin'] = 'LHC'
     # compute the new length
     new_metadata_length = len(SERIALIZERS[0].dumps(test_metadata))
-    # jam the new metadata into the cStringIO
+    # jam the new metadata into the StringIO
     target_fp.seek(0, 0)
     _rewrite_metadata_fp(target_fp, test_metadata,
                          codec=None, level=None)

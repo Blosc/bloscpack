@@ -5,7 +5,6 @@
 
 from __future__ import print_function
 
-from cStringIO import StringIO
 
 import blosc
 import nose.tools as nt
@@ -16,6 +15,7 @@ from bloscpack.args import (BloscArgs,
                             MetadataArgs,
                             calculate_nchunks,
                             )
+from bloscpack.compat_util import StringIO
 from bloscpack.constants import (MAX_FORMAT_VERSION,
                                  BLOSCPACK_HEADER_LENGTH,
                                  BLOSC_HEADER_LENGTH,

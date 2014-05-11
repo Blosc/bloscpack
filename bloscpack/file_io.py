@@ -34,8 +34,7 @@ from .exceptions import (MetadataSectionTooSmall,
                          FormatVersionMismatch,
                          ChecksumMismatch,
                          )
-from .headers import (decode_metadata_header,
-                      decode_blosc_header,
+from .headers import ( decode_blosc_header,
                       BloscPackHeader,
                       MetadataHeader,
                       decode_int64,
@@ -208,15 +207,13 @@ def _read_metadata(input_fp):
     """
     raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
     log.debug("raw metadata header: '%s'" % repr(raw_metadata_header))
-    metadata_header = decode_metadata_header(raw_metadata_header)
-    log.debug("metadata header: ")
-    for arg, value in metadata_header.iteritems():
-        log.debug('\t%s: %s' % (arg, value))
-    metadata = input_fp.read(metadata_header['meta_comp_size'])
-    prealloc = metadata_header['max_meta_size'] - metadata_header['meta_comp_size']
+    metadata_header = MetadataHeader.decode(raw_metadata_header)
+    log.debug(metadata_header.pformat())
+    metadata = input_fp.read(metadata_header.meta_comp_size)
+    prealloc = metadata_header.max_meta_size - metadata_header.meta_comp_size
     input_fp.seek(prealloc, 1)
-    if metadata_header['meta_checksum'] != 'None':
-        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header['meta_checksum']]
+    if metadata_header.meta_checksum != 'None':
+        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header.meta_checksum]
         metadata_expected_digest = input_fp.read(metadata_checksum_impl.size)
         metadata_received_digest = metadata_checksum_impl(metadata)
         if metadata_received_digest != metadata_expected_digest:
@@ -235,8 +232,8 @@ def _read_metadata(input_fp):
     log.verbose("read %s metadata of size: '%s'" %
             # FIXME meta_codec?
             ('compressed' if metadata_header['meta_codec'] != 'None' else
-                'uncompressed', metadata_header['meta_comp_size']))
-    serializer_impl = SERIALIZERS_LOOKUP[metadata_header['magic_format']]
+                'uncompressed', metadata_header.meta_comp_size))
+    serializer_impl = SERIALIZERS_LOOKUP[metadata_header.magic_format]
     metadata = serializer_impl.loads(metadata)
     return metadata, metadata_header
 

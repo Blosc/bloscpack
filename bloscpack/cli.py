@@ -507,7 +507,7 @@ def main():
             log.normal("'metadata':")
             log.normal(pprint.pformat(metadata, indent=4))
             log.normal("'metadata_header':")
-            log.normal(pprint.pformat(metadata_header, indent=4))
+            log.normal(metadata_header.pformat())
         if offsets:
             log.normal("'offsets':")
             log.normal("[%s,...]" % (",".join(str(o) for o in offsets[:5])))

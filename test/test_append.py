@@ -46,8 +46,7 @@ from bloscpack.file_io import (PlainFPSource,
                                _read_metadata,
                                )
 from bloscpack.headers import (BloscPackHeader,
-                               create_metadata_header,
-                               decode_metadata_header,
+                               MetadataHeader
                                )
 from bloscpack.serializers import (SERIALIZERS,
                                    )
@@ -380,17 +379,17 @@ def test_append_mix_shuffle():
 
 
 def test_recreate_metadata():
-    old_meta_header = create_metadata_header(magic_format='',
-        options="00000000",
-        meta_checksum='None',
-        meta_codec='None',
-        meta_level=0,
-        meta_size=0,
-        max_meta_size=0,
-        meta_comp_size=0,
-        user_codec='',
-        )
-    header_dict = decode_metadata_header(old_meta_header)
+    old_meta_header = MetadataHeader(magic_format='',
+                                     meta_options="00000000",
+                                     meta_checksum='None',
+                                     meta_codec='None',
+                                     meta_level=0,
+                                     meta_size=0,
+                                     max_meta_size=0,
+                                     meta_comp_size=0,
+                                     user_codec='',
+                                     )
+    header_dict = dict(old_meta_header)
     nt.assert_raises(NoSuchSerializer,
                      _recreate_metadata,
                      header_dict,

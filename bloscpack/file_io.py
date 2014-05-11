@@ -226,12 +226,12 @@ def _read_metadata(input_fp):
             log.debug('metadata checksum OK (%s): %s ' %
                     (metadata_checksum_impl.name,
                         repr(metadata_received_digest)))
-    if metadata_header['meta_codec'] != 'None':
-        metadata_codec_impl = CODECS_LOOKUP[metadata_header['meta_codec']]
+    if metadata_header.meta_codec != 'None':
+        metadata_codec_impl = CODECS_LOOKUP[metadata_header.meta_codec]
         metadata = metadata_codec_impl.decompress(metadata)
     log.verbose("read %s metadata of size: '%s'" %
             # FIXME meta_codec?
-            ('compressed' if metadata_header['meta_codec'] != 'None' else
+            ('compressed' if metadata_header.meta_codec != 'None' else
                 'uncompressed', metadata_header.meta_comp_size))
     serializer_impl = SERIALIZERS_LOOKUP[metadata_header.magic_format]
     metadata = serializer_impl.loads(metadata)

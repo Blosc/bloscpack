@@ -59,31 +59,31 @@ def prep_array_for_append(blosc_args=BloscArgs(),
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, new)
     new_size = new.tell()
-    new.reset()
+    new.seek(0)
     chunking = calculate_nchunks(new_size)
     source = PlainFPSource(new)
     sink = CompressedFPSink(orig)
     pack(source, sink, *chunking,
          blosc_args=blosc_args,
          bloscpack_args=bloscpack_args)
-    orig.reset()
-    new.reset()
+    orig.seek(0)
+    new.seek(0)
     return orig, new, new_size, dcmp
 
 
 def reset_append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
-    """ like ``append_fp`` but with ``reset()`` on the file pointers. """
+    """ like ``append_fp`` but with ``seek(0)`` on the file pointers. """
     nchunks = append_fp(original_fp, new_content_fp, new_size,
                         blosc_args=blosc_args)
-    original_fp.reset()
-    new_content_fp.reset()
+    original_fp.seek(0)
+    new_content_fp.seek(0)
     return nchunks
 
 
 def reset_read_beginning(input_fp):
-    """ like ``_read_beginning`` but with ``reset()`` on the file pointer. """
+    """ like ``_read_beginning`` but with ``seek(0)`` on the file pointer. """
     ans = _read_beginning(input_fp)
-    input_fp.reset()
+    input_fp.seek(0)
     return ans
 
 
@@ -177,8 +177,8 @@ def test_append_fp():
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
     unpack(source, sink)
-    dcmp.reset()
-    new.reset()
+    dcmp.seek(0)
+    new.seek(0)
     new_str = new.read()
     dcmp_str = dcmp.read()
     nt.assert_equal(len(dcmp_str), len(new_str * 2))
@@ -207,16 +207,16 @@ def test_append_into_last_chunk():
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, new)
     new_size = new.tell()
-    new.reset()
+    new.seek(0)
     chunking = calculate_nchunks(new_size, chunk_size=new_size)
     source = PlainFPSource(new)
     sink = CompressedFPSink(orig)
     pack(source, sink, *chunking)
-    orig.reset()
-    new.reset()
+    orig.seek(0)
+    new.seek(0)
     # append a few bytes, creating a new, smaller, last_chunk
     new_content = new.read()
-    new.reset()
+    new.seek(0)
     nchunks = reset_append_fp(orig, StringIO(new_content[:1023]), 1023)
     bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(nchunks, 1)
@@ -231,8 +231,8 @@ def test_append_into_last_chunk():
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
     unpack(source, sink)
-    dcmp.reset()
-    new.reset()
+    dcmp.seek(0)
+    new.seek(0)
     new_str = new.read()
     dcmp_str = dcmp.read()
     nt.assert_equal(len(dcmp_str), len(new_str) + 2046)
@@ -243,13 +243,13 @@ def test_append_single_chunk():
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, new)
     new_size = new.tell()
-    new.reset()
+    new.seek(0)
     chunking = calculate_nchunks(new_size, chunk_size=new_size)
     source = PlainFPSource(new)
     sink = CompressedFPSink(orig)
     pack(source, sink, *chunking)
-    orig.reset()
-    new.reset()
+    orig.seek(0)
+    new.seek(0)
 
     # append a single chunk
     reset_append_fp(orig, new, new_size)
@@ -258,7 +258,7 @@ def test_append_single_chunk():
 
     # append a large content, that amounts to two chunks
     new_content = new.read()
-    new.reset()
+    new.seek(0)
     reset_append_fp(orig, StringIO(new_content * 2), new_size * 2)
     bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(bloscpack_header['nchunks'], 4)
@@ -283,7 +283,7 @@ def test_double_append():
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
     unpack(source, sink)
-    dcmp.reset()
+    dcmp.seek(0)
     dcmp_str = dcmp.read()
     nt.assert_equal(len(dcmp_str), len(new_str) * 3)
     nt.assert_equal(dcmp_str, new_str * 3)
@@ -293,22 +293,22 @@ def test_append_metadata():
     orig, new, dcmp = StringIO(), StringIO(), StringIO()
     create_array_fp(1, new)
     new_size = new.tell()
-    new.reset()
+    new.seek(0)
 
     metadata = {"dtype": "float64", "shape": [1024], "others": []}
     chunking = calculate_nchunks(new_size, chunk_size=new_size)
     source = PlainFPSource(new)
     sink = CompressedFPSink(orig)
     pack(source, sink, *chunking, metadata=metadata)
-    orig.reset()
-    new.reset()
+    orig.seek(0)
+    new.seek(0)
     reset_append_fp(orig, new, new_size)
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
     ans = unpack(source, sink)
     print(ans)
-    dcmp.reset()
-    new.reset()
+    dcmp.seek(0)
+    new.seek(0)
     new_str = new.read()
     dcmp_str = dcmp.read()
     nt.assert_equal(len(dcmp_str), len(new_str) * 2)
@@ -334,7 +334,7 @@ def test_mixing_clevel():
     # get the original size
     orig.seek(0, 2)
     orig_size = orig.tell()
-    orig.reset()
+    orig.seek(0)
     # get a backup of the settings
     bloscpack_header, metadata, metadata_header, offsets = \
             reset_read_beginning(orig)
@@ -350,7 +350,7 @@ def test_mixing_clevel():
     # get the final size
     orig.seek(0, 2)
     final_size = orig.tell()
-    orig.reset()
+    orig.seek(0)
 
     # the original file minus the compressed size of the last chunk
     discounted_orig_size = orig_size - last_chunk_compressed_size
@@ -366,8 +366,8 @@ def test_mixing_clevel():
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
     unpack(source, sink)
-    dcmp.reset()
-    new.reset()
+    dcmp.seek(0)
+    new.seek(0)
     new_str = new.read()
     dcmp_str = dcmp.read()
     nt.assert_equal(len(dcmp_str), len(new_str * 2))
@@ -385,9 +385,9 @@ def test_append_mix_shuffle():
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
     unpack(source, sink)
-    orig.reset()
-    dcmp.reset()
-    new.reset()
+    orig.seek(0)
+    dcmp.seek(0)
+    new.seek(0)
     new_str = new.read()
     dcmp_str = dcmp.read()
     nt.assert_equal(len(dcmp_str), len(new_str * 2))

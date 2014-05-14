@@ -24,7 +24,16 @@ Get more information using --verbose:
   blpk: output file size: 16.2M (16984384B)
   blpk: compression ratio: 0.106152
   blpk: done
-  $ rm data.dat.blp
+  $ blpk --verbose decompress data.dat.blp data.dat.dcmp
+  blpk: using 4 threads
+  blpk: getting ready for decompression
+  blpk: input file is: 'data.dat.blp'
+  blpk: output file is: 'data.dat.dcmp'
+  blpk: input file size: 16.2M
+  blpk: output file size: 152.59M
+  blpk: decompression ratio: 9.420418
+  blpk: done
+  $ rm data.dat.blp data.dat.dcmp
 
 Try using --debug
 

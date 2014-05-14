@@ -12,6 +12,7 @@ except ImportError:
 
 
 import blosc
+import six
 
 from .abstract_objects import (MutableMappaingObject,
                                )
@@ -102,7 +103,10 @@ def check_options_zero(options, indices):
 
 
 def decode_uint8(byte):
-    return struct.unpack('<B', byte)[0]
+    if six.PY3:
+        return byte
+    else:
+        return struct.unpack('<B', byte)[0]
 
 
 def decode_uint32(fourbyte):

@@ -34,7 +34,7 @@ from .exceptions import (MetadataSectionTooSmall,
                          FormatVersionMismatch,
                          ChecksumMismatch,
                          )
-from .headers import ( decode_blosc_header,
+from .headers import (decode_blosc_header,
                       BloscPackHeader,
                       MetadataHeader,
                       decode_int64,

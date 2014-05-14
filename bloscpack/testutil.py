@@ -69,7 +69,7 @@ def create_tmp_files():
     shutil.rmtree(tdir)
 
 
-def cmp(file1, file2):
+def cmp_file(file1, file2):
     """ File comparison utility with a small chunksize """
     with open_two_file(open(file1, 'rb'), open(file2, 'rb')) as \
             (fp1, fp2):

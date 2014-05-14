@@ -45,6 +45,7 @@ from bloscpack.testutil import (create_array,
                                 create_array_fp,
                                 create_tmp_files,
                                 cmp_fp,
+                                cmp_file,
                                 simple_progress,
                                 )
 
@@ -195,7 +196,7 @@ def pack_unpack(repeats, chunk_size=None, progress=False):
         unpack_file(out_file, dcmp_file)
         if progress:
             print("Verifying")
-        cmp(in_file, dcmp_file)
+        cmp_file(in_file, dcmp_file)
 
 
 def pack_unpack_fp(repeats, chunk_size=DEFAULT_CHUNK_SIZE,

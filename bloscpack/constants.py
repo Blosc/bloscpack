@@ -13,7 +13,7 @@ except ImportError:  # pragma: no cover
 
 # miscellaneous
 FORMAT_VERSION = 3
-MAGIC = 'blpk'
+MAGIC = b'blpk'
 EXTENSION = '.blp'
 
 # header lengths

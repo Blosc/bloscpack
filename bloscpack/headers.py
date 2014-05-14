@@ -126,7 +126,7 @@ def decode_bitfield(byte):
 
 
 def decode_magic_string(str_):
-    return str_.strip('\x00')
+    return str_.strip(b'\x00')
 
 
 def encode_uint8(byte):

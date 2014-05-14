@@ -231,7 +231,7 @@ def test_append_single_chunk():
     nt.assert_equal(bloscpack_header['nchunks'], 4)
 
     # append half a chunk
-    reset_append_fp(orig, StringIO(new_content[:len(new_content)]), new_size/2)
+    reset_append_fp(orig, StringIO(new_content[:len(new_content)]), new_size//2)
     bloscpack_header = reset_read_beginning(orig)[0]
     nt.assert_equal(bloscpack_header['nchunks'], 5)
 

@@ -226,7 +226,7 @@ Try using --debug with metadata:
   blpk: metadata args are:
   blpk: \tmagic_format: JSON (esc)
   blpk: \tmeta_codec: zlib (esc)
-  blpk: \tmax_meta_size: .* (esc)(re)
+  blpk: .* (re)
   blpk: \tmeta_level: 6 (esc)
   blpk: \tmeta_checksum: adler32 (esc)
   blpk: Raw compressed metadata of size '62': 'x\x9c\xabVJ)\xa9,HU\xb2R\xb2I\xb3P\xd2Q*\xceH\x04\xf1\xa2\x8d\x0c  VG)9?\xaf$13/\xb5\x08\xa8(\xaf4\xb7\xa0\x12\xa8,\xbf(\x05\xccwV\xaa\x05\x00\x95,\x13\xe7'

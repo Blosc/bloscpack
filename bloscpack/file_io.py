@@ -287,7 +287,7 @@ def _write_offsets(output_fp, offsets):
     log.debug("Writing '%d' offsets: '%s'" %
               (len(offsets), repr(offsets)))
     # write the offsets encoded into the reserved space in the file
-    encoded_offsets = "".join([encode_int64(i) for i in offsets])
+    encoded_offsets = b"".join([encode_int64(i) for i in offsets])
     log.debug("Raw offsets: %s" % repr(encoded_offsets))
     output_fp.write(encoded_offsets)
 

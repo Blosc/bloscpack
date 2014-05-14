@@ -25,13 +25,12 @@ from bloscpack.pretty import reverse_pretty
 from bloscpack import checksums
 from bloscpack import exceptions
 from bloscpack.headers import (BloscPackHeader,
+                               MetadataHeader,
                                create_options,
                                decode_options,
                                check_options,
                                create_metadata_options,
                                decode_metadata_options,
-                               create_metadata_header,
-                               decode_metadata_header,
                                check_range,
                                decode_blosc_header,
                                )
@@ -379,60 +378,45 @@ def test_create_metadata_header():
           '\x00\x00\x00\x00\x00\x00\x00\x00'\
           '\x00\x00\x00\x00\x00\x00\x00\x00'\
           '\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(raw, create_metadata_header())
+    yield nt.assert_equal, raw, MetadataHeader().encode()
 
     def mod_raw(offset, value):
         return raw[0:offset] + value + \
             raw[offset+len(value):]
 
-    nt.assert_equal(mod_raw(0, 'JSON'),
-            create_metadata_header(magic_format='JSON'))
-
-    nt.assert_equal(mod_raw(9, '\x01'),
-            create_metadata_header(meta_checksum='adler32'))
-
-    nt.assert_equal(mod_raw(10, '\x01'),
-            create_metadata_header(meta_codec='zlib'))
-
-    nt.assert_equal(mod_raw(11, '\x01'),
-            create_metadata_header(meta_level=1))
-
-    nt.assert_equal(mod_raw(12, '\x01'),
-            create_metadata_header(meta_size=1))
-    nt.assert_equal(mod_raw(12, '\xff\xff\xff\xff'),
-            create_metadata_header(meta_size=MAX_META_SIZE))
-
-    nt.assert_equal(mod_raw(16, '\x01'),
-            create_metadata_header(max_meta_size=1))
-    nt.assert_equal(mod_raw(16, '\xff\xff\xff\xff'),
-            create_metadata_header(max_meta_size=MAX_META_SIZE))
-
-    nt.assert_equal(mod_raw(20, '\x01'),
-            create_metadata_header(meta_comp_size=1))
-    nt.assert_equal(mod_raw(20, '\xff\xff\xff\xff'),
-            create_metadata_header(meta_comp_size=MAX_META_SIZE))
-
-    nt.assert_equal(mod_raw(24, 'sesame'),
-            create_metadata_header(user_codec='sesame'))
+    for offset, replacement, kwargs in [
+            (0, 'JSON', {'magic_format': 'JSON'}),
+            (9, '\x01', {'meta_checksum': 'adler32'}),
+            (10, '\x01', {'meta_codec': 'zlib'}),
+            (11, '\x01', {'meta_level': 1}),
+            (12, '\x01', {'meta_size': 1}),
+            (12, '\xff\xff\xff\xff', {'meta_size': MAX_META_SIZE}),
+            (16, '\x01', {'max_meta_size': 1}),
+            (16, '\xff\xff\xff\xff', {'max_meta_size': MAX_META_SIZE}),
+            (20, '\x01', {'meta_comp_size': 1}),
+            (20, '\xff\xff\xff\xff', {'meta_comp_size': MAX_META_SIZE}),
+            (24, 'sesame', {'user_codec': 'sesame'}),
+            ]:
+        yield nt.assert_equal, mod_raw(offset, replacement), \
+            MetadataHeader(**kwargs).encode()
 
 
 def test_decode_metadata_header():
-    no_arg_return = {
-            'magic_format':        '',
-            'meta_options':        '00000000',
-            'meta_checksum':       'None',
-            'meta_codec':          'None',
-            'meta_level':          0,
-            'meta_size':           0,
-            'max_meta_size':       0,
-            'meta_comp_size':      0,
-            'user_codec':          '',
-            }
-    no_arg_input = '\x00\x00\x00\x00\x00\x00\x00\x00'\
-                   '\x00\x00\x00\x00\x00\x00\x00\x00'\
-                   '\x00\x00\x00\x00\x00\x00\x00\x00'\
-                   '\x00\x00\x00\x00\x00\x00\x00\x00'
-    nt.assert_equal(no_arg_return, decode_metadata_header(no_arg_input))
+    no_arg_return = {'magic_format':        '',
+                     'meta_options':        '00000000',
+                     'meta_checksum':       'None',
+                     'meta_codec':          'None',
+                     'meta_level':          0,
+                     'meta_size':           0,
+                     'max_meta_size':       0,
+                     'meta_comp_size':      0,
+                     'user_codec':          '',
+                     }
+    no_arg_return = MetadataHeader(**no_arg_return)
+    no_arg_input = ('\x00\x00\x00\x00\x00\x00\x00\x00'
+                    '\x00\x00\x00\x00\x00\x00\x00\x00'
+                    '\x00\x00\x00\x00\x00\x00\x00\x00'
+                    '\x00\x00\x00\x00\x00\x00\x00\x00')
 
     def copy_and_set_return(key, value):
         copy_ = no_arg_return.copy()
@@ -443,41 +427,20 @@ def test_decode_metadata_header():
         return no_arg_input[0:offset] + value + \
             no_arg_input[offset+len(value):]
 
-    nt.assert_equal(copy_and_set_return('magic_format', 'JSON'),
-            decode_metadata_header(copy_and_set_input(0, 'JSON')))
+    yield nt.assert_equal, no_arg_return, MetadataHeader.decode(no_arg_input)
 
-    nt.assert_equal(copy_and_set_return('meta_checksum', 'adler32'),
-            decode_metadata_header(copy_and_set_input(9, '\x01')))
-
-    nt.assert_equal(copy_and_set_return('meta_codec', 'zlib'),
-            decode_metadata_header(copy_and_set_input(10, '\x01')))
-
-    nt.assert_equal(copy_and_set_return('meta_level', 1),
-            decode_metadata_header(copy_and_set_input(11, '\x01')))
-
-    nt.assert_equal(copy_and_set_return('meta_size', 1),
-            decode_metadata_header(copy_and_set_input(12, '\x01\x00\x00\x00')))
-
-    nt.assert_equal(copy_and_set_return('meta_size', MAX_META_SIZE),
-            decode_metadata_header(copy_and_set_input(12, '\xff\xff\xff\xff')))
-
-    nt.assert_equal(copy_and_set_return('max_meta_size', 1),
-            decode_metadata_header(copy_and_set_input(16, '\x01\x00\x00\x00')))
-
-    nt.assert_equal(copy_and_set_return('max_meta_size', MAX_META_SIZE),
-            decode_metadata_header(copy_and_set_input(16, '\xff\xff\xff\xff')))
-
-    nt.assert_equal(copy_and_set_return('max_meta_size', 1),
-            decode_metadata_header(copy_and_set_input(16, '\x01\x00\x00\x00')))
-
-    nt.assert_equal(copy_and_set_return('max_meta_size', MAX_META_SIZE),
-            decode_metadata_header(copy_and_set_input(16, '\xff\xff\xff\xff')))
-
-    nt.assert_equal(copy_and_set_return('meta_comp_size', 1),
-            decode_metadata_header(copy_and_set_input(20, '\x01\x00\x00\x00')))
-
-    nt.assert_equal(copy_and_set_return('meta_comp_size', MAX_META_SIZE),
-            decode_metadata_header(copy_and_set_input(20, '\xff\xff\xff\xff')))
-
-    nt.assert_equal(copy_and_set_return('user_codec', 'sesame'),
-            decode_metadata_header(copy_and_set_input(24, 'sesame')))
+    for attribute, value, offset, replacement in [
+            ('magic_format', 'JSON', 0, 'JSON'),
+            ('meta_checksum', 'adler32', 9, '\x01'),
+            ('meta_codec', 'zlib', 10, '\x01'),
+            ('meta_level', 1, 11, '\x01'),
+            ('meta_size', 1, 12, '\x01\x00\x00\x00'),
+            ('meta_size', MAX_META_SIZE, 12, '\xff\xff\xff\xff'),
+            ('max_meta_size', 1, 16, '\x01\x00\x00\x00'),
+            ('max_meta_size', MAX_META_SIZE, 16, '\xff\xff\xff\xff'),
+            ('meta_comp_size', 1, 20, '\x01\x00\x00\x00'),
+            ('meta_comp_size', MAX_META_SIZE, 20, '\xff\xff\xff\xff'),
+            ('user_codec', 'sesame', 24, 'sesame'),
+            ]:
+        yield nt.assert_equal, copy_and_set_return(attribute, value), \
+            MetadataHeader.decode(copy_and_set_input(offset, replacement))

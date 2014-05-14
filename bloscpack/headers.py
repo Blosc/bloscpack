@@ -382,52 +382,93 @@ class BloscPackHeader(MutableMappaingObject):
             max_app_chunks=decode_int64(buffer_[24:32]))
 
 
-def create_metadata_header(magic_format='',
-       options="00000000",
-       meta_checksum='None',
-       meta_codec='None',
-       meta_level=0,
-       meta_size=0,
-       max_meta_size=0,
-       meta_comp_size=0,
-       user_codec='',
-       ):
-    _check_str('magic-format',     magic_format,  8)
-    check_options(options)
-    check_valid_checksum(meta_checksum)
-    check_valid_codec(meta_codec)
-    check_range('meta_level',      meta_level,     0, MAX_CLEVEL)
-    check_range('meta_size',       meta_size,      0, MAX_META_SIZE)
-    check_range('max_meta_size',   max_meta_size,  0, MAX_META_SIZE)
-    check_range('meta_comp_size',  meta_comp_size, 0, MAX_META_SIZE)
-    _check_str('user_codec',       user_codec,     8)
+class MetadataHeader(MutableMappaingObject):
 
-    magic_format        = _pad_with_nulls(magic_format, 8)
-    options             = encode_uint8(int(options, 2))
-    meta_checksum       = encode_uint8(CHECKSUMS_AVAIL.index(meta_checksum))
-    meta_codec          = encode_uint8(CODECS_AVAIL.index(meta_codec))
-    meta_level          = encode_uint8(meta_level)
-    meta_size           = encode_uint32(meta_size)
-    max_meta_size       = encode_uint32(max_meta_size)
-    meta_comp_size      = encode_uint32(meta_comp_size)
-    user_codec          = _pad_with_nulls(user_codec, 8)
+    def __init__(self,
+                 magic_format='',
+                 meta_options="00000000",
+                 meta_checksum='None',
+                 meta_codec='None',
+                 meta_level=0,
+                 meta_size=0,
+                 max_meta_size=0,
+                 meta_comp_size=0,
+                 user_codec='',
+                 ):
+        _check_str('magic-format',     magic_format,  8)
+        check_options(meta_options)
+        check_valid_checksum(meta_checksum)
+        check_valid_codec(meta_codec)
+        check_range('meta_level',      meta_level,     0, MAX_CLEVEL)
+        check_range('meta_size',       meta_size,      0, MAX_META_SIZE)
+        check_range('max_meta_size',   max_meta_size,  0, MAX_META_SIZE)
+        check_range('meta_comp_size',  meta_comp_size, 0, MAX_META_SIZE)
+        _check_str('user_codec',       user_codec,     8)
 
-    return magic_format + options + meta_checksum + meta_codec + meta_level + \
-            meta_size + max_meta_size + meta_comp_size + user_codec
+        self.magic_format = magic_format
+        self.meta_options = meta_options
+        self.meta_checksum = meta_checksum
+        self.meta_codec = meta_codec
+        self.meta_level = meta_level
+        self.meta_size = meta_size
+        self.max_meta_size = max_meta_size
+        self.meta_comp_size = meta_comp_size
+        self.user_codec = user_codec
 
+        self._attrs = ['magic_format',
+                       'meta_options',
+                       'meta_checksum',
+                       'meta_codec',
+                       'meta_level',
+                       'meta_size',
+                       'max_meta_size',
+                       'meta_comp_size',
+                       'user_codec',
+                       ]
 
-def decode_metadata_header(buffer_):
-    if len(buffer_) != 32:
-        raise ValueError(
-            "attempting to decode a bloscpack metadata header of length '%d', not '32'"
-            % len(buffer_))
-    return {'magic_format':        decode_magic_string(buffer_[:8]),
-            'meta_options':        decode_bitfield(buffer_[8]),
-            'meta_checksum':       CHECKSUMS_AVAIL[decode_uint8(buffer_[9])],
-            'meta_codec':          CODECS_AVAIL[decode_uint8(buffer_[10])],
-            'meta_level':          decode_uint8(buffer_[11]),
-            'meta_size':           decode_uint32(buffer_[12:16]),
-            'max_meta_size':       decode_uint32(buffer_[16:20]),
-            'meta_comp_size':      decode_uint32(buffer_[20:24]),
-            'user_codec':          decode_magic_string(buffer_[24:32])
-            }
+        self._bytes_attrs = ['meta_size',
+                             'max_meta_size',
+                             'meta_comp_size',
+                             ]
+
+    @property
+    def attributes(self):
+        return self._attrs
+
+    @property
+    def bytes_attributes(self):
+        return self._bytes_attrs
+
+    def encode(self):
+
+        magic_format = _pad_with_nulls(self.magic_format, 8)
+        meta_options = encode_uint8(int(self.meta_options, 2))
+        meta_checksum = encode_uint8(CHECKSUMS_AVAIL.index(self.meta_checksum))
+        meta_codec = encode_uint8(CODECS_AVAIL.index(self.meta_codec))
+        meta_level = encode_uint8(self.meta_level)
+        meta_size = encode_uint32(self.meta_size)
+        max_meta_size = encode_uint32(self.max_meta_size)
+        meta_comp_size = encode_uint32(self.meta_comp_size)
+        user_codec = _pad_with_nulls(self.user_codec, 8)
+
+        return magic_format + meta_options + meta_checksum + meta_codec + \
+                meta_level + meta_size + max_meta_size + meta_comp_size + \
+                user_codec
+
+    @staticmethod
+    def decode(buffer_):
+        if len(buffer_) != 32:
+            raise ValueError(
+                "attempting to decode a bloscpack metadata header of length '%d', not '32'"
+                % len(buffer_))
+        decoded= {'magic_format':        decode_magic_string(buffer_[:8]),
+                  'meta_options':        decode_bitfield(buffer_[8]),
+                  'meta_checksum':       CHECKSUMS_AVAIL[decode_uint8(buffer_[9])],
+                  'meta_codec':          CODECS_AVAIL[decode_uint8(buffer_[10])],
+                  'meta_level':          decode_uint8(buffer_[11]),
+                  'meta_size':           decode_uint32(buffer_[12:16]),
+                  'max_meta_size':       decode_uint32(buffer_[16:20]),
+                  'meta_comp_size':      decode_uint32(buffer_[20:24]),
+                  'user_codec':          decode_magic_string(buffer_[24:32])
+                  }
+        return MetadataHeader(**decoded)

@@ -34,10 +34,9 @@ from .exceptions import (MetadataSectionTooSmall,
                          FormatVersionMismatch,
                          ChecksumMismatch,
                          )
-from .headers import (create_metadata_header,
-                      decode_metadata_header,
-                      decode_blosc_header,
+from .headers import (decode_blosc_header,
                       BloscPackHeader,
+                      MetadataHeader,
                       decode_int64,
                       encode_int64,
                       )
@@ -124,14 +123,14 @@ def _write_metadata(output_fp, metadata, metadata_args):
                 (meta_comp_size, max_meta_size))
     metadata_total += meta_comp_size
     # create metadata header
-    raw_metadata_header = create_metadata_header(
+    raw_metadata_header = MetadataHeader(
             magic_format=metadata_args['magic_format'],
             meta_checksum=metadata_args['meta_checksum'],
             meta_codec=codec,
             meta_level=metadata_args['meta_level'],
             meta_size=meta_size,
             max_meta_size=max_meta_size,
-            meta_comp_size=meta_comp_size)
+            meta_comp_size=meta_comp_size).encode()
     log.debug('raw_metadata_header: %s' % repr(raw_metadata_header))
     output_fp.write(raw_metadata_header)
     output_fp.write(metadata)
@@ -208,15 +207,13 @@ def _read_metadata(input_fp):
     """
     raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
     log.debug("raw metadata header: '%s'" % repr(raw_metadata_header))
-    metadata_header = decode_metadata_header(raw_metadata_header)
-    log.debug("metadata header: ")
-    for arg, value in metadata_header.iteritems():
-        log.debug('\t%s: %s' % (arg, value))
-    metadata = input_fp.read(metadata_header['meta_comp_size'])
-    prealloc = metadata_header['max_meta_size'] - metadata_header['meta_comp_size']
+    metadata_header = MetadataHeader.decode(raw_metadata_header)
+    log.debug(metadata_header.pformat())
+    metadata = input_fp.read(metadata_header.meta_comp_size)
+    prealloc = metadata_header.max_meta_size - metadata_header.meta_comp_size
     input_fp.seek(prealloc, 1)
-    if metadata_header['meta_checksum'] != 'None':
-        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header['meta_checksum']]
+    if metadata_header.meta_checksum != 'None':
+        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_header.meta_checksum]
         metadata_expected_digest = input_fp.read(metadata_checksum_impl.size)
         metadata_received_digest = metadata_checksum_impl(metadata)
         if metadata_received_digest != metadata_expected_digest:
@@ -229,14 +226,14 @@ def _read_metadata(input_fp):
             log.debug('metadata checksum OK (%s): %s ' %
                     (metadata_checksum_impl.name,
                         repr(metadata_received_digest)))
-    if metadata_header['meta_codec'] != 'None':
-        metadata_codec_impl = CODECS_LOOKUP[metadata_header['meta_codec']]
+    if metadata_header.meta_codec != 'None':
+        metadata_codec_impl = CODECS_LOOKUP[metadata_header.meta_codec]
         metadata = metadata_codec_impl.decompress(metadata)
     log.verbose("read %s metadata of size: '%s'" %
             # FIXME meta_codec?
-            ('compressed' if metadata_header['meta_codec'] != 'None' else
-                'uncompressed', metadata_header['meta_comp_size']))
-    serializer_impl = SERIALIZERS_LOOKUP[metadata_header['magic_format']]
+            ('compressed' if metadata_header.meta_codec != 'None' else
+                'uncompressed', metadata_header.meta_comp_size))
+    serializer_impl = SERIALIZERS_LOOKUP[metadata_header.magic_format]
     metadata = serializer_impl.loads(metadata)
     return metadata, metadata_header
 

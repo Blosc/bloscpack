@@ -35,6 +35,34 @@ Get more information using --verbose:
   blpk: done
   $ rm data.dat.blp data.dat.dcmp
 
+Get more information using --verbose, but with metadata:
+
+  $ blpk --verbose compress --metadata meta.json data.dat
+  blpk: using [0-9]+ threads (re)
+  blpk: getting ready for compression
+  blpk: input file is: 'data.dat'
+  blpk: output file is: 'data.dat.blp'
+  blpk: input file size: 152.59M (160000000B)
+  blpk: nchunks: 153
+  blpk: chunk_size: 1.0M (1048576B)
+  blpk: last_chunk_size: 602.0K (616448B)
+  blpk: output file size: 16.2M (16985080B)
+  blpk: compression ratio: 0.106157
+  blpk: done
+  $ blpk --verbose decompress data.dat.blp data.dat.dcmp
+  blpk: using 4 threads
+  blpk: getting ready for decompression
+  blpk: input file is: 'data.dat.blp'
+  blpk: output file is: 'data.dat.dcmp'
+  blpk: input file size: 16.2M
+  blpk: read compressed metadata of size: '62'
+  blpk: output file size: 152.59M
+  blpk: decompression ratio: 9.420032
+  blpk: Metadata is:
+  blpk: '{u'dtype': u'<f8', u'shape': [20000000], u'container': u'numpy', u'order': u'C'}'
+  blpk: done
+  $ rm data.dat.blp data.dat.dcmp
+
 Try using --debug
 
   $ blpk --debug compress --chunk-size 50M data.dat

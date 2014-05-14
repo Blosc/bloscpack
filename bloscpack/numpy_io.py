@@ -17,7 +17,6 @@ from .file_io import (CompressedFPSource,
                       CompressedFPSink,
                       )
 from .args import (BloscArgs,
-                   BloscpackArgs,
                    DEFAULT_METADATA_ARGS,
                    calculate_nchunks,
                    )

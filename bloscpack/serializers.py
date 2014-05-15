@@ -33,7 +33,7 @@ class Serializer(object):
         return self._loads(data)
 
 
-SERIALIZERS = [Serializer('JSON',
+SERIALIZERS = [Serializer(b'JSON',
                   lambda x: json.dumps(x, separators=(',', ':')),
                   lambda x: json.loads(x))]
 SERIALIZERS_AVAIL = [s.name for s in SERIALIZERS]

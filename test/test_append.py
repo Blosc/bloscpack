@@ -412,7 +412,7 @@ def test_append_mix_shuffle():
 
 
 def test_recreate_metadata():
-    old_meta_header = MetadataHeader(magic_format='',
+    old_meta_header = MetadataHeader(magic_format=b'',
                                      meta_options="00000000",
                                      meta_checksum='None',
                                      meta_codec='None',
@@ -420,7 +420,7 @@ def test_recreate_metadata():
                                      meta_size=0,
                                      max_meta_size=0,
                                      meta_comp_size=0,
-                                     user_codec='',
+                                     user_codec=b'',
                                      )
     header_dict = old_meta_header
     nt.assert_raises(NoSuchSerializer,

@@ -51,7 +51,7 @@ DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
 METADATA_ARGS = ('magic_format', 'meta_checksum',
                  'meta_codec', 'meta_level', 'max_meta_size')
 _METADATA_ARGS_SET = set(METADATA_ARGS)  # cached
-DEFAULT_MAGIC_FORMAT = 'JSON'
+DEFAULT_MAGIC_FORMAT = b'JSON'
 DEFAULT_META_CHECKSUM = 'adler32'
 DEFAULT_META_CODEC = 'zlib'
 DEFAULT_META_LEVEL = 6

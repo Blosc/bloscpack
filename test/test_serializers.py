@@ -17,7 +17,7 @@ from bloscpack.serializers import (SERIALIZERS,
 
 
 def test_serializers():
-    nt.assert_equal(SERIALIZERS_AVAIL, ['JSON'])
+    nt.assert_equal(SERIALIZERS_AVAIL, [b'JSON'])
     output = '{"dtype":"float64","shape":[1024],"others":[]}'
     input_ = OrderedDict(dtype="float64",
                          shape=[1024],

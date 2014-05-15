@@ -49,24 +49,24 @@ def check_range(name, value, min_, max_):
 
 
 def _check_str(name, value, max_len):
-    if not isinstance(value, six.string_types):
-        raise TypeError("'%s' must be of type 'str'" % name)
+    if not isinstance(value, six.binary_type):
+        raise TypeError("'%s' must be of type 'str'/'bytes'" % name)
     elif len(value) > max_len:
         raise ValueError("'%s' can be of max length '%i' but is: '%s'" %
                          (name, max_len, len(value)))
 
 
-def _pad_with_nulls(str_, len_):
+def _pad_with_nulls(data, len_):
     """ Pad string with null bytes.
 
     Parameters
     ----------
-    str_ : str
-        the string to pad
+    data : str/bytes
+        the string/bytes to pad
     len_ : int
         the final desired length
     """
-    return str_ + ("\x00" * (len_ - len(str_)))
+    return data + (b'\x00' * (len_ - len(data)))
 
 
 def check_options(options):
@@ -126,7 +126,10 @@ def decode_bitfield(byte):
 
 
 def decode_magic_string(str_):
-    return str_.strip(b'\x00')
+    if six.PY3:
+        return str_.strip(b'\x00')
+    else:
+        return str_.strip('\x00')
 
 
 def encode_uint8(byte):
@@ -390,7 +393,7 @@ class BloscpackHeader(MutableMappaingObject):
 class MetadataHeader(MutableMappaingObject):
 
     def __init__(self,
-                 magic_format='',
+                 magic_format=b'',
                  meta_options="00000000",
                  meta_checksum='None',
                  meta_codec='None',
@@ -398,7 +401,7 @@ class MetadataHeader(MutableMappaingObject):
                  meta_size=0,
                  max_meta_size=0,
                  meta_comp_size=0,
-                 user_codec='',
+                 user_codec=b'',
                  ):
         _check_str('magic-format',     magic_format,  8)
         check_options(meta_options)

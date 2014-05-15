@@ -10,7 +10,6 @@ In case of no arguments, show a usage message:
   blpk: error: too few arguments
   [2]
 
-In case of the wrong subcommand:
 (On Python 2.6 the list of possible choices seems random and unpredictable.
  Hence we deactivate this one test here.)
 

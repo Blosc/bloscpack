@@ -174,7 +174,7 @@ def test_file_corruption():
             # read the fifth byte
             fifth = input_fp.read(1)
             # figure out what to replace it by
-            replace = '\x00' if fifth == '\xff' else '\xff'
+            replace = b'\x00' if fifth == b'\xff' else b'\xff'
             # seek one byte back relative to current position
             input_fp.seek(-1, 1)
             # write the flipped byte

@@ -197,8 +197,8 @@ def test_BloscPackHeader_constructor_exceptions():
             (ValueError, {'max_app_chunks': -1}),
             (TypeError,  {'max_app_chunks': 'foo'}),
             # sum of nchunks and max_app_chunks
-            (ValueError, {'nchunks': MAX_CHUNKS/2+1,
-                          'max_app_chunks': MAX_CHUNKS/2+1}),
+            (ValueError, {'nchunks': MAX_CHUNKS//2+1,
+                          'max_app_chunks': MAX_CHUNKS//2+1}),
             # check that max_app_chunks is zero
             (ValueError, {'nchunks': -1,
                           'max_app_chunks': 1}),

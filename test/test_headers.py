@@ -355,8 +355,9 @@ def test_decode_bloscpack_header():
                BloscPackHeader(**kwargs),
                BloscPackHeader.decode(mod_raw(offset, replacement)))
 
+
 def test_BloscPackHeader_accessor_exceptions():
-    if sys.version_info[0:2] < (2,7):
+    if sys.version_info[0:2] < (2, 7):
         raise SkipTest
     bloscpack_header = BloscPackHeader()
     nt.assert_raises_regexp(KeyError,

@@ -232,8 +232,8 @@ def test_BloscpackHeader_encode():
     # the raw encoded header as produces w/o any kwargs
     format_version = struct.pack('<B', FORMAT_VERSION)
     raw = MAGIC + format_version + \
-        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
-        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+        b'\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
+        b'\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
 
     # modify the raw encoded header with the value starting at offset
     def mod_raw(offset, replacement):
@@ -246,43 +246,43 @@ def test_BloscpackHeader_encode():
     for offset, replacement, kwargs in [
             (4, struct.pack('<B', 23), {'format_version': 23}),
             # test with options
-            (5, '\x01', {'offsets': True}),
-            (5, '\x02', {'metadata': True}),
-            (5, '\x03', {'offsets': True, 'metadata': True}),
+            (5, b'\x01', {'offsets': True}),
+            (5, b'\x02', {'metadata': True}),
+            (5, b'\x03', {'offsets': True, 'metadata': True}),
             # test with checksum
-            (6, '\x01', {'checksum': 'adler32'}),
-            (6, '\x08', {'checksum': 'sha512'}),
+            (6, b'\x01', {'checksum': 'adler32'}),
+            (6, b'\x08', {'checksum': 'sha512'}),
             # test with typesize
-            (7, '\x01', {'typesize': 1}),
-            (7, '\x02', {'typesize': 2}),
-            (7, '\x04', {'typesize': 4}),
-            (7, '\x10', {'typesize': 16}),
-            (7, '\xff', {'typesize': 255}),
+            (7, b'\x01', {'typesize': 1}),
+            (7, b'\x02', {'typesize': 2}),
+            (7, b'\x04', {'typesize': 4}),
+            (7, b'\x10', {'typesize': 16}),
+            (7, b'\xff', {'typesize': 255}),
             # test with chunksize
-            (8, '\xff\xff\xff\xff', {'chunk_size': -1}),
-            (8, '\x01\x00\x00\x00', {'chunk_size': 1}),
-            (8, '\x00\x00\x10\x00', {'chunk_size': reverse_pretty('1M')}),
-            (8, '\xef\xff\xff\x7f', {'chunk_size': blosc.BLOSC_MAX_BUFFERSIZE}),
+            (8, b'\xff\xff\xff\xff', {'chunk_size': -1}),
+            (8, b'\x01\x00\x00\x00', {'chunk_size': 1}),
+            (8, b'\x00\x00\x10\x00', {'chunk_size': reverse_pretty('1M')}),
+            (8, b'\xef\xff\xff\x7f', {'chunk_size': blosc.BLOSC_MAX_BUFFERSIZE}),
             # test with last_chunk
-            (12, '\xff\xff\xff\xff', {'last_chunk': -1}),
-            (12, '\x01\x00\x00\x00', {'last_chunk': 1}),
-            (12, '\x00\x00\x10\x00', {'last_chunk': reverse_pretty('1M')}),
-            (12, '\xef\xff\xff\x7f', {'last_chunk': blosc.BLOSC_MAX_BUFFERSIZE}),
+            (12, b'\xff\xff\xff\xff', {'last_chunk': -1}),
+            (12, b'\x01\x00\x00\x00', {'last_chunk': 1}),
+            (12, b'\x00\x00\x10\x00', {'last_chunk': reverse_pretty('1M')}),
+            (12, b'\xef\xff\xff\x7f', {'last_chunk': blosc.BLOSC_MAX_BUFFERSIZE}),
             # test nchunks
-            (16, '\xff\xff\xff\xff\xff\xff\xff\xff', {'nchunks': -1}),
-            (16, '\x00\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 0}),
-            (16, '\x01\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 1}),
-            (16, '\x7f\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 127}),
-            (16, '\xff\xff\xff\xff\xff\xff\xff\x7f', {'nchunks': MAX_CHUNKS}),
+            (16, b'\xff\xff\xff\xff\xff\xff\xff\xff', {'nchunks': -1}),
+            (16, b'\x00\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 0}),
+            (16, b'\x01\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 1}),
+            (16, b'\x7f\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 127}),
+            (16, b'\xff\xff\xff\xff\xff\xff\xff\x7f', {'nchunks': MAX_CHUNKS}),
             # test max_app_chunks
-            (16, '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+            (16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
                 {'nchunks': 1, 'max_app_chunks': 0}),
-            (16, '\x01\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00',
+            (16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00',
                 {'nchunks': 1, 'max_app_chunks': 1}),
-            (16, '\x01\x00\x00\x00\x00\x00\x00\x00\x7f\x00\x00\x00\x00\x00\x00\x00',
+            (16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x7f\x00\x00\x00\x00\x00\x00\x00',
                 {'nchunks': 1, 'max_app_chunks': 127}),
             # Maximum value is MAX_CHUNKS - 1 since nchunks is already 1
-            (16, '\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f',
+            (16, b'\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f',
                 {'nchunks': 1, 'max_app_chunks': MAX_CHUNKS-1}),
             ]:
         yield nt.assert_equal, mod_raw(offset, replacement), \
@@ -293,8 +293,8 @@ def test_BloscpackHeader_decode():
 
     format_version = struct.pack('<B', FORMAT_VERSION)
     raw = MAGIC + format_version + \
-        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
-        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+        b'\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
+        b'\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
 
     def mod_raw(offset, replacement):
         return raw[0:offset] + replacement + \
@@ -305,51 +305,51 @@ def test_BloscpackHeader_decode():
 
     for kwargs, offset, replacement in [
             # check with format_version
-            ({'format_version': 23}, 4, '\x17'),
+            ({'format_version': 23}, 4, b'\x17'),
             # check with options
-            ({'offsets': True}, 5, '\x01'),
-            ({'metadata': True}, 5, '\x02'),
-            ({'metadata': True, 'offsets': True}, 5, '\x03'),
+            ({'offsets': True}, 5, b'\x01'),
+            ({'metadata': True}, 5, b'\x02'),
+            ({'metadata': True, 'offsets': True}, 5, b'\x03'),
             # check with checksum
-            ({'checksum': 'adler32'}, 6, '\x01'),
-            ({'checksum': 'sha384'}, 6, '\x07'),
+            ({'checksum': 'adler32'}, 6, b'\x01'),
+            ({'checksum': 'sha384'}, 6, b'\x07'),
             # check with typesize
-            ({'typesize': 1}, 7, '\x01'),
-            ({'typesize': 2}, 7, '\x02'),
-            ({'typesize': 4}, 7, '\x04'),
-            ({'typesize': 8}, 7, '\x08'),
-            ({'typesize': blosc.BLOSC_MAX_TYPESIZE}, 7, '\xff'),
+            ({'typesize': 1}, 7, b'\x01'),
+            ({'typesize': 2}, 7, b'\x02'),
+            ({'typesize': 4}, 7, b'\x04'),
+            ({'typesize': 8}, 7, b'\x08'),
+            ({'typesize': blosc.BLOSC_MAX_TYPESIZE}, 7, b'\xff'),
             # check with chunk_size
-            ({'chunk_size': 1}, 
-                8, '\x01\x00\x00\x00'),
+            ({'chunk_size': 1},
+                8, b'\x01\x00\x00\x00'),
             ({'chunk_size': reverse_pretty('1M')},
-                8, '\x00\x00\x10\x00'),
+                8, b'\x00\x00\x10\x00'),
             ({'chunk_size': blosc.BLOSC_MAX_BUFFERSIZE},
-                8, '\xef\xff\xff\x7f'),
+                8, b'\xef\xff\xff\x7f'),
             # check with last_chunk
             ({'last_chunk': 1},
-                12, '\x01\x00\x00\x00'),
+                12, b'\x01\x00\x00\x00'),
             ({'last_chunk': reverse_pretty('1M')},
-                12, '\x00\x00\x10\x00'),
+                12, b'\x00\x00\x10\x00'),
             ({'last_chunk': blosc.BLOSC_MAX_BUFFERSIZE},
-                12, '\xef\xff\xff\x7f'),
+                12, b'\xef\xff\xff\x7f'),
             # check with nchunks
             ({'nchunks': 1},
-                16, '\x01\x00\x00\x00\x00\x00\x00\x00'),
+                16, b'\x01\x00\x00\x00\x00\x00\x00\x00'),
             ({'nchunks': reverse_pretty('1M')},
-                16, '\x00\x00\x10\x00\x00\x00\x00\x00'),
+                16, b'\x00\x00\x10\x00\x00\x00\x00\x00'),
             ({'nchunks': MAX_CHUNKS},
-                16, '\xff\xff\xff\xff\xff\xff\xff\x7f'),
+                16, b'\xff\xff\xff\xff\xff\xff\xff\x7f'),
             # check with max_app_chunks
             ({'nchunks': 1, 'max_app_chunks': 0},
-                16, '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'),
+                16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'),
             ({'nchunks': 1, 'max_app_chunks': 1},
-                16, '\x01\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00'),
+                16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00'),
             ({'nchunks': 1, 'max_app_chunks': reverse_pretty('1M')},
-                16, '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00'),
+                16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00'),
             # Maximum value is MAX_CHUNKS - 1 since nchunks is already 1
             ({'nchunks': 1, 'max_app_chunks': MAX_CHUNKS-1},
-                16, '\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f'),
+                16, b'\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f'),
             ]:
         yield (nt.assert_equal,
                BloscpackHeader(**kwargs),

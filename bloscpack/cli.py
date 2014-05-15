@@ -501,7 +501,7 @@ def main():
         except FileNotFound as fnf:
             log.error(str(fnf))
         try:
-            with open(args.file_) as fp:
+            with open(args.file_, 'rb') as fp:
                 bloscpack_header, metadata, metadata_header, offsets = \
                     _read_beginning(fp)
         except ValueError as ve:

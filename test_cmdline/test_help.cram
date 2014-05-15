@@ -10,6 +10,13 @@ In case of no arguments, show a usage message:
   blpk: error: too few arguments
   [2]
 
+In case of the wrong subcommand:
+
+  $ blpk NO_SUCH_SUBCOMMAND
+  usage: blpk [-h] [--version] [-v | -d] [-f] [-n [1, 256]]  ...
+  blpk: error: argument : invalid choice: 'NO_SUCH_SUBCOMMAND' (choose from 'compress', 'c', 'decompress', 'd', 'append', 'a', 'info', 'i')
+  [2]
+
 Help for global options and subcommands:
 
   $ blpk --help

@@ -516,6 +516,7 @@ def main():
             log.normal(metadata_header.pformat())
 
     else:  # pragma: no cover
-        # we should never reach this
-        log.error('You found the easter-egg, please contact the author')
+        # in Python 3 subcommands are not mandatory by default
+        parser.print_usage()
+        log.error('too few arguments', 2)
     log.verbose('done')

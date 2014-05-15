@@ -41,7 +41,8 @@ def zlib_hash(func):
     """ Wrapper for zlib hashes. """
     def hash_(data):
         # The binary OR is recommended to obtain uniform hashes on all python
-        # versions and platforms. The type with be 'uint32'.
+        # versions and platforms. The result of the checksum is a 'uint32'
+        # https://docs.python.org/3.4/library/zlib.html
         return struct.pack('<I', func(data) & 0xffffffff)
     return 4, hash_
 

@@ -336,3 +336,35 @@ class BloscpackArgs(MutableMappaingObject):
     @property
     def bytes_attributes(self):
         return []
+
+
+class MetadataArgs(MutableMappaingObject):
+
+    def __init__(self,
+                 magic_format=DEFAULT_MAGIC_FORMAT,
+                 meta_checksum=DEFAULT_META_CHECKSUM,
+                 meta_codec=DEFAULT_META_CODEC,
+                 meta_level=DEFAULT_META_LEVEL,
+                 max_meta_size=DEFAULT_MAX_META_SIZE,
+                 ):
+        self.magic_format = magic_format
+        self.meta_checksum = meta_checksum
+        self.meta_codec = meta_codec
+        self.meta_level = meta_level
+        self.max_meta_size = max_meta_size
+
+        self._attrs = [
+                'magic_format',
+                'meta_checksum',
+                'meta_codec',
+                'meta_level',
+                'max_meta_size',
+                ]
+
+    @property
+    def attributes(self):
+        return self._attrs
+
+    @property
+    def bytes_attributes(self):
+        return []

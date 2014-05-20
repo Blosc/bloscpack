@@ -373,19 +373,18 @@ class MetadataArgs(MutableMappaingObject):
 
     @property
     def meta_codec_impl(self):
-        return CODECS_LOOKUP[metadata_args.meta_codec]
+        return CODECS_LOOKUP[self.meta_codec]
 
     @property
     def meta_codec_name(self):
         return self.meta_codec_impl.name
 
 
-    @property
-    def effective_max_meta_size(self):
+    def effective_max_meta_size(self, meta_size):
         if hasattr(self.max_meta_size, '__call__'):
             max_meta_size = self.max_meta_size(meta_size)
         elif isinstance(self.max_meta_size, int):  # TOOD: py3 compat
-            max_meta_size = metadata_args.max_meta_size
+            max_meta_size = self.max_meta_size
         log.debug('max meta size is deemed to be: %d' %
                 max_meta_size)
         return max_meta_size

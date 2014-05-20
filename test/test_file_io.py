@@ -13,7 +13,7 @@ from mock import patch
 
 from bloscpack.args import (BloscArgs,
                             BloscpackArgs,
-                            DEFAULT_METADATA_ARGS,
+                            MetadataArgs,
                             calculate_nchunks,
                             )
 from bloscpack.constants import (MAX_FORMAT_VERSION,
@@ -114,7 +114,7 @@ def test_metadata_opportunisitic_compression():
     test_metadata = ("{'dtype': 'float64', 'shape': [1024], 'others': [],"
                      "'original_container': 'carray'}")
     target_fp = StringIO()
-    _write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
+    _write_metadata(target_fp, test_metadata, MetadataArgs())
     target_fp.seek(0, 0)
     metadata, header = _read_metadata(target_fp)
     nt.assert_equal('zlib', header['meta_codec'])
@@ -123,7 +123,7 @@ def test_metadata_opportunisitic_compression():
     test_metadata = "abc"
     target_fp = StringIO()
     # default args say: do compression...
-    _write_metadata(target_fp, test_metadata, DEFAULT_METADATA_ARGS)
+    _write_metadata(target_fp, test_metadata, MetadataArgs())
     target_fp.seek(0, 0)
     metadata, header = _read_metadata(target_fp)
     # but it wasn't of any use

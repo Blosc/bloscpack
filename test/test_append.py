@@ -21,7 +21,7 @@ from bloscpack.append import (append,
 from bloscpack.args import (BloscArgs,
                             BloscpackArgs,
                             calculate_nchunks,
-                            DEFAULT_METADATA_ARGS,
+                            MetadataArgs,
                             )
 from bloscpack.checksums import (CHECKSUMS_LOOKUP,
                                  )
@@ -413,17 +413,17 @@ def test_rewrite_metadata():
                      'others': [],
                      }
     # assemble the metadata args from the default
-    metadata_args = DEFAULT_METADATA_ARGS.copy()
+    metadata_args = MetadataArgs()
     # avoid checksum and codec
-    metadata_args['meta_checksum'] = 'None'
-    metadata_args['meta_codec'] = 'None'
+    metadata_args.meta_checksum = 'None'
+    metadata_args.meta_codec = 'None'
     # preallocate a fixed size
-    metadata_args['max_meta_size'] = 1000  # fixed preallocation
+    metadata_args.max_meta_size = 1000  # fixed preallocation
     target_fp = StringIO()
     # write the metadata section
     _write_metadata(target_fp, test_metadata, metadata_args)
     # check that the length is correct
-    nt.assert_equal(METADATA_HEADER_LENGTH + metadata_args['max_meta_size'],
+    nt.assert_equal(METADATA_HEADER_LENGTH + metadata_args.max_meta_size,
                     len(target_fp.getvalue()))
 
     # now add stuff to the metadata
@@ -440,7 +440,7 @@ def test_rewrite_metadata():
     target_fp.seek(0, 0)
     result_metadata, result_header = _read_metadata(target_fp)
     nt.assert_equal(test_metadata, result_metadata)
-    nt.assert_equal(new_metadata_length, result_header['meta_comp_size'])
+    nt.assert_equal(new_metadata_length, result_header.meta_comp_size)
 
     # make sure that NoChangeInMetadata is raised
     target_fp.seek(0, 0)

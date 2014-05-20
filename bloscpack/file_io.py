@@ -84,11 +84,11 @@ def _write_metadata(output_fp, metadata, metadata_args):
     metadata_total += METADATA_HEADER_LENGTH
     serializer_impl = SERIALIZERS_LOOKUP[metadata_args.magic_format]
     metadata = serializer_impl.dumps(metadata)
+    meta_size = len(metadata)
     if metadata_args.should_compress:
         codec_impl = metadata_args.meta_codec_impl
         metadata_compressed = codec_impl.compress(metadata,
                 metadata_args.meta_level)
-        meta_size = len(metadata)
         meta_comp_size = len(metadata_compressed)
         # be opportunistic, avoid compression if not beneficial
         if meta_size < meta_comp_size:
@@ -101,11 +101,11 @@ def _write_metadata(output_fp, metadata, metadata_args):
         else:
             metadata = metadata_compressed
     else:
-        meta_size = len(metadata)
         meta_comp_size = meta_size
     log.debug("Raw %s metadata of size '%s': %s" %
               ('compressed' if metadata_args.should_compress else
                'uncompressed', meta_comp_size, repr(metadata)))
+    max_meta_size = metadata_args.effective_max_meta_size(meta_size)
     if meta_comp_size > max_meta_size:
         raise MetadataSectionTooSmall(
                 'metadata section is too small to contain the metadata '

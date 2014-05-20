@@ -23,6 +23,9 @@ from .exceptions import(ChunkingException,
                         )
 from .headers import (MAX_CHUNKS,
                       )
+from .metacodecs import (CODECS_AVAIL,
+                         CODECS_LOOKUP,
+                         )
 from .pretty import (double_pretty_size,
                      reverse_pretty,
                      )
@@ -362,9 +365,36 @@ class MetadataArgs(MutableMappaingObject):
                 ]
 
     @property
+    def should_compress(self):
+        return self.meta_codec != CODECS_AVAIL[0]
+
+    def nullify_codec(self):
+        self.meta_codec = CODECS_AVAIL[0]
+
+    @property
+    def meta_codec_impl(self):
+        return CODECS_LOOKUP[metadata_args.meta_codec]
+
+    @property
+    def meta_codec_name(self):
+        return self.meta_codec_impl.name
+
+
+    @property
+    def effective_max_meta_size(self):
+        if hasattr(self.max_meta_size, '__call__'):
+            max_meta_size = self.max_meta_size(meta_size)
+        elif isinstance(self.max_meta_size, int):  # TOOD: py3 compat
+            max_meta_size = metadata_args.max_meta_size
+        log.debug('max meta size is deemed to be: %d' %
+                max_meta_size)
+        return max_meta_size
+
+    @property
     def attributes(self):
         return self._attrs
 
     @property
     def bytes_attributes(self):
         return []
+    

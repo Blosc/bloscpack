@@ -11,7 +11,7 @@ import blosc
 
 from .args import (BloscArgs,
                    BloscpackArgs,
-                   DEFAULT_METADATA_ARGS,
+                   MetadataArgs,
                    _handle_max_apps
                    )
 from .headers import (BloscPackHeader,
@@ -110,16 +110,24 @@ def pack(source, sink,
          metadata=None,
          blosc_args=None,
          bloscpack_args=None,
-         metadata_args=DEFAULT_METADATA_ARGS):
+         metadata_args=None):
     """ Core packing function.  """
+
     if not isinstance(source, PlainSource):
         raise TypeError
     if not isinstance(sink, CompressedSink):
         raise TypeError
+
     blosc_args = blosc_args or BloscArgs()
     log.debug(blosc_args.pformat())
     bloscpack_args = bloscpack_args or BloscpackArgs()
     log.debug(bloscpack_args.pformat())
+    if metadata is not None:
+        metadata_args = metadata_args or MetadataArgs()
+        log.debug(metadata_args.pformat())
+    elif metadata_args is not None:
+        log.debug('metadata_args will be silently ignored')
+
     max_app_chunks = _handle_max_apps(bloscpack_args.offsets,
             nchunks,
             bloscpack_args.max_app_chunks)
@@ -135,14 +143,12 @@ def pack(source, sink,
             max_app_chunks=max_app_chunks
             )
     log.debug(bloscpack_header.pformat())
+
     source.configure(chunk_size, last_chunk, nchunks)
     sink.configure(blosc_args, bloscpack_header)
     sink.write_bloscpack_header()
-    # deal with metadata
     if metadata is not None:
         sink.write_metadata(metadata, metadata_args)
-    elif metadata_args is not None:
-        log.debug('metadata_args will be silently ignored')
     sink.init_offsets()
 
     compress_func = source.compress_func

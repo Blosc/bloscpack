@@ -362,10 +362,7 @@ class BloscPackHeader(MutableMappaingObject):
                 "attempting to decode a bloscpack header of length '%d', not '%d'"
                 % (len(buffer_), BLOSCPACK_HEADER_LENGTH))
         elif buffer_[0:4] != MAGIC:
-            try:
-                rep = buffer_[0:4].tobytes()
-            except AttributeError:
-                rep = buffer_[0:4]
+            rep = buffer_[0:4]
             raise ValueError(
                 "the magic marker '%s' is missing from the bloscpack " % MAGIC +
                 "header, instead we found: %s" % repr(rep))

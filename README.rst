@@ -1059,8 +1059,6 @@ Library Features
 * Allow to not-prealloc additional space for metadata
 * Refactor certain collections of functions that operate on data into objects
 
-  * BloscHeader
-  * MetadataHeader
   * Offsets (maybe)
 
 * partial decompression?

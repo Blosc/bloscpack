@@ -107,7 +107,7 @@ def pack_ndarray(ndarray, sink,
         blosc args
     bloscpack_args : BloscpackArgs
         bloscpack args
-    metadata_args : dict
+    metadata_args : MetadataArgs
         the args for the metadata
 
     Notes

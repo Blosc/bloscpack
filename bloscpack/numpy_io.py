@@ -17,7 +17,6 @@ from .file_io import (CompressedFPSource,
                       CompressedFPSink,
                       )
 from .args import (BloscArgs,
-                   MetadataArgs,
                    calculate_nchunks,
                    )
 from .defaults import (DEFAULT_CHUNK_SIZE,

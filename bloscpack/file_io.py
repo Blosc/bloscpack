@@ -428,8 +428,8 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
         blosc args
     bloscpack_args : BloscpackArgs
         bloscpack args
-    metadata_args : dict
-        metadata keyword args
+    metadata_args : MetadataArgs
+        metadata args
 
     Raises
     ------

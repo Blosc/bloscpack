@@ -389,7 +389,7 @@ def test_recreate_metadata():
                                      meta_comp_size=0,
                                      user_codec='',
                                      )
-    header_dict = dict(old_meta_header)
+    header_dict = old_meta_header
     nt.assert_raises(NoSuchSerializer,
                      _recreate_metadata,
                      header_dict,

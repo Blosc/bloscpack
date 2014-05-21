@@ -17,8 +17,7 @@ from .args import (DEFAULT_METADATA_ARGS,
 from .abstract_io import (pack,
                           unpack,
                           )
-from .metacodecs import (CODECS_AVAIL,
-                         CODECS_LOOKUP,
+from .metacodecs import (CODECS_LOOKUP,
                          )
 from .constants import (METADATA_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,
@@ -64,7 +63,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
         the file pointer to write to
     metadata : dict
         the metadata to write
-    metadata_args : dict
+    metadata_args : MetadataArgs
         the metadata args
 
     Returns
@@ -81,18 +80,14 @@ def _write_metadata(output_fp, metadata, metadata_args):
     """
     _check_metadata_arguments(metadata_args)
     metadata_total = 0
-    log.debug('metadata args are:')
-    for arg, value in metadata_args.iteritems():
-        log.debug('\t%s: %s' % (arg, value))
     metadata_total += METADATA_HEADER_LENGTH
-    serializer_impl = SERIALIZERS_LOOKUP[metadata_args['magic_format']]
+    serializer_impl = SERIALIZERS_LOOKUP[metadata_args.magic_format]
     metadata = serializer_impl.dumps(metadata)
-    codec = 'None'
-    if metadata_args['meta_codec'] != CODECS_AVAIL[0]:
-        codec_impl = CODECS_LOOKUP[metadata_args['meta_codec']]
+    meta_size = len(metadata)
+    if metadata_args.should_compress:
+        codec_impl = metadata_args.meta_codec_impl
         metadata_compressed = codec_impl.compress(metadata,
-                metadata_args['meta_level'])
-        meta_size = len(metadata)
+                metadata_args.meta_level)
         meta_comp_size = len(metadata_compressed)
         # be opportunistic, avoid compression if not beneficial
         if meta_size < meta_comp_size:
@@ -101,21 +96,15 @@ def _write_metadata(output_fp, metadata, metadata_args):
                       "(raw: '%s' vs. compressed: '%s') " %
                       (meta_size, meta_comp_size))
             meta_comp_size = meta_size
+            metadata_args.nullify_codec()
         else:
-            codec = codec_impl.name
             metadata = metadata_compressed
     else:
-        meta_size = len(metadata)
         meta_comp_size = meta_size
     log.debug("Raw %s metadata of size '%s': %s" %
-              ('compressed' if metadata_args['meta_codec'] != 'None' else
+              ('compressed' if metadata_args.should_compress else
                'uncompressed', meta_comp_size, repr(metadata)))
-    if hasattr(metadata_args['max_meta_size'], '__call__'):
-        max_meta_size = metadata_args['max_meta_size'](meta_size)
-    elif isinstance(metadata_args['max_meta_size'], int):
-        max_meta_size = metadata_args['max_meta_size']
-    log.debug('max meta size is deemed to be: %d' %
-              max_meta_size)
+    max_meta_size = metadata_args.effective_max_meta_size(meta_size)
     if meta_comp_size > max_meta_size:
         raise MetadataSectionTooSmall(
                 'metadata section is too small to contain the metadata '
@@ -124,10 +113,10 @@ def _write_metadata(output_fp, metadata, metadata_args):
     metadata_total += meta_comp_size
     # create metadata header
     raw_metadata_header = MetadataHeader(
-            magic_format=metadata_args['magic_format'],
-            meta_checksum=metadata_args['meta_checksum'],
-            meta_codec=codec,
-            meta_level=metadata_args['meta_level'],
+            magic_format=metadata_args.magic_format,
+            meta_checksum=metadata_args.meta_checksum,
+            meta_codec=metadata_args.meta_codec_name,
+            meta_level=metadata_args.meta_level,
             meta_size=meta_size,
             max_meta_size=max_meta_size,
             meta_comp_size=meta_comp_size).encode()
@@ -140,7 +129,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
     metadata_total += prealloc
     log.debug("metadata has %d preallocated empty bytes" % prealloc)
     if metadata_args['meta_checksum'] != CHECKSUMS_AVAIL[0]:
-        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_args['meta_checksum']]
+        metadata_checksum_impl = CHECKSUMS_LOOKUP[metadata_args.meta_checksum]
         metadata_digest = metadata_checksum_impl(metadata)
         metadata_total += metadata_checksum_impl.size
         output_fp.write(metadata_digest)
@@ -439,8 +428,8 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
         blosc args
     bloscpack_args : BloscpackArgs
         bloscpack args
-    metadata_args : dict
-        metadata keyword args
+    metadata_args : MetadataArgs
+        metadata args
 
     Raises
     ------

@@ -100,6 +100,7 @@ Try using --debug
   blpk:     offsets: True
   blpk:     checksum: 'adler32'
   .* (re)
+  blpk: metadata_args will be silently ignored
   blpk: max_app_chunks is a callable
   blpk: max_app_chunks was set to: 40
   blpk: BloscPackHeader:
@@ -113,7 +114,6 @@ Try using --debug
   blpk:     nchunks: 4
   blpk:     max_app_chunks: 40
   blpk: raw_bloscpack_header: 'blpk\x03\x01\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
-  blpk: metadata_args will be silently ignored
   blpk: Handle chunk '0'
   blpk: checksum \(adler32\)\: .* (re)
   blpk: chunk handled, in: 50.0M (52428800B) out: 6.69M (7010707B)
@@ -209,7 +209,13 @@ Try using --debug with metadata:
   blpk: BloscpackArgs:
   blpk:     offsets: True
   blpk:     checksum: 'adler32'
-  .* (re)
+  blpk:     max_app_chunks: .*$ (re)
+  blpk: MetadataArgs:
+  blpk:     magic_format: 'JSON'
+  blpk:     meta_checksum: 'adler32'
+  blpk:     meta_codec: 'zlib'
+  blpk:     meta_level: 6
+  blpk:     max_meta_size: .*$ (re)
   blpk: max_app_chunks is a callable
   blpk: max_app_chunks was set to: 40
   blpk: BloscPackHeader:
@@ -223,12 +229,6 @@ Try using --debug with metadata:
   blpk:     nchunks: 4
   blpk:     max_app_chunks: 40
   blpk: raw_bloscpack_header: 'blpk\x03\x03\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
-  blpk: metadata args are:
-  blpk: \tmagic_format: JSON (esc)
-  blpk: \tmeta_codec: zlib (esc)
-  blpk: .* (re)
-  blpk: \tmeta_level: 6 (esc)
-  blpk: \tmeta_checksum: adler32 (esc)
   blpk: Raw compressed metadata of size '62': 'x\x9c\xabVJ)\xa9,HU\xb2R\xb2I\xb3P\xd2Q*\xceH\x04\xf1\xa2\x8d\x0c  VG)9?\xaf$13/\xb5\x08\xa8(\xaf4\xb7\xa0\x12\xa8,\xbf(\x05\xccwV\xaa\x05\x00\x95,\x13\xe7'
   blpk: max meta size is deemed to be: 660
   blpk: raw_metadata_header: 'JSON\x00\x00\x00\x00\x00\x01\x01\x06B\x00\x00\x00\x94\x02\x00\x00>\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'

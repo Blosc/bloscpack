@@ -16,6 +16,7 @@ import blosc
 from .abstract_io import (_compress_chunk_str,
                           )
 from .args import (BLOSC_ARGS,
+                   MetadataArgs,
                    calculate_nchunks,
                    _check_blosc_args,
                    DEFAULT_META_CODEC,
@@ -327,23 +328,24 @@ def _recreate_metadata(old_metadata_header, new_metadata,
 
     """
     # get the settings from the metadata header
-    metadata_args = dict((k, old_metadata_header[k]) for k in METADATA_ARGS)
+    metadata_args = MetadataArgs(**dict((k, old_metadata_header[k])
+                                        for k in METADATA_ARGS))
     # handle and check validity of overrides
     if magic_format is not None:
         check_valid_serializer(magic_format)
-        metadata_args['magic_format'] = magic_format
+        metadata_args.magic_format = magic_format
     if checksum is not None:
         check_valid_checksum(checksum)
-        old_impl = CHECKSUMS_LOOKUP[old_metadata_header['meta_checksum']]
+        old_impl = CHECKSUMS_LOOKUP[old_metadata_header.meta_checksum]
         new_impl = CHECKSUMS_LOOKUP[checksum]
         if old_impl.size != new_impl.size:
             raise ChecksumLengthMismatch(
                     'checksums have a size mismatch')
-        metadata_args['meta_checksum'] = checksum
+        metadata_args.meta_checksum = checksum
     if codec is not None:
         check_valid_codec(codec)
-        metadata_args['meta_codec'] = codec
+        metadata_args.meta_codec = codec
     if level is not None:
         check_range('meta_level', level, 0, MAX_CLEVEL)
-        metadata_args['meta_level'] = level
+        metadata_args.meta_level = level
     return metadata_args

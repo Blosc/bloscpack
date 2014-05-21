@@ -23,6 +23,9 @@ from .exceptions import(ChunkingException,
                         )
 from .headers import (MAX_CHUNKS,
                       )
+from .metacodecs import (CODECS_AVAIL,
+                         CODECS_LOOKUP,
+                         )
 from .pretty import (double_pretty_size,
                      reverse_pretty,
                      )
@@ -336,3 +339,61 @@ class BloscpackArgs(MutableMappaingObject):
     @property
     def bytes_attributes(self):
         return []
+
+
+class MetadataArgs(MutableMappaingObject):
+
+    def __init__(self,
+                 magic_format=DEFAULT_MAGIC_FORMAT,
+                 meta_checksum=DEFAULT_META_CHECKSUM,
+                 meta_codec=DEFAULT_META_CODEC,
+                 meta_level=DEFAULT_META_LEVEL,
+                 max_meta_size=DEFAULT_MAX_META_SIZE,
+                 ):
+        self.magic_format = magic_format
+        self.meta_checksum = meta_checksum
+        self.meta_codec = meta_codec
+        self.meta_level = meta_level
+        self.max_meta_size = max_meta_size
+
+        self._attrs = [
+                'magic_format',
+                'meta_checksum',
+                'meta_codec',
+                'meta_level',
+                'max_meta_size',
+                ]
+
+    @property
+    def should_compress(self):
+        return self.meta_codec != CODECS_AVAIL[0]
+
+    def nullify_codec(self):
+        self.meta_codec = CODECS_AVAIL[0]
+
+    @property
+    def meta_codec_impl(self):
+        return CODECS_LOOKUP[self.meta_codec]
+
+    @property
+    def meta_codec_name(self):
+        return self.meta_codec_impl.name
+
+
+    def effective_max_meta_size(self, meta_size):
+        if hasattr(self.max_meta_size, '__call__'):
+            max_meta_size = self.max_meta_size(meta_size)
+        elif isinstance(self.max_meta_size, int):  # TOOD: py3 compat
+            max_meta_size = self.max_meta_size
+        log.debug('max meta size is deemed to be: %d' %
+                max_meta_size)
+        return max_meta_size
+
+    @property
+    def attributes(self):
+        return self._attrs
+
+    @property
+    def bytes_attributes(self):
+        return []
+    

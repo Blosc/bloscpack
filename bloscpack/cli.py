@@ -14,7 +14,7 @@ import blosc
 
 from .args import (BloscArgs,
                    BloscpackArgs,
-                   DEFAULT_METADATA_ARGS,
+                   MetadataArgs,
                    )
 from .append import (append,
                      _seek_to_metadata,
@@ -449,7 +449,7 @@ def main():
                       metadata=metadata,
                       blosc_args=blosc_args,
                       bloscpack_args=bloscpack_args,
-                      metadata_args=DEFAULT_METADATA_ARGS)
+                      metadata_args=MetadataArgs())
         except ChunkingException as ce:
             log.error(str(ce))
     elif args.subcommand in ['decompress', 'd']:

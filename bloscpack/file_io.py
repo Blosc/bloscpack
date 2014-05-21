@@ -17,8 +17,7 @@ from .args import (DEFAULT_METADATA_ARGS,
 from .abstract_io import (pack,
                           unpack,
                           )
-from .metacodecs import (CODECS_AVAIL,
-                         CODECS_LOOKUP,
+from .metacodecs import (CODECS_LOOKUP,
                          )
 from .constants import (METADATA_HEADER_LENGTH,
                         BLOSCPACK_HEADER_LENGTH,

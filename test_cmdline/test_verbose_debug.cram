@@ -236,16 +236,16 @@ Try using --debug with metadata:
   blpk: metadata checksum (adler32): '\x10\x18\x08\x11'
   blpk: metadata section occupies a total of 696.0B (696B)
   blpk: Handle chunk '0'
-  blpk: checksum \(adler32\)\: '.*' (re)
+  blpk: checksum \(adler32\)\: .* (re)
   blpk: chunk handled, in: 50.0M (52428800B) out: 6.69M (7010707B)
   blpk: Handle chunk '1'
-  blpk: checksum \(adler32\)\: '.*' (re)
+  blpk: checksum \(adler32\)\: .* (re)
   blpk: chunk handled, in: 50.0M (52428800B) out: 4.99M (5230082B)
   blpk: Handle chunk '2'
-  blpk: checksum \(adler32\)\: '.*' (re)
+  blpk: checksum \(adler32\)\: .* (re)
   blpk: chunk handled, in: 50.0M (52428800B) out: 4.29M (4493269B)
   blpk: Handle chunk '3' (last)
-  blpk: checksum \(adler32\)\: '.*' (re)
+  blpk: checksum \(adler32\)\: .* (re)
   blpk: chunk handled, in: 2.59M (2713600B) out: 228.35K (233834B)
   blpk: Writing '4' offsets: '[1080, 7011791, 12241877, 16735150]'
   blpk: Raw offsets: '8\x04\x00\x00\x00\x00\x00\x00\xcf\xfdj\x00\x00\x00\x00\x00\xd5\xcb\xba\x00\x00\x00\x00\x00\xae[\xff\x00\x00\x00\x00\x00'
@@ -288,19 +288,19 @@ Try using --debug with metadata:
   blpk: Offsets: [1080, 7011791, 12241877, 16735150]
   blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 7010707, 'version': 2, 'flags': 1, 'nbytes': 52428800, 'typesize': 8}
   blpk: decompressing chunk '0'
-  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: checksum OK \(adler32\)\: .* (re)
   blpk: chunk handled, in: 6.69M (7010707B) out: 50.0M (52428800B)
   blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 5230082, 'version': 2, 'flags': 1, 'nbytes': 52428800, 'typesize': 8}
   blpk: decompressing chunk '1'
-  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: checksum OK \(adler32\)\: .* (re)
   blpk: chunk handled, in: 4.99M (5230082B) out: 50.0M (52428800B)
   blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 4493269, 'version': 2, 'flags': 1, 'nbytes': 52428800, 'typesize': 8}
   blpk: decompressing chunk '2'
-  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: checksum OK \(adler32\)\: .* (re)
   blpk: chunk handled, in: 4.29M (4493269B) out: 50.0M (52428800B)
   blpk: blosc_header: {'versionlz': 1, 'blocksize': 131072, 'ctbytes': 233834, 'version': 2, 'flags': 1, 'nbytes': 2713600, 'typesize': 8}
   blpk: decompressing chunk '3' (last)
-  blpk: checksum OK \(adler32\)\: '.*' (re)
+  blpk: checksum OK \(adler32\)\: .* (re)
   blpk: chunk handled, in: 228.35K (233834B) out: 2.59M (2713600B)
   blpk: output file size: 152.59M
   blpk: decompression ratio: 9.428965

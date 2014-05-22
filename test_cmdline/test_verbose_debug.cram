@@ -25,7 +25,7 @@ Get more information using --verbose:
   blpk: compression ratio: 0.106152
   blpk: done
   $ blpk --verbose decompress data.dat.blp data.dat.dcmp
-  blpk: using 4 threads
+  blpk: using [0-9]+ threads (re)
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'
@@ -50,7 +50,7 @@ Get more information using --verbose, but with metadata:
   blpk: compression ratio: 0.106157
   blpk: done
   $ blpk --verbose decompress data.dat.blp data.dat.dcmp
-  blpk: using 4 threads
+  blpk: using [0-9]+ threads (re)
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'

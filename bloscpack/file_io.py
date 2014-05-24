@@ -411,7 +411,7 @@ class CompressedFPSink(CompressedSink):
 def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
               blosc_args=None,
               bloscpack_args=None,
-              metadata_args=DEFAULT_METADATA_ARGS):
+              metadata_args=None):
     """ Main function for compressing a file.
 
     Parameters

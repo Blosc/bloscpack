@@ -14,7 +14,7 @@ Add metadata to the file:
 
   $ blpk compress --metadata meta.json data.dat
   $ blpk info data.dat.blp
-  blpk: BloscPackHeader:
+  blpk: BloscpackHeader:
   blpk:     format_version: 3
   blpk:     offsets: True
   blpk:     metadata: True

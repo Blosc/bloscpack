@@ -14,7 +14,7 @@ from .args import (BloscArgs,
                    MetadataArgs,
                    _handle_max_apps
                    )
-from .headers import (BloscPackHeader,
+from .headers import (BloscpackHeader,
                       )
 from .exceptions import (ChecksumMismatch,
                          )
@@ -132,7 +132,7 @@ def pack(source, sink,
             nchunks,
             bloscpack_args.max_app_chunks)
     # create the bloscpack header
-    bloscpack_header = BloscPackHeader(
+    bloscpack_header = BloscpackHeader(
             offsets=bloscpack_args.offsets,
             metadata=metadata is not None,
             checksum=bloscpack_args.checksum,

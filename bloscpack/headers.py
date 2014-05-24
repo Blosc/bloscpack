@@ -208,7 +208,7 @@ def decode_blosc_header(buffer_):
             'ctbytes':   decode_uint32(buffer_[12:16])}
 
 
-class BloscPackHeader(MutableMappaingObject):
+class BloscpackHeader(MutableMappaingObject):
     """ The Bloscpack header.
 
     Parameters
@@ -367,7 +367,7 @@ class BloscPackHeader(MutableMappaingObject):
                 "the magic marker '%s' is missing from the bloscpack " % MAGIC +
                 "header, instead we found: %s" % repr(rep))
         options = decode_options(decode_bitfield(buffer_[5]))
-        return BloscPackHeader(
+        return BloscpackHeader(
             format_version=decode_uint8(buffer_[4]),
             offsets=options['offsets'],
             metadata=options['metadata'],

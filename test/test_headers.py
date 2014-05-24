@@ -24,7 +24,7 @@ from bloscpack.constants import (MAGIC,
 from bloscpack.pretty import reverse_pretty
 from bloscpack import checksums
 from bloscpack import exceptions
-from bloscpack.headers import (BloscPackHeader,
+from bloscpack.headers import (BloscpackHeader,
                                MetadataHeader,
                                create_options,
                                decode_options,
@@ -172,7 +172,7 @@ def test_BloscPackHeader_constructor_exceptions():
     # uses nose test generators
 
     def check(error_type, args_dict):
-        nt.assert_raises(error_type, BloscPackHeader, **args_dict)
+        nt.assert_raises(error_type, BloscpackHeader, **args_dict)
 
     for error_type, args_dict in [
             (ValueError, {'format_version': -1}),
@@ -222,12 +222,12 @@ def test_BloscPackHeader_total_prospective_entries():
             (MAX_CHUNKS, (MAX_CHUNKS-1, 1)),
             (MAX_CHUNKS, (1, MAX_CHUNKS-1)),
             ]:
-        header = BloscPackHeader(nchunks=nchunks,
+        header = BloscpackHeader(nchunks=nchunks,
                                  max_app_chunks=max_app_chunks)
         yield nt.assert_equal, expected, header.total_prospective_chunks
 
 
-def test_BloscPackHeader_encode():
+def test_BloscpackHeader_encode():
 
     # the raw encoded header as produces w/o any kwargs
     format_version = struct.pack('<B', FORMAT_VERSION)
@@ -241,7 +241,7 @@ def test_BloscPackHeader_encode():
             raw[offset+len(replacement):]
 
     # test with no arguments
-    yield nt.assert_equal, raw, BloscPackHeader().encode()
+    yield nt.assert_equal, raw, BloscpackHeader().encode()
 
     for offset, replacement, kwargs in [
             (4, struct.pack('<B', 23), {'format_version': 23}),
@@ -286,10 +286,10 @@ def test_BloscPackHeader_encode():
                 {'nchunks': 1, 'max_app_chunks': MAX_CHUNKS-1}),
             ]:
         yield nt.assert_equal, mod_raw(offset, replacement), \
-            BloscPackHeader(**kwargs).encode()
+            BloscpackHeader(**kwargs).encode()
 
 
-def test_decode_bloscpack_header():
+def test_BloscpackHeader_decode():
 
     format_version = struct.pack('<B', FORMAT_VERSION)
     raw = MAGIC + format_version + \
@@ -301,7 +301,7 @@ def test_decode_bloscpack_header():
             raw[offset+len(replacement):]
 
     # check with no args
-    yield nt.assert_equal, BloscPackHeader(), BloscPackHeader.decode(raw)
+    yield nt.assert_equal, BloscpackHeader(), BloscpackHeader.decode(raw)
 
     for kwargs, offset, replacement in [
             # check with format_version
@@ -352,24 +352,24 @@ def test_decode_bloscpack_header():
                 16, '\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f'),
             ]:
         yield (nt.assert_equal,
-               BloscPackHeader(**kwargs),
-               BloscPackHeader.decode(mod_raw(offset, replacement)))
+               BloscpackHeader(**kwargs),
+               BloscpackHeader.decode(mod_raw(offset, replacement)))
 
 
-def test_BloscPackHeader_accessor_exceptions():
+def test_BloscpackHeader_accessor_exceptions():
     if sys.version_info[0:2] < (2, 7):
         raise SkipTest
-    bloscpack_header = BloscPackHeader()
+    bloscpack_header = BloscpackHeader()
     nt.assert_raises_regexp(KeyError,
-                            'foo not in BloscPackHeader',
+                            'foo not in BloscpackHeader',
                             bloscpack_header.__getitem__,
                             'foo')
     nt.assert_raises_regexp(KeyError,
-                            'foo not in BloscPackHeader',
+                            'foo not in BloscpackHeader',
                             bloscpack_header.__setitem__,
                             'foo', 'bar')
     nt.assert_raises_regexp(NotImplementedError,
-                            'BloscPackHeader does not support __delitem__ or derivatives',
+                            'BloscpackHeader does not support __delitem__ or derivatives',
                             bloscpack_header.__delitem__,
                             'foo',)
 

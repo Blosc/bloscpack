@@ -45,7 +45,7 @@ from bloscpack.file_io import (PlainFPSource,
                                _write_metadata,
                                _read_metadata,
                                )
-from bloscpack.headers import (BloscPackHeader,
+from bloscpack.headers import (BloscpackHeader,
                                MetadataHeader
                                )
 from bloscpack.serializers import (SERIALIZERS,
@@ -94,7 +94,7 @@ def test_append_fp():
 
     # check that the header and offsets are as we expected them to be
     orig_bloscpack_header, orig_offsets = reset_read_beginning(orig)[0:4:3]
-    expected_orig_bloscpack_header = BloscPackHeader(
+    expected_orig_bloscpack_header = BloscpackHeader(
             format_version=3,
             offsets=True,
             metadata=False,

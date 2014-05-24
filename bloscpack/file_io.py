@@ -34,7 +34,7 @@ from .exceptions import (MetadataSectionTooSmall,
                          ChecksumMismatch,
                          )
 from .headers import (decode_blosc_header,
-                      BloscPackHeader,
+                      BloscpackHeader,
                       MetadataHeader,
                       decode_int64,
                       encode_int64,
@@ -164,7 +164,7 @@ def _read_bloscpack_header(input_fp):
     bloscpack_header_raw = input_fp.read(BLOSCPACK_HEADER_LENGTH)
     log.debug('bloscpack_header_raw: %s' %
               repr(bloscpack_header_raw))
-    bloscpack_header = BloscPackHeader.decode(bloscpack_header_raw)
+    bloscpack_header = BloscpackHeader.decode(bloscpack_header_raw)
     log.debug("bloscpack header: %s" % repr(bloscpack_header))
     if FORMAT_VERSION != bloscpack_header.format_version:
         raise FormatVersionMismatch(

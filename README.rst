@@ -339,15 +339,16 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
 .. code-block:: console
 
     $ ./blpk --verbose compress --chunk-size 0.5G data.dat
+    blpk: using 4 threads
     blpk: getting ready for compression
-    blpk: input file is: data.dat
-    blpk: output file is: data.dat.blp
-    blpk: using 8 threads
+    blpk: input file is: 'data.dat'
+    blpk: output file is: 'data.dat.blp'
     blpk: input file size: 1.49G (1600000000B)
     blpk: nchunks: 3
     blpk: chunk_size: 512.0M (536870912B)
-    blpk: output file size: 161.9M (169759818B)
-    blpk: compression ratio: 0.106100
+    blpk: last_chunk_size: 501.88M (526258176B)
+    blpk: output file size: 198.39M (208028617B)
+    blpk: compression ratio: 0.130018
     blpk: done
 
 ... and ``[-d | --debug]`` prints a detailed account of what is going on:

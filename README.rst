@@ -429,7 +429,7 @@ The Python API is still in flux, so this section is deliberately sparse.
 Numpy
 ~~~~~
 
-Numpy arrays can be serialized as bloscpack files, here is a very brief example:
+Numpy arrays can be serialized as Bloscpack files, here is a very brief example:
 
 .. code-block:: pycon
 
@@ -496,6 +496,11 @@ Or use alternate compressors:
     >>> b = unpack_ndarray_str(c)
     >>> (a == b).all()
     True
+
+If you are interested in the performance of Bloscpack compared to other
+serialization formats for Numpy arrays, please look at the benchmarks presented
+in `the Bloscpack paper from the EuroScipy 2013 conference proceedings
+<http://arxiv.org/abs/1404.6383>`_.
 
 Testing
 -------

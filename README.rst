@@ -45,7 +45,8 @@ Command line interface to and serialization format for `Blosc
 <http://blosc.org/>`_, a high performance, multi-threaded, blocking and
 shuffling compressor. Uses `python-blosc
 <https://github.com/Blosc/python-blosc>`_ bindings to interface with Blosc.
-Also comes with native support for serializing and deserializing numpy arrays.
+Also comes with native support for efficiently serializing and deserializing
+Numpy arrays.
 
 
 Dependencies

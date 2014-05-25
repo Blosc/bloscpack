@@ -1114,6 +1114,8 @@ Changelog
   * Introduce a BloscArgs object for saner handling of the BloscArgs
   * Introduce a BloscpackArgs object for saner handling of the BloscpackArgs
   * Introduce MetadataHeader and MetdataArgs objects too
+  * Fix all (hopefully) incorrect uses of the term compression ratio and adhere
+    to the coding standar
   * Various miscellaneous fixes and improvements
 
 * v0.6.0     - Fri Mar 28 2014

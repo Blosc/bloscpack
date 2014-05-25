@@ -250,19 +250,19 @@ If you just need some info on how the file was compressed ``[i | info]``:
 
 .. code-block:: console
 
-   $ ./blpk info data.dat
-   blpk: bloscpack header: 
-   blpk:     format_version=3,
-   blpk:     offsets=True,
-   blpk:     metadata=False,
-   blpk:     checksum='adler32',
-   blpk:     typesize=8,
-   blpk:     chunk_size=512.0M (536870912B),
-   blpk:     last_chunk=501.88M (526258176B),
-   blpk:     nchunks=3,
-   blpk:     max_app_chunks=30
-   blpk: 'offsets':
-   blpk: [296,78074317,140782616,...]
+    $ ./blpk info data.dat.blp
+    blpk: BloscpackHeader:
+    blpk:     format_version: 3
+    blpk:     offsets: True
+    blpk:     metadata: False
+    blpk:     checksum: 'adler32'
+    blpk:     typesize: 8
+    blpk:     chunk_size: 512.0M (536870912B)
+    blpk:     last_chunk: 501.88M (526258176B)
+    blpk:     nchunks: 3
+    blpk:     max_app_chunks: 30
+    blpk: 'offsets':
+    blpk: [296,78074317,140782616,...]
 
 Adding Metdata
 ~~~~~~~~~~~~~~

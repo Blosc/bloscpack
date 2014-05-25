@@ -107,28 +107,29 @@ the standard ``setup.py``:
 Usage
 -----
 
-Bloscpack has a number of global options and four subcommands: ``[c |
-compress]``, ``[d | decompress]``, ``[a | append]`` and ``[i | info]`` most of
-which each have their own options.
+Bloscpack is accessible from the command line using the ``blpk`` executable
+this has a number of global options and four subcommands: ``[c | compress]``,
+``[d | decompress]``, ``[a | append]`` and ``[i | info]`` most of which each
+have their own options.
 
 Help for global options and subcommands:
 
 .. code-block:: console
 
-    $ ./blpk --help
+    $ blpk --help
     [...]
 
 Help for each one of the subcommands:
 
 .. code-block:: console
 
-    $ ./blpk compress --help
+    $ blpk compress --help
     [...]
-    $ ./blpk decompress --help
+    $ blpk decompress --help
     [...]
-    $ ./blpk info --help
+    $ blpk info --help
     [...]
-    $ ./blpk append --help
+    $ blpk append --help
     [...]
 
 Examples
@@ -141,13 +142,13 @@ Basic compression:
 
 .. code-block:: console
 
-    $ ./blpk compress data.dat
+    $ blpk compress data.dat
 
 Or:
 
 .. code-block:: console
 
-    $ ./blpk c data.dat
+    $ blpk c data.dat
 
 ... will compress the file ``data.dat`` to ``data.dat.blp``
 
@@ -155,13 +156,13 @@ Basic decompression:
 
 .. code-block:: console
 
-    $ ./blpk decompress data.dat.blp data.dcmp
+    $ blpk decompress data.dat.blp data.dcmp
 
 Or:
 
 .. code-block:: console
 
-    $ ./blpk d data.dat.blp data.dcmp
+    $ blpk d data.dat.blp data.dcmp
 
 ... will decompress the file ``data.dat.blp`` to the file ``data.dcmp``. If you
 leave out the ``[<out_file>]`` argument, Bloscpack will complain that the file
@@ -169,7 +170,7 @@ leave out the ``[<out_file>]`` argument, Bloscpack will complain that the file
 
 .. code-block:: console
 
-    $ ./blpk decompress data.dat.blp
+    $ blpk decompress data.dat.blp
     blpk: error: output file 'data.dat' exists!
 
 If you know what you are doing, you can use the global option ``[-f |
@@ -177,21 +178,21 @@ If you know what you are doing, you can use the global option ``[-f |
 
 .. code-block:: console
 
-    $ ./blpk --force decompress data.dat.blp
+    $ blpk --force decompress data.dat.blp
 
 Incidentally this works for compression too:
 
 .. code-block:: console
 
-    $ ./blpk compress data.dat
+    $ blpk compress data.dat
     blpk: error: output file 'data.dat.blp' exists!
-    $ ./blpk --force compress data.dat
+    $ blpk --force compress data.dat
 
 Lastly, if you want a different filename:
 
 .. code-block:: console
 
-    $ ./blpk compress data.dat custom.filename.blp
+    $ blpk compress data.dat custom.filename.blp
 
 ... will compress the file ``data.dat`` to ``custom.filename.blp``
 
@@ -204,22 +205,22 @@ You can change this using the ``[-n | --nthreads]`` option:
 
 .. code-block:: console
 
-    $ ./blpk --nthreads 1 compress data.dat
+    $ blpk --nthreads 1 compress data.dat
 
 Compression with Blosc is controlled with the following options:
 
 * ``[-t | --typesize]``
   Typesize used by Blosc (default: 8):
-  ``$ ./blpk compress --typesize 8 data.dat``
+  ``$ blpk compress --typesize 8 data.dat``
 * ``[-l | --level]``
   Compression level (default: 7):
-  ``$ ./blpk compress --level 3 data.dat``
+  ``$ blpk compress --level 3 data.dat``
 * ``[-s | --no-shuffle]``
   Deactivate shuffle:
-  ``$ ./blpk compress --no-shuffle data.dat``
+  ``$ blpk compress --no-shuffle data.dat``
 * ``[-c | --codec]``
   Use alternative codec:
-  ``$ ./blpk compress --codec lz4 data.dat``
+  ``$ blpk compress --codec lz4 data.dat``
 
 In addition, there are the following options that control the Bloscpack file:
 
@@ -227,8 +228,8 @@ In addition, there are the following options that control the Bloscpack file:
   Desired approximate size of the chunks, where you can use human readable
   strings like ``8M`` or ``128K`` or ``max`` to use the maximum chunk size of
   apprx. ``2GB`` (default: ``1MB``):
-  ``$ ./blpk compress --chunk-size 128K data.dat`` or
-  ``$ ./blpk c -z max data.dat``
+  ``$ blpk compress --chunk-size 128K data.dat`` or
+  ``$ blpk c -z max data.dat``
 * ``[-k | --checksum <checksum>]``
   Chose which checksum to use. The following values are permissible:
   ``None``, ``adler32``, ``crc32``, ``md5``,
@@ -236,13 +237,13 @@ In addition, there are the following options that control the Bloscpack file:
   ``sha512``, (default: ``adler32``). As described in the header format, each
   compressed chunk can be stored with a checksum, which aids corruption
   detection on decompression:
-  ``$ ./blpk compress --checksum crc32 data.dat``
+  ``$ blpk compress --checksum crc32 data.dat``
 * ``[-o | --no-offsets]``
   By default, offsets to the individual chunks are stored. These are included
   to allow for partial decompression in the future. This option disables that
   feature. Also, a certain number of offsets (default: 10 * 'nchunks') are
   preallocated to allow for appending data to the file:
-  ``$ ./blpk compress --no-offsets data.dat``
+  ``$ blpk compress --no-offsets data.dat``
 
 Info Subcommand
 ~~~~~~~~~~~~~~~
@@ -251,7 +252,7 @@ If you just need some info on how the file was compressed ``[i | info]``:
 
 .. code-block:: console
 
-    $ ./blpk info data.dat.blp
+    $ blpk info data.dat.blp
     blpk: BloscpackHeader:
     blpk:     format_version: 3
     blpk:     offsets: True
@@ -274,8 +275,8 @@ Using the ``[-m | --metadata]`` option you can include JSON from a file:
 
    $ cat meta.json
    {"dtype": "float64", "shape": [200000000], "container": "numpy"}
-   $ ./blpk compress --chunk-size=512M --metadata meta.json data.dat
-   $ ./blpk info data.dat.blp
+   $ blpk compress --chunk-size=512M --metadata meta.json data.dat
+   $ blpk info data.dat.blp
    blpk: BloscpackHeader:
    blpk:     format_version: 3
    blpk:     offsets: True
@@ -305,7 +306,7 @@ It will be printed when decompressing:
 
 .. code-block:: console
 
-    $ ./blpk decompress data.dat.blp
+    $ blpk decompress data.dat.blp
     blpk: Metadata is:
     blpk: '{u'dtype': u'float64', u'shape': [200000000], u'container': u'numpy'}'
 
@@ -316,7 +317,7 @@ You can also append data to an existing bloscpack compressed file:
 
 .. code-block:: console
 
-   $ ./blpk append data.dat.blp data.dat
+   $ blpk append data.dat.blp data.dat
 
 However there are certain limitations on the amount of data can be appended.
 For example, if there is an offsets section, there must be enough room to store
@@ -339,7 +340,7 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
 
 .. code-block:: console
 
-    $ ./blpk --verbose compress --chunk-size 0.5G data.dat
+    $ blpk --verbose compress --chunk-size 0.5G data.dat
     blpk: using 4 threads
     blpk: getting ready for compression
     blpk: input file is: 'data.dat'
@@ -356,7 +357,7 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
 
 .. code-block:: console
 
-    $ ./blpk --debug compress --chunk-size 0.5G data.dat
+    $ blpk --debug compress --chunk-size 0.5G data.dat
     blpk: command line argument parsing complete
     blpk: command line arguments are: 
     blpk:     force: False

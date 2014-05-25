@@ -1109,8 +1109,12 @@ Changelog
 
   * Modularize cram tests, even has something akin to a harness
   * Refactored, tweaked and simplified Source/Sink code and semantics
+  * Various documentation improvements: listing prior art, comparison to HDF5
+  * Improve benchmarking scripts
   * Introduce a BloscArgs object for saner handling of the BloscArgs
   * Introduce a BloscpackArgs object for saner handling of the BloscpackArgs
+  * Introduce MetadataHeader and MetdataArgs objects too
+  * Various miscellaneous fixes and improvements
 
 * v0.6.0     - Fri Mar 28 2014
 

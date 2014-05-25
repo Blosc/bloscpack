@@ -22,7 +22,7 @@ Get more information using --verbose:
   blpk: chunk_size: 1.0M (1048576B)
   blpk: last_chunk_size: 602.0K (616448B)
   blpk: output file size: 16.2M (16984384B)
-  blpk: compression ratio: 0.106152
+  blpk: compression ratio: 9.420418
   blpk: done
   $ blpk --verbose decompress data.dat.blp data.dat.dcmp
   blpk: using [0-9]+ threads (re)
@@ -47,7 +47,7 @@ Get more information using --verbose, but with metadata:
   blpk: chunk_size: 1.0M (1048576B)
   blpk: last_chunk_size: 602.0K (616448B)
   blpk: output file size: 16.2M (16985080B)
-  blpk: compression ratio: 0.106157
+  blpk: compression ratio: 9.420032
   blpk: done
   $ blpk --verbose decompress data.dat.blp data.dat.dcmp
   blpk: using [0-9]+ threads (re)
@@ -129,7 +129,7 @@ Try using --debug
   blpk: Writing '4' offsets: '[384, 7011095, 12241181, 16734454]'
   blpk: Raw offsets: '\x80\x01\x00\x00\x00\x00\x00\x00\x17\xfbj\x00\x00\x00\x00\x00\x1d\xc9\xba\x00\x00\x00\x00\x00\xf6X\xff\x00\x00\x00\x00\x00'
   blpk: output file size: 16.18M (16968292B)
-  blpk: compression ratio: 0.106052
+  blpk: compression ratio: 9.429352
   blpk: done
   $ blpk --debug decompress data.dat.blp data.dat.dcmp
   blpk: command line argument parsing complete
@@ -250,7 +250,7 @@ Try using --debug with metadata:
   blpk: Writing '4' offsets: '[1080, 7011791, 12241877, 16735150]'
   blpk: Raw offsets: '8\x04\x00\x00\x00\x00\x00\x00\xcf\xfdj\x00\x00\x00\x00\x00\xd5\xcb\xba\x00\x00\x00\x00\x00\xae[\xff\x00\x00\x00\x00\x00'
   blpk: output file size: 16.18M (16968988B)
-  blpk: compression ratio: 0.106056
+  blpk: compression ratio: 9.428965
   blpk: done
   $ blpk --debug decompress data.dat.blp data.dat.dcmp
   blpk: command line argument parsing complete

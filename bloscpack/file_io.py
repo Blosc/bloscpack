@@ -456,7 +456,7 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
                 metadata_args=metadata_args)
     out_file_size = path.getsize(out_file)
     log.verbose('output file size: %s' % double_pretty_size(out_file_size))
-    log.verbose('compression ratio: %f' % (out_file_size/in_file_size))
+    log.verbose('compression ratio: %f' % (in_file_size/out_file_size))
 
 
 def unpack_file(in_file, out_file):

@@ -348,7 +348,7 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: chunk_size: 512.0M (536870912B)
     blpk: last_chunk_size: 501.88M (526258176B)
     blpk: output file size: 198.39M (208028617B)
-    blpk: compression ratio: 0.130018
+    blpk: compression ratio: 7.691250
     blpk: done
 
 ... and ``[-d | --debug]`` prints a detailed account of what is going on:
@@ -416,7 +416,7 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: Writing '3' offsets: '[296, 78074317, 140782616]'
     blpk: Raw offsets: '(\x01\x00\x00\x00\x00\x00\x00\xcdQ\xa7\x04\x00\x00\x00\x00\x18,d\x08\x00\x00\x00\x00'
     blpk: output file size: 198.39M (208028617B)
-    blpk: compression ratio: 0.130018
+    blpk: compression ratio: 7.691250
     blpk: done
 
 

@@ -381,27 +381,37 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
     blpk: nchunks: 3
     blpk: chunk_size: 512.0M (536870912B)
     blpk: last_chunk_size: 501.88M (526258176B)
-    blpk: blosc args are:
+    blpk: BloscArgs:
     blpk:     typesize: 8
-    blpk:     shuffle: True
     blpk:     clevel: 7
-    blpk:     cname: blosclz
-    blpk: bloscpack args are:
-    blpk:     checksum: adler32
-    blpk:     max_app_chunks: <function <lambda> at 0x7f0b0774baa0>
+    blpk:     shuffle: True
+    blpk:     cname: 'blosclz'
+    blpk: BloscpackArgs:
     blpk:     offsets: True
+    blpk:     checksum: 'adler32'
+    blpk:     max_app_chunks: <function <lambda> at 0x1182de8>
+    blpk: metadata_args will be silently ignored
     blpk: max_app_chunks is a callable
     blpk: max_app_chunks was set to: 30
+    blpk: BloscpackHeader:
+    blpk:     format_version: 3
+    blpk:     offsets: True
+    blpk:     metadata: False
+    blpk:     checksum: 'adler32'
+    blpk:     typesize: 8
+    blpk:     chunk_size: 512.0M (536870912B)
+    blpk:     last_chunk: 501.88M (526258176B)
+    blpk:     nchunks: 3
+    blpk:     max_app_chunks: 30
     blpk: raw_bloscpack_header: 'blpk\x03\x01\x01\x08\x00\x00\x00 \x00\x10^\x1f\x03\x00\x00\x00\x00\x00\x00\x00\x1e\x00\x00\x00\x00\x00\x00\x00'
-    blpk: metadata_args will be silently ignored
     blpk: Handle chunk '0'
-    blpk: checksum (adler32): 'k\xe9\xdc\x92'
+    blpk: checksum (adler32): '\x1f\xed\x1e\xf4'
     blpk: chunk handled, in: 512.0M (536870912B) out: 74.46M (78074017B)
     blpk: Handle chunk '1'
-    blpk: checksum (adler32): '\xa9(\xb5\xd8'
+    blpk: checksum (adler32): ')\x1e\x08\x88'
     blpk: chunk handled, in: 512.0M (536870912B) out: 59.8M (62708295B)
     blpk: Handle chunk '2' (last)
-    blpk: checksum (adler32): '\xb1$\xfb\x08'
+    blpk: checksum (adler32): '\xe8\x18\xa4\xac'
     blpk: chunk handled, in: 501.88M (526258176B) out: 64.13M (67245997B)
     blpk: Writing '3' offsets: '[296, 78074317, 140782616]'
     blpk: Raw offsets: '(\x01\x00\x00\x00\x00\x00\x00\xcdQ\xa7\x04\x00\x00\x00\x00\x18,d\x08\x00\x00\x00\x00'

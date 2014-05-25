@@ -273,32 +273,32 @@ Using the ``[-m | --metadata]`` option you can include JSON from a file:
 
    $ cat meta.json
    {"dtype": "float64", "shape": [200000000], "container": "numpy"}
-   $ ./blpk compress --metadata meta.json data.dat
+   $ ./blpk compress --chunk-size=512M --metadata meta.json data.dat
    $ ./blpk info data.dat.blp
-   blpk: bloscpack header: 
-   blpk:     format_version=3,
-   blpk:     offsets=True,
-   blpk:     metadata=True,
-   blpk:     checksum='adler32',
-   blpk:     typesize=8,
-   blpk:     chunk_size=1.0M (1048576B),
-   blpk:     last_chunk=900.0K (921600B),
-   blpk:     nchunks=1526,
-   blpk:     max_app_chunks=15260
+   blpk: BloscpackHeader:
+   blpk:     format_version: 3
+   blpk:     offsets: True
+   blpk:     metadata: True
+   blpk:     checksum: 'adler32'
+   blpk:     typesize: 8
+   blpk:     chunk_size: 512.0M (536870912B)
+   blpk:     last_chunk: 501.88M (526258176B)
+   blpk:     nchunks: 3
+   blpk:     max_app_chunks: 30
+   blpk: 'offsets':
+   blpk: [922,78074943,140783242,...]
    blpk: 'metadata':
    blpk: {   u'container': u'numpy', u'dtype': u'float64', u'shape': [200000000]}
-   blpk: 'metadata_header':
-   blpk: {   'magic_format': 'JSON',
-   blpk:     'max_meta_size': 590,
-   blpk:     'meta_checksum': 'adler32',
-   blpk:     'meta_codec': 'zlib',
-   blpk:     'meta_comp_size': 58,
-   blpk:     'meta_level': 6,
-   blpk:     'meta_options': '00000000',
-   blpk:     'meta_size': 59,
-   blpk:     'user_codec': ''}
-   blpk: 'offsets':
-   blpk: [134946,354628,552808,710223,871120,...]
+   blpk: MetadataHeader:
+   blpk:     magic_format: 'JSON'
+   blpk:     meta_options: '00000000'
+   blpk:     meta_checksum: 'adler32'
+   blpk:     meta_codec: 'zlib'
+   blpk:     meta_level: 6
+   blpk:     meta_size: 59.0B (59B)
+   blpk:     max_meta_size: 590.0B (590B)
+   blpk:     meta_comp_size: 58.0B (58B)
+   blpk:     user_codec: ''
 
 It will be printed when decompressing:
 

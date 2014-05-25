@@ -503,14 +503,13 @@ def main():
             log.error(str(ve) + "\n" +
                       "This might not be a bloscpack compressed file.")
         log.normal(bloscpack_header.pformat())
-        if metadata is not None:
-            log.normal("'metadata':")
-            log.normal(pprint.pformat(metadata, indent=4))
-            log.normal("'metadata_header':")
-            log.normal(metadata_header.pformat())
         if offsets:
             log.normal("'offsets':")
             log.normal("[%s,...]" % (",".join(str(o) for o in offsets[:5])))
+        if metadata is not None:
+            log.normal("'metadata':")
+            log.normal(pprint.pformat(metadata, indent=4))
+            log.normal(metadata_header.pformat())
 
     else:  # pragma: no cover
         # we should never reach this

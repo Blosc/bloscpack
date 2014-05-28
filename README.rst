@@ -1125,7 +1125,7 @@ Packaging and Infrastructure
 Changelog
 ---------
 
-* v0.7.0     - XXX XXX XX XXXX
+* v0.7.0     - Wed May 28 2014
 
   * Modularize cram tests, even has something akin to a harness
   * Refactored, tweaked and simplified Source/Sink code and semantics

@@ -450,33 +450,33 @@ Looking at the generated file, we can see the Numpy metadata being saved:
     -rw------- 1 esc esc 266M Aug 13 23:21 a.blp
 
     $ blpk info a.blp
-    blpk: bloscpack header: 
-    blpk:     format_version=3,
-    blpk:     offsets=True,
-    blpk:     metadata=True,
-    blpk:     checksum='adler32',
-    blpk:     typesize=8,
-    blpk:     chunk_size=1.0M (1048576B),
-    blpk:     last_chunk=838.0K (858112B),
-    blpk:     nchunks=2289,
-    blpk:     max_app_chunks=22890
+    blpk: BloscpackHeader:
+    blpk:     format_version: 3
+    blpk:     offsets: True
+    blpk:     metadata: True
+    blpk:     checksum: 'adler32'
+    blpk:     typesize: 8
+    blpk:     chunk_size: 1.0M (1048576B)
+    blpk:     last_chunk: 838.0K (858112B)
+    blpk:     nchunks: 2289
+    blpk:     max_app_chunks: 22890
+    blpk: 'offsets':
+    blpk: [202170,408064,554912,690452,819679,...]
     blpk: 'metadata':
     blpk: {   u'container': u'numpy',
-    blpk:     u'dtype': [[u'', u'<f8']],
+    blpk:     u'dtype': u'<f8',
     blpk:     u'order': u'C',
     blpk:     u'shape': [300000000]}
-    blpk: 'metadata_header':
-    blpk: {   'magic_format': 'JSON',
-    blpk:     'max_meta_size': 740,
-    blpk:     'meta_checksum': 'adler32',
-    blpk:     'meta_codec': 'zlib',
-    blpk:     'meta_comp_size': 68,
-    blpk:     'meta_level': 6,
-    blpk:     'meta_options': '00000000',
-    blpk:     'meta_size': 74,
-    blpk:     'user_codec': ''}
-    blpk: 'offsets':
-    blpk: [202240,408134,554982,690522,819749,...]
+    blpk: MetadataHeader:
+    blpk:     magic_format: 'JSON'
+    blpk:     meta_options: '00000000'
+    blpk:     meta_checksum: 'adler32'
+    blpk:     meta_codec: 'zlib'
+    blpk:     meta_level: 6
+    blpk:     meta_size: 67.0B (67B)
+    blpk:     max_meta_size: 670.0B (670B)
+    blpk:     meta_comp_size: 62.0B (62B)
+    blpk:     user_codec: ''
 
 Alternatively, we can also use a string as storage:
 

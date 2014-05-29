@@ -1281,7 +1281,7 @@ Changelog
 Thanks
 ------
 
-* Fracesc Alted for writing Blosc in the first place, for providing continual
+* Francesc Alted for writing Blosc in the first place, for providing continual
   code-review and feedback on Bloscpack and for co-authoring the Bloscpack
   file-format specification.
 

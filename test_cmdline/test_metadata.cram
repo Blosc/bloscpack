@@ -26,7 +26,7 @@ Add metadata to the file:
   blpk:     max_app_chunks: 1530
   blpk: 'offsets':
   blpk: [14192,169364,311687,472289,628926,...]
-  blpk: 'metadata':
+  blpk: Metadata:
   blpk: {   u'container': u'numpy',
   blpk:     u'dtype': u'<f8',
   blpk:     u'order': u'C',
@@ -42,8 +42,11 @@ Add metadata to the file:
   blpk:     meta_comp_size: 62.0B (62B)
   blpk:     user_codec: ''
   $ blpk decompress data.dat.blp data.dat.dcmp
-  blpk: Metadata is:
-  blpk: '{u'dtype': u'<f8', u'shape': [20000000], u'container': u'numpy', u'order': u'C'}'
+  blpk: Metadata:
+  blpk: {   u'container': u'numpy',
+  blpk:     u'dtype': u'<f8',
+  blpk:     u'order': u'C',
+  blpk:     u'shape': [20000000]}
 
 Clean up:
 

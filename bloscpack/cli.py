@@ -170,6 +170,11 @@ def process_nthread_arg(args):
                 (args.nthreads, 's' if args.nthreads > 1 else ''))
 
 
+def log_metadata(metadata):
+    log.normal("Metadata:")
+    log.normal(pprint.pformat(metadata, indent=4))
+
+
 class BloscPackCustomFormatter(argparse.HelpFormatter):
     """ Custom HelpFormatter.
 
@@ -462,7 +467,7 @@ def main():
         try:
             metadata = unpack_file(in_file, out_file)
             if metadata:
-                log.normal("Metadata is:\n'%s'" % metadata)
+                log_metadata(metadata)
         except FormatVersionMismatch as fvm:
             log.error(fvm.message)
         except ChecksumMismatch as csm:
@@ -507,8 +512,7 @@ def main():
             log.normal("'offsets':")
             log.normal("[%s,...]" % (",".join(str(o) for o in offsets[:5])))
         if metadata is not None:
-            log.normal("'metadata':")
-            log.normal(pprint.pformat(metadata, indent=4))
+            log_metadata(metadata)
             log.normal(metadata_header.pformat())
 
     else:  # pragma: no cover

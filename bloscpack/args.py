@@ -396,4 +396,3 @@ class MetadataArgs(MutableMappaingObject):
     @property
     def bytes_attributes(self):
         return []
-    

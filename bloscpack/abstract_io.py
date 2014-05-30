@@ -171,9 +171,10 @@ def unpack(source, sink):
         raise TypeError
     # read, decompress, write loop
     for i, (compressed, digest) in enumerate(source):
-        log.debug("decompressing chunk '%d'%s" %
-                  (i, ' (last)' if source.nchunks is not None
-                   and i == source.nchunks - 1 else ''))
+        if log.LEVEL == log.DEBUG:
+            log.debug("decompressing chunk '%d'%s" %
+                    (i, ' (last)' if source.nchunks is not None
+                    and i == source.nchunks - 1 else ''))
         if digest:
             computed_digest = source.checksum_impl(compressed)
             if digest != computed_digest:
@@ -182,10 +183,12 @@ def unpack(source, sink):
                         "expected: '%s', received: '%s'" %
                         (repr(digest), repr(computed_digest)))
             else:
-                log.debug('checksum OK (%s): %s' %
-                        (source.checksum_impl.name, repr(digest)))
+                if log.LEVEL == log.DEBUG:
+                    log.debug('checksum OK (%s): %s' %
+                            (source.checksum_impl.name, repr(digest)))
 
         len_decompressed = sink.put(compressed)
-        log.debug("chunk handled, in: %s out: %s" %
-                  (double_pretty_size(len(compressed)),
-                   double_pretty_size(len_decompressed)))
+        if log.LEVEL == log.DEBUG:
+            log.debug("chunk handled, in: %s out: %s" %
+                    (double_pretty_size(len(compressed)),
+                    double_pretty_size(len_decompressed)))

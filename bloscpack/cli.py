@@ -172,7 +172,7 @@ def process_nthread_arg(args):
 
 def log_metadata(metadata):
     log.normal("Metadata:")
-    log.normal(pprint.pformat(metadata, indent=4))
+    log.normal(pprint.pformat(metadata, width=90))
 
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):

@@ -6,3 +6,8 @@ try:
     from cStringIO import StringIO
 except ImportError:
     from io import BytesIO as StringIO
+
+try:
+    from collections import OrderedDict
+except ImportError:  # pragma: no cover
+    from ordereddict import OrderedDict

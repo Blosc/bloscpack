@@ -164,3 +164,20 @@ def test_alternate_cname():
         pack_ndarray(array_, sink, blosc_args=blosc_args)
         blosc_header = decode_blosc_header(sink.chunks[0])
         yield nt.assert_equal, blosc_header['flags'] >> 5, int_id
+
+
+def test_typesize_is_set_correctly_with_default_blosc_args():
+    a = np.array([1, 2, 3], dtype='uint8')
+    sink = CompressedMemorySink()
+    pack_ndarray(a, sink)
+    expected_args = BloscArgs(typesize=1)
+    nt.assert_equal(expected_args, sink.blosc_args)
+
+
+def test_typesize_is_set_correctly_with_custom_blosc_args():
+    a = np.array([1, 2, 3], dtype='uint8')
+    sink = CompressedMemorySink()
+    input_args = BloscArgs(clevel=9)
+    pack_ndarray(a, sink, blosc_args=input_args)
+    expected_args = BloscArgs(clevel=9, typesize=1)
+    nt.assert_equal(expected_args, sink.blosc_args)

@@ -1195,6 +1195,12 @@ Packaging and Infrastructure
 Changelog
 ---------
 
+* v0.7.1     - Sun Jun 29 2014
+
+  * Fix a bug related to setting the correct typesize when compressing Numpy
+    arrays
+  * Optimization of debug statements in the inner loops
+
 * v0.7.0     - Wed May 28 2014
 
   * Modularize cram tests, even has something akin to a harness

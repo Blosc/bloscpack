@@ -26,6 +26,7 @@ from .abstract_io import (PlainSource,
                           )
 from .exceptions import (NotANumpyArray,
                          )
+from . import log
 
 
 def _compress_chunk_ptr(chunk, blosc_args):
@@ -117,7 +118,11 @@ def pack_ndarray(ndarray, sink,
     with the itemsize of the Numpy array's dtype.
     """
 
-    blosc_args = blosc_args or BloscArgs(typesize=ndarray.dtype.itemsize)
+    if blosc_args is None:
+        blosc_args = BloscArgs(typesize=ndarray.dtype.itemsize)
+    else:
+        log.debug("Ignoring 'typesize' in blosc_args")
+        blosc_args.typesize = ndarray.dtype.itemsize
     source = PlainNumpySource(ndarray)
     nchunks, chunk_size, last_chunk_size = \
         calculate_nchunks(source.size, chunk_size)

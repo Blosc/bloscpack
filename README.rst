@@ -956,6 +956,76 @@ Coding Conventions
 * Use the Wikipedia definition of compression ratio:
   http://en.wikipedia.org/wiki/Data_compression_ratio
 
+How to Optimize Logging
+-----------------------
+
+Some care must be taken when logging in the inner look. For example condier the
+following two commits:
+
+* https://github.com/Blosc/bloscpack/commit/0854930514eebaf7dbc6c4dcf3589dbcb9f2fdc9
+
+* https://github.com/Blosc/bloscpack/commit/355bf90a8c13a2a1f792d43228c2a68c61476621
+
+If there are a larger number of chunks, calls to ``double_pretty_size`` will be
+executed (and may be costly) *even* if no logging is needed.
+
+Consider the following script, ``loop-bench.py``:
+
+.. code-block:: python
+
+    import numpy as np
+    import bloscpack as bp
+    import blosc
+
+    shuffle = True
+    clevel = 9
+    cname = 'lz4'
+
+    a = np.arange(2.5e8)
+
+    bargs = bp.args.BloscArgs(clevel=clevel, shuffle=shuffle, cname=cname)
+    bpargs = bp.BloscpackArgs(offsets=False, checksum='None', max_app_chunks=0)
+
+Timing with ``v0.7.0``:
+
+.. code-block:: pycon
+
+    In [1]: %run loop-bench.py
+
+    In [2]: %timeit bpc = bp.pack_ndarray_str(a, blosc_args=bargs, bloscpack_args=bpargs)
+    1 loops, best of 3: 423 ms per loop
+
+    In [3]: %timeit bpc = bp.pack_ndarray_str(a, blosc_args=bargs, bloscpack_args=bpargs)
+    1 loops, best of 3: 421 ms per loop
+
+    In [4]: bpc = bp.pack_ndarray_str(a, blosc_args=bargs, bloscpack_args=bpargs)
+
+    In [5]: %timeit a3 = bp.unpack_ndarray_str(bpc)
+    1 loops, best of 3: 727 ms per loop
+
+    In [6]: %timeit a3 = bp.unpack_ndarray_str(bpc)
+    1 loops, best of 3: 725 ms per loop
+
+And then using a development version that contains the two optimization commits:
+
+.. code-block:: pycon
+
+    In [1]: %run loop-bench.py
+
+    In [2]: %timeit bpc = bp.pack_ndarray_str(a, blosc_args=bargs, bloscpack_args=bpargs)
+    1 loops, best of 3: 357 ms per loop
+
+    In [3]: %timeit bpc = bp.pack_ndarray_str(a, blosc_args=bargs, bloscpack_args=bpargs)
+    1 loops, best of 3: 357 ms per loop
+
+    In [4]: bpc = bp.pack_ndarray_str(a, blosc_args=bargs, bloscpack_args=bpargs)
+
+    In [5]: %timeit a3 = bp.unpack_ndarray_str(bpc)
+    1 loops, best of 3: 658 ms per loop
+
+    In [6]: %timeit a3 = bp.unpack_ndarray_str(bpc)
+    1 loops, best of 3: 655 ms per loop
+
 Comparison to HDF5/PyTables
 ---------------------------
 

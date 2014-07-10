@@ -1,6 +1,3 @@
-.. image:: https://badge.waffle.io/blosc/bloscpack.png?label=ready&title=Ready 
- :target: https://waffle.io/blosc/bloscpack
- :alt: 'Stories in Ready'
 Bloscpack
 =========
 
@@ -16,6 +13,7 @@ Bloscpack
 :drone.io: |drone|
 :Coveralls: |coveralls|
 :Downloads: |downloads|
+:Waffle: |waffle|
 :License: |license|
 :And...: |powered|
 
@@ -36,6 +34,10 @@ Bloscpack
 
 .. |license| image:: https://pypip.in/license/bloscpack/badge.png
         :target: https://pypi.python.org/pypi/bloscpack
+
+.. |waffle|  image:: https://badge.waffle.io/blosc/bloscpack.png?label=ready&title=Ready
+        :target: https://waffle.io/blosc/bloscpack
+        :alt: 'Stories in Ready'
 
 .. |powered| image:: http://b.repl.ca/v1/Powered--By-Blosc-blue.png
         :target: https://blosc.org

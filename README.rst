@@ -1,3 +1,6 @@
+.. image:: https://badge.waffle.io/blosc/bloscpack.png?label=ready&title=Ready 
+ :target: https://waffle.io/blosc/bloscpack
+ :alt: 'Stories in Ready'
 Bloscpack
 =========
 

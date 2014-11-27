@@ -136,6 +136,10 @@ def test_numpy_dtypes_shapes_order():
     x = np.arange(10, dtype='>i8')
     roundtrip_ndarray(x)
 
+    # empty array
+    x = np.array([], dtype='f8')
+    roundtrip_ndarray(x)
+
 
 def test_larger_arrays():
     for dt in ('uint64', 'int64', 'float64'):

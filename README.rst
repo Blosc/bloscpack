@@ -964,7 +964,7 @@ Coding Conventions
 How to Optimize Logging
 -----------------------
 
-Some care must be taken when logging in the inner loop. For example condier the
+Some care must be taken when logging in the inner loop. For example consider the
 following two commits:
 
 * https://github.com/Blosc/bloscpack/commit/0854930514eebaf7dbc6c4dcf3589dbcb9f2fdc9

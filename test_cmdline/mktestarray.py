@@ -20,6 +20,7 @@ import numpy
 DATA_FILE = 'data.dat'
 META_FILE = 'meta.json'
 
+
 def exists(filename):
     return path.isfile(filename)
 

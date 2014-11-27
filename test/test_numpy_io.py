@@ -137,6 +137,13 @@ def test_numpy_dtypes_shapes_order():
     roundtrip_ndarray(x)
 
 
+def test_itemsize_chunk_size_mismatch():
+    a = np.arange(10)
+    s = pack_ndarray_str(a, chunk_size=7)
+    b = unpack_ndarray_str(s)
+    npt.assert_array_equal(a, b)
+
+
 def test_larger_arrays():
     for dt in ('uint64', 'int64', 'float64'):
         a = np.arange(2e4, dtype=dt)

@@ -17,6 +17,7 @@ from .args import (BloscArgs,
 from .headers import (BloscpackHeader,
                       )
 from .exceptions import (ChecksumMismatch,
+                         ChunkSizeTypeSizeMismatch,
                          )
 from .pretty import (double_pretty_size,
                      )

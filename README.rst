@@ -1200,6 +1200,8 @@ Packaging and Infrastructure
 Changelog
 ---------
 
+* v0.7.2     - Xxx Xxx XX XXXX
+
 * v0.7.1     - Sun Jun 29 2014
 
   * Fix a bug related to setting the correct typesize when compressing Numpy

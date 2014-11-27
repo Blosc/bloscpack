@@ -18,6 +18,7 @@ from bloscpack.args import (BloscArgs,
                             calculate_nchunks,
                             )
 from bloscpack.exceptions import (NotANumpyArray,
+                                  ChunkSizeTypeSizeMismatch,
                                   )
 from bloscpack.file_io import (PlainFPSource,
                                CompressedFPSource,
@@ -139,9 +140,7 @@ def test_numpy_dtypes_shapes_order():
 
 def test_itemsize_chunk_size_mismatch():
     a = np.arange(10)
-    s = pack_ndarray_str(a, chunk_size=7)
-    b = unpack_ndarray_str(s)
-    npt.assert_array_equal(a, b)
+    nt.assert_raises(ChunkSizeTypeSizeMismatch, pack_ndarray_str, a, chunk_size=7)
 
 
 def test_larger_arrays():

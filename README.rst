@@ -35,9 +35,9 @@ Bloscpack
 .. |license| image:: https://pypip.in/license/bloscpack/badge.png
         :target: https://pypi.python.org/pypi/bloscpack
 
-.. |waffle|  image:: https://badge.waffle.io/blosc/bloscpack.png?label=ready&title=Ready
+.. |waffle|  image:: https://badge.waffle.io/blosc/bloscpack.png?label=in%20progress&title=In%20Progress
         :target: https://waffle.io/blosc/bloscpack
-        :alt: 'Stories in Ready'
+        :alt: 'Issues In Progress'
 
 .. |powered| image:: http://b.repl.ca/v1/Powered--By-Blosc-blue.png
         :target: https://blosc.org

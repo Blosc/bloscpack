@@ -113,6 +113,10 @@ def test_numpy_dtypes_shapes_order():
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
     roundtrip_ndarray(a)
 
+    # structured array
+    a = np.array([('a', 1), ('b', 2)], dtype=[('a', 'S1'), ('b', 'f8')])
+    roundtrip_ndarray(a)
+
     # record array
     x = np.array([(1, 'O', 1)],
                  dtype=np.dtype([('step', 'int32'),

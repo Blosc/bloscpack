@@ -38,37 +38,35 @@ from bloscpack.testutil import (create_tmp_files,
                                 )
 
 
-class RoundTripNumpy(TestCase):
+def roundtrip_numpy_memory(ndarray):
+    sink = CompressedMemorySink()
+    pack_ndarray(ndarray, sink)
+    source = CompressedMemorySource(sink)
+    b = unpack_ndarray(source)
+    return npt.assert_array_equal, ndarray, b
 
-    def setUp(self):
-        self.a = np.arange(50)
 
-    def test_roundtrip_numpy_file_pointers(self):
-        sio = StringIO()
-        sink = CompressedFPSink(sio)
-        pack_ndarray(self.a, sink)
-        sio.seek(0)
-        source = CompressedFPSource(sio)
-        b = unpack_ndarray(source)
-        npt.assert_array_equal(self.a, b)
+def roundtrip_numpy_str(ndarray):
+    s = pack_ndarray_str(ndarray)
+    b = unpack_ndarray_str(s)
+    return npt.assert_array_equal, ndarray, b
 
-    def test_roundtrip_numpy_memory(self):
-        sink = CompressedMemorySink()
-        pack_ndarray(self.a, sink)
-        source = CompressedMemorySource(sink)
-        b = unpack_ndarray(source)
-        npt.assert_array_equal(self.a, b)
 
-    def test_roundtrip_numpy_str(self):
-        s = pack_ndarray_str(self.a)
-        b = unpack_ndarray_str(s)
-        npt.assert_array_equal(self.a, b)
+def roundtrip_numpy_file_pointers(ndarray):
+    sio = StringIO()
+    sink = CompressedFPSink(sio)
+    pack_ndarray(ndarray, sink)
+    sio.seek(0)
+    source = CompressedFPSource(sio)
+    b = unpack_ndarray(source)
+    return npt.assert_array_equal, ndarray, b
 
-    def test_roundtrip_numpy_file(self):
-        with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
-            pack_ndarray_file(self.a, out_file)
-            b = unpack_ndarray_file(out_file)
-            npt.assert_array_equal(self.a, b)
+
+def roundtrip_numpy_file(ndarray):
+    with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
+        pack_ndarray_file(ndarray, out_file)
+        b = unpack_ndarray_file(out_file)
+        return npt.assert_array_equal, ndarray, b
 
 
 def test_unpack_exception():
@@ -82,47 +80,64 @@ def test_unpack_exception():
 
 
 def roundtrip_ndarray(ndarray):
-    sink = CompressedMemorySink()
-    pack_ndarray(ndarray, sink)
-    source = CompressedMemorySource(sink)
-    result = unpack_ndarray(source)
-    npt.assert_array_equal(ndarray, result)
+    yield roundtrip_numpy_memory(ndarray)
+    yield roundtrip_numpy_str(ndarray)
+    yield roundtrip_numpy_file_pointers(ndarray)
+    yield roundtrip_numpy_file(ndarray)
 
 
 def test_numpy_dtypes_shapes_order():
+
+    # happy trail
+    a = np.arange(50)
+    for case in roundtrip_ndarray(a):
+        yield case
+
     for dt in np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
         a = np.arange(64, dtype=dt)
-        roundtrip_ndarray(a)
+        for case in roundtrip_ndarray(a):
+            yield case
         a = a.copy().reshape(8, 8)
-        roundtrip_ndarray(a)
+        for case in roundtrip_ndarray(a):
+            yield case
         a = a.copy().reshape(4, 16)
-        roundtrip_ndarray(a)
+        for case in roundtrip_ndarray(a):
+            yield case
         a = a.copy().reshape(4, 4, 4)
-        roundtrip_ndarray(a)
+        for case in roundtrip_ndarray(a):
+            yield case
         a = np.asfortranarray(a)
         nt.assert_true(np.isfortran(a))
-        roundtrip_ndarray(a)
+        for case in roundtrip_ndarray(a):
+            yield case
 
-    # Fixed with string arrays
+    # Fixed width string arrays
     a = np.array(['abc', 'def', 'ghi'])
-    roundtrip_ndarray(a)
+    for case in roundtrip_ndarray(a):
+        yield case
+
     # This actually get's cast to a fixed width string array
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')])
-    roundtrip_ndarray(a)
+    for case in roundtrip_ndarray(a):
+        yield case
+
     # object arrays
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
-    roundtrip_ndarray(a)
+    for case in roundtrip_ndarray(a):
+        yield case
 
     # structured array
     a = np.array([('a', 1), ('b', 2)], dtype=[('a', 'S1'), ('b', 'f8')])
-    roundtrip_ndarray(a)
+    for case in roundtrip_ndarray(a):
+        yield case
 
     # record array
-    x = np.array([(1, 'O', 1)],
+    a = np.array([(1, 'O', 1)],
                  dtype=np.dtype([('step', 'int32'),
                                 ('symbol', '|S1'),
                                 ('index', 'int32')]))
-    roundtrip_ndarray(x)
+    for case in roundtrip_ndarray(a):
+        yield case
 
     # and a nested record array
     dt = [('year', '<i4'),
@@ -130,20 +145,23 @@ def test_numpy_dtypes_shapes_order():
                          ('c2', [('iso', 'a3'), ('value', '<f4')])
                          ])
           ]
-    x = np.array([(2009, (('USA', 10.),
+    a = np.array([(2009, (('USA', 10.),
                           ('CHN', 12.))),
                   (2010, (('BRA', 10.),
                           ('ARG', 12.)))],
                  dt)
-    roundtrip_ndarray(x)
+    for case in roundtrip_ndarray(a):
+        yield case
 
     # what about endianess
-    x = np.arange(10, dtype='>i8')
-    roundtrip_ndarray(x)
+    a = np.arange(10, dtype='>i8')
+    for case in roundtrip_ndarray(a):
+        yield case
 
     # empty array
-    x = np.array([], dtype='f8')
-    roundtrip_ndarray(x)
+    a = np.array([], dtype='f8')
+    for case in roundtrip_ndarray(a):
+        yield case
 
 
 def test_itemsize_chunk_size_mismatch():

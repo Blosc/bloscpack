@@ -1202,7 +1202,8 @@ Changelog
 
 * v0.7.2     - Xxx Xxx XX XXXX
 
-  * Fix support for zero length arrays (and input in general) (#17 reported by dmbelov)
+  * Fix support for zero length arrays (and input in general) (#17 reported by @dmbelov)
+  * Catch when ``typesize`` doesn't divide ``chunk_size`` (#18 reported by @dmbelov)
 
 * v0.7.1     - Sun Jun 29 2014
 

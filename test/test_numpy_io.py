@@ -144,7 +144,8 @@ def test_numpy_dtypes_shapes_order():
 
 def test_itemsize_chunk_size_mismatch():
     a = np.arange(10)
-    nt.assert_raises(ChunkSizeTypeSizeMismatch, pack_ndarray_str, a, chunk_size=7)
+    nt.assert_raises(ChunkSizeTypeSizeMismatch,
+                     pack_ndarray_str, a, chunk_size=7)
 
 
 def test_larger_arrays():

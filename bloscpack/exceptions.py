@@ -23,6 +23,10 @@ class ChunkingException(BaseException):
     pass
 
 
+class ChunkSizeTypeSizeMismatch(ValueError):
+    pass
+
+
 class ChecksumMismatch(RuntimeError):
     pass
 

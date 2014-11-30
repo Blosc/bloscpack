@@ -1,0 +1,32 @@
+#!/usr/bin/env cram
+# vim: set syntax=cram :
+
+  $ . $TESTDIR/cram_strap.sh
+
+Create an empty file.
+
+  $ touch  data.dat
+  $ ls
+  data.dat
+
+Compress it.
+
+  $ blpk compress data.dat
+  $ ls
+  data.dat
+  data.dat.blp
+
+Ensure it has the correct length
+
+  $ wc -c data.dat.blp
+  140 data.dat.blp
+
+Decompress it
+
+  $ blpk decompress data.dat.blp data.dat.dcmp
+  $ diff data.dat data.dat.dcmp
+
+  $ wc -c data.dat
+  0 data.dat
+  $ wc -c data.dat.dcmp
+  0 data.dat.dcmp

@@ -52,7 +52,7 @@ def _ndarray_meta(ndarray):
             }
 
 
-def _fix_numpy_metadata(metadata):
+def _fix_numpy_dtype(metadata):
     """
     Fix numpy metadata when it goes through JSON.
 
@@ -64,18 +64,18 @@ def _fix_numpy_metadata(metadata):
 
     Examples
     --------
-    >>> _fix_numpy_metadata([[u'a', u'f8']])
+    >>> _fix_numpy_dtype([[u'a', u'f8']])
     [('a', 'f8')]
-    >>> _fix_numpy_metadata([[u'a', u'f8', 2]])
+    >>> _fix_numpy_dtype([[u'a', u'f8', 2]])
     [('a', 'f8', 2)]
-    >>> _fix_numpy_metadata([[u'a', [[u'b', 'f8']]]])
+    >>> _fix_numpy_dtype([[u'a', [[u'b', 'f8']]]])
     [('a', [('b', 'f8')])]
     """
     if isinstance(metadata, list):
         if isinstance(metadata[0], list):
-            metadata = map(_fix_numpy_metadata, metadata)
+            metadata = map(_fix_numpy_dtype, metadata)
         else:
-            metadata = tuple(map(_fix_numpy_metadata, metadata))
+            metadata = tuple(map(_fix_numpy_dtype, metadata))
     elif isinstance(metadata, unicode):
         metadata = str(metadata)
     else:

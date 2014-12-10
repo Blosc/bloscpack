@@ -46,10 +46,8 @@ class JSONSerializer(object):
 
     def loads(self, data):
         x = json.loads(data)
-        print x
         if isinstance(x, dict)  and u'container' in x and x[u'container'] == u'numpy':
             x['dtype'] =self._fix_numpy_dtype(x[u'dtype'])
-        print x
         return x
 
     @staticmethod

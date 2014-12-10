@@ -52,38 +52,6 @@ def _ndarray_meta(ndarray):
             }
 
 
-def _fix_numpy_dtype(metadata):
-    """
-    Fix numpy metadata when it goes through JSON.
-
-    JSON converts tuples into lists, on the way down but doesn't convert them
-    back on the way up. Also all strings are converted to unicode but not
-    convrted back. This is a problem during the initialization of Numpy arrays
-    because the resulting datatype isn't understood. This function converts
-    nested list of lists into list of tuples and unicode into strings.
-
-    Examples
-    --------
-    >>> _fix_numpy_dtype([[u'a', u'f8']])
-    [('a', 'f8')]
-    >>> _fix_numpy_dtype([[u'a', u'f8', 2]])
-    [('a', 'f8', 2)]
-    >>> _fix_numpy_dtype([[u'a', [[u'b', 'f8']]]])
-    [('a', [('b', 'f8')])]
-    """
-    if isinstance(metadata, list):
-        if isinstance(metadata[0], list):
-            metadata = map(_fix_numpy_dtype, metadata)
-        else:
-            metadata = tuple(map(_fix_numpy_dtype, metadata))
-    elif isinstance(metadata, unicode):
-        metadata = str(metadata)
-    else:
-        # keep metadata as is
-        pass
-    return metadata
-
-
 class PlainNumpySource(PlainSource):
 
     def __init__(self, ndarray):
@@ -113,8 +81,6 @@ class PlainNumpySink(PlainSink):
         if metadata is None or metadata['container'] != 'numpy':
             raise NotANumpyArray
         dtype = metadata['dtype']
-        if isinstance(dtype, list) and isinstance(dtype[0], list):
-            dtype = _fix_numpy_dtype(metadata['dtype'])
         self.ndarray = numpy.empty(metadata['shape'],
                                    dtype=numpy.dtype(dtype),
                                    order=metadata['order'])

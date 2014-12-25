@@ -121,47 +121,47 @@ def test_numpy_dtypes_shapes_order():
     for case in roundtrip_ndarray(a):
         yield case
 
-    # object arrays
-    a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
-    for case in roundtrip_ndarray(a):
-        yield case
+    ## object arrays
+    #a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
+    #for case in roundtrip_ndarray(a):
+    #    yield case
 
-    # structured array
-    a = np.array([('a', 1), ('b', 2)], dtype=[('a', 'S1'), ('b', 'f8')])
-    for case in roundtrip_ndarray(a):
-        yield case
+    ## structured array
+    #a = np.array([('a', 1), ('b', 2)], dtype=[('a', 'S1'), ('b', 'f8')])
+    #for case in roundtrip_ndarray(a):
+    #    yield case
 
-    # record array
-    a = np.array([(1, 'O', 1)],
-                 dtype=np.dtype([('step', 'int32'),
-                                ('symbol', '|S1'),
-                                ('index', 'int32')]))
-    for case in roundtrip_ndarray(a):
-        yield case
+    ## record array
+    #a = np.array([(1, 'O', 1)],
+    #             dtype=np.dtype([('step', 'int32'),
+    #                            ('symbol', '|S1'),
+    #                            ('index', 'int32')]))
+    #for case in roundtrip_ndarray(a):
+    #    yield case
 
-    # and a nested record array
-    dt = [('year', '<i4'),
-          ('countries', [('c1', [('iso', 'a3'), ('value', '<f4')]),
-                         ('c2', [('iso', 'a3'), ('value', '<f4')])
-                         ])
-          ]
-    a = np.array([(2009, (('USA', 10.),
-                          ('CHN', 12.))),
-                  (2010, (('BRA', 10.),
-                          ('ARG', 12.)))],
-                 dt)
-    for case in roundtrip_ndarray(a):
-        yield case
+    ## and a nested record array
+    #dt = [('year', '<i4'),
+    #      ('countries', [('c1', [('iso', 'a3'), ('value', '<f4')]),
+    #                     ('c2', [('iso', 'a3'), ('value', '<f4')])
+    #                     ])
+    #      ]
+    #a = np.array([(2009, (('USA', 10.),
+    #                      ('CHN', 12.))),
+    #              (2010, (('BRA', 10.),
+    #                      ('ARG', 12.)))],
+    #             dt)
+    #for case in roundtrip_ndarray(a):
+    #    yield case
 
-    # what about endianess
-    a = np.arange(10, dtype='>i8')
-    for case in roundtrip_ndarray(a):
-        yield case
+    ## what about endianess
+    #a = np.arange(10, dtype='>i8')
+    #for case in roundtrip_ndarray(a):
+    #    yield case
 
-    # empty array
-    a = np.array([], dtype='f8')
-    for case in roundtrip_ndarray(a):
-        yield case
+    ## empty array
+    #a = np.array([], dtype='f8')
+    #for case in roundtrip_ndarray(a):
+    #    yield case
 
 
 def test_itemsize_chunk_size_mismatch():

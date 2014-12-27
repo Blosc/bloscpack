@@ -43,9 +43,9 @@ def _ndarray_meta(ndarray):
     # as a name. The dtype() constructor interprets this as a request to
     # give a default name.  Instead, we construct descriptor that can be
     # passed to dtype().
-    return {'dtype': ndarray.dtype.descr
+    return {'dtype': repr(ndarray.dtype.descr)
             if ndarray.dtype.names is not None
-            else ndarray.dtype.str,
+            else repr(ndarray.dtype.str),
             'shape': ndarray.shape,
             'order': 'F' if numpy.isfortran(ndarray) else 'C',
             'container': 'numpy',
@@ -80,8 +80,9 @@ class PlainNumpySink(PlainSink):
         self.metadata = metadata
         if metadata is None or metadata['container'] != 'numpy':
             raise NotANumpyArray
+
         self.ndarray = numpy.empty(metadata['shape'],
-                                   dtype=numpy.dtype(metadata['dtype']),
+                                   dtype=numpy.dtype(numpy.safe_eval(metadata['dtype'])),
                                    order=metadata['order'])
         self.ptr = self.ndarray.__array_interface__['data'][0]
 

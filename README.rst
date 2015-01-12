@@ -106,7 +106,7 @@ the standard ``setup.py``:
 
     $ git clone https://github.com/Blosc/bloscpack
     $ cd bloscpack
-    $ pip install requirements.txt
+    $ pip install -r requirements.txt
     $ python setup.py install
 
 Usage

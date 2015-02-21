@@ -32,7 +32,7 @@ def simple_progress(i):
 
 
 def create_array(repeats, in_file, progress=False):
-    with open(in_file, 'w') as in_fp:
+    with open(in_file, 'wb') as in_fp:
         create_array_fp(repeats, in_fp, progress=progress)
 
 

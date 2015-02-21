@@ -2,3 +2,4 @@ nose
 cram>=0.6
 mock
 coverage
+coveralls

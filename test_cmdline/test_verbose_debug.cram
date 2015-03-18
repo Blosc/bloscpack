@@ -59,10 +59,7 @@ Get more information using --verbose, but with metadata:
   blpk: output file size: 152.59M
   blpk: decompression ratio: 9.420032
   blpk: Metadata:
-  blpk: {   u'container': u'numpy',
-  blpk:     u'dtype': u'<f8',
-  blpk:     u'order': u'C',
-  blpk:     u'shape': [20000000]}
+  blpk: {   u'container': u'numpy', u'dtype': '<f8', u'order': u'C', u'shape': [20000000]}
   blpk: done
   $ rm data.dat.blp data.dat.dcmp
 
@@ -308,10 +305,7 @@ Try using --debug with metadata:
   blpk: output file size: 152.59M
   blpk: decompression ratio: 9.428965
   blpk: Metadata:
-  blpk: {   u'container': u'numpy',
-  blpk:     u'dtype': u'<f8',
-  blpk:     u'order': u'C',
-  blpk:     u'shape': [20000000]}
+  blpk: {   u'container': u'numpy', u'dtype': '<f8', u'order': u'C', u'shape': [20000000]}
   blpk: done
   $ rm data.dat.blp data.dat.dcmp
 Check that directory is clean.

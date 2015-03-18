@@ -80,8 +80,9 @@ class PlainNumpySink(PlainSink):
         self.metadata = metadata
         if metadata is None or metadata['container'] != 'numpy':
             raise NotANumpyArray
+        dtype = metadata['dtype']
         self.ndarray = numpy.empty(metadata['shape'],
-                                   dtype=numpy.dtype(metadata['dtype']),
+                                   dtype=numpy.dtype(dtype),
                                    order=metadata['order'])
         self.ptr = self.ndarray.__array_interface__['data'][0]
 

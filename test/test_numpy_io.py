@@ -121,10 +121,10 @@ def test_numpy_dtypes_shapes_order():
     for case in roundtrip_ndarray(a):
         yield case
 
-    # object arrays
-    a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
-    for case in roundtrip_ndarray(a):
-        yield case
+    ## object arrays
+    #a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
+    #for case in roundtrip_ndarray(a):
+    #    yield case
 
     # structured array
     a = np.array([('a', 1), ('b', 2)], dtype=[('a', 'S1'), ('b', 'f8')])

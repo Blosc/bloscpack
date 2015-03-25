@@ -89,8 +89,6 @@ dependencies and bloscpack itself:
 
 .. code-block:: console
 
-    $ wget https://raw.github.com/Blosc/bloscpack/master/requirements.txt
-    $ pip install -r requirements.txt
     $ pip install bloscpack
 
 If you want to install straight from GitHub, use pip's VCS support:
@@ -106,7 +104,6 @@ the standard ``setup.py``:
 
     $ git clone https://github.com/Blosc/bloscpack
     $ cd bloscpack
-    $ pip install -r requirements.txt
     $ python setup.py install
 
 Usage

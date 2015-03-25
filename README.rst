@@ -1101,6 +1101,7 @@ Resources and Related Publications
 * `The Blosc Github organization <https://github.com/Blosc>`_
 * `Valentin Haenel. *Introducing Bloscpack* EuroScipy 2013 Presentation <https://github.com/esc/euroscipy2013-talk-bloscpack>`_
 * `Valentin Haenel. *Bloscpack: a compressed lightweight serialization format for numerical data*. Proceedings of the 6th European Conference on Python in Science (EuroSciPy 2013) <http://arxiv.org/abs/1404.6383>`_.
+* Valentin Haenel. *Valentin Haenel - Fast Serialization of Numpy Arrays with Bloscpack*. PyData Berlin 2014 `slides <http://slides.zetatech.org/haenel-bloscpack-talk-2014-PyDataBerlin.pdf>`_, `video <https://www.youtube.com/watch?v=TZdqeEd7iTM>`_
 
 Maintainers Notes on Cutting a Release
 --------------------------------------

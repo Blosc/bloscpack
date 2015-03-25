@@ -8,7 +8,7 @@
 
 
 if [ -n "$COVERAGE" ]; then
-  alias blpk="COVERAGE_FILE=$TESTDIR/../.coverage `which coverage` run --timid -a $TESTDIR/../blpk"
+alias blpk="COVERAGE_FILE=$TESTDIR/../.coverage $( which coverage ) run --timid -a $TESTDIR/../blpk"
 else
   alias blpk="$TESTDIR/../blpk"
 fi

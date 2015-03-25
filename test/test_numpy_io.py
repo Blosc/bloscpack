@@ -10,6 +10,7 @@ from unittest import TestCase
 import numpy as np
 import numpy.testing as npt
 import nose.tools as nt
+import mock
 
 
 from bloscpack.abstract_io import (pack,
@@ -189,16 +190,11 @@ def test_backwards_compat():
                 'container': 'numpy',
                 }
     a = np.arange(10)
-    # keep a copy of the original
-    backup_ = bloscpack.numpy_io._ndarray_meta
-    # monkey patch the old version
-    bloscpack.numpy_io._ndarray_meta = old_ndarray_meta
-    # run compression with old serialization
-    c = pack_ndarray_str(a)
-    # restore original (not needed for test, but very important for the rest)
-    bloscpack.numpy_io._ndarray_meta = backup_
-    # ensure it is backwards compatible.
-    d = unpack_ndarray_str(c)
+    with mock.patch('bloscpack.numpy_io._ndarray_meta', old_ndarray_meta):
+        # uses old version of _ndarray_meta
+        c = pack_ndarray_str(a)
+        # should not raise a SyntaxError
+        d = unpack_ndarray_str(c)
 
 
 def test_itemsize_chunk_size_mismatch():

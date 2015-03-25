@@ -1198,7 +1198,7 @@ Packaging and Infrastructure
 Changelog
 ---------
 
-* v0.7.2     - Xxx Xxx XX XXXX
+* v0.7.2     - Wed Mar 25 2015
 
   * Fix support for zero length arrays (and input in general) (#17 reported by @dmbelov)
   * Catch when ``typesize`` doesn't divide ``chunk_size`` (#18 reported by @dmbelov)
@@ -1207,6 +1207,7 @@ Changelog
   * Provide backwards compatibility for older Numpy serializations
   * Fix win32 compatibility of tests (#27 fixed by @mindw)
   * Fix using setuptools for scripts and dependencies (#28 fixed by @mindw)
+  * Various misc fixes
 
 * v0.7.1     - Sun Jun 29 2014
 

@@ -174,9 +174,12 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
         if the resulting nchunks is larger than MAX_CHUNKS
 
     """
-    if in_file_size <= 0:
+    if in_file_size < 0:
             raise ValueError("'in_file_size' must be strictly positive, not %d"
                              % in_file_size)
+    elif in_file_size == 0:
+        return (1, 0, 0)
+        log.verbose("Input was length zero, ignoring 'chunk_size'")
     # convert a human readable description to an int
     if isinstance(chunk_size, basestring):
         chunk_size = reverse_pretty(chunk_size)

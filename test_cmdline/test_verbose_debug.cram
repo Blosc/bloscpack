@@ -71,21 +71,21 @@ Try using --debug
   $ blpk --debug compress --chunk-size 50M data.dat
   blpk: command line argument parsing complete
   blpk: command line arguments are: 
-  blpk:     force: False
-  blpk:     verbose: False
-  blpk:     offsets: True
   blpk:     checksum: adler32
-  blpk:     subcommand: compress
-  blpk:     out_file: None
-  blpk:     metadata: None
-  blpk:     cname: blosclz
-  blpk:     in_file: data.dat
   blpk:     chunk_size: 52428800
-  blpk:     debug: True
-  blpk:     shuffle: True
-  blpk:     typesize: 8
   blpk:     clevel: 7
+  blpk:     cname: blosclz
+  blpk:     debug: True
+  blpk:     force: False
+  blpk:     in_file: data.dat
+  blpk:     metadata: None
   blpk:     nthreads: .* (re)
+  blpk:     offsets: True
+  blpk:     out_file: None
+  blpk:     shuffle: True
+  blpk:     subcommand: compress
+  blpk:     typesize: 8
+  blpk:     verbose: False
   blpk: using .* threads (re)
   blpk: getting ready for compression
   blpk: input file is: 'data.dat'
@@ -137,14 +137,14 @@ Try using --debug
   $ blpk --debug decompress data.dat.blp data.dat.dcmp
   blpk: command line argument parsing complete
   blpk: command line arguments are: 
+  blpk:     debug: True
   blpk:     force: False
-  blpk:     verbose: False
+  blpk:     in_file: data.dat.blp
+  blpk:     no_check_extension: False
+  blpk:     nthreads: .* (re)
   blpk:     out_file: data.dat.dcmp
   blpk:     subcommand: decompress
-  blpk:     no_check_extension: False
-  blpk:     in_file: data.dat.blp
-  blpk:     debug: True
-  blpk:     nthreads: .* (re)
+  blpk:     verbose: False
   blpk: using .* threads (re)
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
@@ -181,21 +181,21 @@ Try using --debug with metadata:
   $ blpk --debug compress --chunk-size 50M --metadata meta.json data.dat
   blpk: command line argument parsing complete
   blpk: command line arguments are: 
-  blpk:     force: False
-  blpk:     verbose: False
-  blpk:     offsets: True
   blpk:     checksum: adler32
-  blpk:     subcommand: compress
-  blpk:     out_file: None
-  blpk:     metadata: meta.json
-  blpk:     cname: blosclz
-  blpk:     in_file: data.dat
   blpk:     chunk_size: 52428800
-  blpk:     debug: True
-  blpk:     shuffle: True
-  blpk:     typesize: 8
   blpk:     clevel: 7
+  blpk:     cname: blosclz
+  blpk:     debug: True
+  blpk:     force: False
+  blpk:     in_file: data.dat
+  blpk:     metadata: meta.json
   blpk:     nthreads: .* (re)
+  blpk:     offsets: True
+  blpk:     out_file: None
+  blpk:     shuffle: True
+  blpk:     subcommand: compress
+  blpk:     typesize: 8
+  blpk:     verbose: False
   blpk: using .* threads (re)
   blpk: getting ready for compression
   blpk: input file is: 'data.dat'
@@ -258,14 +258,14 @@ Try using --debug with metadata:
   $ blpk --debug decompress data.dat.blp data.dat.dcmp
   blpk: command line argument parsing complete
   blpk: command line arguments are: 
+  blpk:     debug: True
   blpk:     force: False
-  blpk:     verbose: False
+  blpk:     in_file: data.dat.blp
+  blpk:     no_check_extension: False
+  blpk:     nthreads: .* (re)
   blpk:     out_file: data.dat.dcmp
   blpk:     subcommand: decompress
-  blpk:     no_check_extension: False
-  blpk:     in_file: data.dat.blp
-  blpk:     debug: True
-  blpk:     nthreads: .* (re)
+  blpk:     verbose: False
   blpk: using .* threads (re)
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'

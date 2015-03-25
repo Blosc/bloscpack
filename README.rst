@@ -1202,6 +1202,11 @@ Changelog
 
   * Fix support for zero length arrays (and input in general) (#17 reported by @dmbelov)
   * Catch when ``typesize`` doesn't divide ``chunk_size`` (#18 reported by @dmbelov)
+  * Fix serialization of object arrays (#16 reported by @dmbelov)
+  * Reject Object dtype arrays since they cannot be compressed with Bloscpack
+  * Provide backwards compatibility for older Numpy serializations
+  * Fix win32 compatibility of tests (#27 fixed by @mindw)
+  * Fix using setuptools for scripts and dependencies (#28 fixed by @mindw)
 
 * v0.7.1     - Sun Jun 29 2014
 

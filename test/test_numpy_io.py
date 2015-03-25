@@ -19,6 +19,7 @@ from bloscpack.args import (BloscArgs,
                             )
 from bloscpack.exceptions import (NotANumpyArray,
                                   ChunkSizeTypeSizeMismatch,
+                                  ObjectNumpyArrayRejection,
                                   )
 from bloscpack.file_io import (PlainFPSource,
                                CompressedFPSource,
@@ -166,7 +167,9 @@ def test_numpy_dtypes_shapes_order():
 
 def test_reject_object_array():
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
-    nt.assert_raises(Exception, roundtrip_ndarray, a)
+    nt.assert_raises(ObjectNumpyArrayRejection, roundtrip_numpy_memory, a)
+
+
 
 
 def test_itemsize_chunk_size_mismatch():

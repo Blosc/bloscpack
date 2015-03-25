@@ -25,10 +25,10 @@ Add metadata to the file:
   blpk:     nchunks: 153
   blpk:     max_app_chunks: 1530
   blpk: 'offsets':
-  blpk: [14192,169364,311687,472289,628926,...]
+  blpk: [14212,169384,311707,472309,628946,...]
   blpk: Metadata:
   blpk: {   u'container': u'numpy',
-  blpk:     u'dtype': u'<f8',
+  blpk:     u'dtype': u"'<f8'",
   blpk:     u'order': u'C',
   blpk:     u'shape': [20000000]}
   blpk: MetadataHeader:
@@ -37,14 +37,14 @@ Add metadata to the file:
   blpk:     meta_checksum: 'adler32'
   blpk:     meta_codec: 'zlib'
   blpk:     meta_level: 6
-  blpk:     meta_size: 66.0B (66B)
-  blpk:     max_meta_size: 660.0B (660B)
-  blpk:     meta_comp_size: 62.0B (62B)
+  blpk:     meta_size: 68.0B (68B)
+  blpk:     max_meta_size: 680.0B (680B)
+  blpk:     meta_comp_size: 64.0B (64B)
   blpk:     user_codec: ''
   $ blpk decompress data.dat.blp data.dat.dcmp
   blpk: Metadata:
   blpk: {   u'container': u'numpy',
-  blpk:     u'dtype': u'<f8',
+  blpk:     u'dtype': u"'<f8'",
   blpk:     u'order': u'C',
   blpk:     u'shape': [20000000]}
 

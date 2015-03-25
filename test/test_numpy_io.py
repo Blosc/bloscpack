@@ -164,6 +164,11 @@ def test_numpy_dtypes_shapes_order():
         yield case
 
 
+def test_reject_object_array():
+    a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
+    nt.assert_raises(Exception, roundtrip_ndarray, a)
+
+
 def test_itemsize_chunk_size_mismatch():
     a = np.arange(10)
     nt.assert_raises(ChunkSizeTypeSizeMismatch,

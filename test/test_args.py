@@ -83,8 +83,12 @@ def test_calculate_nchunks():
     nt.assert_equal((1, 1,  1),
                     calculate_nchunks(1, chunk_size=1))
 
-    # check that a zero length file raises an error
-    nt.assert_raises(ValueError, calculate_nchunks, 0)
+    # check that a zero length input is handled correctly
+    nt.assert_equal((1, 0,  0),
+                    calculate_nchunks(0, chunk_size=1))
+    # check that the chunk_size is ignored in this case
+    nt.assert_equal((1, 0,  0),
+                    calculate_nchunks(0, chunk_size=512))
     # in_file_size must be strictly positive
     nt.assert_raises(ValueError, calculate_nchunks, -1)
 

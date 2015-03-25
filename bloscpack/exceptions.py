@@ -23,6 +23,10 @@ class ChunkingException(BaseException):
     pass
 
 
+class ChunkSizeTypeSizeMismatch(ValueError):
+    pass
+
+
 class ChecksumMismatch(RuntimeError):
     pass
 
@@ -56,4 +60,7 @@ class NotEnoughSpace(RuntimeError):
 
 
 class NotANumpyArray(RuntimeError):
+    pass
+
+class ObjectNumpyArrayRejection(RuntimeError):
     pass

@@ -25,6 +25,7 @@ from .abstract_io import (PlainSource,
                           PlainSink,
                           )
 from .exceptions import (NotANumpyArray,
+                         ObjectNumpyArrayRejection,
                          )
 from . import log
 
@@ -43,9 +44,9 @@ def _ndarray_meta(ndarray):
     # as a name. The dtype() constructor interprets this as a request to
     # give a default name.  Instead, we construct descriptor that can be
     # passed to dtype().
-    return {'dtype': ndarray.dtype.descr
+    return {'dtype': repr(ndarray.dtype.descr)
             if ndarray.dtype.names is not None
-            else ndarray.dtype.str,
+            else repr(ndarray.dtype.str),
             'shape': ndarray.shape,
             'order': 'F' if numpy.isfortran(ndarray) else 'C',
             'container': 'numpy',
@@ -80,8 +81,19 @@ class PlainNumpySink(PlainSink):
         self.metadata = metadata
         if metadata is None or metadata['container'] != 'numpy':
             raise NotANumpyArray
+        # The try except is a backwards compatability hack for the old way of
+        # serializing ndarray dtype which was used prior to 0.7.2. This means
+        # the dtype 'descr' was serialized directly to json and not via 'repr'.
+        # As such, it does not need to be evaluated, but instead is already a
+        # string that can be passed to the constructor. Note that this never
+        # worked for nested dtype objects and that this required it to be
+        # changed in the first place.
+        try:
+            dtype_ = numpy.safe_eval(metadata['dtype'])
+        except SyntaxError:
+            dtype_ = metadata['dtype']
         self.ndarray = numpy.empty(metadata['shape'],
-                                   dtype=numpy.dtype(metadata['dtype']),
+                                   dtype=numpy.dtype(dtype_),
                                    order=metadata['order'])
         self.ptr = self.ndarray.__array_interface__['data'][0]
 
@@ -117,7 +129,8 @@ def pack_ndarray(ndarray, sink,
     The 'typesize' value of 'blosc_args' will be silently ignored and replaced
     with the itemsize of the Numpy array's dtype.
     """
-
+    if ndarray.dtype.hasobject:
+        raise ObjectNumpyArrayRejection
     if blosc_args is None:
         blosc_args = BloscArgs(typesize=ndarray.dtype.itemsize)
     else:

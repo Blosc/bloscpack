@@ -434,7 +434,7 @@ def main():
         log.LEVEL = log.DEBUG
     log.debug('command line argument parsing complete')
     log.debug('command line arguments are: ')
-    for arg, val in vars(args).iteritems():
+    for arg, val in sorted(vars(args).iteritems()):
         log.debug('    %s: %s' % (arg, str(val)))
     process_nthread_arg(args)
 

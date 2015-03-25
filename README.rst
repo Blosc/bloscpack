@@ -89,8 +89,6 @@ dependencies and bloscpack itself:
 
 .. code-block:: console
 
-    $ wget https://raw.github.com/Blosc/bloscpack/master/requirements.txt
-    $ pip install -r requirements.txt
     $ pip install bloscpack
 
 If you want to install straight from GitHub, use pip's VCS support:
@@ -106,7 +104,6 @@ the standard ``setup.py``:
 
     $ git clone https://github.com/Blosc/bloscpack
     $ cd bloscpack
-    $ pip install requirements.txt
     $ python setup.py install
 
 Usage
@@ -1104,6 +1101,7 @@ Resources and Related Publications
 * `The Blosc Github organization <https://github.com/Blosc>`_
 * `Valentin Haenel. *Introducing Bloscpack* EuroScipy 2013 Presentation <https://github.com/esc/euroscipy2013-talk-bloscpack>`_
 * `Valentin Haenel. *Bloscpack: a compressed lightweight serialization format for numerical data*. Proceedings of the 6th European Conference on Python in Science (EuroSciPy 2013) <http://arxiv.org/abs/1404.6383>`_.
+* Valentin Haenel. *Fast Serialization of Numpy Arrays with Bloscpack*. PyData Berlin 2014 `slides <http://slides.zetatech.org/haenel-bloscpack-talk-2014-PyDataBerlin.pdf>`_, `video <https://www.youtube.com/watch?v=TZdqeEd7iTM>`_
 
 Maintainers Notes on Cutting a Release
 --------------------------------------
@@ -1199,6 +1197,17 @@ Packaging and Infrastructure
 
 Changelog
 ---------
+
+* v0.7.2     - Wed Mar 25 2015
+
+  * Fix support for zero length arrays (and input in general) (#17 reported by @dmbelov)
+  * Catch when ``typesize`` doesn't divide ``chunk_size`` (#18 reported by @dmbelov)
+  * Fix serialization of object arrays (#16 reported by @dmbelov)
+  * Reject Object dtype arrays since they cannot be compressed with Bloscpack
+  * Provide backwards compatibility for older Numpy serializations
+  * Fix win32 compatibility of tests (#27 fixed by @mindw)
+  * Fix using setuptools for scripts and dependencies (#28 fixed by @mindw)
+  * Various misc fixes
 
 * v0.7.1     - Sun Jun 29 2014
 
@@ -1369,7 +1378,7 @@ Thanks
 Author, Copyright and License
 -----------------------------
 
-© 2012-2014 Valentin Haenel <valentin@haenel.co>
+© 2012-2015 Valentin Haenel <valentin@haenel.co>
 
 Bloscpack is licensed under the terms of the MIT License.
 

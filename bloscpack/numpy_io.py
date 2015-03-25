@@ -81,9 +81,19 @@ class PlainNumpySink(PlainSink):
         self.metadata = metadata
         if metadata is None or metadata['container'] != 'numpy':
             raise NotANumpyArray
-
+        # The try except is a backwards compatability hack for the old way of
+        # serializing ndarray dtype which was used prior to 0.7.2. This means
+        # the dtype 'descr' was serialized directly to json and not via 'repr'.
+        # As such, it does not need to be evaluated, but instead is already a
+        # string that can be passed to the constructor. Note that this never
+        # worked for nested dtype objects and that this required it to be
+        # changed in the first place.
+        try:
+            dtype_ = numpy.safe_eval(metadata['dtype'])
+        except SyntaxError:
+            dtype_ = metadata['dtype']
         self.ndarray = numpy.empty(metadata['shape'],
-                                   dtype=numpy.dtype(numpy.safe_eval(metadata['dtype'])),
+                                   dtype=numpy.dtype(dtype_),
                                    order=metadata['order'])
         self.ptr = self.ndarray.__array_interface__['data'][0]
 

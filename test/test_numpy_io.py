@@ -10,6 +10,7 @@ from unittest import TestCase
 import numpy as np
 import numpy.testing as npt
 import nose.tools as nt
+import mock
 
 
 from bloscpack.abstract_io import (pack,
@@ -174,6 +175,26 @@ def test_reject_nested_object_array():
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')],
                   dtype=[('a', int), ('b', 'object')])
     nt.assert_raises(ObjectNumpyArrayRejection, roundtrip_numpy_memory, a)
+
+def test_backwards_compat():
+    import bloscpack
+    import numpy
+    def old_ndarray_meta(ndarray):
+        # This DOESN'T use 'repr', see also:
+        # bloscpack.numpy_io._ndarray_meta
+        return {'dtype': ndarray.dtype.descr
+                if ndarray.dtype.names is not None
+                else ndarray.dtype.str,
+                'shape': ndarray.shape,
+                'order': 'F' if numpy.isfortran(ndarray) else 'C',
+                'container': 'numpy',
+                }
+    a = np.arange(10)
+    with mock.patch('bloscpack.numpy_io._ndarray_meta', old_ndarray_meta):
+        # uses old version of _ndarray_meta
+        c = pack_ndarray_str(a)
+        # should not raise a SyntaxError
+        d = unpack_ndarray_str(c)
 
 
 def test_itemsize_chunk_size_mismatch():

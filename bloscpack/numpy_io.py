@@ -25,6 +25,7 @@ from .abstract_io import (PlainSource,
                           PlainSink,
                           )
 from .exceptions import (NotANumpyArray,
+                         ObjectNumpyArrayRejection,
                          )
 from . import log
 
@@ -118,7 +119,8 @@ def pack_ndarray(ndarray, sink,
     The 'typesize' value of 'blosc_args' will be silently ignored and replaced
     with the itemsize of the Numpy array's dtype.
     """
-
+    if ndarray.dtype.hasobject:
+        raise ObjectNumpyArrayRejection
     if blosc_args is None:
         blosc_args = BloscArgs(typesize=ndarray.dtype.itemsize)
     else:

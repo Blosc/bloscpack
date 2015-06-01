@@ -3,6 +3,7 @@
 # vim :set ft=py:
 
 import blosc
+from six.moves import xrange
 
 from .abstract_io import (PlainSource,
                           CompressedSource,

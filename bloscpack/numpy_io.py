@@ -8,6 +8,7 @@ import cStringIO
 
 import blosc
 import numpy
+from six.moves import xrange
 
 
 from .abstract_io import(pack,

@@ -44,7 +44,7 @@ def check_range(name, value, min_, max_):
 
 def _check_str(name, value, max_len):
     if not isinstance(value, str):
-        raise TypeError("'%s' must be of type 'int'" % name)
+        raise TypeError("'%s' must be of type 'str'" % name)
     elif len(value) > max_len:
         raise ValueError("'%s' can be of max length '%i' but is: '%s'" %
                          (name, max_len, len(value)))

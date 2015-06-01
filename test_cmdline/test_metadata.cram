@@ -25,7 +25,7 @@ Add metadata to the file:
   blpk:     nchunks: 153
   blpk:     max_app_chunks: 1530
   blpk: 'offsets':
-  blpk: [14212,169384,311707,472309,628946,...]
+  blpk: [14212,149922,266769,398990,531772,...]
   blpk: Metadata:
   blpk: {   u'container': u'numpy',
   blpk:     u'dtype': u"'<f8'",

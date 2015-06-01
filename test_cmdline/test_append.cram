@@ -14,10 +14,10 @@ Test basic append:
 
   $ blpk compress data.dat
   $ ls -lah  data.dat.blp
-  .* 1 .* .* 17M .* .* .* data.dat.blp (re)
+  .* 1 .* .* 13M .* .* .* data.dat.blp (re)
   $ blpk append data.dat.blp data.dat
   $ ls -lah  data.dat.blp
-  .* 1 .* .* 33M .* .* .* data.dat.blp (re)
+  .* 1 .* .* 26M .* .* .* data.dat.blp (re)
 
 Cleanup.
 

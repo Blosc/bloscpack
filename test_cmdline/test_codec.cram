@@ -84,7 +84,7 @@ Try using an alternative codec ('lz4' should be available):
   blpk:     nchunks: 153
   blpk:     max_app_chunks: 1530
   blpk: 'offsets':
-  blpk: [13496,173761,305230,439451,572081,...]
+  blpk: [13496,147622,236620,324526,419236,...]
   $ rm data.dat.blp
 
 Try using an  codec that is not available:

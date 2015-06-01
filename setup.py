@@ -13,7 +13,8 @@ with open('bloscpack/version.py') as f:
 
 install_requires = [
     'blosc>=1.2.7',
-    'numpy'
+    'numpy',
+    'six',
 ]
 
 # Dependencies for 2.6

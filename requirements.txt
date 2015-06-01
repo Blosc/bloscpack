@@ -1,2 +1,2 @@
-blosc>=1.2.0
+blosc>=1.2.7
 numpy

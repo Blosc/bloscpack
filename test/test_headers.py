@@ -133,7 +133,7 @@ def test_decode_blosc_header():
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
-                'blocksize': 131072,
+                'blocksize': 160000,
                 'ctbytes': len(compressed),
                 'version': 2,
                 'flags': 1,
@@ -145,7 +145,7 @@ def test_decode_blosc_header():
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
-                'blocksize': 131072,
+                'blocksize': 160000,
                 'ctbytes': len(compressed),
                 'version': 2,
                 'flags': 0,  # no shuffle flag

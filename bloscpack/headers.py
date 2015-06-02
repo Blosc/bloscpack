@@ -14,6 +14,8 @@ from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
                         check_valid_checksum,
                         )
+from .compat_util import (OrderedDict,
+                          )
 from .constants import (MAGIC,
                         FORMAT_VERSION,
                         MAX_FORMAT_VERSION,
@@ -199,13 +201,13 @@ def decode_blosc_header(buffer_):
 
     """
     buffer_ = memoryview(buffer_)
-    return {'version':   decode_uint8(buffer_[0]),
-            'versionlz': decode_uint8(buffer_[1]),
-            'flags':     decode_uint8(buffer_[2]),
-            'typesize':  decode_uint8(buffer_[3]),
-            'nbytes':    decode_uint32(buffer_[4:8]),
-            'blocksize': decode_uint32(buffer_[8:12]),
-            'ctbytes':   decode_uint32(buffer_[12:16])}
+    return OrderedDict((('version', decode_uint8(buffer_[0])),
+                        ('versionlz', decode_uint8(buffer_[1])),
+                        ('flags', decode_uint8(buffer_[2])),
+                        ('typesize', decode_uint8(buffer_[3])),
+                        ('nbytes', decode_uint32(buffer_[4:8])),
+                        ('blocksize', decode_uint32(buffer_[8:12])),
+                        ('ctbytes', decode_uint32(buffer_[12:16]))))
 
 
 class BloscpackHeader(MutableMappaingObject):

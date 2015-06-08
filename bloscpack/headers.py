@@ -12,7 +12,7 @@ except ImportError:
 
 
 import blosc
-import six
+from six import PY3, integer_types, binary_type
 
 from .abstract_objects import (MutableMappaingObject,
                                )
@@ -40,7 +40,7 @@ from . import log
 
 def check_range(name, value, min_, max_):
     """ Check that a variable is in range. """
-    if not isinstance(value, six.integer_types):
+    if not isinstance(value, integer_types):
         raise TypeError("'%s' must be of type 'int'" % name)
     elif not min_ <= value <= max_:
         raise ValueError(
@@ -49,7 +49,7 @@ def check_range(name, value, min_, max_):
 
 
 def _check_str(name, value, max_len):
-    if not isinstance(value, six.binary_type):
+    if not isinstance(value, binary_type):
         raise TypeError("'%s' must be of type 'str'/'bytes'" % name)
     elif len(value) > max_len:
         raise ValueError("'%s' can be of max length '%i' but is: '%s'" %
@@ -103,7 +103,7 @@ def check_options_zero(options, indices):
 
 
 def decode_uint8(byte):
-    if six.PY3:
+    if PY3:
         return byte
     else:
         return struct.unpack('<B', byte)[0]
@@ -126,7 +126,7 @@ def decode_bitfield(byte):
 
 
 def decode_magic_string(str_):
-    if six.PY3:
+    if PY3:
         return str_.strip(b'\x00')
     else:
         return str_.strip('\x00')

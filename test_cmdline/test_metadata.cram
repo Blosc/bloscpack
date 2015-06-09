@@ -27,7 +27,7 @@ Add metadata to the file:
   blpk: 'offsets':
   blpk: [14212,149922,266769,398990,531772,...]
   blpk: Metadata:
-  blpk: {u?'container': u?'numpy', u?'dtype': u?'<f8', u?'order': u?'C', u?'shape': \[20000000\]} (re)
+  blpk: {u?'container': u?'numpy', u?'dtype': u?"'<f8'", u?'order': u?'C', u?'shape': \[20000000\]} (re)
   blpk: MetadataHeader:
   blpk:     magic_format: 'JSON'
   blpk:     meta_options: '00000000'
@@ -40,7 +40,7 @@ Add metadata to the file:
   blpk:     user_codec: ''
   $ blpk decompress data.dat.blp data.dat.dcmp
   blpk: Metadata:
-  blpk: {u?'container': u?'numpy', u?'dtype': u?'<f8', u?'order': u?'C', u?'shape': \[20000000\]} (re)
+  blpk: {u?'container': u?'numpy', u?'dtype': u?"'<f8'", u?'order': u?'C', u?'shape': \[20000000\]} (re)
 
 Clean up:
 

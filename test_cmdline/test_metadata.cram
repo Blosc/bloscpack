@@ -29,15 +29,15 @@ Add metadata to the file:
   blpk: Metadata:
   blpk: {u?'container': u?'numpy', u?'dtype': u?"'<f8'", u?'order': u?'C', u?'shape': \[20000000\]} (re)
   blpk: MetadataHeader:
-  blpk:     magic_format: 'JSON'
+  blpk:     magic_format: b?'JSON' (re)
   blpk:     meta_options: '00000000'
   blpk:     meta_checksum: 'adler32'
   blpk:     meta_codec: 'zlib'
   blpk:     meta_level: 6
   blpk:     meta_size: 68.0B (68B)
   blpk:     max_meta_size: 680.0B (680B)
-  blpk:     meta_comp_size: 64.0B (64B)
-  blpk:     user_codec: ''
+  blpk:     meta_comp_size: 6[2-5]\.0B \(6[2-5]B\) (re)
+  blpk:     user_codec: b?'' (re)
   $ blpk decompress data.dat.blp data.dat.dcmp
   blpk: Metadata:
   blpk: {u?'container': u?'numpy', u?'dtype': u?"'<f8'", u?'order': u?'C', u?'shape': \[20000000\]} (re)

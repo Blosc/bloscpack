@@ -55,14 +55,11 @@ Get more information using --verbose, but with metadata:
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'
   blpk: input file size: 12.93M
-  blpk: read compressed metadata of size: '64'
+  blpk: read compressed metadata of size: '6[2-5]' (re)
   blpk: output file size: 152.59M
   blpk: decompression ratio: 11.805415
   blpk: Metadata:
-  blpk: {   u'container': u'numpy',
-  blpk:     u'dtype': u"'<f8'",
-  blpk:     u'order': u'C',
-  blpk:     u'shape': [20000000]}
+  blpk: {u?'container': u?'numpy', u?'dtype': u?"'<f8'", u?'order': u?'C', u?'shape': \[20000000\]} (re)
   blpk: done
   $ rm data.dat.blp data.dat.dcmp
 
@@ -116,7 +113,7 @@ Try using --debug
   blpk:     last_chunk: 2.59M (2713600B)
   blpk:     nchunks: 4
   blpk:     max_app_chunks: 40
-  blpk: raw_bloscpack_header: 'blpk\x03\x01\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
+  blpk: raw_bloscpack_header: b?'.*' (re)
   blpk: Handle chunk '0'
   blpk: checksum \(adler32\)\: .* (re)
   blpk: chunk handled, in: 50.0M (52428800B) out: 5.56M (5829276B)
@@ -130,7 +127,7 @@ Try using --debug
   blpk: checksum \(adler32\)\: .* (re)
   blpk: chunk handled, in: 2.59M (2713600B) out: 167.4K (171418B)
   blpk: Writing '4' offsets: '[384, 5829664, 10126569, 13364872]'
-  blpk: Raw offsets: '\x80\x01\x00\x00\x00\x00\x00\x00 \xf4X\x00\x00\x00\x00\x00\xe9\x84\x9a\x00\x00\x00\x00\x00\x88\xee\xcb\x00\x00\x00\x00\x00'
+  blpk: Raw offsets: b?'.*' (re)
   blpk: output file size: 12.91M (13536294B)
   blpk: compression ratio: 11.820074
   blpk: done
@@ -151,9 +148,9 @@ Try using --debug
   blpk: output file is: 'data.dat.dcmp'
   blpk: input file size: 12.91M
   blpk: reading bloscpack header
-  blpk: bloscpack_header_raw: 'blpk\x03\x01\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
+  blpk: bloscpack_header_raw: b?'.*' (re)
   blpk: bloscpack header: BloscpackHeader(format_version=3, offsets=True, metadata=False, checksum='adler32', typesize=8, chunk_size=52428800, last_chunk=2713600, nchunks=4, max_app_chunks=40)
-  blpk: Read raw offsets: '\x80\x01\x00\x00\x00\x00\x00\x00 \xf4X\x00\x00\x00\x00\x00\xe9\x84\x9a\x00\x00\x00\x00\x00\x88\xee\xcb\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
+  blpk: Read raw offsets: b?'.*' (re)
   blpk: Offsets: [384, 5829664, 10126569, 13364872]
   blpk: blosc_header: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 52428800), ('blocksize', 262144), ('ctbytes', 5829276)])
   blpk: decompressing chunk '0'
@@ -214,7 +211,7 @@ Try using --debug with metadata:
   blpk:     checksum: 'adler32'
   blpk:     max_app_chunks: .*$ (re)
   blpk: MetadataArgs:
-  blpk:     magic_format: 'JSON'
+  blpk:     magic_format: b?'JSON' (re)
   blpk:     meta_checksum: 'adler32'
   blpk:     meta_codec: 'zlib'
   blpk:     meta_level: 6
@@ -231,12 +228,12 @@ Try using --debug with metadata:
   blpk:     last_chunk: 2.59M (2713600B)
   blpk:     nchunks: 4
   blpk:     max_app_chunks: 40
-  blpk: raw_bloscpack_header: 'blpk\x03\x03\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
-  blpk: Raw compressed metadata of size '64': 'x\x9c\xabVJ)\xa9,HU\xb2RR\xb7I\xb3PW\xd2Q*\xceH\x04\xf1\xa3\x8d\x0c  VG)9?\xaf$13/\xb5\x08\xa8,\xaf4\xb7\xa0\x12\xa8,\xbf(\x05\xccwV\xaa\x05\x00\xad\x9a\x145'
+  blpk: raw_bloscpack_header: b?'.*' (re)
+  blpk: Raw compressed metadata of size '6[0-9]': b?'.*' (re)
   blpk: max meta size is deemed to be: 680
-  blpk: raw_metadata_header: 'JSON\x00\x00\x00\x00\x00\x01\x01\x06D\x00\x00\x00\xa8\x02\x00\x00@\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-  blpk: metadata has 616 preallocated empty bytes
-  blpk: metadata checksum (adler32): '\x98\x18\x19@'
+  blpk: raw_metadata_header: b?'.*' (re)
+  blpk: metadata has 61[0-9] preallocated empty bytes (re)
+  blpk: metadata checksum \(adler32\): b?'.*' (re)
   blpk: metadata section occupies a total of 716.0B (716B)
   blpk: Handle chunk '0'
   blpk: checksum \(adler32\)\: .* (re)
@@ -251,7 +248,7 @@ Try using --debug with metadata:
   blpk: checksum \(adler32\)\: .* (re)
   blpk: chunk handled, in: 2.59M (2713600B) out: 167.4K (171418B)
   blpk: Writing '4' offsets: '[1100, 5830380, 10127285, 13365588]'
-  blpk: Raw offsets: 'L\x04\x00\x00\x00\x00\x00\x00\xec\xf6X\x00\x00\x00\x00\x00\xb5\x87\x9a\x00\x00\x00\x00\x00T\xf1\xcb\x00\x00\x00\x00\x00'
+  blpk: Raw offsets: b?'.*' (re)
   blpk: output file size: 12.91M (13537010B)
   blpk: compression ratio: 11.819449
   blpk: done
@@ -272,22 +269,22 @@ Try using --debug with metadata:
   blpk: output file is: 'data.dat.dcmp'
   blpk: input file size: 12.91M
   blpk: reading bloscpack header
-  blpk: bloscpack_header_raw: 'blpk\x03\x03\x01\x08\x00\x00 \x03\x00h)\x00\x04\x00\x00\x00\x00\x00\x00\x00(\x00\x00\x00\x00\x00\x00\x00'
+  blpk: bloscpack_header_raw: b?'.*' (re)
   blpk: bloscpack header: BloscpackHeader(format_version=3, offsets=True, metadata=True, checksum='adler32', typesize=8, chunk_size=52428800, last_chunk=2713600, nchunks=4, max_app_chunks=40)
-  blpk: raw metadata header: ''JSON\x00\x00\x00\x00\x00\x01\x01\x06D\x00\x00\x00\xa8\x02\x00\x00@\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00''
+  blpk: raw metadata header: b?'.*' (re)
   blpk: MetadataHeader:
-  blpk:     magic_format: 'JSON'
+  blpk:     magic_format: b?'JSON' (re)
   blpk:     meta_options: '00000000'
   blpk:     meta_checksum: 'adler32'
   blpk:     meta_codec: 'zlib'
   blpk:     meta_level: 6
   blpk:     meta_size: 68.0B (68B)
   blpk:     max_meta_size: 680.0B (680B)
-  blpk:     meta_comp_size: 64.0B (64B)
-  blpk:     user_codec: ''
-  blpk: metadata checksum OK (adler32): '\x98\x18\x19@' 
-  blpk: read compressed metadata of size: '64'
-  blpk: Read raw offsets: 'L\x04\x00\x00\x00\x00\x00\x00\xec\xf6X\x00\x00\x00\x00\x00\xb5\x87\x9a\x00\x00\x00\x00\x00T\xf1\xcb\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
+  blpk:     meta_comp_size: 6[2-5].0B \(6[2-5]B\) (re)
+  blpk:     user_codec: b?'' (re)
+  blpk: metadata checksum OK \(adler32\): b?'.*' (re)
+  blpk: read compressed metadata of size: '6[2-5]' (re)
+  blpk: Read raw offsets: b?'.*' (re)
   blpk: Offsets: [1100, 5830380, 10127285, 13365588]
   blpk: blosc_header: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 52428800), ('blocksize', 262144), ('ctbytes', 5829276)])
   blpk: decompressing chunk '0'
@@ -308,10 +305,7 @@ Try using --debug with metadata:
   blpk: output file size: 152.59M
   blpk: decompression ratio: 11.819449
   blpk: Metadata:
-  blpk: {   u'container': u'numpy',
-  blpk:     u'dtype': u"'<f8'",
-  blpk:     u'order': u'C',
-  blpk:     u'shape': [20000000]}
+  blpk: {u?'container': u?'numpy', u?'dtype': u?"'<f8'", u?'order': u?'C', u?'shape': \[20000000\]} (re)
   blpk: done
   $ rm data.dat.blp data.dat.dcmp
 Check that directory is clean.

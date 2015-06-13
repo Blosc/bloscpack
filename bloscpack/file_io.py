@@ -199,7 +199,7 @@ def _read_metadata(input_fp):
 
     """
     raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
-    log.debug("raw metadata header: '%s'" % repr(raw_metadata_header))
+    log.debug("raw metadata header: %s" % repr(raw_metadata_header))
     metadata_header = MetadataHeader.decode(raw_metadata_header)
     log.debug(metadata_header.pformat())
     metadata = input_fp.read(metadata_header.meta_comp_size)
@@ -216,7 +216,7 @@ def _read_metadata(input_fp):
                     (repr(metadata_expected_digest),
                         repr(metadata_received_digest)))
         else:
-            log.debug('metadata checksum OK (%s): %s ' %
+            log.debug('metadata checksum OK (%s): %s' %
                     (metadata_checksum_impl.name,
                         repr(metadata_received_digest)))
     if metadata_header.meta_codec != 'None':

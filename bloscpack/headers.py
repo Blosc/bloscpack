@@ -40,7 +40,7 @@ from . import log
 
 def check_range(name, value, min_, max_):
     """ Check that a variable is in range. """
-    if not isinstance(value, (int, long)):
+    if not isinstance(value, six.integer_types):
         raise TypeError("'%s' must be of type 'int'" % name)
     elif not min_ <= value <= max_:
         raise ValueError(
@@ -49,7 +49,7 @@ def check_range(name, value, min_, max_):
 
 
 def _check_str(name, value, max_len):
-    if not isinstance(value, str):
+    if not isinstance(value, six.string_types):
         raise TypeError("'%s' must be of type 'str'" % name)
     elif len(value) > max_len:
         raise ValueError("'%s' can be of max length '%i' but is: '%s'" %

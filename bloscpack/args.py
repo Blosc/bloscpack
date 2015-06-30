@@ -4,6 +4,8 @@
 
 
 import blosc
+import six
+
 
 
 from .abstract_objects import (MutableMappaingObject,
@@ -181,7 +183,7 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
         return (1, 0, 0)
         log.verbose("Input was length zero, ignoring 'chunk_size'")
     # convert a human readable description to an int
-    if isinstance(chunk_size, basestring):
+    if isinstance(chunk_size, six.string_types):
         chunk_size = reverse_pretty(chunk_size)
     check_range('chunk_size', chunk_size, 1, blosc.BLOSC_MAX_BUFFERSIZE)
     # downcast
@@ -264,7 +266,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
             # it's a callable all right
             log.debug("max_app_chunks is a callable")
             max_app_chunks = max_app_chunks(nchunks)
-            if not isinstance(max_app_chunks, (int, long)):
+            if not isinstance(max_app_chunks, six.integer_types):
                 raise ValueError(
                         "max_app_chunks callable returned a non integer "
                         "of type '%s'" % type(max_app_chunks))
@@ -272,7 +274,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
             if max_app_chunks < 0:
                 raise ValueError(
                         'max_app_chunks callable returned a negative integer')
-        elif isinstance(max_app_chunks, (int, long)):
+        elif isinstance(max_app_chunks, six.integer_types):
             # it's a plain int, check its range
             log.debug("max_app_chunks is an int")
             check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
@@ -383,7 +385,7 @@ class MetadataArgs(MutableMappaingObject):
     def effective_max_meta_size(self, meta_size):
         if hasattr(self.max_meta_size, '__call__'):
             max_meta_size = self.max_meta_size(meta_size)
-        elif isinstance(self.max_meta_size, int):  # TOOD: py3 compat
+        elif isinstance(self.max_meta_size, six.integer_types):
             max_meta_size = self.max_meta_size
         log.debug('max meta size is deemed to be: %d' % max_meta_size)
         return max_meta_size

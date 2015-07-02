@@ -5,6 +5,11 @@
 
 import struct
 
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
+
 
 import blosc
 
@@ -14,8 +19,6 @@ from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
                         check_valid_checksum,
                         )
-from .compat_util import (OrderedDict,
-                          )
 from .constants import (MAGIC,
                         FORMAT_VERSION,
                         MAX_FORMAT_VERSION,

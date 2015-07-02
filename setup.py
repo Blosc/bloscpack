@@ -16,6 +16,7 @@ install_requires = [
     'numpy'
 ]
 
+# Dependencies for 2.6
 if sys.version_info[:2] < (2, 7):
     install_requires += ['ordereddict', 'argparse']
 

@@ -57,7 +57,7 @@ Numpy arrays.
 Dependencies
 ------------
 
-* Python 2.6 (requires packages listed in ``2.6_requirements.txt``) or Python
+* Python 2.6 (requires packages listed in ``setup.py``) or Python
   2.7
 * `python-blosc  <https://github.com/Blosc/python-blosc>`_ (provides Blosc) and
   `Numpy <http://www.numpy.org/>`_ (as listed in ``requirements.txt`` for

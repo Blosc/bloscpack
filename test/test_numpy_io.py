@@ -176,9 +176,9 @@ def test_reject_nested_object_array():
                   dtype=[('a', int), ('b', 'object')])
     nt.assert_raises(ObjectNumpyArrayRejection, roundtrip_numpy_memory, a)
 
+
 def test_backwards_compat():
-    import bloscpack
-    import numpy
+
     def old_ndarray_meta(ndarray):
         # This DOESN'T use 'repr', see also:
         # bloscpack.numpy_io._ndarray_meta
@@ -186,15 +186,21 @@ def test_backwards_compat():
                 if ndarray.dtype.names is not None
                 else ndarray.dtype.str,
                 'shape': ndarray.shape,
-                'order': 'F' if numpy.isfortran(ndarray) else 'C',
+                'order': 'F' if np.isfortran(ndarray) else 'C',
                 'container': 'numpy',
                 }
-    a = np.arange(10)
+    test_data = [np.arange(10),
+                 np.array([('a', 1), ('b', 2)],
+                          dtype=[('a', 'S1'), ('b', 'f8')]),
+                 ]
+
     with mock.patch('bloscpack.numpy_io._ndarray_meta', old_ndarray_meta):
-        # uses old version of _ndarray_meta
-        c = pack_ndarray_str(a)
-        # should not raise a SyntaxError
-        d = unpack_ndarray_str(c)
+        for a in test_data:
+            # uses old version of _ndarray_meta
+            c = pack_ndarray_str(a)
+            # should not raise a SyntaxError
+            d = unpack_ndarray_str(c)
+            yield npt.assert_array_equal, a, d
 
 
 def test_itemsize_chunk_size_mismatch():

@@ -26,6 +26,8 @@ from .constants import (METADATA_HEADER_LENGTH,
                         BLOSC_HEADER_LENGTH,
                         FORMAT_VERSION,
                         )
+from .compat_util import (StringIO,
+                          )
 from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
                         )
@@ -500,3 +502,35 @@ def unpack_file(in_file, out_file):
     log.verbose('output file size: %s' % pretty_size(out_file_size))
     log.verbose('decompression ratio: %f' % (out_file_size / in_file_size))
     return source.metadata
+
+
+def pack_bytes_file(bytes_, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
+                    blosc_args=None,
+                    bloscpack_args=None,
+                    metadata_args=None):
+    bytes_size = len(bytes_)
+    log.verbose('input bytes size: %s' % double_pretty_size(bytes_size))
+    # calculate chunk sizes
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(bytes_size, chunk_size)
+    with open(out_file, 'wb') as output_fp:
+        source = PlainFPSource(StringIO(bytes_))
+        sink = CompressedFPSink(output_fp)
+        pack(source, sink,
+             nchunks, chunk_size, last_chunk_size,
+             metadata=metadata,
+             blosc_args=blosc_args,
+             bloscpack_args=bloscpack_args,
+             metadata_args=metadata_args)
+    out_file_size = path.getsize(out_file)
+    log.verbose('output file size: %s' % double_pretty_size(out_file_size))
+    log.verbose('compression ratio: %f' % (bytes_size/out_file_size))
+
+
+def unpack_bytes_file(compressed_file):
+    sio = StringIO()
+    sink = PlainFPSink(sio)
+    with open(compressed_file) as fp:
+        source = CompressedFPSource(fp)
+        unpack(source, sink)
+    return sio.getvalue()

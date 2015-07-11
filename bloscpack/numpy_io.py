@@ -75,6 +75,31 @@ class PlainNumpySource(PlainSource):
         yield offset, int(self.last_chunk / self.ndarray.itemsize)
 
 
+def _conv(descr):
+    """ Converts nested list of lists into list of tuples.
+
+    Needed for backwards compatability, see below.
+
+    Examples
+    --------
+     [[u'a', u'f8']] -> [('a', 'f8')]
+     [[u'a', u'f8', 2]] -> [('a', 'f8', 2)]
+     [[u'a', [[u'b', 'f8']]]] -> [('a', [('b', 'f8')])]
+
+    """
+    if isinstance(descr, list):
+        if isinstance(descr[0], list):
+            descr = map(_conv, descr)
+        else:
+            descr = tuple(map(_conv, descr))
+    elif isinstance(descr, unicode):
+        descr = str(descr)
+    else:
+        # keep descr as is
+        pass
+    return descr
+
+
 class PlainNumpySink(PlainSink):
 
     def __init__(self, metadata):
@@ -82,16 +107,20 @@ class PlainNumpySink(PlainSink):
         if metadata is None or metadata['container'] != 'numpy':
             raise NotANumpyArray
         # The try except is a backwards compatability hack for the old way of
-        # serializing ndarray dtype which was used prior to 0.7.2. This means
-        # the dtype 'descr' was serialized directly to json and not via 'repr'.
-        # As such, it does not need to be evaluated, but instead is already a
-        # string that can be passed to the constructor. Note that this never
-        # worked for nested dtype objects and that this required it to be
-        # changed in the first place.
+        # serializing ndarray dtype which was used prior to 0.7.2. For basic
+        # dtyepes, the dtype 'descr' was serialized directly to json and not
+        # via 'repr'.  As such, it does not need to be evaluated, but instead
+        # is already a string that can be passed to the constructor. It will
+        # raise a SyntaxError in this case. For nested dtypes we have the
+        # problem, that it did compress the files but was unable to decompress
+        # them. In this case, it will raise a TypeError and the _conv function
+        # above is used to convert the dtype accordingly.
         try:
             dtype_ = numpy.safe_eval(metadata['dtype'])
         except SyntaxError:
             dtype_ = metadata['dtype']
+        except TypeError:
+            dtype_ = _conv(metadata['dtype'])
         self.ndarray = numpy.empty(metadata['shape'],
                                    dtype=numpy.dtype(dtype_),
                                    order=metadata['order'])

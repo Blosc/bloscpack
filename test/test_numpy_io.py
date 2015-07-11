@@ -35,6 +35,7 @@ from bloscpack.numpy_io import (pack_ndarray,
                                 unpack_ndarray_str,
                                 pack_ndarray_file,
                                 unpack_ndarray_file,
+                                _conv,
                                 )
 from bloscpack.testutil import (create_tmp_files,
                                 )
@@ -69,6 +70,17 @@ def roundtrip_numpy_file(ndarray):
         pack_ndarray_file(ndarray, out_file)
         b = unpack_ndarray_file(out_file)
         return npt.assert_array_equal, ndarray, b
+
+
+def test_conv():
+    test_data = (
+        ([[u'a', u'f8']], [('a', 'f8')]),
+        ([[u'a', u'f8', 2]], [('a', 'f8', 2)]),
+        ([[u'a', [[u'b', 'f8']]]], [('a', [('b', 'f8')])]),
+    )
+    for input_, expected in test_data:
+        received = _conv(input_)
+        yield nt.assert_equal, expected, received
 
 
 def test_unpack_exception():

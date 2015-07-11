@@ -1198,6 +1198,11 @@ Packaging and Infrastructure
 Changelog
 ---------
 
+* v0.7.3     - Xxx Xxx XX XXXX
+
+  * Fix deserialization of numpy arrays with nested dtypes that were created
+    with versions v0.7.1 and before. (#37)
+
 * v0.7.2     - Wed Mar 25 2015
 
   * Fix support for zero length arrays (and input in general) (#17 reported by @dmbelov)

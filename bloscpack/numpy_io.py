@@ -5,6 +5,7 @@
 
 import blosc
 import numpy
+import six
 from six.moves import xrange
 
 
@@ -88,10 +89,10 @@ def _conv(descr):
     """
     if isinstance(descr, list):
         if isinstance(descr[0], list):
-            descr = map(_conv, descr)
+            descr = [_conv(d) for d in descr]
         else:
-            descr = tuple(map(_conv, descr))
-    elif isinstance(descr, unicode):
+            descr = tuple([_conv(d) for d in descr])
+    elif six.PY2 and isinstance(descr, unicode):
         descr = str(descr)
     else:
         # keep descr as is

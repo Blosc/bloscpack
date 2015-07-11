@@ -9,6 +9,9 @@ import itertools
 import os.path as path
 
 import blosc
+import six
+from six.moves import xrange
+
 
 from .args import (calculate_nchunks,
                    _check_metadata_arguments,
@@ -50,7 +53,7 @@ from .abstract_io import (PlainSource,
                           CompressedSource,
                           CompressedSink,
                           )
-import log
+from . import log
 
 
 def _write_metadata(output_fp, metadata, metadata_args):
@@ -83,6 +86,8 @@ def _write_metadata(output_fp, metadata, metadata_args):
     serializer_impl = SERIALIZERS_LOOKUP[metadata_args.magic_format]
     metadata = serializer_impl.dumps(metadata)
     meta_size = len(metadata)
+    if six.PY3 and isinstance(metadata, str):
+        metadata = metadata.encode()
     if metadata_args.should_compress:
         codec_impl = metadata_args.meta_codec_impl
         metadata_compressed = codec_impl.compress(metadata,
@@ -124,7 +129,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
     output_fp.write(metadata)
     prealloc = max_meta_size - meta_comp_size
     for i in xrange(prealloc):
-        output_fp.write('\x00')
+        output_fp.write(b'\x00')
     metadata_total += prealloc
     log.debug("metadata has %d preallocated empty bytes" % prealloc)
     if metadata_args['meta_checksum'] != CHECKSUMS_AVAIL[0]:
@@ -194,7 +199,7 @@ def _read_metadata(input_fp):
 
     """
     raw_metadata_header = input_fp.read(METADATA_HEADER_LENGTH)
-    log.debug("raw metadata header: '%s'" % repr(raw_metadata_header))
+    log.debug("raw metadata header: %s" % repr(raw_metadata_header))
     metadata_header = MetadataHeader.decode(raw_metadata_header)
     log.debug(metadata_header.pformat())
     metadata = input_fp.read(metadata_header.meta_comp_size)
@@ -211,7 +216,7 @@ def _read_metadata(input_fp):
                     (repr(metadata_expected_digest),
                         repr(metadata_received_digest)))
         else:
-            log.debug('metadata checksum OK (%s): %s ' %
+            log.debug('metadata checksum OK (%s): %s' %
                     (metadata_checksum_impl.name,
                         repr(metadata_received_digest)))
     if metadata_header.meta_codec != 'None':
@@ -222,6 +227,8 @@ def _read_metadata(input_fp):
             ('compressed' if metadata_header.meta_codec != 'None' else
                 'uncompressed', metadata_header.meta_comp_size))
     serializer_impl = SERIALIZERS_LOOKUP[metadata_header.magic_format]
+    if six.PY3 and isinstance(metadata, bytes):
+        metadata = metadata.decode()
     metadata = serializer_impl.loads(metadata)
     return metadata, metadata_header
 
@@ -285,7 +292,7 @@ def _write_offsets(output_fp, offsets):
     log.debug("Writing '%d' offsets: '%s'" %
               (len(offsets), repr(offsets)))
     # write the offsets encoded into the reserved space in the file
-    encoded_offsets = "".join([encode_int64(i) for i in offsets])
+    encoded_offsets = b"".join([encode_int64(i) for i in offsets])
     log.debug("Raw offsets: %s" % repr(encoded_offsets))
     output_fp.write(encoded_offsets)
 

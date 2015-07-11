@@ -3,16 +3,16 @@
 # vim :set ft=py:
 
 
-import cStringIO
-
-
 import blosc
 import numpy
+import six
+from six.moves import xrange
 
 
 from .abstract_io import(pack,
                          unpack,
                          )
+from .compat_util import StringIO
 from .file_io import (CompressedFPSource,
                       CompressedFPSink,
                       )
@@ -89,10 +89,10 @@ def _conv(descr):
     """
     if isinstance(descr, list):
         if isinstance(descr[0], list):
-            descr = map(_conv, descr)
+            descr = [_conv(d) for d in descr]
         else:
-            descr = tuple(map(_conv, descr))
-    elif isinstance(descr, unicode):
+            descr = tuple([_conv(d) for d in descr])
+    elif six.PY2 and isinstance(descr, unicode):
         descr = str(descr)
     else:
         # keep descr as is
@@ -198,7 +198,7 @@ def pack_ndarray_str(ndarray,
                      blosc_args=None,
                      bloscpack_args=None,
                      metadata_args=None):
-    sio = cStringIO.StringIO()
+    sio = StringIO()
     sink = CompressedFPSink(sio)
     pack_ndarray(ndarray, sink,
                  chunk_size=chunk_size,
@@ -238,6 +238,6 @@ def unpack_ndarray_file(filename):
 
 
 def unpack_ndarray_str(str_):
-    sio = cStringIO.StringIO(str_)
+    sio = StringIO(str_)
     source = CompressedFPSource(sio)
     return unpack_ndarray(source)

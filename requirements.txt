@@ -1,2 +1,3 @@
 blosc>=1.2.7
 numpy
+six

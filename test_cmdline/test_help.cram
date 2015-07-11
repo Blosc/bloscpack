@@ -10,6 +10,20 @@ In case of no arguments, show a usage message:
   blpk: error: too few arguments
   [2]
 
+(On Python 2.6 the list of possible choices seems random and unpredictable.
+ Hence we deactivate this one test here.)
+
+  $ if $TESTDIR/pyversion.py "< (2,7)" ; then 
+  >   echo 'usage: blpk [-h] [--version] [-v | -d] [-f] [-n [1, 256]]  ...' && \
+  >   echo "blpk: error: argument : invalid choice: 'NO_SUCH_SUBCOMMAND' (choose from 'compress', 'c', 'decompress', 'd', 'append', 'a', 'info', 'i')" && \
+  >   python -c "import sys; sys.exit(2)"
+  > else
+  >   blpk NO_SUCH_SUBCOMMAND
+  > fi
+  usage: blpk [-h] [--version] [-v | -d] [-f] [-n [1, 256]]  ...
+  blpk: error: argument : invalid choice: 'NO_SUCH_SUBCOMMAND' (choose from 'compress', 'c', 'decompress', 'd', 'append', 'a', 'info', 'i')
+  [2]
+
 Help for global options and subcommands:
 
   $ blpk --help

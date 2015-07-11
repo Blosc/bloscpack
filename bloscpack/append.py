@@ -58,7 +58,7 @@ from .pretty import (double_pretty_size,
                      )
 from .util import (open_two_file,
                    )
-import log
+from . import log
 
 
 def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):

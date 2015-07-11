@@ -82,7 +82,7 @@ def cmp_fp(fp1, fp2):
     while True:
         a = fp1.read(chunk_size)
         b = fp2.read(chunk_size)
-        if a == '' and b == '':
+        if a == b'' and b == b'':
             return True
         else:
             nt.assert_equal(a, b)

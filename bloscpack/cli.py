@@ -49,7 +49,7 @@ from .pretty import (reverse_pretty,
                      join_with_eol,
                      )
 from .version import __version__
-import log
+from . import log
 
 
 def check_files(in_file, out_file, args):
@@ -172,7 +172,7 @@ def process_nthread_arg(args):
 
 def log_metadata(metadata):
     log.normal("Metadata:")
-    log.normal(pprint.pformat(metadata, indent=4))
+    log.normal(pprint.pformat(metadata, width=90))
 
 
 class BloscPackCustomFormatter(argparse.HelpFormatter):
@@ -434,7 +434,7 @@ def main():
         log.LEVEL = log.DEBUG
     log.debug('command line argument parsing complete')
     log.debug('command line arguments are: ')
-    for arg, val in sorted(vars(args).iteritems()):
+    for arg, val in sorted(vars(args).items()):
         log.debug('    %s: %s' % (arg, str(val)))
     process_nthread_arg(args)
 
@@ -501,7 +501,7 @@ def main():
         except FileNotFound as fnf:
             log.error(str(fnf))
         try:
-            with open(args.file_) as fp:
+            with open(args.file_, 'rb') as fp:
                 bloscpack_header, metadata, metadata_header, offsets = \
                     _read_beginning(fp)
         except ValueError as ve:

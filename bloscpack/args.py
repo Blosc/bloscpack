@@ -4,6 +4,7 @@
 
 
 import blosc
+from six import integer_types, string_types
 
 
 from .abstract_objects import (MutableMappaingObject,
@@ -29,7 +30,7 @@ from .metacodecs import (CODECS_AVAIL,
 from .pretty import (double_pretty_size,
                      reverse_pretty,
                      )
-from bloscpack import log
+from . import log
 
 # Bloscpack args
 BLOSCPACK_ARGS = ('offsets', 'checksum', 'max_app_chunks')
@@ -49,7 +50,7 @@ DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
 METADATA_ARGS = ('magic_format', 'meta_checksum',
                  'meta_codec', 'meta_level', 'max_meta_size')
 _METADATA_ARGS_SET = set(METADATA_ARGS)  # cached
-DEFAULT_MAGIC_FORMAT = 'JSON'
+DEFAULT_MAGIC_FORMAT = b'JSON'
 DEFAULT_META_CHECKSUM = 'adler32'
 DEFAULT_META_CODEC = 'zlib'
 DEFAULT_META_LEVEL = 6
@@ -181,7 +182,7 @@ def calculate_nchunks(in_file_size, chunk_size=DEFAULT_CHUNK_SIZE):
         return (1, 0, 0)
         log.verbose("Input was length zero, ignoring 'chunk_size'")
     # convert a human readable description to an int
-    if isinstance(chunk_size, basestring):
+    if isinstance(chunk_size, string_types):
         chunk_size = reverse_pretty(chunk_size)
     check_range('chunk_size', chunk_size, 1, blosc.BLOSC_MAX_BUFFERSIZE)
     # downcast
@@ -264,7 +265,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
             # it's a callable all right
             log.debug("max_app_chunks is a callable")
             max_app_chunks = max_app_chunks(nchunks)
-            if not isinstance(max_app_chunks, (int, long)):
+            if not isinstance(max_app_chunks, integer_types):
                 raise ValueError(
                         "max_app_chunks callable returned a non integer "
                         "of type '%s'" % type(max_app_chunks))
@@ -272,7 +273,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
             if max_app_chunks < 0:
                 raise ValueError(
                         'max_app_chunks callable returned a negative integer')
-        elif isinstance(max_app_chunks, (int, long)):
+        elif isinstance(max_app_chunks, integer_types):
             # it's a plain int, check its range
             log.debug("max_app_chunks is an int")
             check_range('max_app_chunks', max_app_chunks, 0, MAX_CHUNKS)
@@ -383,7 +384,7 @@ class MetadataArgs(MutableMappaingObject):
     def effective_max_meta_size(self, meta_size):
         if hasattr(self.max_meta_size, '__call__'):
             max_meta_size = self.max_meta_size(meta_size)
-        elif isinstance(self.max_meta_size, int):  # TOOD: py3 compat
+        elif isinstance(self.max_meta_size, integer_types):
             max_meta_size = self.max_meta_size
         log.debug('max meta size is deemed to be: %d' % max_meta_size)
         return max_meta_size

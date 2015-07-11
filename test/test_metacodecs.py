@@ -15,7 +15,7 @@ from bloscpack.metacodecs import (CODECS,
 
 def test_codecs():
     nt.assert_equal(CODECS_AVAIL, ['None', 'zlib'])
-    random_str = "4KzGCl7SxTsYLaerommsMWyZg1TXbV6wsR9Xk"
+    random_str = b"4KzGCl7SxTsYLaerommsMWyZg1TXbV6wsR9Xk"
     for i, c in enumerate(CODECS):
         nt.assert_equal(random_str, c.decompress(
             c.compress(random_str, DEFAULT_META_LEVEL)))

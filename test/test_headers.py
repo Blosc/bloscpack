@@ -232,8 +232,8 @@ def test_BloscpackHeader_encode():
     # the raw encoded header as produces w/o any kwargs
     format_version = struct.pack('<B', FORMAT_VERSION)
     raw = MAGIC + format_version + \
-        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
-        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+        b'\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
+        b'\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
 
     # modify the raw encoded header with the value starting at offset
     def mod_raw(offset, replacement):
@@ -246,43 +246,43 @@ def test_BloscpackHeader_encode():
     for offset, replacement, kwargs in [
             (4, struct.pack('<B', 23), {'format_version': 23}),
             # test with options
-            (5, '\x01', {'offsets': True}),
-            (5, '\x02', {'metadata': True}),
-            (5, '\x03', {'offsets': True, 'metadata': True}),
+            (5, b'\x01', {'offsets': True}),
+            (5, b'\x02', {'metadata': True}),
+            (5, b'\x03', {'offsets': True, 'metadata': True}),
             # test with checksum
-            (6, '\x01', {'checksum': 'adler32'}),
-            (6, '\x08', {'checksum': 'sha512'}),
+            (6, b'\x01', {'checksum': 'adler32'}),
+            (6, b'\x08', {'checksum': 'sha512'}),
             # test with typesize
-            (7, '\x01', {'typesize': 1}),
-            (7, '\x02', {'typesize': 2}),
-            (7, '\x04', {'typesize': 4}),
-            (7, '\x10', {'typesize': 16}),
-            (7, '\xff', {'typesize': 255}),
+            (7, b'\x01', {'typesize': 1}),
+            (7, b'\x02', {'typesize': 2}),
+            (7, b'\x04', {'typesize': 4}),
+            (7, b'\x10', {'typesize': 16}),
+            (7, b'\xff', {'typesize': 255}),
             # test with chunksize
-            (8, '\xff\xff\xff\xff', {'chunk_size': -1}),
-            (8, '\x01\x00\x00\x00', {'chunk_size': 1}),
-            (8, '\x00\x00\x10\x00', {'chunk_size': reverse_pretty('1M')}),
-            (8, '\xef\xff\xff\x7f', {'chunk_size': blosc.BLOSC_MAX_BUFFERSIZE}),
+            (8, b'\xff\xff\xff\xff', {'chunk_size': -1}),
+            (8, b'\x01\x00\x00\x00', {'chunk_size': 1}),
+            (8, b'\x00\x00\x10\x00', {'chunk_size': reverse_pretty('1M')}),
+            (8, b'\xef\xff\xff\x7f', {'chunk_size': blosc.BLOSC_MAX_BUFFERSIZE}),
             # test with last_chunk
-            (12, '\xff\xff\xff\xff', {'last_chunk': -1}),
-            (12, '\x01\x00\x00\x00', {'last_chunk': 1}),
-            (12, '\x00\x00\x10\x00', {'last_chunk': reverse_pretty('1M')}),
-            (12, '\xef\xff\xff\x7f', {'last_chunk': blosc.BLOSC_MAX_BUFFERSIZE}),
+            (12, b'\xff\xff\xff\xff', {'last_chunk': -1}),
+            (12, b'\x01\x00\x00\x00', {'last_chunk': 1}),
+            (12, b'\x00\x00\x10\x00', {'last_chunk': reverse_pretty('1M')}),
+            (12, b'\xef\xff\xff\x7f', {'last_chunk': blosc.BLOSC_MAX_BUFFERSIZE}),
             # test nchunks
-            (16, '\xff\xff\xff\xff\xff\xff\xff\xff', {'nchunks': -1}),
-            (16, '\x00\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 0}),
-            (16, '\x01\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 1}),
-            (16, '\x7f\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 127}),
-            (16, '\xff\xff\xff\xff\xff\xff\xff\x7f', {'nchunks': MAX_CHUNKS}),
+            (16, b'\xff\xff\xff\xff\xff\xff\xff\xff', {'nchunks': -1}),
+            (16, b'\x00\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 0}),
+            (16, b'\x01\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 1}),
+            (16, b'\x7f\x00\x00\x00\x00\x00\x00\x00', {'nchunks': 127}),
+            (16, b'\xff\xff\xff\xff\xff\xff\xff\x7f', {'nchunks': MAX_CHUNKS}),
             # test max_app_chunks
-            (16, '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+            (16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
                 {'nchunks': 1, 'max_app_chunks': 0}),
-            (16, '\x01\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00',
+            (16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00',
                 {'nchunks': 1, 'max_app_chunks': 1}),
-            (16, '\x01\x00\x00\x00\x00\x00\x00\x00\x7f\x00\x00\x00\x00\x00\x00\x00',
+            (16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x7f\x00\x00\x00\x00\x00\x00\x00',
                 {'nchunks': 1, 'max_app_chunks': 127}),
             # Maximum value is MAX_CHUNKS - 1 since nchunks is already 1
-            (16, '\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f',
+            (16, b'\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f',
                 {'nchunks': 1, 'max_app_chunks': MAX_CHUNKS-1}),
             ]:
         yield nt.assert_equal, mod_raw(offset, replacement), \
@@ -293,8 +293,8 @@ def test_BloscpackHeader_decode():
 
     format_version = struct.pack('<B', FORMAT_VERSION)
     raw = MAGIC + format_version + \
-        '\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
-        '\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+        b'\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff' + \
+        b'\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
 
     def mod_raw(offset, replacement):
         return raw[0:offset] + replacement + \
@@ -305,51 +305,51 @@ def test_BloscpackHeader_decode():
 
     for kwargs, offset, replacement in [
             # check with format_version
-            ({'format_version': 23}, 4, '\x17'),
+            ({'format_version': 23}, 4, b'\x17'),
             # check with options
-            ({'offsets': True}, 5, '\x01'),
-            ({'metadata': True}, 5, '\x02'),
-            ({'metadata': True, 'offsets': True}, 5, '\x03'),
+            ({'offsets': True}, 5, b'\x01'),
+            ({'metadata': True}, 5, b'\x02'),
+            ({'metadata': True, 'offsets': True}, 5, b'\x03'),
             # check with checksum
-            ({'checksum': 'adler32'}, 6, '\x01'),
-            ({'checksum': 'sha384'}, 6, '\x07'),
+            ({'checksum': 'adler32'}, 6, b'\x01'),
+            ({'checksum': 'sha384'}, 6, b'\x07'),
             # check with typesize
-            ({'typesize': 1}, 7, '\x01'),
-            ({'typesize': 2}, 7, '\x02'),
-            ({'typesize': 4}, 7, '\x04'),
-            ({'typesize': 8}, 7, '\x08'),
-            ({'typesize': blosc.BLOSC_MAX_TYPESIZE}, 7, '\xff'),
+            ({'typesize': 1}, 7, b'\x01'),
+            ({'typesize': 2}, 7, b'\x02'),
+            ({'typesize': 4}, 7, b'\x04'),
+            ({'typesize': 8}, 7, b'\x08'),
+            ({'typesize': blosc.BLOSC_MAX_TYPESIZE}, 7, b'\xff'),
             # check with chunk_size
-            ({'chunk_size': 1}, 
-                8, '\x01\x00\x00\x00'),
+            ({'chunk_size': 1},
+                8, b'\x01\x00\x00\x00'),
             ({'chunk_size': reverse_pretty('1M')},
-                8, '\x00\x00\x10\x00'),
+                8, b'\x00\x00\x10\x00'),
             ({'chunk_size': blosc.BLOSC_MAX_BUFFERSIZE},
-                8, '\xef\xff\xff\x7f'),
+                8, b'\xef\xff\xff\x7f'),
             # check with last_chunk
             ({'last_chunk': 1},
-                12, '\x01\x00\x00\x00'),
+                12, b'\x01\x00\x00\x00'),
             ({'last_chunk': reverse_pretty('1M')},
-                12, '\x00\x00\x10\x00'),
+                12, b'\x00\x00\x10\x00'),
             ({'last_chunk': blosc.BLOSC_MAX_BUFFERSIZE},
-                12, '\xef\xff\xff\x7f'),
+                12, b'\xef\xff\xff\x7f'),
             # check with nchunks
             ({'nchunks': 1},
-                16, '\x01\x00\x00\x00\x00\x00\x00\x00'),
+                16, b'\x01\x00\x00\x00\x00\x00\x00\x00'),
             ({'nchunks': reverse_pretty('1M')},
-                16, '\x00\x00\x10\x00\x00\x00\x00\x00'),
+                16, b'\x00\x00\x10\x00\x00\x00\x00\x00'),
             ({'nchunks': MAX_CHUNKS},
-                16, '\xff\xff\xff\xff\xff\xff\xff\x7f'),
+                16, b'\xff\xff\xff\xff\xff\xff\xff\x7f'),
             # check with max_app_chunks
             ({'nchunks': 1, 'max_app_chunks': 0},
-                16, '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'),
+                16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'),
             ({'nchunks': 1, 'max_app_chunks': 1},
-                16, '\x01\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00'),
+                16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00'),
             ({'nchunks': 1, 'max_app_chunks': reverse_pretty('1M')},
-                16, '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00'),
+                16, b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00'),
             # Maximum value is MAX_CHUNKS - 1 since nchunks is already 1
             ({'nchunks': 1, 'max_app_chunks': MAX_CHUNKS-1},
-                16, '\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f'),
+                16, b'\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f'),
             ]:
         yield (nt.assert_equal,
                BloscpackHeader(**kwargs),
@@ -374,11 +374,11 @@ def test_BloscpackHeader_accessor_exceptions():
                             'foo',)
 
 
-def test_create_metadata_header():
-    raw = '\x00\x00\x00\x00\x00\x00\x00\x00'\
-          '\x00\x00\x00\x00\x00\x00\x00\x00'\
-          '\x00\x00\x00\x00\x00\x00\x00\x00'\
-          '\x00\x00\x00\x00\x00\x00\x00\x00'
+def test_MetadataHeader_encode():
+    raw = b'\x00\x00\x00\x00\x00\x00\x00\x00'\
+          b'\x00\x00\x00\x00\x00\x00\x00\x00'\
+          b'\x00\x00\x00\x00\x00\x00\x00\x00'\
+          b'\x00\x00\x00\x00\x00\x00\x00\x00'
     yield nt.assert_equal, raw, MetadataHeader().encode()
 
     def mod_raw(offset, value):
@@ -386,24 +386,24 @@ def test_create_metadata_header():
             raw[offset+len(value):]
 
     for offset, replacement, kwargs in [
-            (0, 'JSON', {'magic_format': 'JSON'}),
-            (9, '\x01', {'meta_checksum': 'adler32'}),
-            (10, '\x01', {'meta_codec': 'zlib'}),
-            (11, '\x01', {'meta_level': 1}),
-            (12, '\x01', {'meta_size': 1}),
-            (12, '\xff\xff\xff\xff', {'meta_size': MAX_META_SIZE}),
-            (16, '\x01', {'max_meta_size': 1}),
-            (16, '\xff\xff\xff\xff', {'max_meta_size': MAX_META_SIZE}),
-            (20, '\x01', {'meta_comp_size': 1}),
-            (20, '\xff\xff\xff\xff', {'meta_comp_size': MAX_META_SIZE}),
-            (24, 'sesame', {'user_codec': 'sesame'}),
+            (0, b'JSON', {'magic_format': b'JSON'}),
+            (9, b'\x01', {'meta_checksum': 'adler32'}),
+            (10, b'\x01', {'meta_codec': 'zlib'}),
+            (11, b'\x01', {'meta_level': 1}),
+            (12, b'\x01', {'meta_size': 1}),
+            (12, b'\xff\xff\xff\xff', {'meta_size': MAX_META_SIZE}),
+            (16, b'\x01', {'max_meta_size': 1}),
+            (16, b'\xff\xff\xff\xff', {'max_meta_size': MAX_META_SIZE}),
+            (20, b'\x01', {'meta_comp_size': 1}),
+            (20, b'\xff\xff\xff\xff', {'meta_comp_size': MAX_META_SIZE}),
+            (24, b'sesame', {'user_codec': b'sesame'}),
             ]:
         yield nt.assert_equal, mod_raw(offset, replacement), \
             MetadataHeader(**kwargs).encode()
 
 
-def test_decode_metadata_header():
-    no_arg_return = {'magic_format':        '',
+def test_MetadataHeader_decode():
+    no_arg_return = {'magic_format':        b'',
                      'meta_options':        '00000000',
                      'meta_checksum':       'None',
                      'meta_codec':          'None',
@@ -411,13 +411,13 @@ def test_decode_metadata_header():
                      'meta_size':           0,
                      'max_meta_size':       0,
                      'meta_comp_size':      0,
-                     'user_codec':          '',
+                     'user_codec':          b'',
                      }
     no_arg_return = MetadataHeader(**no_arg_return)
-    no_arg_input = ('\x00\x00\x00\x00\x00\x00\x00\x00'
-                    '\x00\x00\x00\x00\x00\x00\x00\x00'
-                    '\x00\x00\x00\x00\x00\x00\x00\x00'
-                    '\x00\x00\x00\x00\x00\x00\x00\x00')
+    no_arg_input = (b'\x00\x00\x00\x00\x00\x00\x00\x00'
+                    b'\x00\x00\x00\x00\x00\x00\x00\x00'
+                    b'\x00\x00\x00\x00\x00\x00\x00\x00'
+                    b'\x00\x00\x00\x00\x00\x00\x00\x00')
 
     def copy_and_set_return(key, value):
         copy_ = no_arg_return.copy()
@@ -431,17 +431,17 @@ def test_decode_metadata_header():
     yield nt.assert_equal, no_arg_return, MetadataHeader.decode(no_arg_input)
 
     for attribute, value, offset, replacement in [
-            ('magic_format', 'JSON', 0, 'JSON'),
-            ('meta_checksum', 'adler32', 9, '\x01'),
-            ('meta_codec', 'zlib', 10, '\x01'),
-            ('meta_level', 1, 11, '\x01'),
-            ('meta_size', 1, 12, '\x01\x00\x00\x00'),
-            ('meta_size', MAX_META_SIZE, 12, '\xff\xff\xff\xff'),
-            ('max_meta_size', 1, 16, '\x01\x00\x00\x00'),
-            ('max_meta_size', MAX_META_SIZE, 16, '\xff\xff\xff\xff'),
-            ('meta_comp_size', 1, 20, '\x01\x00\x00\x00'),
-            ('meta_comp_size', MAX_META_SIZE, 20, '\xff\xff\xff\xff'),
-            ('user_codec', 'sesame', 24, 'sesame'),
+            ('magic_format', b'JSON', 0, b'JSON'),
+            ('meta_checksum', 'adler32', 9, b'\x01'),
+            ('meta_codec', 'zlib', 10, b'\x01'),
+            ('meta_level', 1, 11, b'\x01'),
+            ('meta_size', 1, 12, b'\x01\x00\x00\x00'),
+            ('meta_size', MAX_META_SIZE, 12, b'\xff\xff\xff\xff'),
+            ('max_meta_size', 1, 16, b'\x01\x00\x00\x00'),
+            ('max_meta_size', MAX_META_SIZE, 16, b'\xff\xff\xff\xff'),
+            ('meta_comp_size', 1, 20, b'\x01\x00\x00\x00'),
+            ('meta_comp_size', MAX_META_SIZE, 20, b'\xff\xff\xff\xff'),
+            ('user_codec', b'sesame', 24, b'sesame'),
             ]:
         yield nt.assert_equal, copy_and_set_return(attribute, value), \
             MetadataHeader.decode(copy_and_set_input(offset, replacement))

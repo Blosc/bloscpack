@@ -3,9 +3,6 @@
 # vim :set ft=py:
 
 
-from cStringIO import StringIO
-
-
 from nose import tools as nt
 
 
@@ -14,6 +11,7 @@ from bloscpack.abstract_io import (pack,
                                    )
 from bloscpack.args import (calculate_nchunks,
                             )
+from bloscpack.compat_util import StringIO
 from bloscpack.defaults import (DEFAULT_CHUNK_SIZE,
                                 )
 from bloscpack.file_io import (PlainFPSource,

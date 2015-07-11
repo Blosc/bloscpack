@@ -6,14 +6,13 @@
 import blosc
 
 
-try:
-    from collections import OrderedDict
-except ImportError:  # pragma: no cover
-    from ordereddict import OrderedDict
+from .compat_util import (OrderedDict,
+                          )
+
 
 # miscellaneous
 FORMAT_VERSION = 3
-MAGIC = 'blpk'
+MAGIC = b'blpk'
 EXTENSION = '.blp'
 
 # header lengths

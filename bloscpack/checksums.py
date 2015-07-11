@@ -54,7 +54,7 @@ def hashlib_hash(func):
     return func().digest_size, hash_
 
 
-CHECKSUMS = [Hash('None', 0, lambda data: ''),
+CHECKSUMS = [Hash('None', 0, lambda data: b''),
              Hash('adler32', *zlib_hash(zlib.adler32)),
              Hash('crc32', *zlib_hash(zlib.crc32)),
              Hash('md5', *hashlib_hash(hashlib.md5)),

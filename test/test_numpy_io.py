@@ -3,7 +3,6 @@
 # vim :set ft=py:
 
 
-from cStringIO import StringIO
 from unittest import TestCase
 
 
@@ -18,6 +17,7 @@ from bloscpack.abstract_io import (pack,
 from bloscpack.args import (BloscArgs,
                             calculate_nchunks,
                             )
+from bloscpack.compat_util import StringIO
 from bloscpack.exceptions import (NotANumpyArray,
                                   ChunkSizeTypeSizeMismatch,
                                   ObjectNumpyArrayRejection,

@@ -1183,7 +1183,6 @@ Library Features
 Miscellaneous
 ~~~~~~~~~~~~~
 
-* check Python 3.x compatibility
 * Announce on scipy/numpy lists, comp.compression, freshmeat, ohloh ...
 
 Packaging and Infrastructure
@@ -1197,6 +1196,10 @@ Packaging and Infrastructure
 
 Changelog
 ---------
+
+* v0.8.0     - Sun Jul 12 2015
+
+  * Python 3.x compatibility (#14)
 
 * v0.7.3     - Sat Jul 11 2015
 

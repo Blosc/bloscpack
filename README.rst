@@ -1198,7 +1198,7 @@ Packaging and Infrastructure
 Changelog
 ---------
 
-* v0.7.3     - Xxx Xxx XX XXXX
+* v0.7.3     - Sat Jul 11 2015
 
   * Fix deserialization of numpy arrays with nested dtypes that were created
     with versions v0.7.1 and before. (#37)

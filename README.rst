@@ -42,6 +42,8 @@ Bloscpack
 .. |powered| image:: http://b.repl.ca/v1/Powered--By-Blosc-blue.png
         :target: https://blosc.org
 
+.. contents:: Table of Contents
+   :depth: 1
 
 Description
 -----------

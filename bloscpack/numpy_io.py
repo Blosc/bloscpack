@@ -96,9 +96,6 @@ def _conv(descr):
             descr = tuple([_conv(d) for d in descr])
     elif six.PY2 and isinstance(descr, unicode):
         descr = str(descr)
-    else:
-        # keep descr as is
-        pass
     return descr
 
 

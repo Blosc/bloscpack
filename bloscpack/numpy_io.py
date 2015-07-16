@@ -3,6 +3,8 @@
 # vim :set ft=py:
 
 
+import ast
+
 import blosc
 import numpy
 import six
@@ -94,9 +96,6 @@ def _conv(descr):
             descr = tuple([_conv(d) for d in descr])
     elif six.PY2 and isinstance(descr, unicode):
         descr = str(descr)
-    else:
-        # keep descr as is
-        pass
     return descr
 
 
@@ -116,10 +115,8 @@ class PlainNumpySink(PlainSink):
         # them. In this case, it will raise a TypeError and the _conv function
         # above is used to convert the dtype accordingly.
         try:
-            dtype_ = numpy.safe_eval(metadata['dtype'])
-        except SyntaxError:
-            dtype_ = metadata['dtype']
-        except TypeError:
+            dtype_ = ast.literal_eval(metadata['dtype'])
+        except (ValueError, SyntaxError):
             dtype_ = _conv(metadata['dtype'])
         self.ndarray = numpy.empty(metadata['shape'],
                                    dtype=numpy.dtype(dtype_),

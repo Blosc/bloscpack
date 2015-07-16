@@ -121,8 +121,6 @@ class PlainNumpySink(PlainSink):
             dtype_ = ast.literal_eval(metadata['dtype'])
         except (ValueError, SyntaxError):
             dtype_ = _conv(metadata['dtype'])
-        except TypeError:
-            dtype_ = _conv(metadata['dtype'])
         self.ndarray = numpy.empty(metadata['shape'],
                                    dtype=numpy.dtype(dtype_),
                                    order=metadata['order'])

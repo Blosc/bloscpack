@@ -3,6 +3,8 @@
 # vim :set ft=py:
 
 
+import ast
+
 import blosc
 import numpy
 import six
@@ -116,9 +118,9 @@ class PlainNumpySink(PlainSink):
         # them. In this case, it will raise a TypeError and the _conv function
         # above is used to convert the dtype accordingly.
         try:
-            dtype_ = numpy.safe_eval(metadata['dtype'])
-        except SyntaxError:
-            dtype_ = metadata['dtype']
+            dtype_ = ast.literal_eval(metadata['dtype'])
+        except (ValueError, SyntaxError):
+            dtype_ = _conv(metadata['dtype'])
         except TypeError:
             dtype_ = _conv(metadata['dtype'])
         self.ndarray = numpy.empty(metadata['shape'],

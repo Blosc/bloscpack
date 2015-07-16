@@ -19,6 +19,11 @@ from .defaults import (DEFAULT_TYPESIZE,
                        DEFAULT_CHECKSUM,
                        DEFAULT_MAX_APP_CHUNKS,
                        DEFAULT_OFFSETS,
+                       DEFAULT_MAGIC_FORMAT,
+                       DEFAULT_META_CHECKSUM,
+                       DEFAULT_META_CODEC,
+                       DEFAULT_META_LEVEL,
+                       DEFAULT_MAX_META_SIZE,
                        )
 from .exceptions import(ChunkingException,
                         )
@@ -50,11 +55,6 @@ DEFAULT_BLOSC_ARGS = dict(zip(BLOSC_ARGS,
 METADATA_ARGS = ('magic_format', 'meta_checksum',
                  'meta_codec', 'meta_level', 'max_meta_size')
 _METADATA_ARGS_SET = set(METADATA_ARGS)  # cached
-DEFAULT_MAGIC_FORMAT = b'JSON'
-DEFAULT_META_CHECKSUM = 'adler32'
-DEFAULT_META_CODEC = 'zlib'
-DEFAULT_META_LEVEL = 6
-DEFAULT_MAX_META_SIZE = lambda x: 10 * x
 DEFAULT_METADATA_ARGS = dict(zip(METADATA_ARGS,
     (DEFAULT_MAGIC_FORMAT, DEFAULT_META_CHECKSUM,
      DEFAULT_META_CODEC, DEFAULT_META_LEVEL, DEFAULT_MAX_META_SIZE)))

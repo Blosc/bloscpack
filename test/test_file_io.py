@@ -9,6 +9,7 @@ from __future__ import print_function
 import blosc
 import nose.tools as nt
 from mock import patch
+import numpy as np
 
 from bloscpack.args import (BloscArgs,
                             BloscpackArgs,
@@ -31,6 +32,8 @@ from bloscpack.file_io import (PlainFPSource,
                                CompressedFPSink,
                                pack_file,
                                unpack_file,
+                               pack_bytes_file,
+                               unpack_bytes_file,
                                _read_bloscpack_header,
                                _read_offsets,
                                _read_beginning,
@@ -240,6 +243,15 @@ def test_pack_unpack_fp():
     pack_unpack_fp(1, chunk_size=reverse_pretty('2M'))
     pack_unpack_fp(1, chunk_size=reverse_pretty('4M'))
     pack_unpack_fp(1, chunk_size=reverse_pretty('8M'))
+
+
+def test_pack_unpack_bytes_file():
+    array_ = np.linspace(0, 1e5)
+    input_bytes = array_.tostring()
+    with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
+        pack_bytes_file(input_bytes, out_file)
+        output_bytes = unpack_bytes_file(out_file)
+    nt.assert_equal(input_bytes, output_bytes)
 
 
 def pack_unpack_hard():

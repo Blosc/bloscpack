@@ -530,7 +530,7 @@ def pack_bytes_file(bytes_, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=No
 def unpack_bytes_file(compressed_file):
     sio = StringIO()
     sink = PlainFPSink(sio)
-    with open(compressed_file) as fp:
+    with open(compressed_file, 'rb') as fp:
         source = CompressedFPSource(fp)
         unpack(source, sink)
     return sio.getvalue()

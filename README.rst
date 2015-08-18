@@ -1199,6 +1199,10 @@ Packaging and Infrastructure
 Changelog
 ---------
 
+* v0.9.0     - Tue Aug 18 2015
+
+  * Use ``ast.literal_eval`` instead of ``np.safe_eval`` which is much faster (#39 @cpcloud)
+
 * v0.8.0     - Sun Jul 12 2015
 
   * Python 3.x compatibility (#14)

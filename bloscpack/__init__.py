@@ -12,6 +12,8 @@ from .args import (BloscArgs,
                    )
 from .file_io import (pack_file,
                       unpack_file,
+                      pack_bytes_file,
+                      unpack_bytes_file,
                       )
 from .numpy_io import (pack_ndarray_file,
                        unpack_ndarray_file,

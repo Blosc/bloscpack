@@ -3,9 +3,6 @@
 # vim :set ft=py:
 
 
-from unittest import TestCase
-
-
 import numpy as np
 import numpy.testing as npt
 import nose.tools as nt

@@ -61,8 +61,17 @@ class PlainNumpySource(PlainSource):
 
         self.metadata = _ndarray_meta(ndarray)
         self.size = ndarray.size * ndarray.itemsize
-        self.ndarray = numpy.ascontiguousarray(ndarray)
-        self.ptr = ndarray.__array_interface__['data'][0]
+        # The following is guesswork
+        # non contiguous fortran array (if ever such a thing exists)
+        if numpy.isfortran(ndarray) and not ndarray.flags['F_CONTIGUOUS']:
+            self.ndarray = numpy.asfortranarray(ndarray)
+        # non contiguous C array
+        elif not numpy.isfortran(ndarray) and not ndarray.flags['C_CONTIGUOUS']:
+            self.ndarray = numpy.ascontiguousarray(ndarray)
+        # contiguous fortran or C array, do nothing
+        else:
+            self.ndarray = ndarray
+        self.ptr = self.ndarray.__array_interface__['data'][0]
 
     @property
     def compress_func(self):

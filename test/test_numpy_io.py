@@ -221,14 +221,16 @@ def test_itemsize_chunk_size_mismatch():
 def test_larger_arrays():
     for dt in ('uint64', 'int64', 'float64'):
         a = np.arange(2e4, dtype=dt)
-        roundtrip_ndarray(a)
+        for case in roundtrip_ndarray(a):
+            yield case
 
 
 def huge_arrays():
     for dt in ('uint64', 'int64', 'float64'):
         # needs plenty of memory
         a = np.arange(1e8, dtype=dt)
-        roundtrip_ndarray(a)
+        for case in roundtrip_ndarray(a):
+            yield case
 
 
 def test_alternate_cname():

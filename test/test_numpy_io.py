@@ -264,3 +264,10 @@ def test_typesize_is_set_correctly_with_custom_blosc_args():
     pack_ndarray(a, sink, blosc_args=input_args)
     expected_args = BloscArgs(clevel=9, typesize=1)
     nt.assert_equal(expected_args, sink.blosc_args)
+
+
+def test_roundtrip_slice():
+    a = np.arange(100).reshape((10, 10))
+    s = a[3:5, 3:5]
+    for case in roundtrip_ndarray(s):
+        yield case

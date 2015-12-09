@@ -17,7 +17,7 @@ Bloscpack
 :License: |license|
 :And...: |powered|
 
-.. |version| image:: https://pypip.in/v/bloscpack/badge.png
+.. |version| image::    https://img.shields.io/pypi/v/bloscpack.svg
         :target: https://pypi.python.org/pypi/bloscpack
 
 .. |travis| image:: https://travis-ci.org/Blosc/bloscpack.png?branch=master
@@ -29,7 +29,7 @@ Bloscpack
 .. |coveralls| image:: https://coveralls.io/repos/Blosc/bloscpack/badge.svg?branch=master&service=github
         :target: https://coveralls.io/github/Blosc/bloscpack?branch=master
 
-.. |downloads| image:: https://pypip.in/d/bloscpack/badge.png
+.. |downloads| image::      https://img.shields.io/pypi/dm/bloscpack.svg
         :target: https://pypi.python.org/pypi/bloscpack
 
 .. |license| image:: https://pypip.in/license/bloscpack/badge.png

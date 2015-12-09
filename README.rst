@@ -32,7 +32,7 @@ Bloscpack
 .. |downloads| image::      https://img.shields.io/pypi/dm/bloscpack.svg
         :target: https://pypi.python.org/pypi/bloscpack
 
-.. |license| image:: https://pypip.in/license/bloscpack/badge.png
+.. |license| image:: https://img.shields.io/pypi/l/bloscpack.svg
         :target: https://pypi.python.org/pypi/bloscpack
 
 .. |waffle|  image:: https://badge.waffle.io/blosc/bloscpack.png?label=in%20progress&title=In%20Progress

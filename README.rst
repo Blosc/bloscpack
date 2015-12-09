@@ -26,7 +26,7 @@ Bloscpack
 .. |drone| image:: https://drone.io/github.com/Blosc/bloscpack/status.png
         :target: https://drone.io/github.com/Blosc/bloscpack
 
-.. |coveralls| .. image:: https://coveralls.io/repos/Blosc/bloscpack/badge.svg?branch=master&service=github
+.. |coveralls| image:: https://coveralls.io/repos/Blosc/bloscpack/badge.svg?branch=master&service=github
         :target: https://coveralls.io/github/Blosc/bloscpack?branch=master
 
 .. |downloads| image:: https://pypip.in/d/bloscpack/badge.png

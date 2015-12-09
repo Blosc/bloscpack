@@ -13,6 +13,7 @@ Bloscpack
 :drone.io: |drone|
 :Coveralls: |coveralls|
 :Downloads: |downloads|
+:Python Versions: |pyversions|
 :Waffle: |waffle|
 :License: |license|
 :And...: |powered|
@@ -41,6 +42,9 @@ Bloscpack
 
 .. |powered| image:: http://b.repl.ca/v1/Powered--By-Blosc-blue.png
         :target: https://blosc.org
+
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/bloscpack.svg
+        :target: https://pypi.python.org/pypi/bloscpack
 
 .. contents:: Table of Contents
    :depth: 1

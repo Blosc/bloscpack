@@ -4,13 +4,14 @@ python:
   - 2.6
   - 2.7
   - 3.4
+  - 3.5
 install:
-  - pip install .
+  - pip install -r requirements.txt
   - pip install -r test_requirements.txt
+  - pip install .
 script:
   - ./test.sh
   - nosetests test/test_file_io.py:pack_unpack_hard
-  - nosetests test/test_numpy_io.py:huge_arrays
 after_success:
   - coveralls
 notifications:

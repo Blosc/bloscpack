@@ -1209,7 +1209,8 @@ Changelog
   * Fix ``un/pack_bytes_file`` to be available from toplevel
   * Fix the badges to come (mostly) from https://img.shields.io
   * Fixes for travis-ci, test Python 3.5 too
-  * Pin Blosc version to 1.2.7 via `requirements.txt` due to breakage with 
+  * Pin Blosc version to 1.2.7 via `requirements.txt` and `setup.py` due to
+    breakage with Blosc 1.2.8.
 
 * v0.9.0     - Tue Aug 18 2015
 

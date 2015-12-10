@@ -1205,11 +1205,11 @@ Changelog
 
 * v0.9.1     - Xxx Xxx XX XXXX
 
-  * Fix for compressing sliced arrays #43
+  * Fix for compressing sliced arrays (#43 reported by @mistycheney)
   * Fix ``un/pack_bytes_file`` to be available from toplevel
   * Fix the badges to come (mostly) from https://img.shields.io
-  * Fixes for travis-ci
-  * Test Python 3.5 too
+  * Fixes for travis-ci, test Python 3.5 too
+  * Pin Blosc version to 1.2.7 via `requirements.txt` due to breakage with 
 
 * v0.9.0     - Tue Aug 18 2015
 

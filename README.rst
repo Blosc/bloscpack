@@ -21,7 +21,7 @@ Bloscpack
 .. |version| image::    https://img.shields.io/pypi/v/bloscpack.svg
         :target: https://pypi.python.org/pypi/bloscpack
 
-.. |travis| image:: https://img.shields.io/travis/blosc/bloscpack/master.svg
+.. |travis| image:: https://img.shields.io/travis/Blosc/bloscpack/master.svg
         :target: https://travis-ci.org/Blosc/bloscpack
 
 .. |drone| image:: https://drone.io/github.com/Blosc/bloscpack/status.png

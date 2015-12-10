@@ -1203,6 +1203,14 @@ Packaging and Infrastructure
 Changelog
 ---------
 
+* v0.9.1     - Xxx Xxx XX XXXX
+
+  * Fix for compressing sliced arrays #43
+  * Fix ``un/pack_bytes_file`` to be available from toplevel
+  * Fix the badges to come (mostly) from https://img.shields.io
+  * Fixes for travis-ci
+  * Test Python 3.5 too
+
 * v0.9.0     - Tue Aug 18 2015
 
   * Use ``ast.literal_eval`` instead of ``np.safe_eval`` which is much faster (#39 @cpcloud)

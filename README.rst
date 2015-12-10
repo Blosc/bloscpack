@@ -6,7 +6,7 @@ Bloscpack
 :List: http://groups.google.com/group/blosc
 :Github: https://github.com/Blosc/bloscpack
 :PyPi: https://pypi.python.org/pypi/bloscpack
-:Binstar: https://binstar.org/pypi/bloscpack
+:Anaconda: https://anaconda.org/pypi/bloscpack
 :Ohloh: https://www.ohloh.net/p/bloscpack
 :Version: |version|
 :Travis CI: |travis|

@@ -1203,7 +1203,7 @@ Packaging and Infrastructure
 Changelog
 ---------
 
-* v0.9.1     - Thu Dec 10 2015 
+* v0.10.0     - Thu Dec 10 2015
 
   * Fix for compressing sliced arrays (#43 reported by @mistycheney)
   * Fix ``un/pack_bytes_file`` to be available from toplevel

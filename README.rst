@@ -21,7 +21,7 @@ Bloscpack
 .. |version| image::    https://img.shields.io/pypi/v/bloscpack.svg
         :target: https://pypi.python.org/pypi/bloscpack
 
-.. |travis| image:: https://travis-ci.org/Blosc/bloscpack.png?branch=master
+.. |travis| image:: https://img.shields.io/travis/blosc/bloscpack/master.svg
         :target: https://travis-ci.org/Blosc/bloscpack
 
 .. |drone| image:: https://drone.io/github.com/Blosc/bloscpack/status.png
@@ -40,7 +40,7 @@ Bloscpack
         :target: https://waffle.io/blosc/bloscpack
         :alt: 'Issues In Progress'
 
-.. |powered| image:: http://b.repl.ca/v1/Powered--By-Blosc-blue.png
+.. |powered| image:: https://img.shields.io/badge/Powerd--By-Blosc-blue.svg
         :target: https://blosc.org
 
 .. |pyversions| image:: https://img.shields.io/pypi/pyversions/bloscpack.svg

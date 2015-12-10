@@ -1103,11 +1103,11 @@ Resources and Related Publications
 * `Main Blosc website <http://www.blosc.org>`_
 * `Francesc Alted. *The Data Access Problem* EuroScipy 2009 Keynote Presentation <http://www.blosc.org/docs/StarvingCPUs.pdf>`_
 * `Francesc Alted. *Why modern CPUs are starving and what can be done about it*, Computing in Science & Engineering, Vol. 12, No. 2. (March 2010), pp. 68-71 <http://www.blosc.org/docs/StarvingCPUs-CISE-2010.pdf>`_
-* Francesc Alted: Sending Data from Memory to CPU (and back) faster than memcpy(). PyData London 2014 `slides <http://www.slideshare.net/PyData/blosc-py-data-2014>`_ `video <http://www.youtube.com/watch?v=IzqlWUTndTo>`_
+* Francesc Alted: Sending Data from Memory to CPU (and back) faster than memcpy(). PyData London 2014 `slides0 <http://www.slideshare.net/PyData/blosc-py-data-2014>`_ `video0 <http://www.youtube.com/watch?v=IzqlWUTndTo>`_
 * `The Blosc Github organization <https://github.com/Blosc>`_
 * `Valentin Haenel. *Introducing Bloscpack* EuroScipy 2013 Presentation <https://github.com/esc/euroscipy2013-talk-bloscpack>`_
 * `Valentin Haenel. *Bloscpack: a compressed lightweight serialization format for numerical data*. Proceedings of the 6th European Conference on Python in Science (EuroSciPy 2013) <http://arxiv.org/abs/1404.6383>`_.
-* Valentin Haenel. *Fast Serialization of Numpy Arrays with Bloscpack*. PyData Berlin 2014 `slides <http://slides.zetatech.org/haenel-bloscpack-talk-2014-PyDataBerlin.pdf>`_, `video <https://www.youtube.com/watch?v=TZdqeEd7iTM>`_
+* Valentin Haenel. *Fast Serialization of Numpy Arrays with Bloscpack*. PyData Berlin 2014 `slides1 <http://slides.zetatech.org/haenel-bloscpack-talk-2014-PyDataBerlin.pdf>`_, `video1 <https://www.youtube.com/watch?v=TZdqeEd7iTM>`_
 
 Maintainers Notes on Cutting a Release
 --------------------------------------

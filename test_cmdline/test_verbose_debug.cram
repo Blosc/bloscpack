@@ -127,7 +127,7 @@ Try using --debug
   blpk: checksum \(adler32\)\: .* (re)
   blpk: chunk handled, in: 2.59M (2713600B) out: 167.4K (171418B)
   blpk: Writing '4' offsets: '[384, 5829664, 10126569, 13364872]'
-  blpk: Raw offsets: b?'.*' (re)
+  blpk: Raw offsets: b?.* (re)
   blpk: output file size: 12.91M (13536294B)
   blpk: compression ratio: 11.820074
   blpk: done
@@ -229,7 +229,7 @@ Try using --debug with metadata:
   blpk:     nchunks: 4
   blpk:     max_app_chunks: 40
   blpk: raw_bloscpack_header: b?'.*' (re)
-  blpk: Raw compressed metadata of size '6[0-9]': b?'.*' (re)
+  blpk: Raw compressed metadata of size '6[0-9]': b?.* (re)
   blpk: max meta size is deemed to be: 680
   blpk: raw_metadata_header: b?'.*' (re)
   blpk: metadata has 61[0-9] preallocated empty bytes (re)
@@ -248,7 +248,7 @@ Try using --debug with metadata:
   blpk: checksum \(adler32\)\: .* (re)
   blpk: chunk handled, in: 2.59M (2713600B) out: 167.4K (171418B)
   blpk: Writing '4' offsets: '[1100, 5830380, 10127285, 13365588]'
-  blpk: Raw offsets: b?'.*' (re)
+  blpk: Raw offsets: b?.* (re)
   blpk: output file size: 12.91M (13537010B)
   blpk: compression ratio: 11.819449
   blpk: done

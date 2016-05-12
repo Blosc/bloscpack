@@ -1,5 +1,5 @@
 #!/bin/sh
-if ! $( which coverage ); then
+if ! $( which coverage > /dev/null ); then
     echo "Error: Coverage script not found!"
     exit 1
 fi

@@ -12,7 +12,7 @@ with open('bloscpack/version.py') as f:
     exec(f.read())
 
 install_requires = [
-    'blosc==1.2.7',
+    'blosc',
     'numpy',
     'six',
 ]

@@ -133,25 +133,23 @@ def test_decode_blosc_header():
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
-                'blocksize': 160000,
-                'ctbytes': len(compressed),
                 'version': 2,
                 'flags': 1,
                 'nbytes': len(array_),
                 'typesize': blosc_args.typesize}
-    nt.assert_equal(expected, header)
+    header_slice = dict((k, header[k]) for k in expected.keys())
+    nt.assert_equal(expected, header_slice)
     # deactivate shuffle
     blosc_args.shuffle = False
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
-                'blocksize': 160000,
-                'ctbytes': len(compressed),
                 'version': 2,
                 'flags': 0,  # no shuffle flag
                 'nbytes': len(array_),
                 'typesize': blosc_args.typesize}
-    nt.assert_equal(expected, header)
+    header_slice = dict((k, header[k]) for k in expected.keys())
+    nt.assert_equal(expected, header_slice)
     # uncompressible data
     array_ = np.asarray(np.random.randn(23),
                         dtype=np.float32).tostring()

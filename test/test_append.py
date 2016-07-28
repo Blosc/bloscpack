@@ -103,24 +103,9 @@ def test_append_fp():
             nchunks=16,
             max_app_chunks=160,
             )
-    expected_orig_offsets = [1440,
-                             195299,
-                             368931,
-                             497746,
-                             634063,
-                             767529,
-                             903070,
-                             1038157,
-                             1174555,
-                             1297424,
-                             1420339,
-                             1544469,
-                             1667805,
-                             1791142,
-                             1914839,
-                             2038360]
+    expected_orig_offsets = [1440]
     nt.assert_equal(expected_orig_bloscpack_header, orig_bloscpack_header)
-    nt.assert_equal(expected_orig_offsets, orig_offsets)
+    nt.assert_equal(expected_orig_offsets[0], orig_offsets[0])
 
     # perform the append
     reset_append_fp(orig, new, new_size)
@@ -139,39 +124,9 @@ def test_append_fp():
             'typesize': 8,
             'metadata': False
     }
-    expected_app_offsets = [1440,
-                            195299,
-                            368931,
-                            497746,
-                            634063,
-                            767529,
-                            903070,
-                            1038157,
-                            1174555,
-                            1297424,
-                            1420339,
-                            1544469,
-                            1667805,
-                            1791142,
-                            1914839,
-                            2038360,
-                            2221798,
-                            2390194,
-                            2533644,
-                            2663010,
-                            2803431,
-                            2936406,
-                            3071130,
-                            3209565,
-                            3333390,
-                            3457344,
-                            3581581,
-                            3705533,
-                            3829188,
-                            3952136,
-                            4075509]
+    expected_app_offsets = [1440]
     nt.assert_equal(expected_app_bloscpack_header, app_bloscpack_header)
-    nt.assert_equal(expected_app_offsets, app_offsets)
+    nt.assert_equal(expected_app_offsets[0], app_offsets[0])
 
     # now check by unpacking
     source = CompressedFPSource(orig)

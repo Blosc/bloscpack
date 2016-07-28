@@ -12,12 +12,14 @@ Create a test datafile.
 
 Test basic append:
 
+  $ ls -lah  data.dat
+  .* 1 .* .* \d{3}M .* .* .* data.dat (re)
   $ blpk compress data.dat
   $ ls -lah  data.dat.blp
-  .* 1 .* .* 13M .* .* .* data.dat.blp (re)
+  .* 1 .* .* \d{2}M .* .* .* data.dat.blp (re)
   $ blpk append data.dat.blp data.dat
   $ ls -lah  data.dat.blp
-  .* 1 .* .* 26M .* .* .* data.dat.blp (re)
+  .* 1 .* .* \d{2}M .* .* .* data.dat.blp (re)
 
 Cleanup.
 

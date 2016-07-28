@@ -21,17 +21,17 @@ Get more information using --verbose:
   blpk: nchunks: 153
   blpk: chunk_size: 1.0M (1048576B)
   blpk: last_chunk_size: 602.0K (616448B)
-  blpk: output file size: 12.92M (13552386B)
-  blpk: compression ratio: 11.806039
+  blpk: output file size: \d{2}\.[1-9]\d*M \([1-9]\d*B\) (re)
+  blpk: compression ratio: [1-9]\d*\.\d+ (re)
   blpk: done
   $ blpk --verbose decompress data.dat.blp data.dat.dcmp
   blpk: using [0-9]+ threads (re)
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'
-  blpk: input file size: 12.92M
+  blpk: input file size: \d{2}\.[1-9]\d*M (re)
   blpk: output file size: 152.59M
-  blpk: decompression ratio: 11.806039
+  blpk: decompression ratio: [1-9]\d*.\d+ (re)
   blpk: done
   $ rm data.dat.blp data.dat.dcmp
 
@@ -46,18 +46,18 @@ Get more information using --verbose, but with metadata:
   blpk: nchunks: 153
   blpk: chunk_size: 1.0M (1048576B)
   blpk: last_chunk_size: 602.0K (616448B)
-  blpk: output file size: 12.93M (13553102B)
-  blpk: compression ratio: 11.805415
+  blpk: output file size: \d{2}\.[1-9]\d*M \([1-9]\d*B\) (re)
+  blpk: compression ratio: [1-9]\d*\.\d+ (re)
   blpk: done
   $ blpk --verbose decompress data.dat.blp data.dat.dcmp
   blpk: using [0-9]+ threads (re)
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'
-  blpk: input file size: 12.93M
+  blpk: input file size: \d{2}\.[1-9]\d*M (re)
   blpk: read compressed metadata of size: '6[2-5]' (re)
   blpk: output file size: 152.59M
-  blpk: decompression ratio: 11.805415
+  blpk: decompression ratio: [1-9]\d*\.\d+ (re)
   blpk: Metadata:
   blpk: {u?'container': u?'numpy', u?'dtype': u?"'<f8'", u?'order': u?'C', u?'shape': \[20000000\]} (re)
   blpk: done
@@ -116,20 +116,20 @@ Try using --debug
   blpk: raw_bloscpack_header: b?'.*' (re)
   blpk: Handle chunk '0'
   blpk: checksum \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 50.0M (52428800B) out: 5.56M (5829276B)
+  blpk: chunk handled, in: 50\.0M \(52428800B\) out: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) (re)
   blpk: Handle chunk '1'
   blpk: checksum \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 50.0M (52428800B) out: 4.1M (4296901B)
+  blpk: chunk handled, in: 50\.0M \(52428800B\) out: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) (re)
   blpk: Handle chunk '2'
   blpk: checksum \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 50.0M (52428800B) out: 3.09M (3238299B)
+  blpk: chunk handled, in: 50\.0M \(52428800B\) out: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) (re)
   blpk: Handle chunk '3' (last)
   blpk: checksum \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 2.59M (2713600B) out: 167.4K (171418B)
-  blpk: Writing '4' offsets: '[384, 5829664, 10126569, 13364872]'
+  blpk: chunk handled, in: 2\.59M \(2713600B\) out: [1-9]\d*\.[1-9]\d*K \([1-9]\d*B\) (re)
+  blpk: Writing '4' offsets: '\[384, [1-9]\d*, [1-9]\d*, [1-9]\d*\]' (re)
   blpk: Raw offsets: b?.* (re)
-  blpk: output file size: 12.91M (13536294B)
-  blpk: compression ratio: 11.820074
+  blpk: output file size: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) (re)
+  blpk: compression ratio: [1-9]\d*\.\d+ (re)
   blpk: done
   $ blpk --debug decompress data.dat.blp data.dat.dcmp
   blpk: command line argument parsing complete
@@ -146,30 +146,30 @@ Try using --debug
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'
-  blpk: input file size: 12.91M
+  blpk: input file size: \d{2}\.[1-9]\d*M (re)
   blpk: reading bloscpack header
   blpk: bloscpack_header_raw: b?'.*' (re)
   blpk: bloscpack header: BloscpackHeader(format_version=3, offsets=True, metadata=False, checksum='adler32', typesize=8, chunk_size=52428800, last_chunk=2713600, nchunks=4, max_app_chunks=40)
   blpk: Read raw offsets: b?'.*' (re)
-  blpk: Offsets: [384, 5829664, 10126569, 13364872]
-  blpk: blosc_header: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 52428800), ('blocksize', 262144), ('ctbytes', 5829276)])
+  blpk: Offsets: \[384, [1-9]\d*, [1-9]\d*, [1-9]\d*\] (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', [1-9]\d*\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '0'
   blpk: checksum OK \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 5.56M (5829276B) out: 50.0M (52428800B)
-  blpk: blosc_header: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 52428800), ('blocksize', 262144), ('ctbytes', 4296901)])
+  blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) out: 50\.0M \(52428800B\) (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', [1-9]\d*\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '1'
   blpk: checksum OK \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 4.1M (4296901B) out: 50.0M (52428800B)
-  blpk: blosc_header: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 52428800), ('blocksize', 262144), ('ctbytes', 3238299)])
+  blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) out: 50\.0M \(52428800B\) (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', [1-9]\d*\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '2'
   blpk: checksum OK \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 3.09M (3238299B) out: 50.0M (52428800B)
-  blpk: blosc_header: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 2713600), ('blocksize', 262144), ('ctbytes', 171418)])
+  blpk: chunk handled, in: \d\.[1-9]\d*M \([1-9]\d*B\) out: 50.0M \(52428800B\) (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 2713600\), \('blocksize', [1-9]\d*\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '3' (last)
   blpk: checksum OK \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 167.4K (171418B) out: 2.59M (2713600B)
+  blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*K \([1-9]\d*B\) out: 2.59M \(2713600B\) (re)
   blpk: output file size: 152.59M
-  blpk: decompression ratio: 11.820074
+  blpk: decompression ratio: [1-9]\d*\.\d+ (re)
   blpk: done
   $ rm data.dat.blp data.dat.dcmp
 
@@ -237,20 +237,20 @@ Try using --debug with metadata:
   blpk: metadata section occupies a total of 716.0B (716B)
   blpk: Handle chunk '0'
   blpk: checksum \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 50.0M (52428800B) out: 5.56M (5829276B)
+  blpk: chunk handled, in: 50\.0M \(52428800B\) out: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) (re)
   blpk: Handle chunk '1'
   blpk: checksum \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 50.0M (52428800B) out: 4.1M (4296901B)
+  blpk: chunk handled, in: 50\.0M \(52428800B\) out: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) (re)
   blpk: Handle chunk '2'
   blpk: checksum \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 50.0M (52428800B) out: 3.09M (3238299B)
+  blpk: chunk handled, in: 50\.0M \(52428800B\) out: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) (re)
   blpk: Handle chunk '3' (last)
   blpk: checksum \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 2.59M (2713600B) out: 167.4K (171418B)
-  blpk: Writing '4' offsets: '[1100, 5830380, 10127285, 13365588]'
+  blpk: chunk handled, in: 2\.59M \(2713600B\) out: [1-9]\d*\.[1-9]\d*K \([1-9]\d*B\) (re)
+  blpk: Writing '4' offsets: '\[1100, [1-9]\d*, [1-9]\d*, [1-9]\d*\]' (re)
   blpk: Raw offsets: b?.* (re)
-  blpk: output file size: 12.91M (13537010B)
-  blpk: compression ratio: 11.819449
+  blpk: output file size: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) (re)
+  blpk: compression ratio: [1-9]\d*\.\d+ (re)
   blpk: done
   $ blpk --debug decompress data.dat.blp data.dat.dcmp
   blpk: command line argument parsing complete
@@ -267,7 +267,7 @@ Try using --debug with metadata:
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'
-  blpk: input file size: 12.91M
+  blpk: input file size: [1-9]\d*\.[1-9]\d*M (re)
   blpk: reading bloscpack header
   blpk: bloscpack_header_raw: b?'.*' (re)
   blpk: bloscpack header: BloscpackHeader(format_version=3, offsets=True, metadata=True, checksum='adler32', typesize=8, chunk_size=52428800, last_chunk=2713600, nchunks=4, max_app_chunks=40)
@@ -285,25 +285,25 @@ Try using --debug with metadata:
   blpk: metadata checksum OK \(adler32\): b?'.*' (re)
   blpk: read compressed metadata of size: '6[2-5]' (re)
   blpk: Read raw offsets: b?'.*' (re)
-  blpk: Offsets: [1100, 5830380, 10127285, 13365588]
-  blpk: blosc_header: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 52428800), ('blocksize', 262144), ('ctbytes', 5829276)])
+  blpk: Offsets: \[1100, [1-9]\d*, [1-9]\d*, [1-9]\d*\] (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', 131072\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '0'
   blpk: checksum OK \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 5.56M (5829276B) out: 50.0M (52428800B)
-  blpk: blosc_header: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 52428800), ('blocksize', 262144), ('ctbytes', 4296901)])
+  blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) out: 50\.0M \(52428800B\) (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', 131072\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '1'
   blpk: checksum OK \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 4.1M (4296901B) out: 50.0M (52428800B)
-  blpk: blosc_header: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 52428800), ('blocksize', 262144), ('ctbytes', 3238299)])
+  blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) out: 50\.0M \(52428800B\) (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', 131072\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '2'
   blpk: checksum OK \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 3.09M (3238299B) out: 50.0M (52428800B)
-  blpk: blosc_header: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 2713600), ('blocksize', 262144), ('ctbytes', 171418)])
+  blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) out: 50\.0M \(52428800B\) (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 2713600\), \('blocksize', 131072\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '3' (last)
   blpk: checksum OK \(adler32\)\: .* (re)
-  blpk: chunk handled, in: 167.4K (171418B) out: 2.59M (2713600B)
+  blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*K \([1-9]\d*B\) out: 2\.59M \(2713600B\) (re)
   blpk: output file size: 152.59M
-  blpk: decompression ratio: 11.819449
+  blpk: decompression ratio: [1-9]\d*\.\d+ (re)
   blpk: Metadata:
   blpk: {u?'container': u?'numpy', u?'dtype': u?"'<f8'", u?'order': u?'C', u?'shape': \[20000000\]} (re)
   blpk: done

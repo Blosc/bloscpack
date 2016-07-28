@@ -1207,7 +1207,7 @@ Changelog
 
   * Unpinn python-blosc (#51)
 
-  * Improved the computation of the chunksize when it is not divisible by
+  * Improve the computation of the chunksize when it is not divisible by
     typesize (#52)
 
 * v0.10.0     - Thu Dec 10 2015

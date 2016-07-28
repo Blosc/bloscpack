@@ -367,7 +367,7 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
 
     $ blpk --debug compress --chunk-size 0.5G data.dat
     blpk: command line argument parsing complete
-    blpk: command line arguments are: 
+    blpk: command line arguments are:
     blpk:     force: False
     blpk:     verbose: False
     blpk:     offsets: True
@@ -616,11 +616,11 @@ SSD, we get:
     create the test data..........done
 
     Input file size: 1.49G
-    Will now run bloscpack... 
+    Will now run bloscpack...
     Time: 2.06 seconds
     Output file size: 198.55M
     Ratio: 7.69
-    Will now run gzip... 
+    Will now run gzip...
     Time: 134.20 seconds
     Output file size: 924.05M
     Ratio: 1.65
@@ -640,11 +640,11 @@ since dropping the caches requires root privileges:
     create the test data..........done
 
     Input file size: 1.49G
-    Will now run bloscpack... 
+    Will now run bloscpack...
     Time: 13.49 seconds
     Output file size: 198.55M
     Ratio: 7.69
-    Will now run gzip... 
+    Will now run gzip...
     Time: 137.49 seconds
     Output file size: 924.05M
     Ratio: 1.65
@@ -1202,6 +1202,11 @@ Packaging and Infrastructure
 
 Changelog
 ---------
+
+* v0.10.1     - Not released yet
+
+  * Improved the computation of the chunksize when it is not divisible by
+    typesize (#52)
 
 * v0.10.0     - Thu Dec 10 2015
 

@@ -122,10 +122,14 @@ def pack(source, sink,
     blosc_args = blosc_args or BloscArgs()
     log.debug(blosc_args.pformat())
     if chunk_size % blosc_args.typesize != 0:
-        raise ChunkSizeTypeSizeMismatch(
-            "chunk_size: '%s' is not divisible by typesize: '%i'" %
-            (double_pretty_size(chunk_size), blosc_args.typesize)
-        )
+        # Make the chunk_size divisible by typesize
+        chunksize = chunk_size - (chunk_size % blosc_args.typesize)
+        if chunksize == 0:
+            raise ChunkSizeTypeSizeMismatch(
+                "chunk_size: '%s' is less than typesize: '%i'" %
+                (double_pretty_size(chunk_size), blosc_args.typesize)
+            )
+        chunk_size = chunksize
     bloscpack_args = bloscpack_args or BloscpackArgs()
     log.debug(bloscpack_args.pformat())
     if metadata is not None:

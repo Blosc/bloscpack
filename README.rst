@@ -1203,7 +1203,7 @@ Packaging and Infrastructure
 Changelog
 ---------
 
-* v0.11.0     - Not released yet
+* v0.11.0     - Mon Aug 22 2016
 
   * Unpinn python-blosc and fix unit-tests (#51 and #57 fixed by @oogali)
   * Improve the computation of the chunksize when it is not divisible by

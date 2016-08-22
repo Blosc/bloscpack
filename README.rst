@@ -1203,7 +1203,7 @@ Packaging and Infrastructure
 Changelog
 ---------
 
-* v0.10.1     - Not released yet
+* v0.11.0     - Not released yet
 
   * Unpinn python-blosc (#51)
 

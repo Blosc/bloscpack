@@ -28,7 +28,7 @@ Get some info on the file:
   blpk:     nchunks: 153
   blpk:     max_app_chunks: 1530
   blpk: 'offsets':
-  blpk: [13496,149206,266053,398274,531056,...]
+  blpk: \[13496,[1-9]\d*,[1-9]\d*,[1-9]\d*,[1-9]\d*,...\] (re)
   $ blpk i data.dat.blp
   blpk: BloscpackHeader:
   blpk:     format_version: 3
@@ -41,7 +41,7 @@ Get some info on the file:
   blpk:     nchunks: 153
   blpk:     max_app_chunks: 1530
   blpk: 'offsets':
-  blpk: [13496,149206,266053,398274,531056,...]
+  blpk: \[13496,[1-9]\d*,[1-9]\d*,[1-9]\d*,[1-9]\d*,...\] (re)
   $ rm data.dat.blp
   $ blpk info data.dat.blp
   blpk: error: file 'data.dat.blp' does not exist!

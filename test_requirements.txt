@@ -3,3 +3,4 @@ cram>=0.6
 mock
 coverage
 coveralls
+unittest2; python_version == '2.6'

@@ -1203,6 +1203,8 @@ Packaging and Infrastructure
 Changelog
 ---------
 
+* v0.12.0     - COMING SOON
+
 * v0.11.0     - Mon Aug 22 2016
 
   * Unpinn python-blosc and fix unit-tests (#51 and #57 fixed by @oogali)

@@ -1203,7 +1203,7 @@ Packaging and Infrastructure
 Changelog
 ---------
 
-* v0.10.1     - Not released yet
+* v0.11.0     - Not released yet
 
   * Improved the computation of the chunksize when it is not divisible by
     typesize (#52)

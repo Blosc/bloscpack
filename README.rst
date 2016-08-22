@@ -1205,10 +1205,9 @@ Changelog
 
 * v0.11.0     - Not released yet
 
-  * Unpinn python-blosc (#51)
-
+  * Unpinn python-blosc and fix unit-tests (#51 and #57 fixed by @oogali)
   * Improve the computation of the chunksize when it is not divisible by
-    typesize (#52)
+    typesize (#52 by FrancescAlted)
 
 * v0.10.0     - Thu Dec 10 2015
 

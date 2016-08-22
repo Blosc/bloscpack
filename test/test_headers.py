@@ -139,7 +139,9 @@ def test_decode_blosc_header():
                 'typesize': blosc_args.typesize}
     header_slice = dict((k, header[k]) for k in expected.keys())
     nt.assert_equal(expected, header_slice)
+
     # deactivate shuffle
+    array_ = np.ones(16000, dtype=np.uint8)
     blosc_args.shuffle = False
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)

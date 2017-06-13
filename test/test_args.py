@@ -122,6 +122,7 @@ def test_handle_max_apps():
     nt.assert_raises(ValueError, _handle_max_apps,
                      True, 10, lambda x: 1.0)
 
+
 class TestBloscArgs(TestCase):
 
     def test_init(self):

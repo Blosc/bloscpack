@@ -62,5 +62,6 @@ class NotEnoughSpace(RuntimeError):
 class NotANumpyArray(RuntimeError):
     pass
 
+
 class ObjectNumpyArrayRejection(RuntimeError):
     pass

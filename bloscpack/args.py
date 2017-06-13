@@ -25,8 +25,8 @@ from .defaults import (DEFAULT_TYPESIZE,
                        DEFAULT_META_LEVEL,
                        DEFAULT_MAX_META_SIZE,
                        )
-from .exceptions import(ChunkingException,
-                        )
+from .exceptions import (ChunkingException,
+                         )
 from .headers import (MAX_CHUNKS,
                       )
 from .metacodecs import (CODECS_AVAIL,

@@ -50,6 +50,11 @@ def test_check_bloscpack_arguments():
     nt.assert_raises(ValueError, _check_bloscpack_args, extra)
 
 
+def test_check_bloscpack_arguments_accpets_None_as_checksum():
+    args = BloscpackArgs(checksum=None)
+    nt.assert_equal(args.checksum, 'None')
+
+
 def test_check_metadata_arguments():
     missing = DEFAULT_METADATA_ARGS.copy()
     missing.pop('magic_format')

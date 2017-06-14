@@ -327,7 +327,8 @@ class BloscpackArgs(MutableMappaingObject):
                  checksum=DEFAULT_CHECKSUM,
                  max_app_chunks=DEFAULT_MAX_APP_CHUNKS):
         self.offsets = offsets
-        self.checksum = checksum
+        # Special hack, accept Pythonic None as 'None'.
+        self.checksum = 'None' if checksum is None else checksum
         self.max_app_chunks = max_app_chunks
 
         self._attrs = ['offsets',

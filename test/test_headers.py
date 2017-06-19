@@ -172,6 +172,25 @@ def test_decode_blosc_header_uncompressible_data():
     nt.assert_equal(expected, header)
 
 
+def test_decode_blosc_header_uncompressible_data_dont_split_false():
+    array_ = np.asarray(np.random.randn(256),
+                        dtype=np.float32).tostring()
+    blosc_args = BloscArgs()
+    blosc_args.shuffle = True
+    compressed = blosc.compress(array_, **blosc_args)
+    header = decode_blosc_header(compressed)
+    expected = {
+        'versionlz': 1,
+        'version': 2,
+        'blocksize': 1024,
+        'ctbytes': len(array_) + 16,  # original + 16 header bytes
+        'flags': 0x3,  # 1 for shuffle 2 for non-compressed
+        'nbytes': len(array_),
+        'typesize': blosc_args.typesize
+    }
+    nt.assert_equal(expected, header)
+
+
 def test_BloscPackHeader_constructor_exceptions():
     # uses nose test generators
 

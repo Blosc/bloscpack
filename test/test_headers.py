@@ -126,9 +126,8 @@ def test_decode_metadata_options_exceptions():
         yield nt.assert_raises, ValueError, decode_metadata_options, broken_input
 
 
-def test_decode_blosc_header():
+def test_decode_blosc_header_basic():
     array_ = np.linspace(0, 100, 2e4).tostring()
-    # basic test case
     blosc_args = BloscArgs()
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
@@ -140,8 +139,10 @@ def test_decode_blosc_header():
     header_slice = dict((k, header[k]) for k in expected.keys())
     nt.assert_equal(expected, header_slice)
 
-    # deactivate shuffle
+
+def test_decode_blosc_header_deactivate_shuffle():
     array_ = np.ones(16000, dtype=np.uint8)
+    blosc_args = BloscArgs()
     blosc_args.shuffle = False
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
@@ -152,9 +153,12 @@ def test_decode_blosc_header():
                 'typesize': blosc_args.typesize}
     header_slice = dict((k, header[k]) for k in expected.keys())
     nt.assert_equal(expected, header_slice)
-    # uncompressible data
+
+
+def test_decode_blosc_header_uncompressible_data():
     array_ = np.asarray(np.random.randn(23),
                         dtype=np.float32).tostring()
+    blosc_args = BloscArgs()
     blosc_args.shuffle = True
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
@@ -162,7 +166,7 @@ def test_decode_blosc_header():
                 'blocksize': 88,
                 'ctbytes': len(array_) + 16,  # original + 16 header bytes
                 'version': 2,
-                'flags': 3,  # 1 for shuffle 2 for non-compressed
+                'flags': 0x13,  # 1 for shuffle 2 for non-compressed 4 for small blocksize
                 'nbytes': len(array_),
                 'typesize': blosc_args.typesize}
     nt.assert_equal(expected, header)

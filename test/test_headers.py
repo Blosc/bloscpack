@@ -156,19 +156,38 @@ def test_decode_blosc_header_deactivate_shuffle():
 
 
 def test_decode_blosc_header_uncompressible_data():
-    array_ = np.asarray(np.random.randn(23),
+    array_ = np.asarray(np.random.randn(255),
                         dtype=np.float32).tostring()
     blosc_args = BloscArgs()
     blosc_args.shuffle = True
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
     expected = {'versionlz': 1,
-                'blocksize': 88,
+                'blocksize': 1016,
                 'ctbytes': len(array_) + 16,  # original + 16 header bytes
                 'version': 2,
                 'flags': 0x13,  # 1 for shuffle 2 for non-compressed 4 for small blocksize
                 'nbytes': len(array_),
                 'typesize': blosc_args.typesize}
+    nt.assert_equal(expected, header)
+
+
+def test_decode_blosc_header_uncompressible_data_dont_split_false():
+    array_ = np.asarray(np.random.randn(256),
+                        dtype=np.float32).tostring()
+    blosc_args = BloscArgs()
+    blosc_args.shuffle = True
+    compressed = blosc.compress(array_, **blosc_args)
+    header = decode_blosc_header(compressed)
+    expected = {
+        'versionlz': 1,
+        'version': 2,
+        'blocksize': 1024,
+        'ctbytes': len(array_) + 16,  # original + 16 header bytes
+        'flags': 0x3,  # 1 for shuffle 2 for non-compressed
+        'nbytes': len(array_),
+        'typesize': blosc_args.typesize
+    }
     nt.assert_equal(expected, header)
 
 

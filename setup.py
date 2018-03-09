@@ -28,6 +28,7 @@ tests_require = [
     'coverage',
     'coveralls',
     'twine',
+    'wheel',
 ]
 
 setup(

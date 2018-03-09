@@ -1,11 +1,11 @@
 package:
   name: bloscpack
-  version: "0.10.0"
+  version: "0.11.0"
 
 source:
   path: ../
 #  fn: bloscpack-0.10.0.tar.gz
-#  url: https://pypi.python.org/packages/68/d4/b47594bb8840e42fb257c392f2e1f177df68ee4e00a8e1a3e9ae7dc761b4/bloscpack-0.10.0.tar.gz
+#  url: https://pypi.python.org/packages/74/72/1eb769495e4b5b640f73bc547ef15f188c8f0ab1117722c4e09c606b297d/bloscpack-0.11.0.tar.gz
 #  md5: 967927ac01bb6d9fdd74b3ac02954b7f
 #  patches:
    # List any patch files here
@@ -32,13 +32,13 @@ requirements:
   build:
     - python
     - setuptools
-    - blosc ==1.2.7
+    - blosc
     - numpy
     - six
 
   run:
     - python
-    - blosc ==1.2.7
+    - blosc
     - numpy
     - six
 

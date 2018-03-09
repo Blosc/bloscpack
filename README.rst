@@ -1190,7 +1190,15 @@ Packaging and Infrastructure
 Changelog
 ---------
 
-* v0.12.0     - COMING SOON
+* v0.12.0     - Fri Mar 09 2018
+
+  * Allow Pythonic None as checksum (#60 by @esc)
+  * Fix failing tests to comply with latest Blosc (#63 and #64 by FrancescElies)
+  * Support testing with Python 3.6 via Travis (#65 by @esc)
+  * Unpinn Blosc in conda recipe (who uses this?) (#61 by @esc)
+  * Cleanup README (#66 by @esc)
+  * Fix Trove classifiers (#67 by @esc)
+  * Random pep8 fixes by @esc
 
 * v0.11.0     - Mon Aug 22 2016
 

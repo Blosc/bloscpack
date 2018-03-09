@@ -26,7 +26,8 @@ tests_require = [
     'cram>=0.6',
     'mock',
     'coverage',
-    'coveralls'
+    'coveralls',
+    'twine',
 ]
 
 setup(

@@ -3,6 +3,7 @@ cram>=0.6
 mock
 coverage
 coveralls
+twine
 unittest2; python_version == '2.6'
 ordereddict; python_version =='2.6'
 argparse; python_version =='2.6'

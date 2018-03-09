@@ -15,5 +15,3 @@ script:
   - nosetests test/test_file_io.py:pack_unpack_hard
 after_success:
   - coveralls
-notifications:
-  email: false

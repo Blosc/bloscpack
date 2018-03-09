@@ -19,7 +19,7 @@ install_requires = [
 
 # Dependencies for 2.6
 if sys.version_info[:2] < (2, 7):
-    install_requires += ['ordereddict', 'argparse']
+    install_requires += ['ordereddict', 'argparse', 'unittest2']
 
 tests_require = [
     'nose',

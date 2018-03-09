@@ -11,9 +11,9 @@ import six
 from six.moves import xrange
 
 
-from .abstract_io import(pack,
-                         unpack,
-                         )
+from .abstract_io import (pack,
+                          unpack,
+                          )
 from .compat_util import StringIO
 from .file_io import (CompressedFPSource,
                       CompressedFPSink,

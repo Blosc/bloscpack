@@ -10,11 +10,8 @@ Bloscpack
 :Ohloh: https://www.ohloh.net/p/bloscpack
 :Version: |version|
 :Travis CI: |travis|
-:drone.io: |drone|
 :Coveralls: |coveralls|
-:Downloads: |downloads|
 :Python Versions: |pyversions|
-:Waffle: |waffle|
 :License: |license|
 :And...: |powered|
 
@@ -24,21 +21,11 @@ Bloscpack
 .. |travis| image:: https://img.shields.io/travis/Blosc/bloscpack/master.svg
         :target: https://travis-ci.org/Blosc/bloscpack
 
-.. |drone| image:: https://drone.io/github.com/Blosc/bloscpack/status.png
-        :target: https://drone.io/github.com/Blosc/bloscpack
-
 .. |coveralls| image:: https://coveralls.io/repos/Blosc/bloscpack/badge.svg?branch=master&service=github
         :target: https://coveralls.io/github/Blosc/bloscpack?branch=master
 
-.. |downloads| image::      https://img.shields.io/pypi/dm/bloscpack.svg
-        :target: https://pypi.python.org/pypi/bloscpack
-
 .. |license| image:: https://img.shields.io/pypi/l/bloscpack.svg
         :target: https://pypi.python.org/pypi/bloscpack
-
-.. |waffle|  image:: https://badge.waffle.io/blosc/bloscpack.png?label=in%20progress&title=In%20Progress
-        :target: https://waffle.io/blosc/bloscpack
-        :alt: 'Issues In Progress'
 
 .. |powered| image:: https://img.shields.io/badge/Powerd--By-Blosc-blue.svg
         :target: https://blosc.org

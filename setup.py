@@ -48,7 +48,7 @@ setup(
     install_requires = install_requires,
     extras_require = dict(tests=tests_require),
     tests_require = tests_require,
-    classifiers = ['Development Status :: 3 - Alpha',
+    classifiers = ['Development Status :: 4 - Beta',
                    'Environment :: Console',
                    'License :: OSI Approved :: MIT License',
                    'Operating System :: Microsoft :: Windows',
@@ -62,5 +62,6 @@ setup(
                    'Programming Language :: Python :: 2.7',
                    'Programming Language :: Python :: 3.4',
                    'Programming Language :: Python :: 3.5',
+                   'Programming Language :: Python :: 3.6',
                   ],
      )

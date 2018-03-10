@@ -240,6 +240,7 @@ def test_alternate_cname():
             ('lz4hc', 1),
             ('snappy', 2),
             ('zlib', 3),
+            ('zstd', 4),
             ]:
         blosc_args = BloscArgs(cname=cname)
         array_ = np.linspace(0, 1, 2e6)

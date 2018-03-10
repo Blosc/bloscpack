@@ -3,7 +3,7 @@
 # vim :set ft=py:
 
 
-import os
+import os  # pragma: no cover
 
 
 def drop_caches():  # pragma: no cover
@@ -13,5 +13,5 @@ def drop_caches():  # pragma: no cover
         raise RuntimeError('Need root permission to drop caches')
 
 
-def sync():
+def sync():  # pragma: no cover
     os.system('sync')

@@ -294,6 +294,20 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
 
 
 class BloscArgs(MutableMappaingObject):
+    """ Object to hold Blosc arguments.
+
+    Parameters
+    ----------
+    typesize : int
+        The typesize used
+    clevel : int
+        Compression level
+    shuffle : boolean
+        Whether or not to activate the shuffle filter
+    cname: str
+        Name of the internal code to use
+
+    """
 
     def __init__(self,
                  typesize=DEFAULT_TYPESIZE,
@@ -321,7 +335,18 @@ class BloscArgs(MutableMappaingObject):
 
 
 class BloscpackArgs(MutableMappaingObject):
+    """ Object to hold BloscPack arguments.
 
+    Parameters
+    ----------
+    offsets : boolean
+        Whether to include space for offsets
+    checksum : str
+        Name of the checksum to use or None/'None'
+    max_app_chunks : int or callable on number of chunks
+        How much space to reserve in the offsets for chunks to be appended.
+
+    """
     def __init__(self,
                  offsets=DEFAULT_OFFSETS,
                  checksum=DEFAULT_CHECKSUM,
@@ -346,6 +371,22 @@ class BloscpackArgs(MutableMappaingObject):
 
 
 class MetadataArgs(MutableMappaingObject):
+    """ Object to hold the metadata arguments.
+
+    Parameters
+    ----------
+    magic_format : 8 bytes
+        Format identifier for the metadata
+    meta_checksum : str
+        Checksum to be used for the metadata
+    meta_codec : str
+        Codec to be used to compress the metadata
+    meta_level : int
+        Compression level for metadata
+    max_meta_size : int or callable on metadata size
+        How much space to reserve for additional metadata
+
+    """
 
     def __init__(self,
                  magic_format=DEFAULT_MAGIC_FORMAT,

@@ -1123,7 +1123,6 @@ Documentation
 ~~~~~~~~~~~~~
 
 * Refactor monolithic readme into Sphinx and publish
-* Write the docstrings for the Args classes
 * Cleanup and double check the docstrings for the public API classes
 * document library usage
 * Announcement RST

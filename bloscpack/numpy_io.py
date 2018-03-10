@@ -103,7 +103,7 @@ def _conv(descr):
             descr = [_conv(d) for d in descr]
         else:
             descr = tuple([_conv(d) for d in descr])
-    elif six.PY2 and isinstance(descr, unicode): # pragma: no cover
+    elif six.PY2 and isinstance(descr, unicode):  # pragma: no cover
         descr = str(descr)
     return descr
 

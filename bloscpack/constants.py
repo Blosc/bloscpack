@@ -37,3 +37,10 @@ SUFFIXES = OrderedDict((
 
 # Codecs available from Blosc
 CNAME_AVAIL = blosc.compressor_list()
+CNAME_MAPPING = {
+    0: 'blosclz',
+    1: 'lz4',
+    2: 'snappy',
+    3: 'zlib',
+    4: 'zstd',
+}

@@ -15,6 +15,7 @@ import numpy as np
 
 from bloscpack.args import (BloscArgs,
                             )
+from bloscpack.compat_util import OrderedDict
 from bloscpack.constants import (MAGIC,
                                  FORMAT_VERSION,
                                  MAX_FORMAT_VERSION,
@@ -33,6 +34,7 @@ from bloscpack.headers import (BloscpackHeader,
                                decode_metadata_options,
                                check_range,
                                decode_blosc_header,
+                               decode_blosc_flags,
                                )
 
 
@@ -189,6 +191,34 @@ def test_decode_blosc_header_uncompressible_data_dont_split_false():
         'typesize': blosc_args.typesize
     }
     nt.assert_equal(expected, header)
+
+
+def test_decode_blosc_flags():
+
+    def gen_expected(new):
+        it = OrderedDict((
+            ('byte_shuffle', False),
+            ('pure_memcpy', False),
+            ('bit_shuffle', False),
+            ('split_blocks', False),
+            ('codec', 'blosclz'),
+        ))
+        it.update(new)
+        return it
+    for input_byte, new_params in [
+            (0b00000000, {}),
+            (0b00000001, {'byte_shuffle': True}),
+            (0b00000010, {'pure_memcpy': True}),
+            (0b00000100, {'bit_shuffle': True}),
+            (0b00010000, {'split_blocks': True}),
+            (0b00100000, {'codec': 'lz4'}),
+            (0b01000000, {'codec': 'snappy'}),
+            (0b01100000, {'codec': 'zlib'}),
+            (0b10000000, {'codec': 'zstd'}),
+            ]:
+        yield (nt.assert_equal,
+               decode_blosc_flags(input_byte),
+               gen_expected(new_params))
 
 
 def test_BloscPackHeader_constructor_exceptions():

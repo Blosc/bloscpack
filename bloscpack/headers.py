@@ -27,6 +27,7 @@ from .constants import (MAGIC,
                         MAX_CLEVEL,
                         BLOSCPACK_HEADER_LENGTH,
                         MAX_META_SIZE,
+                        CNAME_MAPPING,
                         )
 from .defaults import (DEFAULT_OFFSETS,
                        )
@@ -218,6 +219,15 @@ def decode_blosc_header(buffer_):
                         ('nbytes', decode_uint32(buffer_[4:8])),
                         ('blocksize', decode_uint32(buffer_[8:12])),
                         ('ctbytes', decode_uint32(buffer_[12:16]))))
+
+
+def decode_blosc_flags(byte_):
+    return OrderedDict((('byte_shuffle',  bool(byte_ & 1)),
+                        ('pure_memcpy',   bool(byte_ >> 1 & 1)),
+                        ('bit_shuffle',   bool(byte_ >> 2 & 1)),
+                        ('split_blocks',  bool(byte_ >> 4 & 1)),
+                        ('codec',         CNAME_MAPPING[byte_ >> 5 & 7]),
+                        ))
 
 
 class BloscpackHeader(MutableMappingObject):

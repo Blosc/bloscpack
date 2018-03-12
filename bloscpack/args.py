@@ -7,7 +7,7 @@ import blosc
 from six import integer_types, string_types
 
 
-from .abstract_objects import (MutableMappaingObject,
+from .abstract_objects import (MutableMappingObject,
                                )
 from .headers import (check_range,
                       )
@@ -293,7 +293,7 @@ def _handle_max_apps(offsets, nchunks, max_app_chunks):
     return max_app_chunks
 
 
-class BloscArgs(MutableMappaingObject):
+class BloscArgs(MutableMappingObject):
     """ Object to hold Blosc arguments.
 
     Parameters
@@ -334,7 +334,7 @@ class BloscArgs(MutableMappaingObject):
         return []
 
 
-class BloscpackArgs(MutableMappaingObject):
+class BloscpackArgs(MutableMappingObject):
     """ Object to hold BloscPack arguments.
 
     Parameters
@@ -370,7 +370,7 @@ class BloscpackArgs(MutableMappaingObject):
         return []
 
 
-class MetadataArgs(MutableMappaingObject):
+class MetadataArgs(MutableMappingObject):
     """ Object to hold the metadata arguments.
 
     Parameters

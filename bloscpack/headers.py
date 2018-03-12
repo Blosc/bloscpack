@@ -14,7 +14,7 @@ except ImportError:
 import blosc
 from six import PY3, integer_types, binary_type
 
-from .abstract_objects import (MutableMappaingObject,
+from .abstract_objects import (MutableMappingObject,
                                )
 from .checksums import (CHECKSUMS_AVAIL,
                         CHECKSUMS_LOOKUP,
@@ -220,7 +220,7 @@ def decode_blosc_header(buffer_):
                         ('ctbytes', decode_uint32(buffer_[12:16]))))
 
 
-class BloscpackHeader(MutableMappaingObject):
+class BloscpackHeader(MutableMappingObject):
     """ The Bloscpack header.
 
     Parameters
@@ -390,7 +390,7 @@ class BloscpackHeader(MutableMappaingObject):
             max_app_chunks=decode_int64(buffer_[24:32]))
 
 
-class MetadataHeader(MutableMappaingObject):
+class MetadataHeader(MutableMappingObject):
 
     def __init__(self,
                  magic_format=b'',

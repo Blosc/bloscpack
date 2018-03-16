@@ -44,6 +44,9 @@ from .exceptions import (FileNotFound,
 from .file_io import (pack_file,
                       unpack_file,
                       _read_beginning,
+                      _read_compressed_chunk_fp,
+                      )
+from .headers import (decode_blosc_flags,
                       )
 from .pretty import (reverse_pretty,
                      join_with_eol,
@@ -504,6 +507,10 @@ def main():
             with open(args.file_, 'rb') as fp:
                 bloscpack_header, metadata, metadata_header, offsets = \
                     _read_beginning(fp)
+                checksum_impl = bloscpack_header.checksum_impl
+                # get the header of the first chunk
+                _, blosc_header, _ = _read_compressed_chunk_fp(
+                    fp, checksum_impl)
         except ValueError as ve:
             log.error(str(ve) + "\n" +
                       "This might not be a bloscpack compressed file.")
@@ -514,7 +521,10 @@ def main():
         if metadata is not None:
             log_metadata(metadata)
             log.normal(metadata_header.pformat())
-
+        log.normal("First chunk blosc header:")
+        log.normal(str(blosc_header))
+        log.normal("First chunk blosc flags: ")
+        log.normal(str(decode_blosc_flags(blosc_header['flags'])))
     else:  # pragma: no cover
         # in Python 3 subcommands are not mandatory by default
         parser.print_usage()

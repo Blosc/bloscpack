@@ -255,12 +255,25 @@ If you just need some info on how the file was compressed ``[i | info]``:
     blpk:     metadata: False
     blpk:     checksum: 'adler32'
     blpk:     typesize: 8
-    blpk:     chunk_size: 512.0M (536870912B)
-    blpk:     last_chunk: 501.88M (526258176B)
-    blpk:     nchunks: 3
-    blpk:     max_app_chunks: 30
+    blpk:     chunk_size: 1.0M (1048576B)
+    blpk:     last_chunk: 900.0K (921600B)
+    blpk:     nchunks: 1526
+    blpk:     max_app_chunks: 15260
     blpk: 'offsets':
-    blpk: [296,78074317,140782616,...]
+    blpk: [134320,459218,735869,986505,1237646,...]
+    blpk: First chunk blosc header:
+    blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 131072), ('ctbytes', 324894)])
+    blpk: First chunk blosc flags:
+    blpk: OrderedDict([('byte_shuffle', True), ('pure_memcpy', False), ('bit_shuffle', False), ('split_blocks', False), ('codec', 'blosclz')])
+
+Importantly, the header and flag information are for the first chunk only.
+Usually this isn't a problem because bloscpack compressed files do tend to have
+homogeneous settings like codec used, typesize etc... However, there is nothing
+that will stop you from appending to an existing bloscpack file using different
+settings. For example, half the file might be compressed using 'blosclz'
+whereas the other half of the file might be compressed with 'lz4'. In any case,
+just be aware that the output is to be seen as an indication that is likely to
+be correct for all chunks but must not be so necessarily.
 
 Adding Metdata
 ~~~~~~~~~~~~~~

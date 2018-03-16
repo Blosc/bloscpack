@@ -85,6 +85,10 @@ Try using an alternative codec ('lz4' should be available):
   blpk:     max_app_chunks: 1530
   blpk: 'offsets':
   blpk: \[13496,[1-9]\d*,[1-9]\d*,[1-9]\d*,[1-9]\d*,...\] (re)
+  blpk: First chunk blosc header:
+  blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 49), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 131072), ('ctbytes', 174045)])
+  blpk: First chunk blosc flags: 
+  blpk: OrderedDict([('byte_shuffle', True), ('pure_memcpy', False), ('bit_shuffle', False), ('split_blocks', True), ('codec', 'lz4')])
   $ rm data.dat.blp
 
 Try using an  codec that is not available:

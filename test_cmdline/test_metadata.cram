@@ -38,6 +38,10 @@ Add metadata to the file:
   blpk:     max_meta_size: 680.0B (680B)
   blpk:     meta_comp_size: 6[2-5]\.0B \(6[2-5]B\) (re)
   blpk:     user_codec: b?'' (re)
+  blpk: First chunk blosc header:
+  blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 131072), ('ctbytes', 248901)])
+  blpk: First chunk blosc flags: 
+  blpk: OrderedDict([('byte_shuffle', True), ('pure_memcpy', False), ('bit_shuffle', False), ('split_blocks', False), ('codec', 'blosclz')])
   $ blpk decompress data.dat.blp data.dat.dcmp
   blpk: Metadata:
   blpk: {u?'container': u?'numpy', u?'dtype': u?"'<f8'", u?'order': u?'C', u?'shape': \[20000000\]} (re)

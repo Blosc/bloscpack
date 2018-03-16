@@ -255,12 +255,16 @@ If you just need some info on how the file was compressed ``[i | info]``:
     blpk:     metadata: False
     blpk:     checksum: 'adler32'
     blpk:     typesize: 8
-    blpk:     chunk_size: 512.0M (536870912B)
-    blpk:     last_chunk: 501.88M (526258176B)
-    blpk:     nchunks: 3
-    blpk:     max_app_chunks: 30
+    blpk:     chunk_size: 1.0M (1048576B)
+    blpk:     last_chunk: 900.0K (921600B)
+    blpk:     nchunks: 1526
+    blpk:     max_app_chunks: 15260
     blpk: 'offsets':
-    blpk: [296,78074317,140782616,...]
+    blpk: [134320,459218,735869,986505,1237646,...]
+    blpk: First chunk blosc header:
+    blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 131072), ('ctbytes', 324894)])
+    blpk: First chunk blosc flags: 
+    blpk: OrderedDict([('byte_shuffle', True), ('pure_memcpy', False), ('bit_shuffle', False), ('split_blocks', False), ('codec', 'blosclz')])
 
 Adding Metdata
 ~~~~~~~~~~~~~~

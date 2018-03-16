@@ -29,6 +29,10 @@ Get some info on the file:
   blpk:     max_app_chunks: 1530
   blpk: 'offsets':
   blpk: \[13496,[1-9]\d*,[1-9]\d*,[1-9]\d*,[1-9]\d*,...\] (re)
+  blpk: First chunk blosc header:
+  blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 131072), ('ctbytes', 248901)])
+  blpk: First chunk blosc flags: 
+  blpk: OrderedDict([('byte_shuffle', True), ('pure_memcpy', False), ('bit_shuffle', False), ('split_blocks', False), ('codec', 'blosclz')])
   $ blpk i data.dat.blp
   blpk: BloscpackHeader:
   blpk:     format_version: 3
@@ -42,6 +46,10 @@ Get some info on the file:
   blpk:     max_app_chunks: 1530
   blpk: 'offsets':
   blpk: \[13496,[1-9]\d*,[1-9]\d*,[1-9]\d*,[1-9]\d*,...\] (re)
+  blpk: First chunk blosc header:
+  blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 131072), ('ctbytes', 248901)])
+  blpk: First chunk blosc flags: 
+  blpk: OrderedDict([('byte_shuffle', True), ('pure_memcpy', False), ('bit_shuffle', False), ('split_blocks', False), ('codec', 'blosclz')])
   $ rm data.dat.blp
   $ blpk info data.dat.blp
   blpk: error: file 'data.dat.blp' does not exist!

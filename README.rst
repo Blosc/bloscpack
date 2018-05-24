@@ -1204,6 +1204,19 @@ Packaging and Infrastructure
 Changelog
 ---------
 
+* v0.13.0     - Thu May 24 2018
+
+  * Add license file and include in sdist packages (#75 by @toddrme2178)
+  * Print codec on info (#73 by @esc)
+  * Decode Blosc flags (#72 by @esc)
+  * Fix an embarrassing typo (#71 by @esc)
+  * Test zstd (#70 by @esc)
+  * Document args object (#69 by @esc)
+  * Various pep8 fixes by @esc
+  * Support for uploading wheels and using twine by @esc
+  * Fix use of coverage by @esc
+  * Better support for Python 2.6 by @esc
+
 * v0.12.0     - Fri Mar 09 2018
 
   * Allow Pythonic None as checksum (#60 by @esc)

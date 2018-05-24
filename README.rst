@@ -1124,7 +1124,7 @@ Maintainers Notes on Cutting a Release
 #. Push the tag to Blosc github ``git push blosc $VERSION``
 #. Push the tag to own github ``git push esc $VERSION``
 #. Make a source distribution using ``python setup.py sdist bdist_wheel``
-#. Upload to PyPi using ``twine upload dist/bloscpack-$VERSION*`
+#. Upload to PyPi using `twine upload dist/bloscpack-$VERSION*`
 #. Bump version number to next dev version
 #. Announce release on the Blosc list
 #. Announce release via Twitter

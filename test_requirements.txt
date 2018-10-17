@@ -5,6 +5,3 @@ coverage
 coveralls
 twine
 wheel
-unittest2; python_version == '2.6'
-ordereddict; python_version =='2.6'
-argparse; python_version =='2.6'

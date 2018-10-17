@@ -17,10 +17,6 @@ install_requires = [
     'six',
 ]
 
-# Dependencies for 2.6
-if sys.version_info[:2] < (2, 7):
-    install_requires += ['ordereddict', 'argparse', 'unittest2']
-
 tests_require = [
     'nose',
     'cram>=0.6',
@@ -60,7 +56,6 @@ setup(
                    'Topic :: System :: Archiving :: Compression',
                    'Topic :: Utilities',
                    'Programming Language :: Python',
-                   'Programming Language :: Python :: 2.6',
                    'Programming Language :: Python :: 2.7',
                    'Programming Language :: Python :: 3.4',
                    'Programming Language :: Python :: 3.5',

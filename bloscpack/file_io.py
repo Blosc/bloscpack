@@ -48,8 +48,6 @@ from .pretty import (double_pretty_size,
                      )
 from .serializers import (SERIALIZERS_LOOKUP,
                           )
-from .util import (open_two_file,
-                   )
 from .abstract_io import (PlainSource,
                           PlainSink,
                           CompressedSource,
@@ -455,8 +453,7 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
     # calculate chunk sizes
     nchunks, chunk_size, last_chunk_size = \
             calculate_nchunks(in_file_size, chunk_size)
-    with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
-            (input_fp, output_fp):
+    with open(in_file, 'rb') as input_fp, open(out_file, 'wb') as output_fp:
         source = PlainFPSource(input_fp)
         sink = CompressedFPSink(output_fp)
         pack(source, sink,
@@ -495,8 +492,7 @@ def unpack_file(in_file, out_file):
     """
     in_file_size = path.getsize(in_file)
     log.verbose('input file size: %s' % pretty_size(in_file_size))
-    with open_two_file(open(in_file, 'rb'), open(out_file, 'wb')) as \
-            (input_fp, output_fp):
+    with open(in_file, 'rb') as input_fp, open(out_file, 'wb') as output_fp:
         source = CompressedFPSource(input_fp)
         sink = PlainFPSink(output_fp, source.nchunks)
         unpack(source, sink)

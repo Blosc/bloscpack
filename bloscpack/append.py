@@ -56,8 +56,6 @@ from .exceptions import (NotEnoughSpace,
                          )
 from .pretty import (double_pretty_size,
                      )
-from .util import (open_two_file,
-                   )
 from . import log
 
 
@@ -216,8 +214,7 @@ def append(orig_file, new_file, blosc_args=None):
             double_pretty_size(orig_size_before))
     log.verbose('new file size: %s' % double_pretty_size(new_size))
 
-    with open_two_file(open(orig_file, 'r+b'), open(new_file, 'rb')) as \
-            (orig_fp, new_fp):
+    with open(orig_file, 'r+b') as orig_fp, open(new_file, 'rb') as new_fp:
         append_fp(orig_fp, new_fp, new_size, blosc_args)
     orig_size_after = path.getsize(orig_file)
     log.verbose('orig file size after append: %s' %

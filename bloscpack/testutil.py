@@ -19,8 +19,6 @@ import numpy as np
 
 from .defaults import (DEFAULT_CHUNK_SIZE,
                        )
-from .util import (open_two_file,
-                   )
 from .pretty import (reverse_pretty
                      )
 
@@ -71,8 +69,7 @@ def create_tmp_files():
 
 def cmp_file(file1, file2):
     """ File comparison utility with a small chunksize """
-    with open_two_file(open(file1, 'rb'), open(file2, 'rb')) as \
-            (fp1, fp2):
+    with open(file1, 'rb') as fp1, open(file2, 'rb') as fp2:
         cmp_fp(fp1, fp2)
 
 

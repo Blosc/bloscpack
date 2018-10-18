@@ -1203,6 +1203,10 @@ Packaging and Infrastructure
 Changelog
 ---------
 
+* v0.14.0     - Thu Oct 18 2018
+
+  * Remove official support for Python 2.6 (#77 by @esc)
+
 * v0.13.0     - Thu May 24 2018
 
   * Add license file and include in sdist packages (#75 by @toddrme2178)

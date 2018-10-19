@@ -46,6 +46,13 @@ shuffling compressor. Uses `python-blosc
 Also comes with native support for efficiently serializing and deserializing
 Numpy arrays.
 
+Code of Conduct
+---------------
+
+The Blosc community has adopted a `Code of Conduct
+<https://github.com/Blosc/CodeOfConduct>`_ that we expect project participants
+to adhere to. Please read the full text so that you can understand what actions
+will and will not be tolerated.
 
 Dependencies
 ------------

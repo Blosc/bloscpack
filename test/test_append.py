@@ -5,6 +5,7 @@
 
 import blosc
 import nose.tools as nt
+import numpy as np
 
 
 from bloscpack.abstract_io import (pack,
@@ -44,7 +45,7 @@ from bloscpack.file_io import (PlainFPSource,
                                _read_metadata,
                                )
 from bloscpack.headers import (BloscpackHeader,
-                               MetadataHeader
+                               MetadataHeader,
                                )
 from bloscpack.serializers import (SERIALIZERS,
                                    )
@@ -336,7 +337,19 @@ def test_append_mix_shuffle():
     # crank up the clevel to ensure compression happens, otherwise the flags
     # will be screwed later on
     blosc_args = BloscArgs(typesize=None, shuffle=False, clevel=9)
-    reset_append_fp(orig, new, new_size, blosc_args=blosc_args)
+
+    # need to create something that will be compressible even without shuffle,
+    # the linspace used in 'new' doesn't work anymore as of python-blosc 1.6.1
+    to_append = np.zeros(int(2e6))
+    to_append_fp = StringIO()
+    to_append_fp.write(to_append.tostring())
+    to_append_fp_size = to_append_fp.tell()
+    to_append_fp.seek(0)
+
+    # now do the append
+    reset_append_fp(orig, to_append_fp, to_append_fp_size, blosc_args=blosc_args)
+
+    # decompress 'orig' so that we can examine it
     source = CompressedFPSource(orig)
     sink = PlainFPSink(dcmp)
     unpack(source, sink)
@@ -345,8 +358,10 @@ def test_append_mix_shuffle():
     new.seek(0)
     new_str = new.read()
     dcmp_str = dcmp.read()
-    nt.assert_equal(len(dcmp_str), len(new_str * 2))
-    nt.assert_equal(dcmp_str, new_str * 2)
+
+    # now sanity check the length and content of the decompressed
+    nt.assert_equal(len(dcmp_str), len(new_str) + to_append_fp_size)
+    nt.assert_equal(dcmp_str, new_str + to_append.tostring())
 
     # now get the first and the last chunk and check that the shuffle doesn't
     # match

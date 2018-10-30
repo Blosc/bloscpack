@@ -34,6 +34,8 @@ from bloscpack.file_io import (PlainFPSource,
                                unpack_file,
                                pack_bytes_file,
                                unpack_bytes_file,
+                               pack_bytes_to_bytes,
+                               unpack_bytes_from_bytes,
                                _read_bloscpack_header,
                                _read_offsets,
                                _read_beginning,
@@ -247,6 +249,13 @@ def test_pack_unpack_bytes_file():
         pack_bytes_file(input_bytes, out_file)
         output_bytes = unpack_bytes_file(out_file)
     nt.assert_equal(input_bytes, output_bytes)
+
+def test_pack_unpack_bytes_bytes():
+    a = np.linspace(0, 1e5)
+    b = a.tostring()
+    c = pack_bytes_to_bytes(b)
+    d = unpack_bytes_from_bytes(c)
+    nt.assert_equal(b, d)
 
 
 def pack_unpack_hard():

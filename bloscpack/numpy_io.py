@@ -28,7 +28,10 @@ from .abstract_io import (PlainSource,
                           )
 from .exceptions import (NotANumpyArray,
                          ObjectNumpyArrayRejection,
+                         ChunkSizeTypeSizeMismatch,
                          )
+from .pretty import (double_pretty_size,
+                     )
 from . import log
 
 
@@ -78,6 +81,11 @@ class PlainNumpySource(PlainSource):
         return _compress_chunk_ptr
 
     def __iter__(self):
+        if self.chunk_size % self.ndarray.itemsize != 0:
+                raise ChunkSizeTypeSizeMismatch(
+                    "chunk_size: '%s' is not divisible bytypesize: '%i'" %
+                    (double_pretty_size(self.chunk_size), self.ndarray.itemsize)
+                )
         self.nitems = int(self.chunk_size / self.ndarray.itemsize)
         offset = self.ptr
         for i in xrange(self.nchunks - 1):

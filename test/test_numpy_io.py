@@ -213,9 +213,12 @@ def test_backwards_compat():
 
 
 def test_itemsize_chunk_size_mismatch():
-    a = np.arange(10)
-    nt.assert_raises(ChunkSizeTypeSizeMismatch,
-                     pack_ndarray_str, a, chunk_size=7)
+    a = np.arange(1000)
+    # typesize of the array is 8, let's glitch the typesize
+    for i in [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15]:
+            yield nt.assert_raises, \
+                ChunkSizeTypeSizeMismatch, \
+                pack_ndarray_str, a, i
 
 
 def test_larger_arrays():

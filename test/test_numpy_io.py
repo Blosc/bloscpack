@@ -241,7 +241,6 @@ def test_alternate_cname():
             ('blosclz', 0),
             ('lz4', 1),
             ('lz4hc', 1),
-            ('snappy', 2),
             ('zlib', 3),
             ('zstd', 4),
             ]:

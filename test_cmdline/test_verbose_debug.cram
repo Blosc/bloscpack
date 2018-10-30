@@ -286,19 +286,19 @@ Try using --debug with metadata:
   blpk: read compressed metadata of size: '6[2-5]' (re)
   blpk: Read raw offsets: b?'.*' (re)
   blpk: Offsets: \[1100, [1-9]\d*, [1-9]\d*, [1-9]\d*\] (re)
-  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', 131072\), \('ctbytes', [1-9]\d*\)\]\) (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', [1-9]\d*\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '0'
   blpk: checksum OK \(adler32\)\: .* (re)
   blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) out: 50\.0M \(52428800B\) (re)
-  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', 131072\), \('ctbytes', [1-9]\d*\)\]\) (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', [1-9]\d*\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '1'
   blpk: checksum OK \(adler32\)\: .* (re)
   blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) out: 50\.0M \(52428800B\) (re)
-  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', 131072\), \('ctbytes', [1-9]\d*\)\]\) (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', [1-9]\d*\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '2'
   blpk: checksum OK \(adler32\)\: .* (re)
   blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*M \([1-9]\d*B\) out: 50\.0M \(52428800B\) (re)
-  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 2713600\), \('blocksize', 131072\), \('ctbytes', [1-9]\d*\)\]\) (re)
+  blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 2713600\), \('blocksize', [1-9]\d*\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '3' (last)
   blpk: checksum OK \(adler32\)\: .* (re)
   blpk: chunk handled, in: [1-9]\d*\.[1-9]\d*K \([1-9]\d*B\) out: 2\.59M \(2713600B\) (re)

@@ -532,3 +532,37 @@ def unpack_bytes_file(compressed_file):
         source = CompressedFPSource(fp)
         unpack(source, sink)
     return sio.getvalue()
+
+
+def pack_bytes_to_bytes(bytes_,
+                        chunk_size=DEFAULT_CHUNK_SIZE,
+                        metadata=None,
+                        blosc_args=None,
+                        bloscpack_args=None,
+                        metadata_args=None,
+                        ):
+    bytes_size = len(bytes_)
+    log.verbose('input bytes size: %s' % double_pretty_size(bytes_size))
+    nchunks, chunk_size, last_chunk_size = \
+            calculate_nchunks(bytes_size, chunk_size)
+    source = PlainFPSource(StringIO(bytes_))
+    sio = StringIO()
+    sink = CompressedFPSink(sio)
+    pack(source, sink,
+         nchunks, chunk_size, last_chunk_size,
+         metadata=metadata,
+         blosc_args=blosc_args,
+         bloscpack_args=bloscpack_args,
+         metadata_args=metadata_args)
+    out_bytes_size = sio.tell()
+    log.verbose('output bytes size: %s' % double_pretty_size(out_bytes_size))
+    log.verbose('compression ratio: %f' % (bytes_size/out_bytes_size))
+    return sio.getvalue()
+
+
+def unpack_bytes_from_bytes(bytes_):
+    source = CompressedFPSource(StringIO(bytes_))
+    sio = StringIO()
+    sink = PlainFPSink(sio)
+    unpack(source, sink)
+    return sio.getvalue()

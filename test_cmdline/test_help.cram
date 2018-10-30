@@ -79,7 +79,7 @@ Help for the subcommands:
     -s, --no-shuffle      deactivate shuffle
     -c <codec>, --codec <codec>
                           codec to be used by Blosc: 
-                          blosclz, lz4, lz4hc, snappy, zlib, zstd
+                          blosclz, lz4, lz4hc, zlib, zstd
                            (default: blosclz)
   
   bloscpack settings:
@@ -130,7 +130,7 @@ Help for the subcommands:
     -s, --no-shuffle      deactivate shuffle
     -c <codec>, --codec <codec>
                           codec to be used by Blosc: 
-                          blosclz, lz4, lz4hc, snappy, zlib, zstd
+                          blosclz, lz4, lz4hc, zlib, zstd
                            (default: blosclz)
 
   $ blpk info --help

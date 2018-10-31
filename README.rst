@@ -1120,8 +1120,8 @@ Maintainers Notes on Cutting a Release
 --------------------------------------
 
 #. Set the version as environment variable ``VERSION=vX.X.X``
-#. Update the changelog
-#. Commit using ``git commit -m "$VERSION changelog"``
+#. Update the changelog and ANNOUNCE.rst
+#. Commit using ``git commit -m "$VERSION changelog and ANNOUNCE.rst"``
 #. Set the version number in ``bloscpack/version.py``
 #. Commit with ``git commit -m "$VERSION"``
 #. Make the tag using ``git tag -s -m "Bloscpack $VERSION" $VERSION``

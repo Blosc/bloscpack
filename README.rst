@@ -1120,7 +1120,7 @@ Maintainers Notes on Cutting a Release
 --------------------------------------
 
 #. Set the version as environment variable ``VERSION=vX.X.X``
-#. Update the changelog and ANNOUNCE.rst
+#. Update the changelog and ``ANNOUNCE.rst``
 #. Commit using ``git commit -m "$VERSION changelog and ANNOUNCE.rst"``
 #. Set the version number in ``bloscpack/version.py``
 #. Commit with ``git commit -m "$VERSION"``
@@ -1131,7 +1131,7 @@ Maintainers Notes on Cutting a Release
 #. Push the tag to own github ``git push esc $VERSION``
 #. Make a source distribution using ``python setup.py sdist bdist_wheel``
 #. Upload to PyPi using ``twine upload dist/bloscpack-$VERSION*``
-#. Bump version number to next dev version
+#. Bump version number to next dev version and reset ``ANNOUNCE.rst``
 #. Announce release on the Blosc list
 #. Announce release via Twitter
 

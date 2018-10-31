@@ -1,20 +1,11 @@
-===========================
-Announcing Bloscpack 0.15.0
-===========================
+==========================
+Announcing Bloscpack X.Y.Z
+==========================
 
 What is new?
 ============
 
-Two new high-level API functions have been added:
-
-* 'pack_bytes_to_bytes'
-* 'unpack_bytes_from_bytes'
-
-As you might expect from the naming, these allow you to perform fully
-in-memory based compression and decompression via the bytes datatype.
-
-Additionally there are a  few bugfixes, support for python-blosc
-1.6.1 and support for Python 3.7.
+XXXYYYZZZ
 
 For more info, have a look at the changelog:
 

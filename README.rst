@@ -1210,6 +1210,18 @@ Packaging and Infrastructure
 Changelog
 ---------
 
+* v0.15.0     - Wed 31 Oct 2018
+
+  * Halloween Release!
+  * Adding the Blosc code of conduct (#79 by @esc)
+  * Two new high-level functions: 'pack_bytes_to_bytes' and
+    'unpack_bytes_from_bytes' (#83 by @esc)
+  * Fix incorrect check for typesize-chunksize mismatch (#81 by @esc)
+  * Fix test to append without shuffle (#82 by @esc)
+  * Fix tests to respect snappy not being available by default (#85 by @esc)
+  * Fix tests to account for new default blocksize (#86 by @esc)
+  * Enable testing on Python 3.7 via Travis (#84 by @esc)
+
 * v0.14.0     - Thu Oct 18 2018
 
   * Remove official support for Python 2.6 (#77 by @esc)

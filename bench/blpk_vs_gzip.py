@@ -12,7 +12,7 @@ import subprocess
 
 import bloscpack.pretty as bpp
 import bloscpack.testutil as bpt
-from bloscpack import pack_file
+from bloscpack import pack_file_to_file
 
 DROP_CACHES = False
 
@@ -54,7 +54,7 @@ with bpt.create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
 
     print("Will now run bloscpack... ")
     tic = time.time()
-    pack_file(in_file, out_file)
+    pack_file_to_file(in_file, out_file)
     toc = time.time()
     print("Time: %.2f seconds" % (toc - tic))
     print("Output file size: %s" % get_fs(out_file))

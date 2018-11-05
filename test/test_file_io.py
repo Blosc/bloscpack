@@ -30,10 +30,10 @@ from bloscpack.file_io import (PlainFPSource,
                                PlainFPSink,
                                CompressedFPSource,
                                CompressedFPSink,
-                               pack_file,
-                               unpack_file,
-                               pack_bytes_file,
-                               unpack_bytes_file,
+                               pack_file_to_file,
+                               unpack_file_from_file,
+                               pack_bytes_to_file,
+                               unpack_bytes_from_file,
                                pack_bytes_to_bytes,
                                unpack_bytes_from_bytes,
                                _read_bloscpack_header,
@@ -58,7 +58,7 @@ from bloscpack.testutil import (create_array,
 def test_offsets():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        pack_file(in_file, out_file, chunk_size='2M')
+        pack_file_to_file(in_file, out_file, chunk_size='2M')
         with open(out_file, 'r+b') as input_fp:
             bloscpack_header = _read_bloscpack_header(input_fp)
             total_entries = bloscpack_header.total_prospective_chunks
@@ -153,15 +153,15 @@ def test_invalid_format():
     blosc_args = BloscArgs()
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        pack_file(in_file, out_file, blosc_args=blosc_args)
+        pack_file_to_file(in_file, out_file, blosc_args=blosc_args)
         nt.assert_raises(FormatVersionMismatch,
-                         unpack_file, out_file, dcmp_file)
+                         unpack_file_from_file, out_file, dcmp_file)
 
 
 def test_file_corruption():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        pack_file(in_file, out_file)
+        pack_file_to_file(in_file, out_file)
         # now go in and modify a byte in the file
         with open(out_file, 'r+b') as input_fp:
             # read offsets and header
@@ -180,7 +180,7 @@ def test_file_corruption():
             # write the flipped byte
             input_fp.write(replace)
         # now attempt to unpack it
-        nt.assert_raises(ChecksumMismatch, unpack_file, out_file, dcmp_file)
+        nt.assert_raises(ChecksumMismatch, unpack_file_from_file, out_file, dcmp_file)
 
 
 def pack_unpack(repeats, chunk_size=None, progress=False):
@@ -190,10 +190,10 @@ def pack_unpack(repeats, chunk_size=None, progress=False):
         create_array(repeats, in_file, progress=progress)
         if progress:
             print("Compressing")
-        pack_file(in_file, out_file, chunk_size=chunk_size)
+        pack_file_to_file(in_file, out_file, chunk_size=chunk_size)
         if progress:
             print("Decompressing")
-        unpack_file(out_file, dcmp_file)
+        unpack_file_from_file(out_file, dcmp_file)
         if progress:
             print("Verifying")
         cmp_file(in_file, dcmp_file)
@@ -242,13 +242,14 @@ def test_pack_unpack_fp():
     pack_unpack_fp(1, chunk_size=reverse_pretty('8M'))
 
 
-def test_pack_unpack_bytes_file():
+def test_pack_unpack_bytes_to_from_file():
     array_ = np.linspace(0, 1e5)
     input_bytes = array_.tostring()
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
-        pack_bytes_file(input_bytes, out_file)
-        output_bytes = unpack_bytes_file(out_file)
+        pack_bytes_to_file(input_bytes, out_file)
+        output_bytes = unpack_bytes_from_file(out_file)
     nt.assert_equal(input_bytes, output_bytes)
+
 
 def test_pack_unpack_bytes_bytes():
     a = np.linspace(0, 1e5)

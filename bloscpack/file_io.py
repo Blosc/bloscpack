@@ -11,6 +11,7 @@ import os.path as path
 import blosc
 import six
 from six.moves import xrange
+from deprecated import deprecated
 
 
 from .args import (calculate_nchunks,
@@ -416,10 +417,12 @@ class CompressedFPSink(CompressedSink):
         return offset, compressed, digest
 
 
-def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
-              blosc_args=None,
-              bloscpack_args=None,
-              metadata_args=None):
+def pack_file_to_file(in_file, out_file,
+                      chunk_size=DEFAULT_CHUNK_SIZE,
+                      metadata=None,
+                      blosc_args=None,
+                      bloscpack_args=None,
+                      metadata_args=None):
     """ Main function for compressing a file.
 
     Parameters
@@ -467,7 +470,12 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
     log.verbose('compression ratio: %f' % (in_file_size/out_file_size))
 
 
-def unpack_file(in_file, out_file):
+pack_file = deprecated(pack_file_to_file,
+                       version="0.16.0",
+                       reason="Use 'pack_file_to_file' instead")
+
+
+def unpack_file_from_file(in_file, out_file):
     """ Main function for decompressing a file.
 
     Parameters
@@ -502,10 +510,17 @@ def unpack_file(in_file, out_file):
     return source.metadata
 
 
-def pack_bytes_file(bytes_, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
-                    blosc_args=None,
-                    bloscpack_args=None,
-                    metadata_args=None):
+unpack_file = deprecated(unpack_file_from_file,
+                         version="0.16.0",
+                         reason="Use 'unpack_file_from_file' instead")
+
+
+def pack_bytes_to_file(bytes_, out_file,
+                       chunk_size=DEFAULT_CHUNK_SIZE,
+                       metadata=None,
+                       blosc_args=None,
+                       bloscpack_args=None,
+                       metadata_args=None):
     bytes_size = len(bytes_)
     log.verbose('input bytes size: %s' % double_pretty_size(bytes_size))
     # calculate chunk sizes
@@ -525,13 +540,23 @@ def pack_bytes_file(bytes_, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=No
     log.verbose('compression ratio: %f' % (bytes_size/out_file_size))
 
 
-def unpack_bytes_file(compressed_file):
+pack_bytes_file = deprecated(pack_bytes_to_file,
+                             version="0.16.0",
+                             reason="Use 'pack_bytes_to_file' instead")
+
+
+def unpack_bytes_from_file(compressed_file):
     sio = StringIO()
     sink = PlainFPSink(sio)
     with open(compressed_file, 'rb') as fp:
         source = CompressedFPSource(fp)
         unpack(source, sink)
     return sio.getvalue()
+
+
+unpack_bytes_file = deprecated(unpack_bytes_from_file,
+                               version="0.16.0",
+                               reason="Use 'unpack_bytes_from_file' instead")
 
 
 def pack_bytes_to_bytes(bytes_,

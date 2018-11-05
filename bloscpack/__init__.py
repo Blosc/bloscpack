@@ -11,9 +11,13 @@ from .args import (BloscArgs,
                    MetadataArgs,
                    )
 from .file_io import (pack_file,
+                      pack_file_to_file,
                       unpack_file,
+                      unpack_file_from_file,
                       pack_bytes_file,
+                      pack_bytes_to_file,
                       unpack_bytes_file,
+                      unpack_bytes_from_file,
                       pack_bytes_to_bytes,
                       unpack_bytes_from_bytes,
                       )

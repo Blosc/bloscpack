@@ -28,10 +28,10 @@ from bloscpack.headers import (decode_blosc_header,
 from bloscpack.memory_io import CompressedMemorySource, CompressedMemorySink
 from bloscpack.numpy_io import (pack_ndarray,
                                 unpack_ndarray,
-                                pack_ndarray_str,
-                                unpack_ndarray_str,
-                                pack_ndarray_file,
-                                unpack_ndarray_file,
+                                pack_ndarray_to_bytes,
+                                unpack_ndarray_from_bytes,
+                                pack_ndarray_to_file,
+                                unpack_ndarray_from_file,
                                 _conv,
                                 )
 from bloscpack.testutil import (create_tmp_files,
@@ -47,8 +47,8 @@ def roundtrip_numpy_memory(ndarray):
 
 
 def roundtrip_numpy_str(ndarray):
-    s = pack_ndarray_str(ndarray)
-    b = unpack_ndarray_str(s)
+    s = pack_ndarray_to_bytes(ndarray)
+    b = unpack_ndarray_from_bytes(s)
     return npt.assert_array_equal, ndarray, b
 
 
@@ -64,8 +64,8 @@ def roundtrip_numpy_file_pointers(ndarray):
 
 def roundtrip_numpy_file(ndarray):
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
-        pack_ndarray_file(ndarray, out_file)
-        b = unpack_ndarray_file(out_file)
+        pack_ndarray_to_file(ndarray, out_file)
+        b = unpack_ndarray_from_file(out_file)
         return npt.assert_array_equal, ndarray, b
 
 
@@ -87,7 +87,7 @@ def test_unpack_exception():
     source = PlainFPSource(StringIO(a_str))
     sink = CompressedFPSink(sio)
     pack(source, sink, *calculate_nchunks(len(a_str)))
-    nt.assert_raises(NotANumpyArray, unpack_ndarray_str, sio.getvalue())
+    nt.assert_raises(NotANumpyArray, unpack_ndarray_from_bytes, sio.getvalue())
 
 
 def roundtrip_ndarray(ndarray):
@@ -206,9 +206,9 @@ def test_backwards_compat():
     with mock.patch('bloscpack.numpy_io._ndarray_meta', old_ndarray_meta):
         for a in test_data:
             # uses old version of _ndarray_meta
-            c = pack_ndarray_str(a)
+            c = pack_ndarray_to_bytes(a)
             # should not raise a SyntaxError
-            d = unpack_ndarray_str(c)
+            d = unpack_ndarray_from_bytes(c)
             yield npt.assert_array_equal, a, d
 
 
@@ -218,7 +218,7 @@ def test_itemsize_chunk_size_mismatch():
     for i in [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15]:
             yield nt.assert_raises, \
                 ChunkSizeTypeSizeMismatch, \
-                pack_ndarray_str, a, i
+                pack_ndarray_to_bytes, a, i
 
 
 def test_larger_arrays():

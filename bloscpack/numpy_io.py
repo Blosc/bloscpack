@@ -9,6 +9,7 @@ import blosc
 import numpy
 import six
 from six.moves import xrange
+from deprecated import deprecated
 
 
 from .abstract_io import (pack,
@@ -193,11 +194,11 @@ def pack_ndarray(ndarray, sink,
     #log.verbose('compression ratio: %f' % (out_file_size/source.size))
 
 
-def pack_ndarray_file(ndarray, filename,
-                      chunk_size=DEFAULT_CHUNK_SIZE,
-                      blosc_args=None,
-                      bloscpack_args=None,
-                      metadata_args=None):
+def pack_ndarray_to_file(ndarray, filename,
+                         chunk_size=DEFAULT_CHUNK_SIZE,
+                         blosc_args=None,
+                         bloscpack_args=None,
+                         metadata_args=None):
     with open(filename, 'wb') as fp:
         sink = CompressedFPSink(fp)
         pack_ndarray(ndarray, sink,
@@ -207,11 +208,17 @@ def pack_ndarray_file(ndarray, filename,
                      metadata_args=metadata_args)
 
 
-def pack_ndarray_str(ndarray,
-                     chunk_size=DEFAULT_CHUNK_SIZE,
-                     blosc_args=None,
-                     bloscpack_args=None,
-                     metadata_args=None):
+pack_ndarray_file = deprecated(pack_ndarray_to_file,
+                               version='0.16.0',
+                               reason="Use 'pack_ndarray_to_file' instead."
+                               )
+
+
+def pack_ndarray_to_bytes(ndarray,
+                          chunk_size=DEFAULT_CHUNK_SIZE,
+                          blosc_args=None,
+                          bloscpack_args=None,
+                          metadata_args=None):
     sio = StringIO()
     sink = CompressedFPSink(sio)
     pack_ndarray(ndarray, sink,
@@ -220,6 +227,12 @@ def pack_ndarray_str(ndarray,
                  bloscpack_args=bloscpack_args,
                  metadata_args=metadata_args)
     return sio.getvalue()
+
+
+pack_ndarray_str = deprecated(pack_ndarray_to_bytes,
+                              version='0.16.0',
+                              reason="Use 'pack_ndarray_to_bytes' instead."
+                              )
 
 
 def unpack_ndarray(source):
@@ -246,12 +259,24 @@ def unpack_ndarray(source):
     return sink.ndarray
 
 
-def unpack_ndarray_file(filename):
+def unpack_ndarray_from_file(filename):
     source = CompressedFPSource(open(filename, 'rb'))
     return unpack_ndarray(source)
 
 
-def unpack_ndarray_str(str_):
+unpack_ndarray_file = deprecated(unpack_ndarray_from_file,
+                                 version='0.16.0',
+                                 reason="Use 'pack_ndarray_from_file' instead."
+                                 )
+
+
+def unpack_ndarray_from_bytes(str_):
     sio = StringIO(str_)
     source = CompressedFPSource(sio)
     return unpack_ndarray(source)
+
+
+unpack_ndarray_str = deprecated(unpack_ndarray_from_bytes,
+                                version='0.16.0',
+                                reason="Use 'pack_ndarray_from_bytes' instead."
+                                )

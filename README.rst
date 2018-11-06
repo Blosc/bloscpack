@@ -57,9 +57,9 @@ will and will not be tolerated.
 Dependencies
 ------------
 
-* Pythons 2.7, 3.4, 3.5, 3.6 and 3.7
+* Python 2.7, 3.4, 3.5, 3.6 or 3.7
 * `python-blosc  <https://github.com/Blosc/python-blosc>`_ (provides Blosc) and
-  `Numpy <http://www.numpy.org/>`_ (as listed in ``requirements.txt`` for
+  `Numpy <http://www.numpy.org/>`_ (as listed in ``requirements.txt``) for
   running the code
 * The Python packages listed in ``test_requirements.txt`` for testing and
   releasing

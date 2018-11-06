@@ -9,6 +9,7 @@ import blosc
 import numpy
 import six
 from six.moves import xrange
+from deprecated import deprecated
 
 
 from .abstract_io import (pack,
@@ -171,6 +172,7 @@ def pack_ndarray(ndarray, sink,
 
     The 'typesize' value of 'blosc_args' will be silently ignored and replaced
     with the itemsize of the Numpy array's dtype.
+
     """
     if ndarray.dtype.hasobject:
         raise ObjectNumpyArrayRejection
@@ -193,11 +195,32 @@ def pack_ndarray(ndarray, sink,
     #log.verbose('compression ratio: %f' % (out_file_size/source.size))
 
 
-def pack_ndarray_file(ndarray, filename,
-                      chunk_size=DEFAULT_CHUNK_SIZE,
-                      blosc_args=None,
-                      bloscpack_args=None,
-                      metadata_args=None):
+def pack_ndarray_to_file(ndarray, filename,
+                         chunk_size=DEFAULT_CHUNK_SIZE,
+                         blosc_args=None,
+                         bloscpack_args=None,
+                         metadata_args=None):
+    """ Serialialize a Numpy array to a file.
+
+    Parameters
+    ----------
+    ndarray : ndarray
+        the numpy array to serialize
+    filename : str
+        the file to compress to
+    blosc_args : BloscArgs
+        blosc args
+    bloscpack_args : BloscpackArgs
+        bloscpack args
+    metadata_args : MetadataArgs
+        the args for the metadata
+
+    Notes
+    -----
+    The 'typesize' value of 'blosc_args' will be silently ignored and replaced
+    with the itemsize of the Numpy array's dtype.
+
+    """
     with open(filename, 'wb') as fp:
         sink = CompressedFPSink(fp)
         pack_ndarray(ndarray, sink,
@@ -207,11 +230,43 @@ def pack_ndarray_file(ndarray, filename,
                      metadata_args=metadata_args)
 
 
-def pack_ndarray_str(ndarray,
-                     chunk_size=DEFAULT_CHUNK_SIZE,
-                     blosc_args=None,
-                     bloscpack_args=None,
-                     metadata_args=None):
+pack_ndarray_file = deprecated(pack_ndarray_to_file,
+                               version='0.16.0',
+                               reason="Use 'pack_ndarray_to_file' instead."
+                               )
+
+
+def pack_ndarray_to_bytes(ndarray,
+                          chunk_size=DEFAULT_CHUNK_SIZE,
+                          blosc_args=None,
+                          bloscpack_args=None,
+                          metadata_args=None):
+    """ Serialialize a Numpy array to bytes_
+
+    Parameters
+    ----------
+    ndarray : ndarray
+        the numpy array to serialize
+    filename : str
+        the file to compress to
+    blosc_args : BloscArgs
+        blosc args
+    bloscpack_args : BloscpackArgs
+        bloscpack args
+    metadata_args : MetadataArgs
+        the args for the metadata
+
+    Returns
+    -------
+    bytes_ : bytes
+        compressed bytes
+
+    Notes
+    -----
+    The 'typesize' value of 'blosc_args' will be silently ignored and replaced
+    with the itemsize of the Numpy array's dtype.
+
+    """
     sio = StringIO()
     sink = CompressedFPSink(sio)
     pack_ndarray(ndarray, sink,
@@ -220,6 +275,12 @@ def pack_ndarray_str(ndarray,
                  bloscpack_args=bloscpack_args,
                  metadata_args=metadata_args)
     return sio.getvalue()
+
+
+pack_ndarray_str = deprecated(pack_ndarray_to_bytes,
+                              version='0.16.0',
+                              reason="Use 'pack_ndarray_to_bytes' instead."
+                              )
 
 
 def unpack_ndarray(source):
@@ -246,12 +307,58 @@ def unpack_ndarray(source):
     return sink.ndarray
 
 
-def unpack_ndarray_file(filename):
+def unpack_ndarray_from_file(filename):
+    """ Deserialize a Numpy array from a file.
+
+    Parameters
+    ----------
+    filename : str
+        the file to decompress from
+
+    Returns
+    -------
+    ndarray : ndarray
+        the Numpy array
+
+    Raises
+    ------
+    NotANumpyArray
+        if the source doesn't seem to contain a Numpy array
+    """
     source = CompressedFPSource(open(filename, 'rb'))
     return unpack_ndarray(source)
 
 
-def unpack_ndarray_str(str_):
-    sio = StringIO(str_)
+unpack_ndarray_file = deprecated(unpack_ndarray_from_file,
+                                 version='0.16.0',
+                                 reason="Use 'pack_ndarray_from_file' instead."
+                                 )
+
+
+def unpack_ndarray_from_bytes(bytes_):
+    """ Deserialize a Numpy array from bytes.
+
+    Parameters
+    ----------
+    bytes_ : bytes
+        the bytes to decompress from
+
+    Returns
+    -------
+    ndarray : ndarray
+        the Numpy array
+
+    Raises
+    ------
+    NotANumpyArray
+        if the source doesn't seem to contain a Numpy array
+    """
+    sio = StringIO(bytes_)
     source = CompressedFPSource(sio)
     return unpack_ndarray(source)
+
+
+unpack_ndarray_str = deprecated(unpack_ndarray_from_bytes,
+                                version='0.16.0',
+                                reason="Use 'pack_ndarray_from_bytes' instead."
+                                )

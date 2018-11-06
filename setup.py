@@ -15,6 +15,7 @@ install_requires = [
     'blosc',
     'numpy',
     'six',
+    'deprecated',
 ]
 
 tests_require = [

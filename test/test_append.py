@@ -37,8 +37,8 @@ from bloscpack.file_io import (PlainFPSource,
                                PlainFPSink,
                                CompressedFPSource,
                                CompressedFPSink,
-                               pack_file,
-                               unpack_file,
+                               pack_file_to_file,
+                               unpack_file_from_file,
                                _read_beginning,
                                _read_compressed_chunk_fp,
                                _write_metadata,
@@ -149,9 +149,9 @@ def test_append_fp():
 def test_append():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
-        pack_file(in_file, out_file)
+        pack_file_to_file(in_file, out_file)
         append(out_file, in_file)
-        unpack_file(out_file, dcmp_file)
+        unpack_file_from_file(out_file, dcmp_file)
         in_content = open(in_file, 'rb').read()
         dcmp_content = open(dcmp_file, 'rb').read()
         nt.assert_equal(len(dcmp_content), len(in_content) * 2)

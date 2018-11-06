@@ -41,8 +41,8 @@ from .exceptions import (FileNotFound,
                          FormatVersionMismatch,
                          ChecksumMismatch,
                          )
-from .file_io import (pack_file,
-                      unpack_file,
+from .file_io import (pack_file_to_file,
+                      unpack_file_from_file,
                       _read_beginning,
                       _read_compressed_chunk_fp,
                       )
@@ -453,11 +453,12 @@ def main():
         bloscpack_args = BloscpackArgs(offsets=args.offsets,
                                        checksum=args.checksum)
         try:
-            pack_file(in_file, out_file, chunk_size=args.chunk_size,
-                      metadata=metadata,
-                      blosc_args=blosc_args,
-                      bloscpack_args=bloscpack_args,
-                      metadata_args=MetadataArgs())
+            pack_file_to_file(in_file, out_file,
+                              chunk_size=args.chunk_size,
+                              metadata=metadata,
+                              blosc_args=blosc_args,
+                              bloscpack_args=bloscpack_args,
+                              metadata_args=MetadataArgs())
         except ChunkingException as ce:
             log.error(str(ce))
     elif args.subcommand in ['decompress', 'd']:
@@ -468,7 +469,7 @@ def main():
         except FileNotFound as fnf:
             log.error(str(fnf))
         try:
-            metadata = unpack_file(in_file, out_file)
+            metadata = unpack_file_from_file(in_file, out_file)
             if metadata:
                 log_metadata(metadata)
         except FormatVersionMismatch as fvm:

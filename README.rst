@@ -440,7 +440,160 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
 Python API
 ----------
 
-The Python API is still in flux, so this section is deliberately sparse.
+Bloscpack has a versatile yet simple API consisting of a series of 'arguments'
+objects and high-level functions that can be invoked dependding on your input
+and output needs.
+
+Nomenclature wise, Python 3 has done a lot for Bloscpack, because we always
+need to represent compressed data as bytes deliberatey. This makes it easier
+and more natural to distinguish between text, such a filenames and binary and
+bytes objects such as compressed data.
+
+Arguments
+~~~~~~~~~
+
+The three argument types are:
+
+* ``BloscArgs``
+* ``BloscpackArgs``
+* ``MetadataArgs``
+
+as defined in ``bloscpack/args.py``.  Instantiating any of them will create an
+object with the defaults setup. The defaults are defined in
+``bloscpack/defaults.py``. You can use these in the high-level functions listed
+below.
+
+You can override any and all defaults by passing in the respective
+keyword-arguments, for example:
+
+
+.. code-block:: pycon
+
+   >>> b = BloscArgs()               # will create a default args object
+   >>> b = BloscArgs(clevel=4)       # change compression level to 4
+   >>> b = BloscArgs(typesize=4,     # change the typesize to 4
+   >>> ...           clevel=9,       # change the compression level to 9
+   >>> ...           shuffle=False,  # deactivate the shuffle filter
+   >>> ...           cname='lz4')    # let lz4 be the internal codec
+
+
+.. code-block:: python
+
+    class BloscArgs(MutableMappingObject):
+        """ Object to hold Blosc arguments.
+
+        Parameters
+        ----------
+        typesize : int
+            The typesize used
+        clevel : int
+            Compression level
+        shuffle : boolean
+            Whether or not to activate the shuffle filter
+        cname: str
+            Name of the internal code to use
+
+        """
+
+.. code-block:: python
+
+    class BloscpackArgs(MutableMappingObject):
+        """ Object to hold BloscPack arguments.
+
+        Parameters
+        ----------
+        offsets : boolean
+            Whether to include space for offsets
+        checksum : str
+            Name of the checksum to use or None/'None'
+        max_app_chunks : int or callable on number of chunks
+            How much space to reserve in the offsets for chunks to be appended.
+
+        """
+
+.. code-block:: python
+
+    class MetadataArgs(MutableMappingObject):
+        """ Object to hold the metadata arguments.
+
+        Parameters
+        ----------
+        magic_format : 8 bytes
+            Format identifier for the metadata
+        meta_checksum : str
+            Checksum to be used for the metadata
+        meta_codec : str
+            Codec to be used to compress the metadata
+        meta_level : int
+            Compression level for metadata
+        max_meta_size : int or callable on metadata size
+            How much space to reserve for additional metadata
+
+        """
+
+File / Bytes
+~~~~~~~~~~~~
+
+The following high-level functions exist for compressing and decompressing to
+and from files and byte objects:
+
+
+* ``pack_file_to_file``
+* ``unpack_file_from_file``
+* ``pack_bytes_to_file``
+* ``unpack_bytes_from_file``
+* ``pack_bytes_to_bytes``
+* ``unpack_bytes_from_bytes``
+
+Beyond the target arguments such as the files and the bytes, each ``pack_*``
+function takes the following arguments:
+
+.. code-block::
+
+    chunk_size : int
+        the desired chunk size in bytes
+    metadata : dict
+        the metadata dict
+    blosc_args : BloscArgs
+        blosc args
+    bloscpack_args : BloscpackArgs
+        bloscpack args
+    metadata_args : MetadataArgs
+        metadata args
+
+Below are their sigantures:
+
+.. code-block:: python
+
+    def pack_file_to_file(in_file, out_file,
+                          chunk_size=DEFAULT_CHUNK_SIZE,
+                          metadata=None,
+                          blosc_args=None,
+                          bloscpack_args=None,
+                          metadata_args=None):
+
+    def unpack_file_from_file(in_file, out_file):
+
+
+    def pack_bytes_to_file(bytes_, out_file,
+                           chunk_size=DEFAULT_CHUNK_SIZE,
+                           metadata=None,
+                           blosc_args=None,
+                           bloscpack_args=None,
+                           metadata_args=None):
+
+    def unpack_bytes_from_file(compressed_file):
+
+    def pack_bytes_to_bytes(bytes_,
+                            chunk_size=DEFAULT_CHUNK_SIZE,
+                            metadata=None,
+                            blosc_args=None,
+                            bloscpack_args=None,
+                            metadata_args=None,
+                            ):
+
+
+    def unpack_bytes_from_bytes(bytes_):
 
 Numpy
 ~~~~~
@@ -452,8 +605,8 @@ Numpy arrays can be serialized as Bloscpack files, here is a very brief example:
     >>> a = np.linspace(0, 1, 3e8)
     >>> print a.size, a.dtype
     300000000 float64
-    >>> bp.pack_ndarray_file(a, 'a.blp')
-    >>> b = bp.unpack_ndarray_file('a.blp')
+    >>> bp.pack_ndarray_to_file(a, 'a.blp')
+    >>> b = bp.unpack_ndarray_from_file('a.blp')
     >>> (a == b).all()
     True
 
@@ -498,8 +651,8 @@ Alternatively, we can also use a string as storage:
 .. code-block:: pycon
 
     >>> a = np.linspace(0, 1, 3e8)
-    >>> c = pack_ndarray_str(a)
-    >>> b = unpack_ndarray_str(c)
+    >>> c = pack_ndarray_to_bytes(a)
+    >>> b = unpack_ndarray_from_bytes(c)
     >>> (a == b).all()
     True
 
@@ -508,10 +661,29 @@ Or use alternate compressors:
 .. code-block:: pycon
 
     >>> a = np.linspace(0, 1, 3e8)
-    >>> c = pack_ndarray_str(a, blosc_args=BloscArgs(cname='lz4'))
-    >>> b = unpack_ndarray_str(c)
+    >>> c = pack_ndarray_to_bytes(a, blosc_args=BloscArgs(cname='lz4'))
+    >>> b = unpack_ndarray_from_bytes(c)
     >>> (a == b).all()
     True
+
+
+.. code-block:: python
+
+    def pack_ndarray_to_file(ndarray, filename,
+                             chunk_size=DEFAULT_CHUNK_SIZE,
+                             blosc_args=None,
+                             bloscpack_args=None,
+                             metadata_args=None):
+
+    def pack_ndarray_to_bytes(ndarray,
+                              chunk_size=DEFAULT_CHUNK_SIZE,
+                              blosc_args=None,
+                              bloscpack_args=None,
+                              metadata_args=None):
+
+    def unpack_ndarray_from_file(filename):
+
+    def unpack_ndarray_from_bytes(str_):
 
 If you are interested in the performance of Bloscpack compared to other
 serialization formats for Numpy arrays, please look at the benchmarks presented
@@ -1143,7 +1315,6 @@ Documentation
 
 * Refactor monolithic readme into Sphinx and publish
 * Cleanup and double check the docstrings for the public API classes
-* document library usage
 
 Command Line
 ~~~~~~~~~~~~

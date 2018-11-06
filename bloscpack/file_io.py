@@ -11,6 +11,7 @@ import os.path as path
 import blosc
 import six
 from six.moves import xrange
+from deprecated import deprecated
 
 
 from .args import (calculate_nchunks,
@@ -416,11 +417,13 @@ class CompressedFPSink(CompressedSink):
         return offset, compressed, digest
 
 
-def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
-              blosc_args=None,
-              bloscpack_args=None,
-              metadata_args=None):
-    """ Main function for compressing a file.
+def pack_file_to_file(in_file, out_file,
+                      chunk_size=DEFAULT_CHUNK_SIZE,
+                      metadata=None,
+                      blosc_args=None,
+                      bloscpack_args=None,
+                      metadata_args=None):
+    """ Compress a file to a file.
 
     Parameters
     ----------
@@ -467,8 +470,13 @@ def pack_file(in_file, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
     log.verbose('compression ratio: %f' % (in_file_size/out_file_size))
 
 
-def unpack_file(in_file, out_file):
-    """ Main function for decompressing a file.
+pack_file = deprecated(pack_file_to_file,
+                       version="0.16.0",
+                       reason="Use 'pack_file_to_file' instead")
+
+
+def unpack_file_from_file(in_file, out_file):
+    """ Uncompress a file from a file.
 
     Parameters
     ----------
@@ -479,7 +487,7 @@ def unpack_file(in_file, out_file):
 
     Returns
     -------
-    metadata : str
+    metadata : bytes
         the metadata contained in the file if present
 
     Raises
@@ -502,10 +510,42 @@ def unpack_file(in_file, out_file):
     return source.metadata
 
 
-def pack_bytes_file(bytes_, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=None,
-                    blosc_args=None,
-                    bloscpack_args=None,
-                    metadata_args=None):
+unpack_file = deprecated(unpack_file_from_file,
+                         version="0.16.0",
+                         reason="Use 'unpack_file_from_file' instead")
+
+
+def pack_bytes_to_file(bytes_, out_file,
+                       chunk_size=DEFAULT_CHUNK_SIZE,
+                       metadata=None,
+                       blosc_args=None,
+                       bloscpack_args=None,
+                       metadata_args=None):
+    """ Compress bytes to file.
+
+    Parameters
+    ----------
+    bytes_ : bytes
+        the bytes to compress
+    out_file : str
+        the name of the output file
+    chunk_size : int
+        the desired chunk size in bytes
+    metadata : dict
+        the metadata dict
+    blosc_args : BloscArgs
+        blosc args
+    bloscpack_args : BloscpackArgs
+        bloscpack args
+    metadata_args : MetadataArgs
+        metadata args
+
+    Raises
+    ------
+
+    ChunkingException
+        if there was a problem caculating the chunks
+    """
     bytes_size = len(bytes_)
     log.verbose('input bytes size: %s' % double_pretty_size(bytes_size))
     # calculate chunk sizes
@@ -525,13 +565,45 @@ def pack_bytes_file(bytes_, out_file, chunk_size=DEFAULT_CHUNK_SIZE, metadata=No
     log.verbose('compression ratio: %f' % (bytes_size/out_file_size))
 
 
-def unpack_bytes_file(compressed_file):
+pack_bytes_file = deprecated(pack_bytes_to_file,
+                             version="0.16.0",
+                             reason="Use 'pack_bytes_to_file' instead")
+
+
+def unpack_bytes_from_file(compressed_file):
+    """ Uncompress bytes from a file.
+
+    Parameters
+    ----------
+    compressed_file : str
+        the name of the input file
+
+    Returns
+    -------
+    bytes_ : bytes_
+        the decompressed bytes
+    metadata : bytes
+        the metadata contained in the file if present
+
+    Raises
+    ------
+
+    FormatVersionMismatch
+        if the file has an unmatching format version number
+    ChecksumMismatch
+        if any of the chunks fail to produce the correct checksum
+    """
     sio = StringIO()
     sink = PlainFPSink(sio)
     with open(compressed_file, 'rb') as fp:
         source = CompressedFPSource(fp)
         unpack(source, sink)
-    return sio.getvalue()
+        return sio.getvalue(), source.metadata
+
+
+unpack_bytes_file = deprecated(unpack_bytes_from_file,
+                               version="0.16.0",
+                               reason="Use 'unpack_bytes_from_file' instead")
 
 
 def pack_bytes_to_bytes(bytes_,
@@ -541,6 +613,37 @@ def pack_bytes_to_bytes(bytes_,
                         bloscpack_args=None,
                         metadata_args=None,
                         ):
+
+    """ Compress bytes to bytes_
+
+    Parameters
+    ----------
+    bytes_ : bytes
+        the bytes to compress
+    out_file : str
+        the name of the output file
+    chunk_size : int
+        the desired chunk size in bytes
+    metadata : dict
+        the metadata dict
+    blosc_args : BloscArgs
+        blosc args
+    bloscpack_args : BloscpackArgs
+        bloscpack args
+    metadata_args : MetadataArgs
+        metadata args
+
+    Returns
+    -------
+    bytes_ : bytes
+        the compressed bytes
+
+    Raises
+    ------
+
+    ChunkingException
+        if there was a problem caculating the chunks
+    """
     bytes_size = len(bytes_)
     log.verbose('input bytes size: %s' % double_pretty_size(bytes_size))
     nchunks, chunk_size, last_chunk_size = \
@@ -561,8 +664,30 @@ def pack_bytes_to_bytes(bytes_,
 
 
 def unpack_bytes_from_bytes(bytes_):
+    """ Uncompress bytes from bytes
+
+    Parameters
+    ----------
+    bytes_: bytes
+        input bytes
+
+    Returns
+    -------
+    bytes_ : bytes_
+        the decompressed bytes
+    metadata : bytes
+        the metadata contained in the file if present
+
+    Raises
+    ------
+
+    FormatVersionMismatch
+        if the file has an unmatching format version number
+    ChecksumMismatch
+        if any of the chunks fail to produce the correct checksum
+    """
     source = CompressedFPSource(StringIO(bytes_))
     sio = StringIO()
     sink = PlainFPSink(sio)
     unpack(source, sink)
-    return sio.getvalue()
+    return sio.getvalue(), source.metadata

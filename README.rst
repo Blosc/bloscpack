@@ -440,7 +440,101 @@ The first causes basic info to be printed, ``[-v | --verbose]``:
 Python API
 ----------
 
-The Python API is still in flux, so this section is deliberately sparse.
+Bloscpack has a versatile yet simple API consisting of a series of 'arguments'
+objects and high-level functions that can be invoked dependding on your input
+and output needs.
+
+Nomenclature wise, Python 3 has done a lot for Bloscpack, because we always
+need to represent compressed data as bytes deliberatey. This makes it easier
+and more natural to distinguish between text, such a filenames and binary and
+bytes objects such as compressed data.
+
+Arguments
+---------
+
+The three argument types are:
+
+* ``BloscArgs``
+* ``BloscpackArgs``
+* ``MetadataArgs``
+
+as defined in ``bloscpack/args.py``.  Instantiating any of them will create an
+object with the defaults setup. The defaults are defined in
+``bloscpack/defaults.py``. You can use these in the high-level functions listed
+below.
+
+You can override any and all defaults by passing in the respective
+keyword-arguments, for example:
+
+
+.. code-block:: pycon
+
+   >>> b = BloscArgs()               # will create a default args object
+   >>> b = BloscArgs(clevel=4)       # change compression level to 4
+   >>> b = BloscArgs(typesize=4,     # change the typesize to 4
+   >>> ...           clevel=9,       # change the compression level to 9
+   >>> ...           shuffle=False,  # deactivate the shuffle filter
+   >>> ...           cname='lz4')    # let lz4 be the internal codec
+
+
+.. code-block:: python
+
+    class BloscArgs(MutableMappingObject):
+        """ Object to hold Blosc arguments.
+
+        Parameters
+        ----------
+        typesize : int
+            The typesize used
+        clevel : int
+            Compression level
+        shuffle : boolean
+            Whether or not to activate the shuffle filter
+        cname: str
+            Name of the internal code to use
+
+        """
+
+.. code-block:: python
+
+    class BloscpackArgs(MutableMappingObject):
+        """ Object to hold BloscPack arguments.
+
+        Parameters
+        ----------
+        offsets : boolean
+            Whether to include space for offsets
+        checksum : str
+            Name of the checksum to use or None/'None'
+        max_app_chunks : int or callable on number of chunks
+            How much space to reserve in the offsets for chunks to be appended.
+
+        """
+
+.. code-block:: python
+
+    class MetadataArgs(MutableMappingObject):
+        """ Object to hold the metadata arguments.
+
+        Parameters
+        ----------
+        magic_format : 8 bytes
+            Format identifier for the metadata
+        meta_checksum : str
+            Checksum to be used for the metadata
+        meta_codec : str
+            Codec to be used to compress the metadata
+        meta_level : int
+            Compression level for metadata
+        max_meta_size : int or callable on metadata size
+            How much space to reserve for additional metadata
+
+        """
+
+File / Bytes
+------------
+
+
 
 Numpy
 ~~~~~

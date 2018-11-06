@@ -450,7 +450,7 @@ and more natural to distinguish between text, such a filenames and binary and
 bytes objects such as compressed data.
 
 Arguments
----------
+~~~~~~~~~
 
 The three argument types are:
 
@@ -532,9 +532,68 @@ keyword-arguments, for example:
         """
 
 File / Bytes
-------------
+~~~~~~~~~~~~
+
+The following high-level functions exist for compressing and decompressing to
+and from files and byte objects:
 
 
+* ``pack_file_to_file``
+* ``unpack_file_from_file``
+* ``pack_bytes_to_file``
+* ``unpack_bytes_from_file``
+* ``pack_bytes_to_bytes``
+* ``unpack_bytes_from_bytes``
+
+Beyond the target arguments such as the files and the bytes, each ``pack_*``
+function takes the following arguments:
+
+.. code-block::
+
+    chunk_size : int
+        the desired chunk size in bytes
+    metadata : dict
+        the metadata dict
+    blosc_args : BloscArgs
+        blosc args
+    bloscpack_args : BloscpackArgs
+        bloscpack args
+    metadata_args : MetadataArgs
+        metadata args
+
+Below are their sigantures:
+
+.. code-block:: python
+
+    def pack_file_to_file(in_file, out_file,
+                          chunk_size=DEFAULT_CHUNK_SIZE,
+                          metadata=None,
+                          blosc_args=None,
+                          bloscpack_args=None,
+                          metadata_args=None):
+
+    def unpack_file_from_file(in_file, out_file):
+
+
+    def pack_bytes_to_file(bytes_, out_file,
+                           chunk_size=DEFAULT_CHUNK_SIZE,
+                           metadata=None,
+                           blosc_args=None,
+                           bloscpack_args=None,
+                           metadata_args=None):
+
+    def unpack_bytes_from_file(compressed_file):
+
+    def pack_bytes_to_bytes(bytes_,
+                            chunk_size=DEFAULT_CHUNK_SIZE,
+                            metadata=None,
+                            blosc_args=None,
+                            bloscpack_args=None,
+                            metadata_args=None,
+                            ):
+
+
+    def unpack_bytes_from_bytes(bytes_):
 
 Numpy
 ~~~~~

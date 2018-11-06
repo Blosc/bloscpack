@@ -666,6 +666,25 @@ Or use alternate compressors:
     >>> (a == b).all()
     True
 
+
+.. code-block:: python
+
+    def pack_ndarray_to_file(ndarray, filename,
+                             chunk_size=DEFAULT_CHUNK_SIZE,
+                             blosc_args=None,
+                             bloscpack_args=None,
+                             metadata_args=None):
+
+    def pack_ndarray_to_bytes(ndarray,
+                              chunk_size=DEFAULT_CHUNK_SIZE,
+                              blosc_args=None,
+                              bloscpack_args=None,
+                              metadata_args=None):
+
+    def unpack_ndarray_from_file(filename):
+
+    def unpack_ndarray_from_bytes(str_):
+
 If you are interested in the performance of Bloscpack compared to other
 serialization formats for Numpy arrays, please look at the benchmarks presented
 in `the Bloscpack paper from the EuroScipy 2013 conference proceedings

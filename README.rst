@@ -605,8 +605,8 @@ Numpy arrays can be serialized as Bloscpack files, here is a very brief example:
     >>> a = np.linspace(0, 1, 3e8)
     >>> print a.size, a.dtype
     300000000 float64
-    >>> bp.pack_ndarray_file(a, 'a.blp')
-    >>> b = bp.unpack_ndarray_file('a.blp')
+    >>> bp.pack_ndarray_to_file(a, 'a.blp')
+    >>> b = bp.unpack_ndarray_from_file('a.blp')
     >>> (a == b).all()
     True
 
@@ -651,8 +651,8 @@ Alternatively, we can also use a string as storage:
 .. code-block:: pycon
 
     >>> a = np.linspace(0, 1, 3e8)
-    >>> c = pack_ndarray_str(a)
-    >>> b = unpack_ndarray_str(c)
+    >>> c = pack_ndarray_to_bytes(a)
+    >>> b = unpack_ndarray_from_bytes(c)
     >>> (a == b).all()
     True
 
@@ -661,8 +661,8 @@ Or use alternate compressors:
 .. code-block:: pycon
 
     >>> a = np.linspace(0, 1, 3e8)
-    >>> c = pack_ndarray_str(a, blosc_args=BloscArgs(cname='lz4'))
-    >>> b = unpack_ndarray_str(c)
+    >>> c = pack_ndarray_to_bytes(a, blosc_args=BloscArgs(cname='lz4'))
+    >>> b = unpack_ndarray_from_bytes(c)
     >>> (a == b).all()
     True
 

@@ -335,7 +335,7 @@ unpack_ndarray_file = deprecated(unpack_ndarray_from_file,
                                  )
 
 
-def unpack_ndarray_from_bytes(str_):
+def unpack_ndarray_from_bytes(bytes_):
     """ Deserialize a Numpy array from bytes.
 
     Parameters
@@ -353,7 +353,7 @@ def unpack_ndarray_from_bytes(str_):
     NotANumpyArray
         if the source doesn't seem to contain a Numpy array
     """
-    sio = StringIO(str_)
+    sio = StringIO(bytes_)
     source = CompressedFPSource(sio)
     return unpack_ndarray(source)
 

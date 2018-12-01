@@ -4,8 +4,9 @@
 
 from setuptools import setup
 import sys
+import io
 
-with open('README.rst', encoding='utf-8') as f:
+with io.open('README.rst', encoding='utf-8') as f:
     long_description = f.read()
 
 with open('bloscpack/version.py') as f:

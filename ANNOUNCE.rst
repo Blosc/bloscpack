@@ -1,11 +1,18 @@
-===========================
-Announcing Bloscpack vX.Y.Z
-===========================
+============================
+Announcing Bloscpack v0.16.0
+============================
 
 What is new?
 ============
 
-XXXYYYZZZ
+The Python API naming has been overhauled and a few functions have been
+deprecated. Also the documentation for the Python API has been extended
+to inlcude more uses cases and potential applications.
+
+A big thank you goes out to Daniel Stender from the Debian project for his
+continued efforts to package the Blosc stack -- including python-blosc -- for
+Debian. This also means it is likely that a recent version of
+bloscpack will be included in Buster.
 
 For more info, have a look at the changelog:
 

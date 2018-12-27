@@ -1380,6 +1380,11 @@ Packaging and Infrastructure
 Changelog
 ---------
 
+* v0.16.0     - Thu 27 Dec 2018
+
+  * Update of Python API and docs
+  * various minor fixes
+
 * v0.15.0     - Wed 31 Oct 2018
 
   * Halloween Release!

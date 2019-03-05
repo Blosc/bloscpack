@@ -883,7 +883,7 @@ The layout of the file is then::
 
 Description of the header
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-The following 32 bit header is used for Bloscpack as of version ``0.3.0``.  The
+The following 32 byte header is used for Bloscpack as of version ``0.3.0``.  The
 design goals of the header format are to contain as much information as
 possible to achieve interesting things in the future and to be as general as
 possible such that the persistence layer of `Blaze

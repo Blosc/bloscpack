@@ -867,7 +867,7 @@ In addition to the chunks some additional information must be added to the file
 for housekeeping:
 
 :header:
-    a 32 bit header containing various pieces of information
+    a 32 byte header containing various pieces of information
 :meta:
     a variable length metadata section, may contain user data
 :offsets:

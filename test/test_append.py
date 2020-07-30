@@ -366,14 +366,12 @@ def test_append_mix_shuffle():
     # now get the first and the last chunk and check that the shuffle doesn't
     # match
     bloscpack_header, offsets = reset_read_beginning(orig)[0:4:3]
-    orig.seek(offsets[0])
     checksum_impl = CHECKSUMS_LOOKUP[bloscpack_header['checksum']]
     compressed_zero,  blosc_header_zero, digest = \
-        _read_compressed_chunk_fp(orig, checksum_impl)
+        _read_compressed_chunk_fp(orig, checksum_impl, offsets[0])
     decompressed_zero = blosc.decompress(compressed_zero)
-    orig.seek(offsets[-1])
     compressed_last,  blosc_header_last, digest = \
-        _read_compressed_chunk_fp(orig, checksum_impl)
+        _read_compressed_chunk_fp(orig, checksum_impl, offsets[-1])
     decompressed_last = blosc.decompress(compressed_last)
     # first chunk has shuffle active
     nt.assert_equal(blosc_header_zero['flags'], 1)

@@ -298,7 +298,7 @@ def _write_offsets(output_fp, offsets):
     output_fp.write(encoded_offsets)
 
 
-def _read_compressed_chunk_fp(input_fp, checksum_impl):
+def _read_compressed_chunk_fp(input_fp, checksum_impl, offset):
     """ Read a compressed chunk from a file pointer.
 
     Parameters
@@ -307,6 +307,8 @@ def _read_compressed_chunk_fp(input_fp, checksum_impl):
         the file pointer to read the chunk from
     checksum_impl : Checksum
         the checksum that has been used
+    offset: int
+        the offset for the file pointer
 
     Returns
     -------
@@ -318,6 +320,8 @@ def _read_compressed_chunk_fp(input_fp, checksum_impl):
         the checksum of the chunk
     """
     # read blosc header
+    if offset >= 0:
+        input_fp.seek(offset)
     blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
     blosc_header = decode_blosc_header(blosc_header_raw)
     if log.LEVEL == log.DEBUG:
@@ -365,7 +369,7 @@ class CompressedFPSource(CompressedSource):
 
     def __iter__(self):
         for i in xrange(self.nchunks):
-            compressed, header, digest = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
+            compressed, header, digest = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl, self.offsets[i])
             yield compressed, digest
 
 

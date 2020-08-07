@@ -30,7 +30,7 @@ Get some info on the file:
   blpk: 'offsets':
   blpk: \[13496,[1-9]\d*,[1-9]\d*,[1-9]\d*,[1-9]\d*,...\] (re)
   blpk: First chunk blosc header:
-  blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 524288), ('ctbytes', 191870)])
+  blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 1048576), ('ctbytes', 136509)])
   blpk: First chunk blosc flags: 
   blpk: OrderedDict([('byte_shuffle', True), ('pure_memcpy', False), ('bit_shuffle', False), ('split_blocks', False), ('codec', 'blosclz')])
   $ blpk i data.dat.blp
@@ -47,7 +47,7 @@ Get some info on the file:
   blpk: 'offsets':
   blpk: \[13496,[1-9]\d*,[1-9]\d*,[1-9]\d*,[1-9]\d*,...\] (re)
   blpk: First chunk blosc header:
-  blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 524288), ('ctbytes', 191870)])
+  blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 1048576), ('ctbytes', 136509)])
   blpk: First chunk blosc flags: 
   blpk: OrderedDict([('byte_shuffle', True), ('pure_memcpy', False), ('bit_shuffle', False), ('split_blocks', False), ('codec', 'blosclz')])
   $ rm data.dat.blp

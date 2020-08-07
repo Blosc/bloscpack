@@ -129,7 +129,7 @@ def test_decode_metadata_options_exceptions():
 
 
 def test_decode_blosc_header_basic():
-    array_ = np.linspace(0, 100, 2e4).tostring()
+    array_ = np.linspace(0, 100, int(2e4)).tostring()
     blosc_args = BloscArgs()
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)

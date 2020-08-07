@@ -245,7 +245,7 @@ def test_alternate_cname():
             ('zstd', 4),
             ]:
         blosc_args = BloscArgs(cname=cname)
-        array_ = np.linspace(0, 1, 2e6)
+        array_ = np.linspace(0, 1, int(2e6))
         sink = CompressedMemorySink()
         pack_ndarray(array_, sink, blosc_args=blosc_args)
         blosc_header = decode_blosc_header(sink.chunks[0])

@@ -21,7 +21,7 @@ Get more information using --verbose:
   blpk: nchunks: 153
   blpk: chunk_size: 1.0M (1048576B)
   blpk: last_chunk_size: 602.0K (616448B)
-  blpk: output file size: \d{1}\.[1-9]\d*M \([1-9]\d*B\) (re)
+  blpk: output file size: \d*\.[1-9]\d*M \([1-9]\d*B\) (re)
   blpk: compression ratio: [1-9]\d*\.\d+ (re)
   blpk: done
   $ blpk --verbose decompress data.dat.blp data.dat.dcmp
@@ -29,7 +29,7 @@ Get more information using --verbose:
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'
-  blpk: input file size: \d{1}\.[1-9]\d*M (re)
+  blpk: input file size: \d*\.[1-9]\d*M (re)
   blpk: output file size: 152.59M
   blpk: decompression ratio: [1-9]\d*.\d+ (re)
   blpk: done
@@ -46,7 +46,7 @@ Get more information using --verbose, but with metadata:
   blpk: nchunks: 153
   blpk: chunk_size: 1.0M (1048576B)
   blpk: last_chunk_size: 602.0K (616448B)
-  blpk: output file size: \d{1}\.[1-9]\d*M \([1-9]\d*B\) (re)
+  blpk: output file size: \d*\.[1-9]\d*M \([1-9]\d*B\) (re)
   blpk: compression ratio: [1-9]\d*\.\d+ (re)
   blpk: done
   $ blpk --verbose decompress data.dat.blp data.dat.dcmp
@@ -54,7 +54,7 @@ Get more information using --verbose, but with metadata:
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'
-  blpk: input file size: \d{1}\.[1-9]\d*M (re)
+  blpk: input file size: \d*\.[1-9]\d*M (re)
   blpk: read compressed metadata of size: '6[2-5]' (re)
   blpk: output file size: 152.59M
   blpk: decompression ratio: [1-9]\d*\.\d+ (re)
@@ -146,7 +146,7 @@ Try using --debug
   blpk: getting ready for decompression
   blpk: input file is: 'data.dat.blp'
   blpk: output file is: 'data.dat.dcmp'
-  blpk: input file size: \d{1}\.[1-9]\d*M (re)
+  blpk: input file size: \d*\.[1-9]\d*M (re)
   blpk: reading bloscpack header
   blpk: bloscpack_header_raw: b?'.*' (re)
   blpk: bloscpack header: BloscpackHeader(format_version=3, offsets=True, metadata=False, checksum='adler32', typesize=8, chunk_size=52428800, last_chunk=2713600, nchunks=4, max_app_chunks=40)

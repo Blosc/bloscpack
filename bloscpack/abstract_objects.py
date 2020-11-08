@@ -13,7 +13,7 @@ from .pretty import (double_pretty_size,
                      )
 
 
-class MutableMappingObject(collections.MutableMapping):
+class MutableMappingObject(collections.abc.MutableMapping):
 
     _metaclass__ = abc.ABCMeta
 

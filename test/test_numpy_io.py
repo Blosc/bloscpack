@@ -4,7 +4,7 @@
 
 import numpy as np
 import numpy.testing as npt
-import mock
+from unittest import mock
 import pytest
 
 

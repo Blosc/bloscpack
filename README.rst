@@ -1,7 +1,7 @@
 Bloscpack
 =========
 
-:Author: Valentin Hänel
+:Author: Valentin Haenel
 :Contact: valentin@haenel.co
 :List: http://groups.google.com/group/blosc
 :Github: https://github.com/Blosc/bloscpack
@@ -89,7 +89,7 @@ require any or all of: super user privileges, a C++ compiler and/or a virtual
 environment. If you do run into problems or are unsure, it's best to send an
 email to the aforementioned mailing list asking for help.
 
-The package is available on PyPi, so you may use pip to install the
+The package is available on PyPi, so you may use `pip` to install the
 dependencies and bloscpack itself:
 
 .. code-block:: console
@@ -97,7 +97,7 @@ dependencies and bloscpack itself:
     $ pip install bloscpack
 
 The package is also available on anaconda.org via conda-forge. You may use
-conda to install it:
+`conda` to install it:
 
 .. code-block:: console
 

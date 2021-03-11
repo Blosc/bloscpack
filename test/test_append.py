@@ -343,7 +343,7 @@ def test_append_mix_shuffle():
     # the linspace used in 'new' doesn't work anymore as of python-blosc 1.6.1
     to_append = np.zeros(int(2e6))
     to_append_fp = StringIO()
-    to_append_fp.write(to_append.tostring())
+    to_append_fp.write(to_append.tobytes())
     to_append_fp_size = to_append_fp.tell()
     to_append_fp.seek(0)
 
@@ -362,7 +362,7 @@ def test_append_mix_shuffle():
 
     # now sanity check the length and content of the decompressed
     assert len(dcmp_str) == len(new_str) + to_append_fp_size
-    assert dcmp_str == new_str + to_append.tostring()
+    assert dcmp_str == new_str + to_append.tobytes()
 
     # now get the first and the last chunk and check that the shuffle doesn't
     # match

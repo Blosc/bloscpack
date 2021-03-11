@@ -37,7 +37,7 @@ def create_array(repeats, in_file, progress=False):
 def create_array_fp(repeats, in_fp, progress=False):
     for i in range(repeats):
         array_ = np.linspace(i, i+1, int(2e6))
-        in_fp.write(array_.tostring())
+        in_fp.write(array_.tobytes())
         if progress:
             progress(i)
     in_fp.flush()

@@ -135,7 +135,7 @@ def test_decode_metadata_options_exceptions():
 
 
 def test_decode_blosc_header_basic():
-    array_ = np.linspace(0, 100, int(2e4)).tostring()
+    array_ = np.linspace(0, 100, int(2e4)).tobytes()
     blosc_args = BloscArgs()
     compressed = blosc.compress(array_, **blosc_args)
     header = decode_blosc_header(compressed)
@@ -165,7 +165,7 @@ def test_decode_blosc_header_deactivate_shuffle():
 
 def test_decode_blosc_header_uncompressible_data():
     array_ = np.asarray(np.random.randn(255),
-                        dtype=np.float32).tostring()
+                        dtype=np.float32).tobytes()
     blosc_args = BloscArgs()
     blosc_args.shuffle = True
     compressed = blosc.compress(array_, **blosc_args)
@@ -182,7 +182,7 @@ def test_decode_blosc_header_uncompressible_data():
 
 def test_decode_blosc_header_uncompressible_data_dont_split_false():
     array_ = np.asarray(np.random.randn(256),
-                        dtype=np.float32).tostring()
+                        dtype=np.float32).tobytes()
     blosc_args = BloscArgs()
     blosc_args.shuffle = True
     compressed = blosc.compress(array_, **blosc_args)

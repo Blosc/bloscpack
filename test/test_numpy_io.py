@@ -82,7 +82,7 @@ def test_conv():
 def test_unpack_exception():
     a = np.arange(50)
     sio = StringIO()
-    a_str = a.tostring()
+    a_str = a.tobytes()
     source = PlainFPSource(StringIO(a_str))
     sink = CompressedFPSink(sio)
     pack(source, sink, *calculate_nchunks(len(a_str)))

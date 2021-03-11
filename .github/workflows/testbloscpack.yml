@@ -1,0 +1,45 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test-bloscpack:
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+            python:
+              - '3.7'
+              - '3.8'
+              - '3.9'    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install Python dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r test_requirements.txt
+    - name: Install from source
+      run: pip install .
+    - name: Run tests
+      run: ./test.sh
+    - name: Report coverage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_PARALLEL: true
+      run: coveralls --service=github
+
+  coveralls-final:
+    name: Finalize parallel coveralls
+    if: always()
+    needs:
+      - test-bloscpack
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        parallel-finished: true

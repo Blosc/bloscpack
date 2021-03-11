@@ -62,7 +62,7 @@ def create_tmp_files():
     dcmp_file = path.join(tdir, 'file.dcmp')
     # register the temp dir remover, safeguard against abort
     atexit.register(atexit_tmpremover, tdir)
-    tdir(in_file, out_file, dcmp_file)
+    yield tdir, in_file, out_file, dcmp_file
     # context manager remover
     shutil.rmtree(tdir)
 

@@ -258,15 +258,15 @@ def test_pack_unpack_bytes_bytes():
     d, _ = unpack_bytes_from_bytes(c)
     assert b == d
 
-
-def pack_unpack_hard():
+@pytest.mark.slow
+def test_pack_unpack_hard():
     """ Test on somewhat larger arrays, but be nice to memory. """
     # Array is apprx. 1.5 GB large
     # should make apprx 1536 chunks
     pack_unpack(100, chunk_size=reverse_pretty('1M'), progress=simple_progress)
 
-
-def pack_unpack_extreme():
+@pytest.mark.slow
+def test_pack_unpack_extreme():
     """ Test on somewhat larer arrays, uses loads of memory. """
     # this will create a huge array, and then use the
     # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie

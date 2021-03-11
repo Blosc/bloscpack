@@ -724,7 +724,7 @@ Basic tests, runs quickly:
 
 .. code-block:: console
 
-    $ nosetests
+    $ PYTHONPATH=. pytest -m "not slow"
     [...]
 
 
@@ -736,7 +736,7 @@ memory:
 
 .. code-block:: console
 
-    $ nosetests test/test_file_io.py:pack_unpack_hard
+    $ PYTHONPATH=. pytest test/test_file_io.py::test_pack_unpack_hard
     [...]
 
 Extended tests using a huge file. This one take forever and needs loads (5G-6G)
@@ -744,7 +744,7 @@ of memory and loads of disk-space (10G). Use ``-s`` to print progress:
 
 .. code-block:: console
 
-    $ nosetests -s test/test_file_io.py:pack_unpack_extreme
+    $ PYTHONPATH=. test/test_file_io.py::test_pack_unpack_extreme
     [...]
 
 Note that, some compression/decompression tests create temporary files (on
@@ -778,7 +778,7 @@ the unit tests:
 
     $ COVERAGE=1 cram --verbose test_cmdline/*.cram
     [...]
-    $nosetests --with-coverage --cover-package=bloscpack
+    $ PYTHONPATH=. pytest --cov=bloscpack --cov-append -m "not slow" test
     [...]
 
 Test Runner
@@ -1151,7 +1151,6 @@ Coding Conventions
 * Debug messages: as close to where the data was generated
 * Single quotes around ambiguities in messages ``overwriting existing file: 'testfile'``
 * Exceptions instead of exit
-* nose test generators parameterized tests
 * Use the Wikipedia definition of compression ratio:
   http://en.wikipedia.org/wiki/Data_compression_ratio
 

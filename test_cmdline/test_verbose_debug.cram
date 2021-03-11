@@ -150,7 +150,7 @@ Try using --debug
   blpk: reading bloscpack header
   blpk: bloscpack_header_raw: b?'.*' (re)
   blpk: bloscpack header: BloscpackHeader(format_version=3, offsets=True, metadata=False, checksum='adler32', typesize=8, chunk_size=52428800, last_chunk=2713600, nchunks=4, max_app_chunks=40)
-  blpk: Read raw offsets: b?'.*' (re)
+  blpk: Read raw offsets: b?.* (re)
   blpk: Offsets: \[384, [1-9]\d*, [1-9]\d*, [1-9]\d*\] (re)
   blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', [1-9]\d*\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '0'
@@ -284,7 +284,7 @@ Try using --debug with metadata:
   blpk:     user_codec: b?'' (re)
   blpk: metadata checksum OK \(adler32\): b?'.*' (re)
   blpk: read compressed metadata of size: '6[2-5]' (re)
-  blpk: Read raw offsets: b?'.*' (re)
+  blpk: Read raw offsets: b?.* (re)
   blpk: Offsets: \[1100, [1-9]\d*, [1-9]\d*, [1-9]\d*\] (re)
   blpk: blosc_header: OrderedDict\(\[\('version', 2\), \('versionlz', 1\), \('flags', 1\), \('typesize', 8\), \('nbytes', 52428800\), \('blocksize', [1-9]\d*\), \('ctbytes', [1-9]\d*\)\]\) (re)
   blpk: decompressing chunk '0'

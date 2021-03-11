@@ -21,8 +21,6 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install -r test_requirements.txt
-    - name: Install from source
-      run: pip install .
     - name: Run tests
       run: ./test.sh
     - name: Report coverage

@@ -87,50 +87,42 @@ def test_unpack_exception():
     sink = CompressedFPSink(sio)
     pack(source, sink, *calculate_nchunks(len(a_str)))
     with pytest.raises(NotANumpyArray):
-        unpack_ndarray_from_bytes, sio.getvalue()
+        unpack_ndarray_from_bytes(sio.getvalue())
 
 
-def roundtrip_ndarray(ndarray):
-    roundtrip_numpy_memory(ndarray)
-    roundtrip_numpy_str(ndarray)
-    roundtrip_numpy_file_pointers(ndarray)
-    roundtrip_numpy_file(ndarray)
+def roundtrip_ndarray(a):
+    roundtrip_numpy_memory(a)
+    roundtrip_numpy_str(a)
+    roundtrip_numpy_file_pointers(a)
+    roundtrip_numpy_file(a)
 
 
 def test_numpy_dtypes_shapes_order():
 
     # happy trail
     a = np.arange(50)
-    for case in roundtrip_ndarray(a):
-        case()
+    roundtrip_ndarray(a)
 
     for dt in np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
         a = np.arange(64, dtype=dt)
-        for case in roundtrip_ndarray(a):
-            case()
+        roundtrip_ndarray(a)
         a = a.copy().reshape(8, 8)
-        for case in roundtrip_ndarray(a):
-            case()
+        roundtrip_ndarray(a)
         a = a.copy().reshape(4, 16)
-        for case in roundtrip_ndarray(a):
-            case()
+        roundtrip_ndarray(a)
         a = a.copy().reshape(4, 4, 4)
-        for case in roundtrip_ndarray(a):
-            case()
+        roundtrip_ndarray(a)
         a = np.asfortranarray(a)
         assert np.isfortran(a)
-        for case in roundtrip_ndarray(a):
-            case()
+        roundtrip_ndarray(a)
 
     # Fixed width string arrays
     a = np.array(['abc', 'def', 'ghi'])
-    for case in roundtrip_ndarray(a):
-        case()
+    roundtrip_ndarray(a)
 
     # This actually get's cast to a fixed width string array
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')])
-    for case in roundtrip_ndarray(a):
-        case()
+    roundtrip_ndarray(a)
 
     ## object arrays
     #a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
@@ -139,16 +131,14 @@ def test_numpy_dtypes_shapes_order():
 
     # structured array
     a = np.array([('a', 1), ('b', 2)], dtype=[('a', 'S1'), ('b', 'f8')])
-    for case in roundtrip_ndarray(a):
-        case()
+    roundtrip_ndarray(a)
 
     # record array
     a = np.array([(1, 'O', 1)],
                  dtype=np.dtype([('step', 'int32'),
                                 ('symbol', '|S1'),
                                 ('index', 'int32')]))
-    for case in roundtrip_ndarray(a):
-        case()
+    roundtrip_ndarray(a)
 
     # and a nested record array
     dt = [('year', '<i4'),
@@ -161,32 +151,28 @@ def test_numpy_dtypes_shapes_order():
                   (2010, (('BRA', 10.),
                           ('ARG', 12.)))],
                  dt)
-    for case in roundtrip_ndarray(a):
-        case()
+    roundtrip_ndarray(a)
 
     # what about endianess
     a = np.arange(10, dtype='>i8')
-    for case in roundtrip_ndarray(a):
-        case()
+    roundtrip_ndarray(a)
 
     # empty array
     a = np.array([], dtype='f8')
-    for case in roundtrip_ndarray(a):
-        case()
+    roundtrip_ndarray(a)
 
 
 def test_reject_object_array():
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
     with pytest.raises(ObjectNumpyArrayRejection):
-        roundtrip_numpy_memory(a)
+        roundtrip_ndarray(a)
 
 
 def test_reject_nested_object_array():
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')],
                  dtype=[('a', int), ('b', 'object')])
     with pytest.raises(ObjectNumpyArrayRejection):
-        roundtrip_numpy_memory(a)
-
+        roundtrip_ndarray(a)
 
 def test_backwards_compat():
 
@@ -211,7 +197,7 @@ def test_backwards_compat():
             c = pack_ndarray_to_bytes(a)
             # should not raise a SyntaxError
             d = unpack_ndarray_from_bytes(c)
-            npt.assert_array_equali(a, d)
+            npt.assert_array_equal(a, d)
 
 
 def test_itemsize_chunk_size_mismatch():
@@ -225,16 +211,14 @@ def test_itemsize_chunk_size_mismatch():
 def test_larger_arrays():
     for dt in ('uint64', 'int64', 'float64'):
         a = np.arange(2e4, dtype=dt)
-        for case in roundtrip_ndarray(a):
-            case()
+        roundtrip_ndarray(a)
 
 
 def huge_arrays():
     for dt in ('uint64', 'int64', 'float64'):
         # needs plenty of memory
         a = np.arange(1e8, dtype=dt)
-        for case in roundtrip_ndarray(a):
-            case()
+        roundtrip_ndarray(a)
 
 
 def test_alternate_cname():
@@ -273,5 +257,4 @@ def test_typesize_is_set_correctly_with_custom_blosc_args():
 def test_roundtrip_slice():
     a = np.arange(100).reshape((10, 10))
     s = a[3:5, 3:5]
-    for case in roundtrip_ndarray(s):
-        case()
+    roundtrip_ndarray(s)

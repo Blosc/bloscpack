@@ -92,6 +92,13 @@ dependencies and bloscpack itself:
 
     $ pip install bloscpack
 
+The package is also available on anaconda.org via conda-forge. You may use
+conda to install it:
+
+.. code-block:: console
+
+    $ conda install -c conda-forge bloscpack
+
 If you want to install straight from GitHub, use pip's VCS support:
 
 .. code-block:: console

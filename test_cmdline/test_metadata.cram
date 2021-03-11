@@ -39,7 +39,7 @@ Add metadata to the file:
   blpk:     meta_comp_size: 6[2-5]\.0B \(6[2-5]B\) (re)
   blpk:     user_codec: b?'' (re)
   blpk: First chunk blosc header:
-  blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', 524288), ('ctbytes', 366674)])
+  blpk: OrderedDict([('version', 2), ('versionlz', 1), ('flags', 1), ('typesize', 8), ('nbytes', 1048576), ('blocksize', *), ('ctbytes', *)]) (glob)
   blpk: First chunk blosc flags: 
   blpk: OrderedDict([('byte_shuffle', True), ('pure_memcpy', False), ('bit_shuffle', False), ('split_blocks', False), ('codec', 'blosclz')])
   $ blpk decompress data.dat.blp data.dat.dcmp

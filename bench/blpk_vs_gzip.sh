@@ -14,7 +14,7 @@ python -c "
 import numpy
 a = numpy.linspace(0, 100, 2e7)
 with open('$testfile', 'w') as test_file:
-    test_file.write(a.tostring())
+    test_file.write(a.tobytes())
 "
 echo "$testfile is: $(get_fs $testfile)"
 

@@ -244,7 +244,7 @@ def test_pack_unpack_fp():
 
 def test_pack_unpack_bytes_to_from_file():
     array_ = np.linspace(0, 1e5)
-    input_bytes = array_.tostring()
+    input_bytes = array_.tobytes()
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         pack_bytes_to_file(input_bytes, out_file)
         output_bytes, _ = unpack_bytes_from_file(out_file)
@@ -253,7 +253,7 @@ def test_pack_unpack_bytes_to_from_file():
 
 def test_pack_unpack_bytes_bytes():
     a = np.linspace(0, 1e5)
-    b = a.tostring()
+    b = a.tobytes()
     c = pack_bytes_to_bytes(b)
     d, _ = unpack_bytes_from_bytes(c)
     assert b == d

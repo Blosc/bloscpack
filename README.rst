@@ -6,6 +6,7 @@ Bloscpack
 :List: http://groups.google.com/group/blosc
 :Github: https://github.com/Blosc/bloscpack
 :PyPi: https://pypi.python.org/pypi/bloscpack
+:Conda-Forge: https://github.com/conda-forge/bloscpack-feedstock
 :Anaconda: https://anaconda.org/pypi/bloscpack
 :Ohloh: https://www.ohloh.net/p/bloscpack
 :Version: |version|

@@ -27,7 +27,7 @@ def exists(filename):
 if not exists(DATA_FILE) and not exists(META_FILE):
     a = numpy.linspace(0, 100, int(2e7))
     with open(DATA_FILE, 'wb') as f:
-        f.write(a.tostring())
+        f.write(a.tobytes())
     with open(META_FILE, 'w') as m:
         meta = dict(sorted(_ndarray_meta(a).items()))
         m.write(json.dumps(meta))

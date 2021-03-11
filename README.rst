@@ -10,6 +10,7 @@ Bloscpack
 :Ohloh: https://www.ohloh.net/p/bloscpack
 :Version: |version|
 :Travis CI: |travis|
+:GitHub Actions: |gha|
 :Coveralls: |coveralls|
 :Python Versions: |pyversions|
 :License: |license|
@@ -20,6 +21,9 @@ Bloscpack
 
 .. |travis| image:: https://img.shields.io/travis/Blosc/bloscpack/master.svg
         :target: https://travis-ci.org/Blosc/bloscpack
+
+.. |gha| image:: https://github.com/Blosc/bloscpack/actions/workflows/testbloscpack.yml/badge.svg
+        :target: https://github.com/Blosc/bloscpack/actions/workflows/testbloscpack.yml
 
 .. |coveralls| image:: https://coveralls.io/repos/Blosc/bloscpack/badge.svg?branch=master&service=github
         :target: https://coveralls.io/github/Blosc/bloscpack?branch=master

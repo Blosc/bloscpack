@@ -1,6 +1,6 @@
-nose
+pytest
+pytest-cov
 cram>=0.6
-mock
 coverage
 coveralls
 twine

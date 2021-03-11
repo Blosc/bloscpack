@@ -1,10 +1,5 @@
-#!/usr/bin/env nosetests
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
-
-
-from nose import tools as nt
-
 
 from bloscpack.abstract_io import (pack,
                                    unpack,
@@ -42,7 +37,7 @@ def pack_unpack_mem(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
         print("Compressing")
     in_fp.seek(0)
     nchunks, chunk_size, last_chunk_size = \
-            calculate_nchunks(in_fp_size, chunk_size)
+        calculate_nchunks(in_fp_size, chunk_size)
     # let us play merry go round
     source = PlainFPSource(in_fp)
     sink = CompressedMemorySink()
@@ -50,7 +45,7 @@ def pack_unpack_mem(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
     source = CompressedMemorySource(sink)
     sink = PlainMemorySink()
     unpack(source, sink)
-    nt.assert_equal(metadata, source.metadata)
+    assert metadata == source.metadata
     source = PlainMemorySource(sink.chunks)
     sink = CompressedFPSink(out_fp)
     pack(source, sink, nchunks, chunk_size, last_chunk_size, metadata=metadata)
@@ -58,7 +53,7 @@ def pack_unpack_mem(repeats, chunk_size=DEFAULT_CHUNK_SIZE,
     source = CompressedFPSource(out_fp)
     sink = PlainFPSink(dcmp_fp)
     unpack(source, sink)
-    nt.assert_equal(metadata, source.metadata)
+    assert metadata == source.metadata
     in_fp.seek(0)
     dcmp_fp.seek(0)
     cmp_fp(in_fp, dcmp_fp)

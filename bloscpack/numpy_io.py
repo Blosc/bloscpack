@@ -90,9 +90,9 @@ class PlainNumpySource(PlainSource):
         self.nitems = int(self.chunk_size / self.ndarray.itemsize)
         offset = self.ptr
         for i in xrange(self.nchunks - 1):
-            yield offset, self.nitems
+            offset(self.nitems)
             offset += self.chunk_size
-        yield offset, int(self.last_chunk / self.ndarray.itemsize)
+        offset(int(self.last_chunk / self.ndarray.itemsize))
 
 
 def _conv(descr):

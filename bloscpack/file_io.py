@@ -350,7 +350,7 @@ class PlainFPSource(PlainSource):
         for num_bytes in ([self.chunk_size] *
                           (self.nchunks - 1) +
                           [self.last_chunk]):
-            yield self.input_fp.read(num_bytes)
+            self.input_fp.read(num_bytes)
 
 
 class CompressedFPSource(CompressedSource):
@@ -366,7 +366,7 @@ class CompressedFPSource(CompressedSource):
     def __iter__(self):
         for i in xrange(self.nchunks):
             compressed, header, digest = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
-            yield compressed, digest
+            compressed(digest)
 
 
 class PlainFPSink(PlainSink):

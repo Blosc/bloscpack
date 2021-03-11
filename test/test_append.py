@@ -1,10 +1,9 @@
-#!/usr/bin/env nosetests
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
 
 import blosc
-import nose.tools as nt
+import pytest
 import numpy as np
 
 
@@ -105,8 +104,8 @@ def test_append_fp():
             max_app_chunks=160,
             )
     expected_orig_offsets = [1440]
-    nt.assert_equal(expected_orig_bloscpack_header, orig_bloscpack_header)
-    nt.assert_equal(expected_orig_offsets[0], orig_offsets[0])
+    assert expected_orig_bloscpack_header == orig_bloscpack_header
+    assert expected_orig_offsets[0] == orig_offsets[0]
 
     # perform the append
     reset_append_fp(orig, new, new_size)
@@ -126,8 +125,8 @@ def test_append_fp():
             'metadata': False
     }
     expected_app_offsets = [1440]
-    nt.assert_equal(expected_app_bloscpack_header, app_bloscpack_header)
-    nt.assert_equal(expected_app_offsets[0], app_offsets[0])
+    assert expected_app_bloscpack_header == app_bloscpack_header
+    assert expected_app_offsets[0] == app_offsets[0]
 
     # now check by unpacking
     source = CompressedFPSource(orig)
@@ -137,8 +136,8 @@ def test_append_fp():
     new.seek(0)
     new_str = new.read()
     dcmp_str = dcmp.read()
-    nt.assert_equal(len(dcmp_str), len(new_str * 2))
-    nt.assert_equal(dcmp_str, new_str * 2)
+    assert len(dcmp_str) == len(new_str * 2)
+    assert dcmp_str == new_str * 2
 
     ## TODO
     # * check additional aspects of file integrity
@@ -154,8 +153,8 @@ def test_append():
         unpack_file_from_file(out_file, dcmp_file)
         in_content = open(in_file, 'rb').read()
         dcmp_content = open(dcmp_file, 'rb').read()
-        nt.assert_equal(len(dcmp_content), len(in_content) * 2)
-        nt.assert_equal(dcmp_content, in_content * 2)
+        assert len(dcmp_content) == len(in_content) * 2
+        assert dcmp_content == in_content * 2
 
 
 def test_append_into_last_chunk():
@@ -175,13 +174,13 @@ def test_append_into_last_chunk():
     new.seek(0)
     nchunks = reset_append_fp(orig, StringIO(new_content[:1023]), 1023)
     bloscpack_header = reset_read_beginning(orig)[0]
-    nt.assert_equal(nchunks, 1)
-    nt.assert_equal(bloscpack_header['last_chunk'], 1023)
+    assert nchunks == 1
+    assert bloscpack_header['last_chunk'] == 1023
     # now append into that last chunk
     nchunks = reset_append_fp(orig, StringIO(new_content[:1023]), 1023)
     bloscpack_header = reset_read_beginning(orig)[0]
-    nt.assert_equal(nchunks, 0)
-    nt.assert_equal(bloscpack_header['last_chunk'], 2046)
+    assert nchunks == 0
+    assert bloscpack_header['last_chunk'] == 2046
 
     # now check by unpacking
     source = CompressedFPSource(orig)
@@ -191,8 +190,8 @@ def test_append_into_last_chunk():
     new.seek(0)
     new_str = new.read()
     dcmp_str = dcmp.read()
-    nt.assert_equal(len(dcmp_str), len(new_str) + 2046)
-    nt.assert_equal(dcmp_str, new_str + new_str[:1023] * 2)
+    assert len(dcmp_str) == len(new_str) + 2046
+    assert dcmp_str == new_str + new_str[:1023] * 2
 
 
 def test_append_single_chunk():
@@ -210,25 +209,25 @@ def test_append_single_chunk():
     # append a single chunk
     reset_append_fp(orig, new, new_size)
     bloscpack_header = reset_read_beginning(orig)[0]
-    nt.assert_equal(bloscpack_header['nchunks'], 2)
+    assert bloscpack_header['nchunks'] == 2
 
     # append a large content, that amounts to two chunks
     new_content = new.read()
     new.seek(0)
     reset_append_fp(orig, StringIO(new_content * 2), new_size * 2)
     bloscpack_header = reset_read_beginning(orig)[0]
-    nt.assert_equal(bloscpack_header['nchunks'], 4)
+    assert bloscpack_header['nchunks'] == 4
 
     # append half a chunk
     reset_append_fp(orig, StringIO(new_content[:len(new_content)]), new_size//2)
     bloscpack_header = reset_read_beginning(orig)[0]
-    nt.assert_equal(bloscpack_header['nchunks'], 5)
+    assert bloscpack_header['nchunks'] == 5
 
     # append a few bytes
     reset_append_fp(orig, StringIO(new_content[:1023]), 1024)
     # make sure it is squashed into the lat chunk
     bloscpack_header = reset_read_beginning(orig)[0]
-    nt.assert_equal(bloscpack_header['nchunks'], 5)
+    assert bloscpack_header['nchunks'] == 5
 
 
 def test_double_append():
@@ -241,8 +240,8 @@ def test_double_append():
     unpack(source, sink)
     dcmp.seek(0)
     dcmp_str = dcmp.read()
-    nt.assert_equal(len(dcmp_str), len(new_str) * 3)
-    nt.assert_equal(dcmp_str, new_str * 3)
+    assert len(dcmp_str) == len(new_str) * 3
+    assert dcmp_str == new_str * 3
 
 
 def test_append_metadata():
@@ -267,20 +266,22 @@ def test_append_metadata():
     new.seek(0)
     new_str = new.read()
     dcmp_str = dcmp.read()
-    nt.assert_equal(len(dcmp_str), len(new_str) * 2)
-    nt.assert_equal(dcmp_str, new_str * 2)
+    assert len(dcmp_str) == len(new_str) * 2
+    assert dcmp_str == new_str * 2
 
 
 def test_append_fp_no_offsets():
     bloscpack_args = BloscpackArgs(offsets=False)
     orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
-    nt.assert_raises(RuntimeError, append_fp, orig, new, new_size)
+    with pytest.raises(RuntimeError):
+        append_fp(orig, new, new_size)
 
 
 def test_append_fp_not_enough_space():
     bloscpack_args = BloscpackArgs(max_app_chunks=0)
     orig, new, new_size, dcmp = prep_array_for_append(bloscpack_args=bloscpack_args)
-    nt.assert_raises(NotEnoughSpace, append_fp, orig, new, new_size)
+    with pytest.raises(NotEnoughSpace):
+        append_fp(orig, new, new_size)
 
 
 def test_mixing_clevel():
@@ -293,7 +294,7 @@ def test_mixing_clevel():
     orig.seek(0)
     # get a backup of the settings
     bloscpack_header, metadata, metadata_header, offsets = \
-            reset_read_beginning(orig)
+        reset_read_beginning(orig)
     # compressed size of the last chunk, including checksum
     last_chunk_compressed_size = orig_size - offsets[-1]
 
@@ -316,7 +317,7 @@ def test_mixing_clevel():
     #  * nchunks + 1 times the blosc and checksum overhead
     appended_size = new_size + bloscpack_header['last_chunk'] + (nchunks+1) * (16 + 4)
     # final size should be original plus appended data
-    nt.assert_equal(final_size, appended_size + discounted_orig_size)
+    assert final_size == appended_size + discounted_orig_size
 
     # check by unpacking
     source = CompressedFPSource(orig)
@@ -326,8 +327,8 @@ def test_mixing_clevel():
     new.seek(0)
     new_str = new.read()
     dcmp_str = dcmp.read()
-    nt.assert_equal(len(dcmp_str), len(new_str * 2))
-    nt.assert_equal(dcmp_str, new_str * 2)
+    assert len(dcmp_str) == len(new_str * 2)
+    assert dcmp_str == new_str * 2
 
 
 def test_append_mix_shuffle():
@@ -360,8 +361,8 @@ def test_append_mix_shuffle():
     dcmp_str = dcmp.read()
 
     # now sanity check the length and content of the decompressed
-    nt.assert_equal(len(dcmp_str), len(new_str) + to_append_fp_size)
-    nt.assert_equal(dcmp_str, new_str + to_append.tostring())
+    assert len(dcmp_str) == len(new_str) + to_append_fp_size
+    assert dcmp_str == new_str + to_append.tostring()
 
     # now get the first and the last chunk and check that the shuffle doesn't
     # match
@@ -376,9 +377,9 @@ def test_append_mix_shuffle():
         _read_compressed_chunk_fp(orig, checksum_impl)
     decompressed_last = blosc.decompress(compressed_last)
     # first chunk has shuffle active
-    nt.assert_equal(blosc_header_zero['flags'], 1)
+    assert blosc_header_zero['flags'] == 1
     # last chunk doesn't
-    nt.assert_equal(blosc_header_last['flags'], 0)
+    assert blosc_header_last['flags'] == 0
 
 
 def test_recreate_metadata():
@@ -393,21 +394,12 @@ def test_recreate_metadata():
                                      user_codec=b'',
                                      )
     header_dict = old_meta_header
-    nt.assert_raises(NoSuchSerializer,
-                     _recreate_metadata,
-                     header_dict,
-                     '',
-                     magic_format='NOSUCHSERIALIZER')
-    nt.assert_raises(NoSuchCodec,
-                     _recreate_metadata,
-                     header_dict,
-                     '',
-                     codec='NOSUCHCODEC')
-    nt.assert_raises(ChecksumLengthMismatch,
-                     _recreate_metadata,
-                     header_dict,
-                     '',
-                     checksum='adler32')
+    with pytest.raises(NoSuchSerializer):
+        _recreate_metadata(header_dict, '', magic_format='NOSUCHSERIALIZER')
+    with pytest.raises(NoSuchCodec):
+        _recreate_metadata(header_dict, '', codec='NOSUCHCODEC')
+    with pytest.raises(ChecksumLengthMismatch):
+        _recreate_metadata(header_dict, '', checksum='adler32')
 
 
 def test_rewrite_metadata():
@@ -426,8 +418,8 @@ def test_rewrite_metadata():
     # write the metadata section
     _write_metadata(target_fp, test_metadata, metadata_args)
     # check that the length is correct
-    nt.assert_equal(METADATA_HEADER_LENGTH + metadata_args.max_meta_size,
-                    len(target_fp.getvalue()))
+    assert METADATA_HEADER_LENGTH + metadata_args.max_meta_size == \
+        len(target_fp.getvalue())
 
     # now add stuff to the metadata
     test_metadata['container'] = 'numpy'
@@ -442,20 +434,20 @@ def test_rewrite_metadata():
     # correctly
     target_fp.seek(0, 0)
     result_metadata, result_header = _read_metadata(target_fp)
-    nt.assert_equal(test_metadata, result_metadata)
-    nt.assert_equal(new_metadata_length, result_header.meta_comp_size)
+    assert test_metadata == result_metadata
+    assert new_metadata_length == result_header.meta_comp_size
 
     # make sure that NoChangeInMetadata is raised
     target_fp.seek(0, 0)
-    nt.assert_raises(NoChangeInMetadata, _rewrite_metadata_fp,
-                     target_fp, test_metadata, codec=None, level=None)
+    with pytest.raises(NoChangeInMetadata):
+        _rewrite_metadata_fp(target_fp, test_metadata, codec=None, level=None)
 
     # make sure that ChecksumLengthMismatch is raised, needs modified metadata
     target_fp.seek(0, 0)
     test_metadata['fluxcompensator'] = 'back to the future'
-    nt.assert_raises(ChecksumLengthMismatch, _rewrite_metadata_fp,
-                     target_fp, test_metadata,
-                     codec=None, level=None, checksum='sha512')
+    with pytest.raises(ChecksumLengthMismatch):
+        _rewrite_metadata_fp(target_fp, test_metadata, codec=None, level=None,
+                             checksum='sha512')
 
     # make sure if level is not None, this works
     target_fp.seek(0, 0)
@@ -467,5 +459,5 @@ def test_rewrite_metadata():
     for i in range(100):
         test_metadata[str(i)] = str(i)
     target_fp.seek(0, 0)
-    nt.assert_raises(MetadataSectionTooSmall, _rewrite_metadata_fp,
-                     target_fp, test_metadata, codec=None, level=None)
+    with pytest.raises(MetadataSectionTooSmall):
+        _rewrite_metadata_fp(target_fp, test_metadata, codec=None, level=None)

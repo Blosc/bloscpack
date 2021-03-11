@@ -3,7 +3,6 @@
 # flake8: noqa
 
 from setuptools import setup
-import sys
 import io
 
 with io.open('README.rst', encoding='utf-8') as f:
@@ -12,22 +11,11 @@ with io.open('README.rst', encoding='utf-8') as f:
 with open('bloscpack/version.py') as f:
     exec(f.read())
 
-install_requires = [
-    'blosc',
-    'numpy',
-    'six',
-    'deprecated',
-]
+with open('requirements.txt') as f:
+    install_requires = f.readlines()
 
-tests_require = [
-    'nose',
-    'cram>=0.6',
-    'mock',
-    'coverage',
-    'coveralls',
-    'twine',
-    'wheel',
-]
+with open('test_requirements.txt') as f:
+    tests_require = f.readlines()
 
 setup(
     name = "bloscpack",
@@ -47,7 +35,6 @@ setup(
     url = "https://github.com/blosc/bloscpack",
     install_requires = install_requires,
     extras_require = dict(tests=tests_require),
-    tests_require = tests_require,
     classifiers = ['Development Status :: 4 - Beta',
                    'Environment :: Console',
                    'License :: OSI Approved :: MIT License',
@@ -58,10 +45,8 @@ setup(
                    'Topic :: System :: Archiving :: Compression',
                    'Topic :: Utilities',
                    'Programming Language :: Python',
-                   'Programming Language :: Python :: 2.7',
-                   'Programming Language :: Python :: 3.4',
-                   'Programming Language :: Python :: 3.5',
-                   'Programming Language :: Python :: 3.6',
                    'Programming Language :: Python :: 3.7',
+                   'Programming Language :: Python :: 3.8',
+                   'Programming Language :: Python :: 3.9',
                   ],
      )

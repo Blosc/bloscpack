@@ -1,4 +1,3 @@
-#!/usr/bin/env nosetests
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
@@ -6,9 +5,8 @@
 import struct
 import sys
 
-
-import nose.tools as nt
-from nose.plugins.skip import SkipTest
+import pytest
+from unittest import SkipTest
 import blosc
 import numpy as np
 
@@ -39,9 +37,12 @@ from bloscpack.headers import (BloscpackHeader,
 
 
 def test_check_range():
-    nt.assert_raises(TypeError,  check_range, 'test', 'a', 0, 1)
-    nt.assert_raises(ValueError, check_range, 'test', -1, 0, 1)
-    nt.assert_raises(ValueError, check_range, 'test', 2, 0, 1)
+    with pytest.raises(TypeError):
+        check_range('test', 'a', 0, 1)
+    with pytest.raises(ValueError):
+        check_range('test', -1, 0, 1)
+    with pytest.raises(ValueError):
+        check_range('test', 2, 0, 1)
 
 
 def test_create_options():
@@ -57,7 +58,7 @@ def test_create_options():
             ('00000001', {'offsets': True, 'metadata': False}),
             ('00000011', {'offsets': True, 'metadata': True}),
             ]:
-        yield nt.assert_equal, expected_options, create_options(**kwargs)
+        assert expected_options == create_options(**kwargs)
 
 
 def test_decode_options():
@@ -67,7 +68,7 @@ def test_decode_options():
             ({'metadata': True, 'offsets': False}, '00000010'),
             ({'metadata': True, 'offsets': True}, '00000011'),
             ]:
-        yield nt.assert_equal, expected, decode_options(input)
+        assert expected == decode_options(input)
 
 
 def test_decode_options_exceptions():
@@ -81,7 +82,8 @@ def test_decode_options_exceptions():
             '00001100',
             '11111100',
             ]:
-        yield nt.assert_raises, ValueError, decode_options, broken_input
+        with pytest.raises(ValueError):
+            decode_options(broken_input)
 
 
 def test_check_options_exceptions():
@@ -90,7 +92,9 @@ def test_check_options_exceptions():
             0,
             1,
             ]:
-        yield nt.assert_raises, TypeError, check_options, broken_input
+        with pytest.raises(TypeError):
+            check_options(broken_input)
+
     for broken_input in [
             # check for lengths too small and too large
             '0',
@@ -103,15 +107,16 @@ def test_check_options_exceptions():
             '0000000a',
             'aaaaaaaa',
             ]:
-        yield nt.assert_raises, ValueError, check_options, broken_input
+        with pytest.raises(ValueError):
+            check_options(broken_input)
 
 
 def test_create_metadata_options():
-    nt.assert_equal('00000000', create_metadata_options())
+    assert '00000000' == create_metadata_options()
 
 
 def test_decode_metadata_options():
-    nt.assert_equal({}, decode_metadata_options('00000000'))
+    assert {} == decode_metadata_options('00000000')
 
 
 def test_decode_metadata_options_exceptions():
@@ -125,7 +130,8 @@ def test_decode_metadata_options_exceptions():
             '00001111',
             '11111111',
             ]:
-        yield nt.assert_raises, ValueError, decode_metadata_options, broken_input
+        with pytest.raises(ValueError):
+            decode_metadata_options(broken_input)
 
 
 def test_decode_blosc_header_basic():
@@ -139,7 +145,7 @@ def test_decode_blosc_header_basic():
                 'nbytes': len(array_),
                 'typesize': blosc_args.typesize}
     header_slice = dict((k, header[k]) for k in expected.keys())
-    nt.assert_equal(expected, header_slice)
+    assert expected == header_slice
 
 
 def test_decode_blosc_header_deactivate_shuffle():
@@ -154,7 +160,7 @@ def test_decode_blosc_header_deactivate_shuffle():
                 'nbytes': len(array_),
                 'typesize': blosc_args.typesize}
     header_slice = dict((k, header[k]) for k in expected.keys())
-    nt.assert_equal(expected, header_slice)
+    assert expected == header_slice
 
 
 def test_decode_blosc_header_uncompressible_data():
@@ -171,7 +177,7 @@ def test_decode_blosc_header_uncompressible_data():
                 'flags': 0x13,  # 1 for shuffle 2 for non-compressed 4 for small blocksize
                 'nbytes': len(array_),
                 'typesize': blosc_args.typesize}
-    nt.assert_equal(expected, header)
+    assert expected == header
 
 
 def test_decode_blosc_header_uncompressible_data_dont_split_false():
@@ -190,7 +196,7 @@ def test_decode_blosc_header_uncompressible_data_dont_split_false():
         'nbytes': len(array_),
         'typesize': blosc_args.typesize
     }
-    nt.assert_equal(expected, header)
+    assert expected == header
 
 
 def test_decode_blosc_flags():
@@ -216,16 +222,13 @@ def test_decode_blosc_flags():
             (0b01100000, {'codec': 'zlib'}),
             (0b10000000, {'codec': 'zstd'}),
             ]:
-        yield (nt.assert_equal,
-               decode_blosc_flags(input_byte),
-               gen_expected(new_params))
+        assert decode_blosc_flags(input_byte) == gen_expected(new_params)
 
 
 def test_BloscPackHeader_constructor_exceptions():
-    # uses nose test generators
-
     def check(error_type, args_dict):
-        nt.assert_raises(error_type, BloscpackHeader, **args_dict)
+        with pytest.raises(error_type):
+            BloscpackHeader(**args_dict)
 
     for error_type, args_dict in [
             (ValueError, {'format_version': -1}),
@@ -260,7 +263,7 @@ def test_BloscPackHeader_constructor_exceptions():
             (ValueError, {'chunk_size': 1,
                           'last_chunk': 2}),
             ]:
-        yield check, error_type, args_dict
+        check(error_type, args_dict)
 
 
 def test_BloscPackHeader_total_prospective_entries():
@@ -277,7 +280,7 @@ def test_BloscPackHeader_total_prospective_entries():
             ]:
         header = BloscpackHeader(nchunks=nchunks,
                                  max_app_chunks=max_app_chunks)
-        yield nt.assert_equal, expected, header.total_prospective_chunks
+        assert expected == header.total_prospective_chunks
 
 
 def test_BloscpackHeader_encode():
@@ -294,7 +297,7 @@ def test_BloscpackHeader_encode():
             raw[offset+len(replacement):]
 
     # test with no arguments
-    yield nt.assert_equal, raw, BloscpackHeader().encode()
+    assert raw == BloscpackHeader().encode()
 
     for offset, replacement, kwargs in [
             (4, struct.pack('<B', 23), {'format_version': 23}),
@@ -338,7 +341,7 @@ def test_BloscpackHeader_encode():
             (16, b'\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f',
                 {'nchunks': 1, 'max_app_chunks': MAX_CHUNKS-1}),
             ]:
-        yield nt.assert_equal, mod_raw(offset, replacement), \
+        assert mod_raw(offset, replacement) == \
             BloscpackHeader(**kwargs).encode()
 
 
@@ -354,7 +357,7 @@ def test_BloscpackHeader_decode():
             raw[offset+len(replacement):]
 
     # check with no args
-    yield nt.assert_equal, BloscpackHeader(), BloscpackHeader.decode(raw)
+    assert BloscpackHeader() == BloscpackHeader.decode(raw)
 
     for kwargs, offset, replacement in [
             # check with format_version
@@ -404,27 +407,21 @@ def test_BloscpackHeader_decode():
             ({'nchunks': 1, 'max_app_chunks': MAX_CHUNKS-1},
                 16, b'\x01\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff\xff\xff\xff\x7f'),
             ]:
-        yield (nt.assert_equal,
-               BloscpackHeader(**kwargs),
-               BloscpackHeader.decode(mod_raw(offset, replacement)))
+        assert BloscpackHeader(**kwargs) == \
+               BloscpackHeader.decode(mod_raw(offset, replacement))
 
 
 def test_BloscpackHeader_accessor_exceptions():
     if sys.version_info[0:2] < (2, 7):
         raise SkipTest
     bloscpack_header = BloscpackHeader()
-    nt.assert_raises_regexp(KeyError,
-                            'foo not in BloscpackHeader',
-                            bloscpack_header.__getitem__,
-                            'foo')
-    nt.assert_raises_regexp(KeyError,
-                            'foo not in BloscpackHeader',
-                            bloscpack_header.__setitem__,
-                            'foo', 'bar')
-    nt.assert_raises_regexp(NotImplementedError,
-                            'BloscpackHeader does not support __delitem__ or derivatives',
-                            bloscpack_header.__delitem__,
-                            'foo',)
+    with pytest.raises(KeyError, match='foo not in BloscpackHeader'):
+        bloscpack_header.__getitem__('foo')
+    with pytest.raises(KeyError, match='foo not in BloscpackHeader'):
+        bloscpack_header.__setitem__('foo', 'bar')
+    with pytest.raises(NotImplementedError,
+                              match='BloscpackHeader does not support __delitem__ or derivatives'):
+        bloscpack_header.__delitem__('foo')
 
 
 def test_MetadataHeader_encode():
@@ -432,7 +429,7 @@ def test_MetadataHeader_encode():
           b'\x00\x00\x00\x00\x00\x00\x00\x00'\
           b'\x00\x00\x00\x00\x00\x00\x00\x00'\
           b'\x00\x00\x00\x00\x00\x00\x00\x00'
-    yield nt.assert_equal, raw, MetadataHeader().encode()
+    assert raw == MetadataHeader().encode()
 
     def mod_raw(offset, value):
         return raw[0:offset] + value + \
@@ -451,7 +448,7 @@ def test_MetadataHeader_encode():
             (20, b'\xff\xff\xff\xff', {'meta_comp_size': MAX_META_SIZE}),
             (24, b'sesame', {'user_codec': b'sesame'}),
             ]:
-        yield nt.assert_equal, mod_raw(offset, replacement), \
+        assert mod_raw(offset, replacement) == \
             MetadataHeader(**kwargs).encode()
 
 
@@ -481,7 +478,7 @@ def test_MetadataHeader_decode():
         return no_arg_input[0:offset] + value + \
             no_arg_input[offset+len(value):]
 
-    yield nt.assert_equal, no_arg_return, MetadataHeader.decode(no_arg_input)
+    assert no_arg_return == MetadataHeader.decode(no_arg_input)
 
     for attribute, value, offset, replacement in [
             ('magic_format', b'JSON', 0, b'JSON'),
@@ -496,5 +493,5 @@ def test_MetadataHeader_decode():
             ('meta_comp_size', MAX_META_SIZE, 20, b'\xff\xff\xff\xff'),
             ('user_codec', b'sesame', 24, b'sesame'),
             ]:
-        yield nt.assert_equal, copy_and_set_return(attribute, value), \
+        assert copy_and_set_return(attribute, value) == \
             MetadataHeader.decode(copy_and_set_input(offset, replacement))

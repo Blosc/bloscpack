@@ -1,12 +1,13 @@
-import nose.tools as nt
-from mock import patch
+import pytest
+from unittest.mock import patch
 
 
 from bloscpack import log
 
 
 def test_verbose():
-    nt.assert_raises(TypeError, log.verbose, 'message', 'MAXIMUM')
+    with pytest.raises(TypeError):
+        log.verbose('message', 'MAXIMUM')
     log.set_level(log.DEBUG)
     # should probably hijack the print statement
     log.verbose('notification')
@@ -20,4 +21,5 @@ def test_error(exit_mock):
 
 
 def test_set_level_exception():
-    nt.assert_raises(ValueError, log.set_level, 'NO_SUCH_LEVEL')
+    with pytest.raises(ValueError):
+        log.set_level('NO_SUCH_LEVEL')

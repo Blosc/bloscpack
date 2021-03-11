@@ -62,7 +62,7 @@ def create_tmp_files():
     dcmp_file = path.join(tdir, 'file.dcmp')
     # register the temp dir remover, safeguard against abort
     atexit.register(atexit_tmpremover, tdir)
-    yield tdir, in_file, out_file, dcmp_file
+    tdir(in_file, out_file, dcmp_file)
     # context manager remover
     shutil.rmtree(tdir)
 
@@ -74,7 +74,6 @@ def cmp_file(file1, file2):
 
 
 def cmp_fp(fp1, fp2):
-    import nose.tools as nt  # nose is a testing dependency
     chunk_size = reverse_pretty(DEFAULT_CHUNK_SIZE)
     while True:
         a = fp1.read(chunk_size)
@@ -82,4 +81,4 @@ def cmp_fp(fp1, fp2):
         if a == b'' and b == b'':
             return True
         else:
-            nt.assert_equal(a, b)
+            assert a == b

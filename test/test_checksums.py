@@ -1,16 +1,11 @@
-#!/usr/bin/env nosetests
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
-
-
-import nose.tools as nt
-
 
 from bloscpack import checksums
 
 
 def test_checksusm_exist():
-    nt.assert_equal(len(checksums.CHECKSUMS), 9)
+    assert len(checksums.CHECKSUMS) == 9
     checksums_avail = ['None',
                        'adler32',
                        'crc32',
@@ -20,7 +15,7 @@ def test_checksusm_exist():
                        'sha256',
                        'sha384',
                        'sha512']
-    nt.assert_equal(checksums.CHECKSUMS_AVAIL, checksums_avail)
+    assert checksums.CHECKSUMS_AVAIL == checksums_avail
 
 
 def test_checksusm_are_sane():
@@ -43,5 +38,5 @@ def test_checksusm_are_sane():
         ]
     for i, csum in enumerate(checksums.CHECKSUMS):
         digest = csum(b"\x23\x42\xbe\xef")
-        yield nt.assert_equal, len(digest), csum.size
-        yield nt.assert_equal, digest, csum_targets[i]
+        assert len(digest) == csum.size
+        assert digest == csum_targets[i]

@@ -1,12 +1,11 @@
-#!/usr/bin/env nosetests
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
 
 import numpy as np
 import numpy.testing as npt
-import nose.tools as nt
 import mock
+import pytest
 
 
 from bloscpack.abstract_io import (pack,
@@ -77,7 +76,7 @@ def test_conv():
     )
     for input_, expected in test_data:
         received = _conv(input_)
-        yield nt.assert_equal, expected, received
+        assert expected == received
 
 
 def test_unpack_exception():
@@ -87,14 +86,15 @@ def test_unpack_exception():
     source = PlainFPSource(StringIO(a_str))
     sink = CompressedFPSink(sio)
     pack(source, sink, *calculate_nchunks(len(a_str)))
-    nt.assert_raises(NotANumpyArray, unpack_ndarray_from_bytes, sio.getvalue())
+    with pytest.raises(NotANumpyArray):
+        unpack_ndarray_from_bytes, sio.getvalue()
 
 
 def roundtrip_ndarray(ndarray):
-    yield roundtrip_numpy_memory(ndarray)
-    yield roundtrip_numpy_str(ndarray)
-    yield roundtrip_numpy_file_pointers(ndarray)
-    yield roundtrip_numpy_file(ndarray)
+    roundtrip_numpy_memory(ndarray)
+    roundtrip_numpy_str(ndarray)
+    roundtrip_numpy_file_pointers(ndarray)
+    roundtrip_numpy_file(ndarray)
 
 
 def test_numpy_dtypes_shapes_order():
@@ -102,45 +102,45 @@ def test_numpy_dtypes_shapes_order():
     # happy trail
     a = np.arange(50)
     for case in roundtrip_ndarray(a):
-        yield case
+        case()
 
     for dt in np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
         a = np.arange(64, dtype=dt)
         for case in roundtrip_ndarray(a):
-            yield case
+            case()
         a = a.copy().reshape(8, 8)
         for case in roundtrip_ndarray(a):
-            yield case
+            case()
         a = a.copy().reshape(4, 16)
         for case in roundtrip_ndarray(a):
-            yield case
+            case()
         a = a.copy().reshape(4, 4, 4)
         for case in roundtrip_ndarray(a):
-            yield case
+            case()
         a = np.asfortranarray(a)
-        nt.assert_true(np.isfortran(a))
+        assert np.isfortran(a)
         for case in roundtrip_ndarray(a):
-            yield case
+            case()
 
     # Fixed width string arrays
     a = np.array(['abc', 'def', 'ghi'])
     for case in roundtrip_ndarray(a):
-        yield case
+        case()
 
     # This actually get's cast to a fixed width string array
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')])
     for case in roundtrip_ndarray(a):
-        yield case
+        case()
 
     ## object arrays
     #a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
     #for case in roundtrip_ndarray(a):
-    #    yield case
+    #    case()
 
     # structured array
     a = np.array([('a', 1), ('b', 2)], dtype=[('a', 'S1'), ('b', 'f8')])
     for case in roundtrip_ndarray(a):
-        yield case
+        case()
 
     # record array
     a = np.array([(1, 'O', 1)],
@@ -148,7 +148,7 @@ def test_numpy_dtypes_shapes_order():
                                 ('symbol', '|S1'),
                                 ('index', 'int32')]))
     for case in roundtrip_ndarray(a):
-        yield case
+        case()
 
     # and a nested record array
     dt = [('year', '<i4'),
@@ -162,28 +162,30 @@ def test_numpy_dtypes_shapes_order():
                           ('ARG', 12.)))],
                  dt)
     for case in roundtrip_ndarray(a):
-        yield case
+        case()
 
     # what about endianess
     a = np.arange(10, dtype='>i8')
     for case in roundtrip_ndarray(a):
-        yield case
+        case()
 
     # empty array
     a = np.array([], dtype='f8')
     for case in roundtrip_ndarray(a):
-        yield case
+        case()
 
 
 def test_reject_object_array():
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')], dtype='object')
-    nt.assert_raises(ObjectNumpyArrayRejection, roundtrip_numpy_memory, a)
+    with pytest.raises(ObjectNumpyArrayRejection):
+        roundtrip_numpy_memory(a)
 
 
 def test_reject_nested_object_array():
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')],
-                  dtype=[('a', int), ('b', 'object')])
-    nt.assert_raises(ObjectNumpyArrayRejection, roundtrip_numpy_memory, a)
+                 dtype=[('a', int), ('b', 'object')])
+    with pytest.raises(ObjectNumpyArrayRejection):
+        roundtrip_numpy_memory(a)
 
 
 def test_backwards_compat():
@@ -209,23 +211,22 @@ def test_backwards_compat():
             c = pack_ndarray_to_bytes(a)
             # should not raise a SyntaxError
             d = unpack_ndarray_from_bytes(c)
-            yield npt.assert_array_equal, a, d
+            npt.assert_array_equali(a, d)
 
 
 def test_itemsize_chunk_size_mismatch():
     a = np.arange(1000)
     # typesize of the array is 8, let's glitch the typesize
     for i in [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15]:
-            yield nt.assert_raises, \
-                ChunkSizeTypeSizeMismatch, \
-                pack_ndarray_to_bytes, a, i
+        with pytest.raises(ChunkSizeTypeSizeMismatch):
+            pack_ndarray_to_bytes(a, i)
 
 
 def test_larger_arrays():
     for dt in ('uint64', 'int64', 'float64'):
         a = np.arange(2e4, dtype=dt)
         for case in roundtrip_ndarray(a):
-            yield case
+            case()
 
 
 def huge_arrays():
@@ -233,7 +234,7 @@ def huge_arrays():
         # needs plenty of memory
         a = np.arange(1e8, dtype=dt)
         for case in roundtrip_ndarray(a):
-            yield case
+            case()
 
 
 def test_alternate_cname():
@@ -249,7 +250,7 @@ def test_alternate_cname():
         sink = CompressedMemorySink()
         pack_ndarray(array_, sink, blosc_args=blosc_args)
         blosc_header = decode_blosc_header(sink.chunks[0])
-        yield nt.assert_equal, blosc_header['flags'] >> 5, int_id
+        assert blosc_header['flags'] >> 5 == int_id
 
 
 def test_typesize_is_set_correctly_with_default_blosc_args():
@@ -257,7 +258,7 @@ def test_typesize_is_set_correctly_with_default_blosc_args():
     sink = CompressedMemorySink()
     pack_ndarray(a, sink)
     expected_args = BloscArgs(typesize=1)
-    nt.assert_equal(expected_args, sink.blosc_args)
+    assert expected_args == sink.blosc_args
 
 
 def test_typesize_is_set_correctly_with_custom_blosc_args():
@@ -266,11 +267,11 @@ def test_typesize_is_set_correctly_with_custom_blosc_args():
     input_args = BloscArgs(clevel=9)
     pack_ndarray(a, sink, blosc_args=input_args)
     expected_args = BloscArgs(clevel=9, typesize=1)
-    nt.assert_equal(expected_args, sink.blosc_args)
+    assert expected_args == sink.blosc_args
 
 
 def test_roundtrip_slice():
     a = np.arange(100).reshape((10, 10))
     s = a[3:5, 3:5]
     for case in roundtrip_ndarray(s):
-        yield case
+        case()

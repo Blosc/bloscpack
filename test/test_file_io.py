@@ -1,4 +1,3 @@
-#!/usr/bin/env nosetests
 # -*- coding: utf-8 -*-
 # vim :set ft=py:
 
@@ -7,7 +6,7 @@ from __future__ import print_function
 
 
 import blosc
-import nose.tools as nt
+import pytest
 from mock import patch
 import numpy as np
 
@@ -66,8 +65,8 @@ def test_offsets():
             # First chunks should start after header and offsets
             first = BLOSCPACK_HEADER_LENGTH + 8 * total_entries
             # We assume that the others are correct
-            nt.assert_equal(offsets[0], first)
-            nt.assert_equal(736, offsets[0])
+            assert offsets[0] == first
+            assert 736 == offsets[0]
             # try to read the second header
             input_fp.seek(offsets[1], 0)
             blosc_header_raw = input_fp.read(BLOSC_HEADER_LENGTH)
@@ -78,7 +77,7 @@ def test_offsets():
                         'typesize':  8}
             blosc_header = decode_blosc_header(blosc_header_raw)
             blosc_header_slice = dict((k, blosc_header[k]) for k in expected.keys())
-            nt.assert_equal(expected, blosc_header_slice)
+            assert expected == blosc_header_slice
 
     # now check the same thing again, but w/o any max_app_chunks
     input_fp, output_fp = StringIO(), StringIO()
@@ -95,9 +94,9 @@ def test_offsets():
          )
     output_fp.seek(0, 0)
     bloscpack_header = _read_bloscpack_header(output_fp)
-    nt.assert_equal(0, bloscpack_header.max_app_chunks)
+    assert 0 == bloscpack_header.max_app_chunks
     offsets = _read_offsets(output_fp, bloscpack_header)
-    nt.assert_equal(96, offsets[0])
+    assert 96 == offsets[0]
 
 
 def test_metadata():
@@ -106,7 +105,7 @@ def test_metadata():
                      'others': [],
                      }
     received_metadata = pack_unpack_fp(1, metadata=test_metadata)
-    nt.assert_equal(test_metadata, received_metadata)
+    assert test_metadata == received_metadata
 
 
 def test_metadata_opportunisitic_compression():
@@ -117,7 +116,7 @@ def test_metadata_opportunisitic_compression():
     _write_metadata(target_fp, test_metadata, MetadataArgs())
     target_fp.seek(0, 0)
     metadata, header = _read_metadata(target_fp)
-    nt.assert_equal('zlib', header['meta_codec'])
+    assert 'zlib' == header['meta_codec']
 
     # now do the same thing, but use badly compressible metadata
     test_metadata = "abc"
@@ -127,7 +126,7 @@ def test_metadata_opportunisitic_compression():
     target_fp.seek(0, 0)
     metadata, header = _read_metadata(target_fp)
     # but it wasn't of any use
-    nt.assert_equal('None', header['meta_codec'])
+    assert 'None' == header['meta_codec']
 
 
 def test_disable_offsets():
@@ -143,8 +142,8 @@ def test_disable_offsets():
          bloscpack_args=bloscpack_args)
     out_fp.seek(0)
     bloscpack_header, metadata, metadata_header, offsets = \
-            _read_beginning(out_fp)
-    nt.assert_true(len(offsets) == 0)
+        _read_beginning(out_fp)
+    assert len(offsets) == 0
 
 
 # this will cause a bug if we ever reach 255 format versions
@@ -154,8 +153,8 @@ def test_invalid_format():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         create_array(1, in_file)
         pack_file_to_file(in_file, out_file, blosc_args=blosc_args)
-        nt.assert_raises(FormatVersionMismatch,
-                         unpack_file_from_file, out_file, dcmp_file)
+        with pytest.raises(FormatVersionMismatch):
+            unpack_file_from_file(out_file, dcmp_file)
 
 
 def test_file_corruption():
@@ -180,7 +179,8 @@ def test_file_corruption():
             # write the flipped byte
             input_fp.write(replace)
         # now attempt to unpack it
-        nt.assert_raises(ChecksumMismatch, unpack_file_from_file, out_file, dcmp_file)
+        with pytest.raises(ChecksumMismatch):
+            unpack_file_from_file(out_file, dcmp_file)
 
 
 def pack_unpack(repeats, chunk_size=None, progress=False):
@@ -248,7 +248,7 @@ def test_pack_unpack_bytes_to_from_file():
     with create_tmp_files() as (tdir, in_file, out_file, dcmp_file):
         pack_bytes_to_file(input_bytes, out_file)
         output_bytes, _ = unpack_bytes_from_file(out_file)
-    nt.assert_equal(input_bytes, output_bytes)
+    assert input_bytes == output_bytes
 
 
 def test_pack_unpack_bytes_bytes():
@@ -256,7 +256,7 @@ def test_pack_unpack_bytes_bytes():
     b = a.tostring()
     c = pack_bytes_to_bytes(b)
     d, _ = unpack_bytes_from_bytes(c)
-    nt.assert_equal(b, d)
+    assert b == d
 
 
 def pack_unpack_hard():

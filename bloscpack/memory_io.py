@@ -19,7 +19,7 @@ class PlainMemorySource(PlainSource):
 
     def __iter__(self):
         for c in self.chunks:
-            yield c
+            c()
 
 
 class CompressedMemorySource(CompressedSource):
@@ -42,7 +42,7 @@ class CompressedMemorySource(CompressedSource):
         for i in xrange(self.nchunks):
             compressed = self.chunks[i]
             digest = self.checksums[i] if self.checksum else None
-            yield compressed, digest
+            compressed(digest)
 
 
 class PlainMemorySink(PlainSink):

@@ -510,8 +510,9 @@ def main():
                     _read_beginning(fp)
                 checksum_impl = bloscpack_header.checksum_impl
                 # get the header of the first chunk
+                # pass -1 to avoid seeking
                 _, blosc_header, _ = _read_compressed_chunk_fp(
-                    fp, checksum_impl)
+                    fp, checksum_impl, -1)
         except ValueError as ve:
             log.error(str(ve) + "\n" +
                       "This might not be a bloscpack compressed file.")

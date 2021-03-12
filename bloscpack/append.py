@@ -112,11 +112,9 @@ def append_fp(original_fp, new_content_fp, new_size, blosc_args=None):
                   (METADATA_HEADER_LENGTH + metadata_header['max_meta_size'] +
                       CHECKSUMS_LOOKUP[metadata_header['meta_checksum']].size
                    if metadata is not None else 0))
-    # seek to the final offset
-    original_fp.seek(offsets[-1], 0)
     # decompress the last chunk
     compressed, blosc_header, digest = _read_compressed_chunk_fp(original_fp,
-                                                         checksum_impl)
+                                                         checksum_impl, offsets[-1])
     # TODO check digest
     decompressed = blosc.decompress(compressed)
     # figure out how many bytes we need to read to rebuild the last chunk

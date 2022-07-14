@@ -293,8 +293,8 @@ whereas the other half of the file might be compressed with 'lz4'. In any case,
 just be aware that the output is to be seen as an indication that is likely to
 be correct for all chunks but must not be so necessarily.
 
-Adding Metdata
-~~~~~~~~~~~~~~
+Adding Metadata
+~~~~~~~~~~~~~~~
 
 Using the ``[-m | --metadata]`` option you can include JSON from a file:
 
@@ -453,11 +453,11 @@ Python API
 ----------
 
 Bloscpack has a versatile yet simple API consisting of a series of 'arguments'
-objects and high-level functions that can be invoked dependding on your input
+objects and high-level functions that can be invoked depending on your input
 and output needs.
 
 Nomenclature wise, Python 3 has done a lot for Bloscpack, because we always
-need to represent compressed data as bytes deliberatey. This makes it easier
+need to represent compressed data as bytes deliberately. This makes it easier
 and more natural to distinguish between text, such a filenames and binary and
 bytes objects such as compressed data.
 
@@ -573,7 +573,7 @@ function takes the following arguments:
     metadata_args : MetadataArgs
         metadata args
 
-Below are their sigantures:
+Below are their signatures:
 
 .. code-block:: python
 

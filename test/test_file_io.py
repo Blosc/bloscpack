@@ -267,8 +267,8 @@ def test_pack_unpack_hard():
 
 @pytest.mark.slow
 def test_pack_unpack_extreme():
-    """ Test on somewhat larer arrays, uses loads of memory. """
+    """ Test on somewhat larger arrays, uses lots of memory. """
     # this will create a huge array, and then use the
-    # blosc.BLOSC_MAX_BUFFERSIZE as chunk-szie
+    # blosc.BLOSC_MAX_BUFFERSIZE as chunk-size
     pack_unpack(300, chunk_size=blosc.BLOSC_MAX_BUFFERSIZE,
                 progress=simple_progress)

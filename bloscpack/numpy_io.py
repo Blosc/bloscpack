@@ -42,7 +42,7 @@ def _compress_chunk_ptr(chunk, blosc_args):
 
 
 def _ndarray_meta(ndarray):
-    # Reagrding the dtype, quote from numpy/lib/format.py:dtype_to_descr
+    # Regarding the dtype, quote from numpy/lib/format.py:dtype_to_descr
     #
     # The .descr attribute of a dtype object cannot be round-tripped
     # through the dtype() constructor. Simple types, like dtype('float32'),
@@ -84,7 +84,7 @@ class PlainNumpySource(PlainSource):
     def __iter__(self):
         if self.chunk_size % self.ndarray.itemsize != 0:
                 raise ChunkSizeTypeSizeMismatch(
-                    "chunk_size: '%s' is not divisible bytypesize: '%i'" %
+                    "chunk_size: '%s' is not divisible by typesize: '%i'" %
                     (double_pretty_size(self.chunk_size), self.ndarray.itemsize)
                 )
         self.nitems = int(self.chunk_size / self.ndarray.itemsize)
@@ -98,7 +98,7 @@ class PlainNumpySource(PlainSource):
 def _conv(descr):
     """ Converts nested list of lists into list of tuples.
 
-    Needed for backwards compatability, see below.
+    Needed for backwards compatibility, see below.
 
     Examples
     --------
@@ -123,9 +123,9 @@ class PlainNumpySink(PlainSink):
         self.metadata = metadata
         if metadata is None or metadata['container'] != 'numpy':
             raise NotANumpyArray
-        # The try except is a backwards compatability hack for the old way of
+        # The try except is a backwards compatibility hack for the old way of
         # serializing ndarray dtype which was used prior to 0.7.2. For basic
-        # dtyepes, the dtype 'descr' was serialized directly to json and not
+        # dtypes, the dtype 'descr' was serialized directly to json and not
         # via 'repr'.  As such, it does not need to be evaluated, but instead
         # is already a string that can be passed to the constructor. It will
         # raise a SyntaxError in this case. For nested dtypes we have the
@@ -152,7 +152,7 @@ def pack_ndarray(ndarray, sink,
                  blosc_args=None,
                  bloscpack_args=None,
                  metadata_args=None):
-    """ Serialialize a Numpy array.
+    """ Serialize a Numpy array.
 
     Parameters
     ----------
@@ -200,7 +200,7 @@ def pack_ndarray_to_file(ndarray, filename,
                          blosc_args=None,
                          bloscpack_args=None,
                          metadata_args=None):
-    """ Serialialize a Numpy array to a file.
+    """ Serialize a Numpy array to a file.
 
     Parameters
     ----------
@@ -241,7 +241,7 @@ def pack_ndarray_to_bytes(ndarray,
                           blosc_args=None,
                           bloscpack_args=None,
                           metadata_args=None):
-    """ Serialialize a Numpy array to bytes_
+    """ Serialize a Numpy array to bytes_
 
     Parameters
     ----------

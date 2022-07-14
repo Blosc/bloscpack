@@ -446,7 +446,7 @@ def pack_file_to_file(in_file, out_file,
     ------
 
     ChunkingException
-        if there was a problem caculating the chunks
+        if there was a problem calculating the chunks
 
     # TODO document which arguments are silently ignored
 
@@ -544,7 +544,7 @@ def pack_bytes_to_file(bytes_, out_file,
     ------
 
     ChunkingException
-        if there was a problem caculating the chunks
+        if there was a problem calculating the chunks
     """
     bytes_size = len(bytes_)
     log.verbose('input bytes size: %s' % double_pretty_size(bytes_size))
@@ -642,7 +642,7 @@ def pack_bytes_to_bytes(bytes_,
     ------
 
     ChunkingException
-        if there was a problem caculating the chunks
+        if there was a problem calculating the chunks
     """
     bytes_size = len(bytes_)
     log.verbose('input bytes size: %s' % double_pretty_size(bytes_size))

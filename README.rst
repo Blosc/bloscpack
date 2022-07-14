@@ -293,8 +293,8 @@ whereas the other half of the file might be compressed with 'lz4'. In any case,
 just be aware that the output is to be seen as an indication that is likely to
 be correct for all chunks but must not be so necessarily.
 
-Adding Metdata
-~~~~~~~~~~~~~~
+Adding Metadata
+~~~~~~~~~~~~~~~
 
 Using the ``[-m | --metadata]`` option you can include JSON from a file:
 
@@ -573,7 +573,7 @@ function takes the following arguments:
     metadata_args : MetadataArgs
         metadata args
 
-Below are their sigantures:
+Below are their signatures:
 
 .. code-block:: python
 

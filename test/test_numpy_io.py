@@ -120,7 +120,7 @@ def test_numpy_dtypes_shapes_order():
     a = np.array(['abc', 'def', 'ghi'])
     roundtrip_ndarray(a)
 
-    # This actually get's cast to a fixed width string array
+    # This actually gets cast to a fixed width string array
     a = np.array([(1, 'abc'), (2, 'def'), (3, 'ghi')])
     roundtrip_ndarray(a)
 
@@ -153,7 +153,7 @@ def test_numpy_dtypes_shapes_order():
                  dt)
     roundtrip_ndarray(a)
 
-    # what about endianess
+    # what about endianness
     a = np.arange(10, dtype='>i8')
     roundtrip_ndarray(a)
 

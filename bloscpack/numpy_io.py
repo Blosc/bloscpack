@@ -98,7 +98,7 @@ class PlainNumpySource(PlainSource):
 def _conv(descr):
     """ Converts nested list of lists into list of tuples.
 
-    Needed for backwards compatability, see below.
+    Needed for backwards compatibility, see below.
 
     Examples
     --------
@@ -123,7 +123,7 @@ class PlainNumpySink(PlainSink):
         self.metadata = metadata
         if metadata is None or metadata['container'] != 'numpy':
             raise NotANumpyArray
-        # The try except is a backwards compatability hack for the old way of
+        # The try except is a backwards compatibility hack for the old way of
         # serializing ndarray dtype which was used prior to 0.7.2. For basic
         # dtyepes, the dtype 'descr' was serialized directly to json and not
         # via 'repr'.  As such, it does not need to be evaluated, but instead

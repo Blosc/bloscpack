@@ -10,7 +10,7 @@ from bloscpack.pretty import (pretty_size,
                               )
 
 
-def test_pretty_filesieze():
+def test_pretty_filesize():
 
     assert '0B' == pretty_size(0)
     assert '9.0T' == pretty_size(9898989898879)

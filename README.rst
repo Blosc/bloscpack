@@ -453,11 +453,11 @@ Python API
 ----------
 
 Bloscpack has a versatile yet simple API consisting of a series of 'arguments'
-objects and high-level functions that can be invoked dependding on your input
+objects and high-level functions that can be invoked depending on your input
 and output needs.
 
 Nomenclature wise, Python 3 has done a lot for Bloscpack, because we always
-need to represent compressed data as bytes deliberatey. This makes it easier
+need to represent compressed data as bytes deliberately. This makes it easier
 and more natural to distinguish between text, such a filenames and binary and
 bytes objects such as compressed data.
 

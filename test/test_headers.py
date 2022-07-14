@@ -163,7 +163,7 @@ def test_decode_blosc_header_deactivate_shuffle():
     assert expected == header_slice
 
 
-def test_decode_blosc_header_uncompressible_data():
+def test_decode_blosc_header_incompressible_data():
     array_ = np.asarray(np.random.randn(255),
                         dtype=np.float32).tobytes()
     blosc_args = BloscArgs()
@@ -180,7 +180,7 @@ def test_decode_blosc_header_uncompressible_data():
     assert expected == header
 
 
-def test_decode_blosc_header_uncompressible_data_dont_split_false():
+def test_decode_blosc_header_incompressible_data_dont_split_false():
     array_ = np.asarray(np.random.randn(256),
                         dtype=np.float32).tobytes()
     blosc_args = BloscArgs()

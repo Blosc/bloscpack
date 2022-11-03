@@ -9,8 +9,6 @@ import itertools
 import os.path as path
 
 import blosc
-import six
-from six.moves import xrange
 from deprecated import deprecated
 
 
@@ -87,7 +85,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
     serializer_impl = SERIALIZERS_LOOKUP[metadata_args.magic_format]
     metadata = serializer_impl.dumps(metadata)
     meta_size = len(metadata)
-    if six.PY3 and isinstance(metadata, str):
+    if isinstance(metadata, str):
         metadata = metadata.encode()
     if metadata_args.should_compress:
         codec_impl = metadata_args.meta_codec_impl
@@ -129,7 +127,7 @@ def _write_metadata(output_fp, metadata, metadata_args):
     output_fp.write(raw_metadata_header)
     output_fp.write(metadata)
     prealloc = max_meta_size - meta_comp_size
-    for i in xrange(prealloc):
+    for i in range(prealloc):
         output_fp.write(b'\x00')
     metadata_total += prealloc
     log.debug("metadata has %d preallocated empty bytes" % prealloc)
@@ -228,7 +226,7 @@ def _read_metadata(input_fp):
             ('compressed' if metadata_header.meta_codec != 'None' else
                 'uncompressed', metadata_header.meta_comp_size))
     serializer_impl = SERIALIZERS_LOOKUP[metadata_header.magic_format]
-    if six.PY3 and isinstance(metadata, bytes):
+    if isinstance(metadata, bytes):
         metadata = metadata.decode()
     metadata = serializer_impl.loads(metadata)
     return metadata, metadata_header
@@ -258,7 +256,7 @@ def _read_offsets(input_fp, bloscpack_header):
         offsets_raw = input_fp.read(8 * total_entries)
         log.debug('Read raw offsets: %s' % repr(offsets_raw))
         offsets = [decode_int64(offsets_raw[j - 8:j]) for j in
-                   xrange(8, bloscpack_header.nchunks * 8 + 1, 8)]
+                   range(8, bloscpack_header.nchunks * 8 + 1, 8)]
         log.debug('Offsets: %s' % offsets)
         return offsets
     else:
@@ -364,7 +362,7 @@ class CompressedFPSource(CompressedSource):
         self.nchunks = self.bloscpack_header.nchunks
 
     def __iter__(self):
-        for i in xrange(self.nchunks):
+        for i in range(self.nchunks):
             compressed, header, digest = _read_compressed_chunk_fp(self.input_fp, self.checksum_impl)
             yield compressed, digest
 

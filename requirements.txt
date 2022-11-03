@@ -1,4 +1,3 @@
 blosc
 numpy
-six
 deprecated

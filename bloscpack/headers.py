@@ -12,7 +12,6 @@ except ImportError:
 
 
 import blosc
-from six import PY3, integer_types, binary_type
 
 from .abstract_objects import (MutableMappingObject,
                                )
@@ -41,7 +40,7 @@ from . import log
 
 def check_range(name, value, min_, max_):
     """ Check that a variable is in range. """
-    if not isinstance(value, integer_types):
+    if not isinstance(value, int):
         raise TypeError("'%s' must be of type 'int'" % name)
     elif not min_ <= value <= max_:
         raise ValueError(
@@ -50,7 +49,7 @@ def check_range(name, value, min_, max_):
 
 
 def _check_str(name, value, max_len):
-    if not isinstance(value, binary_type):
+    if not isinstance(value, bytes):
         raise TypeError("'%s' must be of type 'str'/'bytes'" % name)
     elif len(value) > max_len:
         raise ValueError("'%s' can be of max length '%i' but is: '%s'" %
@@ -104,10 +103,7 @@ def check_options_zero(options, indices):
 
 
 def decode_uint8(byte):
-    if PY3:
-        return byte
-    else:
-        return struct.unpack('<B', byte)[0]
+    return byte
 
 
 def decode_uint32(fourbyte):
@@ -127,10 +123,7 @@ def decode_bitfield(byte):
 
 
 def decode_magic_string(str_):
-    if PY3:
-        return str_.strip(b'\x00')
-    else:
-        return str_.strip('\x00')
+    return str_.strip(b'\x00')
 
 
 def encode_uint8(byte):

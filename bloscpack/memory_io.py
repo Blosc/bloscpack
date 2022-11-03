@@ -3,7 +3,6 @@
 # vim :set ft=py:
 
 import blosc
-from six.moves import xrange
 
 from .abstract_io import (PlainSource,
                           CompressedSource,
@@ -39,7 +38,7 @@ class CompressedMemorySource(CompressedSource):
             self.checksums = compressed_memory_sink.checksums
 
     def __iter__(self):
-        for i in xrange(self.nchunks):
+        for i in range(self.nchunks):
             compressed = self.chunks[i]
             digest = self.checksums[i] if self.checksum else None
             yield compressed, digest
